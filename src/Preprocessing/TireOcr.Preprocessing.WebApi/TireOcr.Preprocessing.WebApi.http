@@ -1,0 +1,6 @@
+@TireOcr.Preprocessing.WebApi_HostAddress = http://localhost:5254
+
+GET {{TireOcr.Preprocessing.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
