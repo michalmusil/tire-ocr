@@ -1,5 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+#
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Preprocessing", "Preprocessing", "{EBDF096A-73D6-4FD1-B646-BF021E2CF320}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Preprocessing.WebApi", "src\Preprocessing\TireOcr.Preprocessing.WebApi\TireOcr.Preprocessing.WebApi.csproj", "{525474C0-9249-4040-9784-F9673CBAD457}"
@@ -9,6 +10,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Preprocessing.Application", "src\Preprocessing\TireOcr.Preprocessing.Application\TireOcr.Preprocessing.Application.csproj", "{E193D60E-A067-4A26-A90F-75E79ACB478D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Preprocessing.Infrastructure", "src\Preprocessing\TireOcr.Preprocessing.Infrastructure\TireOcr.Preprocessing.Infrastructure.csproj", "{3B45F63F-C54D-45E8-8353-B21D7AD0D178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.AppHost", "src\TireOcr.AppHost\TireOcr.AppHost.csproj", "{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.ServiceDefaults", "src\TireOcr.ServiceDefaults\TireOcr.ServiceDefaults.csproj", "{9287AC9D-EA8D-4DBB-BD6A-FB07175D7E49}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,5 +43,13 @@ Global
 		{3B45F63F-C54D-45E8-8353-B21D7AD0D178}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B45F63F-C54D-45E8-8353-B21D7AD0D178}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B45F63F-C54D-45E8-8353-B21D7AD0D178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9287AC9D-EA8D-4DBB-BD6A-FB07175D7E49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9287AC9D-EA8D-4DBB-BD6A-FB07175D7E49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9287AC9D-EA8D-4DBB-BD6A-FB07175D7E49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9287AC9D-EA8D-4DBB-BD6A-FB07175D7E49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\TireOcr.ServiceDefaults\TireOcr.ServiceDefaults.csproj" />
       <ProjectReference Include="..\TireOcr.Preprocessing.Application\TireOcr.Preprocessing.Application.csproj" />
     </ItemGroup>
 
