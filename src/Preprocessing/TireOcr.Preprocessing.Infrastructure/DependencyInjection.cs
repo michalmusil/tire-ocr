@@ -15,5 +15,6 @@ public static class DependencyInjection
     private static void AddServices(IServiceCollection services)
     {
         services.AddSingleton<IImageManipulationService, OpenCvImageManipulationService>();
+        services.AddSingleton<ITireDetectionService, YoloTireDetectionService>();
     }
 }

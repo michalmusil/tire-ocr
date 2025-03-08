@@ -11,8 +11,4 @@
       <ProjectReference Include="..\TireOcr.Preprocessing.Domain\TireOcr.Preprocessing.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Commands\" />
-    </ItemGroup>
-
 </Project>
