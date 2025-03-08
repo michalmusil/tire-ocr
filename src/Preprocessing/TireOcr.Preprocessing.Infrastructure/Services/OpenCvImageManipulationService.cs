@@ -42,7 +42,7 @@ public class OpenCvImageManipulationService : IImageManipulationService
         Size? tileGridSize = windowSize is null ? null : new Size(windowSize.Width, windowSize.Height);
         using var clahe = Cv2.CreateCLAHE(clipLimit, tileGridSize);
 
-        using var input = image.ToCv2();
+        using var input = image.ToCv2().CvtColor(ColorConversionCodes.BGR2GRAY);
         using var output = new Mat();
 
         clahe.Apply(input, output);
