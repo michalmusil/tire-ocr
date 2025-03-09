@@ -4,16 +4,8 @@ namespace TireOcr.Preprocessing.Domain.Common;
 
 public class CircleInImage : ValueObject
 {
-    public ImageCoordinate Center { get; }
-    public double InnerRadius { get; }
-    public double OuterRadius { get; }
+    public required ImageCoordinate Center { get; init; }
+    public required double Radius { get; init; }
 
-    public CircleInImage(ImageCoordinate center, double innerRadius, double outerRadius)
-    {
-        Center = center;
-        InnerRadius = innerRadius;
-        OuterRadius = outerRadius;
-    }
-
-    protected override IEnumerable<object?> GetEqualityComponents() => [Center, InnerRadius, OuterRadius];
+    protected override IEnumerable<object?> GetEqualityComponents() => [Center, Radius];
 }

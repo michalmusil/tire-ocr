@@ -5,6 +5,7 @@ namespace TireOcr.Preprocessing.Application.Services;
 
 public interface IImageManipulationService
 {
+    public ImageSize GetRawImageSize(byte[] rawImage);
     public Image ResizeToMaxSideSize(Image image, int maxSide);
     public Image ApplyGrayscale(Image image);
     public Image ApplyClahe(Image image, double clipLimit = 40.0, ImageSize? windowSize = null);
