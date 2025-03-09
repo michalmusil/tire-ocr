@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
 using TireOcr.Preprocessing.Infrastructure.Models;
 using TireOcr.Preprocessing.Infrastructure.Services.ModelDownloader;
@@ -17,8 +18,8 @@ public class MlModelResolver : IMlModelResolver
         _modelDownloader = modelDownloader;
         _factories = new()
         {
-            { typeof(YoloTireDetectionService), () => GetModel("TireSegmentation") },
-            { typeof(YoloTextDetectionService), () => GetModel("StripCharacterDetection") }
+            { typeof(ITireDetectionService), () => GetModel("TireSegmentation") },
+            { typeof(ITextDetectionService), () => GetModel("StripCharacterDetection") }
         };
     }
 
