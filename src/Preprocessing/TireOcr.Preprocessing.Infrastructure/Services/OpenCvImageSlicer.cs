@@ -1,0 +1,79 @@
+using OpenCvSharp;
+using TireOcr.Preprocessing.Application.Services;
+using TireOcr.Preprocessing.Domain.ImageEntity;
+using TireOcr.Preprocessing.Infrastructure.Extensions;
+using TireOcr.Shared.Result;
+
+namespace TireOcr.Preprocessing.Infrastructure.Services;
+
+public class OpenCvImageSlicer : IImageSlicer
+{
+    public async Task<DataResult<IEnumerable<Image>>> SliceImage(
+        Image image,
+        ImageSize sliceSize,
+        double xOverlapRatio,
+        double yOverlapRatio
+    )
+    {
+        try
+        {
+            using var inputImage = image.ToCv2();
+            var height = inputImage.Height;
+            var width = inputImage.Width;
+
+            var realSliceWidth = sliceSize.Width;
+            var realSliceHeight = sliceSize.Height;
+
+            var overlapWidth = xOverlapRatio * realSliceWidth;
+            var overlapHeight = yOverlapRatio * realSliceHeight;
+
+            var logicalSliceWidth = realSliceWidth - overlapWidth;
+            var logicalSliceHeight = realSliceHeight - overlapHeight;
+
+            var startingXs = GenerateRange(0, width, logicalSliceWidth);
+            var startingYs = GenerateRange(0, height, logicalSliceHeight);
+
+            var slices = new List<Mat>();
+            foreach (var y in startingYs)
+            {
+                foreach (var x in startingXs)
+                {
+                    var xmin = (int)x;
+                    var ymin = (int)y;
+                    var xmax = (int)Math.Min(x + realSliceWidth, width);
+                    var ymax = (int)Math.Min(y + realSliceHeight, height);
+
+                    var rect = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
+                    slices.Add(new Mat(inputImage, rect));
+                }
+            }
+
+            var resultImages = new List<Image>();
+            for (var i = 0; i < slices.Count; i++)
+            {
+                var slice = slices[i];
+                var imageName = $"{image.Name}_{i + 1}";
+                resultImages.Add(slice.ToDomain(imageName));
+
+                slice.Dispose();
+            }
+
+            return DataResult<IEnumerable<Image>>.Success(resultImages);
+        }
+        catch (Exception ex)
+        {
+            return DataResult<IEnumerable<Image>>.Failure(new Failure(500, "Failed to slice image."));
+        }
+    }
+
+    private static List<double> GenerateRange(double start, double end, double step)
+    {
+        var range = new List<double>();
+        for (double i = start; i < end; i += step)
+        {
+            range.Add(i);
+        }
+
+        return range;
+    }
+}
