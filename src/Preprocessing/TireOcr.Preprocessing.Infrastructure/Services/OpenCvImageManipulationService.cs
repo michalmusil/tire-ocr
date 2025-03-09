@@ -8,6 +8,11 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 
 public class OpenCvImageManipulationService : IImageManipulationService
 {
+    public ImageSize GetRawImageSize(byte[] rawImage)
+    {
+        using var matImage = Mat.FromImageData(rawImage);
+        return new ImageSize(matImage.Height, matImage.Width);
+    }
     public Image ResizeToMaxSideSize(Image image, int maxSide)
     {
         var height = image.Size.Height;

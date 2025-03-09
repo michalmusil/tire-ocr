@@ -1,4 +1,5 @@
 using System.Data;
+using OpenCvSharp;
 using SkiaSharp;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
@@ -12,21 +13,67 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 
 public class YoloTireDetectionService : ITireDetectionService
 {
+    private const string RimClassName = "rim";
+
     private const string ModelPath = "...";
         
 
-    public async Task<DataResult<CircleInImage>> DetectTireCircle(Image image)
+
+    public async Task<DataResult<CircleInImage>> DetectTireRimCircle(Image image)
     {
-        throw new RowNotInTableException("TODO");
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = @"path\to\model.onnx",
-            ModelType = ModelType.ObjectDetection,
-            // Cuda = false,
+            OnnxModel = ModelPath,
+            ModelType = ModelType.Segmentation,
+            Cuda = false,
             // GpuId = 0,
             PrimeGpu = false
         });
 
-        var results = yolo.RunSegmentation(SKImage.FromBitmap(SKBitmap.Decode(image.Data)));
+        using var imageToDetect = SKImage.FromBitmap(SKBitmap.Decode(image.Data));
+        var results = yolo.RunSegmentation(imageToDetect);
+        var rimMaskResult = results.FirstOrDefault(res =>
+            string.Equals(res.Label.Name, RimClassName, StringComparison.CurrentCultureIgnoreCase));
+        if (rimMaskResult is null)
+            return DataResult<CircleInImage>.NotFound("No tire rim was detected in the image.");
+
+
+        using var mask = ConvertSegmentationMaskToMat(
+                detectedImage: imageToDetect,
+                segmentationResult: rimMaskResult)
+            .Threshold(1, 255, ThresholdTypes.Binary);
+
+        using var invertedMask = new Mat();
+        Cv2.BitwiseNot(mask, invertedMask);
+
+        invertedMask.FindContours(out var contours, out _,
+            RetrievalModes.External,
+            ContourApproximationModes.ApproxSimple);
+        var largestContour = contours.MaxBy(p => p.Length);
+        if (largestContour is null)
+            return DataResult<CircleInImage>.NotFound("No tire rim was detected in the image.");
+
+        Cv2.MinEnclosingCircle(largestContour, out var center, out var radius);
+        var rimCircle = new CircleInImage
+        {
+            Center = new ImageCoordinate((int)center.X, (int)center.Y),
+            Radius = radius
+        };
+
+        return DataResult<CircleInImage>.Success(rimCircle);
+    }
+
+    private Mat ConvertSegmentationMaskToMat(SKImage detectedImage, Segmentation segmentationResult)
+    {
+        var height = detectedImage.Height;
+        var width = detectedImage.Width;
+
+        var rimMask = new Mat(height, width, MatType.CV_8UC1, Scalar.White);
+        foreach (var pixel in segmentationResult.SegmentedPixels)
+        {
+            rimMask.Set(pixel.Y, pixel.X, 0);
+        }
+
+        return rimMask;
     }
 }

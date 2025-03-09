@@ -6,5 +6,5 @@ namespace TireOcr.Preprocessing.Application.Services;
 
 public interface ITireDetectionService
 {
-    public Task<DataResult<CircleInImage>> DetectTireCircle(Image image);
+    public Task<DataResult<CircleInImage>> DetectTireRimCircle(Image image);
 }
