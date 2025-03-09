@@ -1,9 +1,10 @@
-using System.Data;
 using OpenCvSharp;
 using SkiaSharp;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
+using TireOcr.Preprocessing.Infrastructure.Extensions;
+using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 using TireOcr.Shared.Result;
 using YoloDotNet;
 using YoloDotNet.Enums;
@@ -14,16 +15,22 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 public class YoloTireDetectionService : ITireDetectionService
 {
     private const string RimClassName = "rim";
+    private readonly IMlModelResolver _modelResolver;
 
-    private const string ModelPath = "...";
-        
-
+    public YoloTireDetectionService(IMlModelResolver modelResolver)
+    {
+        _modelResolver = modelResolver;
+    }
 
     public async Task<DataResult<CircleInImage>> DetectTireRimCircle(Image image)
     {
+        var modelToUse = _modelResolver.Resolve<YoloTireDetectionService>();
+        if (modelToUse is null)
+            return DataResult<CircleInImage>.Failure(new Failure(500, "Failed to load Ml model for tire detection"));
+
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = ModelPath,
+            OnnxModel = modelToUse.GetAbsolutePath(),
             ModelType = ModelType.Segmentation,
             Cuda = false,
             // GpuId = 0,
