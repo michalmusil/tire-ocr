@@ -26,7 +26,7 @@ public class YoloTireDetectionService : ITireDetectionService
 
     public async Task<DataResult<CircleInImage>> DetectTireRimCircle(Image image)
     {
-        var modelToUse = _modelResolver.Resolve<YoloTireDetectionService>();
+        var modelToUse = _modelResolver.Resolve<ITireDetectionService>();
         if (modelToUse is null)
             return DataResult<CircleInImage>.Failure(new Failure(500, "Failed to load Ml model for tire detection"));
 
@@ -35,7 +35,6 @@ public class YoloTireDetectionService : ITireDetectionService
             OnnxModel = modelToUse.GetAbsolutePath(),
             ModelType = ModelType.Segmentation,
             Cuda = false,
-            // GpuId = 0,
             PrimeGpu = false
         });
 

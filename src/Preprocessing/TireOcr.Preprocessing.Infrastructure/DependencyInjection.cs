@@ -22,11 +22,13 @@ public static class DependencyInjection
 
     private static void AddServices(IServiceCollection services)
     {
-        services.AddSingleton<IImageManipulationService, OpenCvImageManipulationService>();
-        services.AddSingleton<ITireDetectionService, YoloTireDetectionService>();
-        services.AddSingleton<IImageSlicer, OpenCvImageSlicer>();
-
         services.AddTransient<IMlModelDownloader, MlModelDownloader>();
         services.AddSingleton<IMlModelResolver, MlModelResolver>();
+        
+        services.AddScoped<IImageManipulationService, OpenCvImageManipulationService>();
+        services.AddScoped<ITireDetectionService, YoloTireDetectionService>();
+        services.AddScoped<ITextDetectionService, YoloTextDetectionService>();
+        services.AddScoped<IImageSlicer, OpenCvImageSlicer>();
+        services.AddScoped<IImageTextApproximator, ImageTextApproximator>();
     }
 }
