@@ -24,6 +24,8 @@ public static class DependencyInjection
     {
         services.AddSingleton<IImageManipulationService, OpenCvImageManipulationService>();
         services.AddSingleton<ITireDetectionService, YoloTireDetectionService>();
+        services.AddSingleton<IImageSlicer, OpenCvImageSlicer>();
+
         services.AddTransient<IMlModelDownloader, MlModelDownloader>();
         services.AddSingleton<IMlModelResolver, MlModelResolver>();
     }

@@ -15,6 +15,8 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 public class YoloTireDetectionService : ITireDetectionService
 {
     private const string RimClassName = "rim";
+    private const double ConfidenceThreshold = 0.6;
+
     private readonly IMlModelResolver _modelResolver;
 
     public YoloTireDetectionService(IMlModelResolver modelResolver)
@@ -41,9 +43,8 @@ public class YoloTireDetectionService : ITireDetectionService
         var results = yolo.RunSegmentation(imageToDetect);
         var rimMaskResult = results.FirstOrDefault(res =>
             string.Equals(res.Label.Name, RimClassName, StringComparison.CurrentCultureIgnoreCase));
-        if (rimMaskResult is null)
+        if (rimMaskResult is null || rimMaskResult.Confidence < ConfidenceThreshold)
             return DataResult<CircleInImage>.NotFound("No tire rim was detected in the image.");
-
 
         using var mask = ConvertSegmentationMaskToMat(
                 detectedImage: imageToDetect,
