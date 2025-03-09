@@ -25,15 +25,24 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
     {
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var image = new Image(request.ImageData, request.ImageName, originalSize);
-        
+
         var resized = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
-        var withClahe = _imageManipulationService.ApplyClahe(resized);
+        var withClahe = _imageManipulationService.ApplyClahe(resized, windowSize: new ImageSize(10, 10));
 
         var circlesResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
         if (circlesResult.IsFailure)
             return DataResult<PreprocessedImageDto>.Failure(circlesResult.Failures);
-        
-        var dto = new PreprocessedImageDto(withClahe.Name, withClahe.Data, "image/jpeg");
+
+        var rimCircle = circlesResult.Data!;
+        var outerTireRadius = rimCircle.Radius * 1.25;
+        var innerTireRadius = rimCircle.Radius * 0.9;
+        var unwrapped = _imageManipulationService.UnwrapRingIntoRectangle(withClahe,
+            rimCircle.Center,
+            innerTireRadius,
+            outerTireRadius
+        );
+
+        var dto = new PreprocessedImageDto(unwrapped.Name, unwrapped.Data, "image/jpeg");
         return DataResult<PreprocessedImageDto>.Success(dto);
     }
 }

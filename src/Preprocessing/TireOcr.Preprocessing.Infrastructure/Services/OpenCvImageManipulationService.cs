@@ -13,6 +13,7 @@ public class OpenCvImageManipulationService : IImageManipulationService
         using var matImage = Mat.FromImageData(rawImage);
         return new ImageSize(matImage.Height, matImage.Width);
     }
+
     public Image ResizeToMaxSideSize(Image image, int maxSide)
     {
         var height = image.Size.Height;
@@ -58,7 +59,7 @@ public class OpenCvImageManipulationService : IImageManipulationService
     {
         var inner = (int)innerRadius;
         var outer = (int)outerRadius;
-        int finalWidth = (int)(2 * Math.PI * innerRadius);
+        int croppedHeight = (int)(2 * Math.PI * innerRadius);
 
         using var input = image.ToCv2();
         using var fullPolar = new Mat();
@@ -66,21 +67,24 @@ public class OpenCvImageManipulationService : IImageManipulationService
         Cv2.WarpPolar(
             input,
             fullPolar,
-            new Size(finalWidth, outer),
+            new Size(outer, croppedHeight),
             new Point2f(center.X, center.Y),
             outerRadius,
-            interpolationFlags: InterpolationFlags.Nearest | InterpolationFlags.Cubic,
+            interpolationFlags: InterpolationFlags.Cubic,
             warpPolarMode: WarpPolarMode.Linear
         );
 
+        var tireThickness = outer - inner;
         using var croppedResult = new Mat(
             fullPolar,
-            new Rect(0, (int)innerRadius, fullPolar.Width, fullPolar.Height - (int)innerRadius)
+            new Rect(
+                location: new Point(X: (fullPolar.Width - tireThickness), Y: 0),
+                size: new Size(width: tireThickness, height: croppedHeight)
+            )
         );
-        
         using var rotatedResult = new Mat();
-        Cv2.Rotate(croppedResult, rotatedResult, RotateFlags.Rotate90Clockwise);
-        
+        Cv2.Rotate(croppedResult, rotatedResult, RotateFlags.Rotate90Counterclockwise);
+
         return rotatedResult.ToDomain(image.Name);
     }
 }
