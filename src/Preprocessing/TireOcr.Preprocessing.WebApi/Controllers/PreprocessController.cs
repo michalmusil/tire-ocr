@@ -31,7 +31,7 @@ public class PreprocessController : ControllerBase
     public async Task<ActionResult> PreprocessImage([FromForm] PreprocessImageRequest request)
     {
         var imageData = await request.Image.ToByteArray();
-        var query = new GetPreprocessedImageQuery(imageData, request.Image.FileName);
+        var query = new GetPreprocessedImageQuery(imageData, request.Image.FileName, request.Image.ContentType);
         var result = await _mediator.Send(query);
 
         return result.Map(
