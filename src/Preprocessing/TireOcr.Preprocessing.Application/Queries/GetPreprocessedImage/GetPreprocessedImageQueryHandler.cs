@@ -1,4 +1,5 @@
 using TireOcr.Preprocessing.Application.Dtos;
+using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
@@ -11,14 +12,14 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
-    private readonly IImageSlicer _imageSlicer;
+    private readonly ITextDetectionFacade _textDetectionFacade;
 
     public GetPreprocessedImageQueryHandler(IImageManipulationService imageManipulationService,
-        ITireDetectionService tireDetectionService, IImageSlicer imageSlicer)
+        ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
-        _imageSlicer = imageSlicer;
+        _textDetectionFacade = textDetectionFacade;
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
@@ -40,15 +41,16 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
             return DataResult<PreprocessedImageDto>.Failure(circlesResult.Failures);
 
         var unwrapped = GetUnwrappedTireStrip(withClahe, circlesResult.Data!);
-        var slicesResult = await SliceTireStrip(unwrapped);
-        if (slicesResult.IsFailure)
-            return DataResult<PreprocessedImageDto>.Failure(slicesResult.Failures);
 
-        var slices = slicesResult.Data!.ToList();
-
-
-        var dto = new PreprocessedImageDto(slices[0].Name, slices[0].Data, "image/jpeg");
-        return DataResult<PreprocessedImageDto>.Success(dto);
+        var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(unwrapped);
+        return textArea.Map(
+            onFailure: failures => DataResult<PreprocessedImageDto>.Failure(failures),
+            onSuccess: res =>
+            {
+                var resultDto = new PreprocessedImageDto(res.BestImage.Name, res.BestImage.Data, "image/jpeg");
+                return DataResult<PreprocessedImageDto>.Success(resultDto);
+            }
+        );
     }
 
     private Image GetUnwrappedTireStrip(Image image, CircleInImage rimCircle)
@@ -60,15 +62,5 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
             innerTireRadius,
             outerTireRadius
         );
-    }
-
-    private async Task<DataResult<IEnumerable<Image>>> SliceTireStrip(Image image)
-    {
-        var sliceSize = new ImageSize(
-            image.Size.Height,
-            (int)(image.Size.Width * 0.2)
-        );
-
-        return await _imageSlicer.SliceImage(image, sliceSize, 0.3, 0);
     }
 }
