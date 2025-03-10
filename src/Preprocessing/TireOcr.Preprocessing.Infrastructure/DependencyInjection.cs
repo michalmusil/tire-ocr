@@ -33,6 +33,7 @@ public static class DependencyInjection
         services.AddScoped<ITextDetectionService, YoloTextDetectionService>();
         services.AddScoped<IImageSlicer, OpenCvImageSlicer>();
         services.AddScoped<IImageTextApproximator, ImageTextApproximator>();
+        services.AddScoped<IContentTypeResolver, ContentTypeResolver>();
     }
 
     private static void AddFacades(IServiceCollection services)

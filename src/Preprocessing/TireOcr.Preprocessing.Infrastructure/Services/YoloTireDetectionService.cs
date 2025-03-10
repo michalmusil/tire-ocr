@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using OpenCvSharp;
 using SkiaSharp;
+using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
@@ -24,11 +26,15 @@ public class YoloTireDetectionService : ITireDetectionService
         _modelResolver = modelResolver;
     }
 
-    public async Task<DataResult<CircleInImage>> DetectTireRimCircle(Image image)
+    public async Task<DataResult<TireDetectionResult>> DetectTireRimCircle(Image image)
     {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+
         var modelToUse = _modelResolver.Resolve<ITireDetectionService>();
         if (modelToUse is null)
-            return DataResult<CircleInImage>.Failure(new Failure(500, "Failed to load Ml model for tire detection"));
+            return DataResult<TireDetectionResult>.Failure(new Failure(500,
+                "Failed to load Ml model for tire detection"));
 
         using var yolo = new Yolo(new YoloOptions
         {
@@ -43,7 +49,7 @@ public class YoloTireDetectionService : ITireDetectionService
         var rimMaskResult = results.FirstOrDefault(res =>
             string.Equals(res.Label.Name, RimClassName, StringComparison.CurrentCultureIgnoreCase));
         if (rimMaskResult is null || rimMaskResult.Confidence < ConfidenceThreshold)
-            return DataResult<CircleInImage>.NotFound("No tire rim was detected in the image.");
+            return DataResult<TireDetectionResult>.NotFound("No tire rim was detected in the image.");
 
         using var mask = ConvertSegmentationMaskToMat(
                 detectedImage: imageToDetect,
@@ -58,7 +64,7 @@ public class YoloTireDetectionService : ITireDetectionService
             ContourApproximationModes.ApproxSimple);
         var largestContour = contours.MaxBy(p => p.Length);
         if (largestContour is null)
-            return DataResult<CircleInImage>.NotFound("No tire rim was detected in the image.");
+            return DataResult<TireDetectionResult>.NotFound("No tire rim was detected in the image.");
 
         Cv2.MinEnclosingCircle(largestContour, out var center, out var radius);
         var rimCircle = new CircleInImage
@@ -67,7 +73,11 @@ public class YoloTireDetectionService : ITireDetectionService
             Radius = radius
         };
 
-        return DataResult<CircleInImage>.Success(rimCircle);
+        stopWatch.Stop();
+        var timeTaken = stopWatch.Elapsed;
+        var result = new TireDetectionResult(rimCircle, timeTaken);
+
+        return DataResult<TireDetectionResult>.Success(result);
     }
 
     private Mat ConvertSegmentationMaskToMat(SKImage detectedImage, Segmentation segmentationResult)

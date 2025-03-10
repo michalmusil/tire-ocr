@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
@@ -13,13 +14,18 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
     private readonly ITextDetectionFacade _textDetectionFacade;
+    private readonly IContentTypeResolver _contentTypeResolver;
+    private ILogger<GetPreprocessedImageQueryHandler> _logger;
 
     public GetPreprocessedImageQueryHandler(IImageManipulationService imageManipulationService,
-        ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade)
+        ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade,
+        IContentTypeResolver contentTypeResolver, ILogger<GetPreprocessedImageQueryHandler> logger)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _textDetectionFacade = textDetectionFacade;
+        _contentTypeResolver = contentTypeResolver;
+        _logger = logger;
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
@@ -27,6 +33,11 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         CancellationToken cancellationToken
     )
     {
+        var contentTypeSupported = _contentTypeResolver.IsContentTypeSupported(request.OriginalContentType);
+        if (!contentTypeSupported)
+            return DataResult<PreprocessedImageDto>.Invalid(
+                $"Content type {request.OriginalContentType} is not supported");
+        
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var image = new Image(request.ImageData, request.ImageName, originalSize);
 
@@ -36,18 +47,29 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
             windowSize: new ImageSize(10, 10)
         );
 
-        var circlesResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
-        if (circlesResult.IsFailure)
-            return DataResult<PreprocessedImageDto>.Failure(circlesResult.Failures);
+        var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
+        if (detectedTireResult.IsFailure)
+            return DataResult<PreprocessedImageDto>.Failure(detectedTireResult.Failures);
 
-        var unwrapped = GetUnwrappedTireStrip(withClahe, circlesResult.Data!);
+        var detectedTire = detectedTireResult.Data!;
+        var unwrapped = GetUnwrappedTireStrip(withClahe, detectedTire.RimCircle);
 
         var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(unwrapped);
+
         return textArea.Map(
             onFailure: failures => DataResult<PreprocessedImageDto>.Failure(failures),
             onSuccess: res =>
             {
-                var resultDto = new PreprocessedImageDto(res.BestImage.Name, res.BestImage.Data, "image/jpeg");
+                var tireDetectionSeconds = detectedTire.TimeTaken.TotalSeconds;
+                var textDetectionSeconds = res.TimeTaken.TotalSeconds;
+                _logger.LogInformation(
+                    $"Preprocessing completed:\nTire detection: {tireDetectionSeconds}s\nText detection: {textDetectionSeconds}s");
+
+                var resultDto = new PreprocessedImageDto(
+                    res.BestImage.Name,
+                    res.BestImage.Data,
+                    request.OriginalContentType
+                );
                 return DataResult<PreprocessedImageDto>.Success(resultDto);
             }
         );
