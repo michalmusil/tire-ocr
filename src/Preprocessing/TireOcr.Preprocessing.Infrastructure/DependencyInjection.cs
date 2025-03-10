@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
+using TireOcr.Preprocessing.Infrastructure.Facades;
 using TireOcr.Preprocessing.Infrastructure.Services;
 using TireOcr.Preprocessing.Infrastructure.Services.ModelDownloader;
 using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
@@ -12,6 +14,7 @@ public static class DependencyInjection
     {
         AddClients(services);
         AddServices(services);
+        AddFacades(services);
         return services;
     }
 
@@ -24,11 +27,16 @@ public static class DependencyInjection
     {
         services.AddTransient<IMlModelDownloader, MlModelDownloader>();
         services.AddSingleton<IMlModelResolver, MlModelResolver>();
-        
+
         services.AddScoped<IImageManipulationService, OpenCvImageManipulationService>();
         services.AddScoped<ITireDetectionService, YoloTireDetectionService>();
         services.AddScoped<ITextDetectionService, YoloTextDetectionService>();
         services.AddScoped<IImageSlicer, OpenCvImageSlicer>();
         services.AddScoped<IImageTextApproximator, ImageTextApproximator>();
+    }
+
+    private static void AddFacades(IServiceCollection services)
+    {
+        services.AddScoped<ITextDetectionFacade, TextDetectionFacade>();
     }
 }

@@ -5,5 +5,9 @@ namespace TireOcr.Preprocessing.Application.Services;
 
 public interface IImageTextApproximator
 {
-    public DataResult<IEnumerable<string>> Approximate(IEnumerable<CharacterInImage> imageCharacters);
+    public DataResult<IEnumerable<string>> ApproximateStringsFromCharacters(
+        IEnumerable<CharacterInImage> imageCharacters
+    );
+
+    public DataResult<Dictionary<string, int>> GetTireCodeLevenshteinDistanceOfStrings(IEnumerable<string> strings);
 }

@@ -26,6 +26,8 @@ public class PreprocessController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult> PreprocessImage([FromForm] PreprocessImageRequest request)
     {
         var imageData = await request.Image.ToByteArray();
