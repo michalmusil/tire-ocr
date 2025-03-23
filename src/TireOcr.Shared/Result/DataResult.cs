@@ -35,6 +35,15 @@ public class DataResult<T> : Result
         return onFailure(Failures);
     }
     
+    public Task<TResult> MapAsync<TResult>(Func<T, Task<TResult>> onSuccess, Func<Failure[], Task<TResult>> onFailure)
+    {
+        if (IsSuccess)
+        {
+            return onSuccess(Data!);
+        }
+
+        return onFailure(Failures);
+    }
     public new static DataResult<T> Unauthorized(string message, params Failure[] failures) =>
         Failure(new[] { new Failure(401, message) }.Concat(failures).ToArray());
 
