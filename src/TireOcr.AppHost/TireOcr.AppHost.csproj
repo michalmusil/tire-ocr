@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ocr\TireOcr.Ocr.WebApi\TireOcr.Ocr.WebApi.csproj" />
     <ProjectReference Include="..\Preprocessing\TireOcr.Preprocessing.WebApi\TireOcr.Preprocessing.WebApi.csproj" />
   </ItemGroup>
 
