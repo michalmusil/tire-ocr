@@ -7,11 +7,9 @@ public class GetPreprocessedImageQueryValidator : AbstractValidator<GetPreproces
     public GetPreprocessedImageQueryValidator()
     {
         RuleFor(q => q.ImageName)
-            .NotNull()
             .NotEmpty();
 
         RuleFor(q => q.ImageData)
-            .NotNull()
             .NotEmpty();
     }
 }
