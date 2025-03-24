@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using TireOcr.Ocr.Application.Dtos;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
+using TireOcr.Ocr.Infrastructure.Dtos.GoogleGeminiResponse;
 using TireOcr.Ocr.Infrastructure.Services.ImageUtils;
 using TireOcr.Shared.Result;
 
@@ -16,7 +17,7 @@ public class GoogleGeminiTireCodeDetector : ITireCodeDetector
     private readonly IConfiguration _configuration;
 
     private readonly string _prompt =
-        "In the following image, there should be a picture of a portion of a car tire. On this picture, there should be embossed tire code. The format is for example: \"185/75R1482S\". Please read the tire code from the image and return it in following JSON format: {\"TireCode\" \"185/75R1482S\"}";
+        "In the following image, there should be a picture of a portion of a car tire. On this picture, there should be embossed tire code. The format is for example: \"185/75R1482S\" or \"P215/55ZR1895V\". Keep in mind that the \"/\" character has to be in the output. Please read the tire code from the image and return only the detected code string itself (for example just \"210/60ZR15\"). If you can't detect any tire code in the photo for whatever reason, just answer with letter \"N\" and nothing else.";
 
 
     public GoogleGeminiTireCodeDetector(HttpClient httpClient, IImageUtils imageUtils, IConfiguration configuration)
@@ -40,9 +41,17 @@ public class GoogleGeminiTireCodeDetector : ITireCodeDetector
 
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
-            var responseDictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(responseContent);
+            var responseDto = JsonConvert.DeserializeObject<GoogleGeminiResponseDto>(responseContent);
 
-            var result = new OcrResultDto("");
+            var foundTireCode = responseDto.ContentCandidates
+                .SelectMany(c => c.Content.Parts)
+                .FirstOrDefault(p => !string.IsNullOrEmpty(p.Text) && p.Text.Contains('/'))
+                ?.Text;
+
+            if (foundTireCode is null)
+                return DataResult<OcrResultDto>.NotFound("No tire code detected");
+
+            var result = new OcrResultDto(foundTireCode);
             return DataResult<OcrResultDto>.Success(result);
         }
         catch (Exception e)
