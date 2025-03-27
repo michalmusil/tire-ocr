@@ -22,10 +22,11 @@ public class TireCodeDetectorResolver : ITireCodeDetectorResolver
 
     public DataResult<ITireCodeDetector> Resolve(TireCodeDetectorType detectorType)
     {
-        var detector = detectorType switch
+        ITireCodeDetector? detector = detectorType switch
         {
             TireCodeDetectorType.GoogleGemini => new GoogleGeminiTireCodeDetector(
                 _httpClient, _imageUtils, _configuration),
+            TireCodeDetectorType.MistralPixtral => new MistralPixtralTireCodeDetector(_httpClient, _imageUtils, _configuration),
             _ => null
         };
 
