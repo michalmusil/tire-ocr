@@ -59,7 +59,7 @@ public class MistralPixtralTireCodeDetector : ITireCodeDetector
         }
         catch (Exception e)
         {
-            var failure = new Failure(500, "Failed to perform Ocr via Google Gemini Tire Code Detector");
+            var failure = new Failure(500, "Failed to perform Ocr via Mistral Pixtral Tire Code Detector");
             return DataResult<OcrResultDto>.Failure(failure);
         }
     }
