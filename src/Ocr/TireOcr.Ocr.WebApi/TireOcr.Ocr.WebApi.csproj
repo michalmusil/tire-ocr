@@ -19,4 +19,10 @@
       <ProjectReference Include="..\TireOcr.Ocr.Infrastructure\TireOcr.Ocr.Infrastructure.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="./gcp_credentials.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
