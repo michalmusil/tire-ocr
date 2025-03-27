@@ -26,7 +26,9 @@ public class TireCodeDetectorResolver : ITireCodeDetectorResolver
         {
             TireCodeDetectorType.GoogleGemini => new GoogleGeminiTireCodeDetector(
                 _httpClient, _imageUtils, _configuration),
-            TireCodeDetectorType.MistralPixtral => new MistralPixtralTireCodeDetector(_httpClient, _imageUtils, _configuration),
+            TireCodeDetectorType.MistralPixtral => new MistralPixtralTireCodeDetector(_httpClient, _imageUtils,
+                _configuration),
+            TireCodeDetectorType.OpenAiGpt => new OpenAiGptTireCodeDetector(_configuration),
             _ => null
         };
 
