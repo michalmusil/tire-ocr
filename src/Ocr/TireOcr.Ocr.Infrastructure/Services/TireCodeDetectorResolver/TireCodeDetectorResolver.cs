@@ -30,10 +30,11 @@ public class TireCodeDetectorResolver : ITireCodeDetectorResolver
                 _configuration),
             TireCodeDetectorType.OpenAiGpt => new OpenAiGptTireCodeDetector(_configuration),
             TireCodeDetectorType.GoogleCloudVision => new GoogleCloudVisionTireCodeDetector(_configuration),
+            TireCodeDetectorType.AzureAiVision => new AzureAiVisionTireCodedetector(_configuration),
             _ => null
         };
 
-        if (detector == null)
+        if (detector is null)
             return DataResult<ITireCodeDetector>.Failure(
                 new Failure(500, $"Detector type {detectorType} not supported"));
 
