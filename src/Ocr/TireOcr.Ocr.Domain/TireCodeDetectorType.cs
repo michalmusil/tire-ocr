@@ -6,4 +6,5 @@ public enum TireCodeDetectorType
     MistralPixtral = 1,
     OpenAiGpt = 2,
     GoogleCloudVision = 3,
+    AzureAiVision = 4,
 }
