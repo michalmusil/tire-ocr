@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Ocr.Infrastructure"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Ocr.WebApi", "src\Ocr\TireOcr.Ocr.WebApi\TireOcr.Ocr.WebApi.csproj", "{1536CDD1-1C2C-432A-940A-4A0D98CB935B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.RunnerPrototype", "src\TireOcr.RunnerPrototype\TireOcr.RunnerPrototype.csproj", "{52E9E848-69C2-49D3-9438-F648B1C2DDD7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,5 +89,9 @@ Global
 		{1536CDD1-1C2C-432A-940A-4A0D98CB935B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1536CDD1-1C2C-432A-940A-4A0D98CB935B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1536CDD1-1C2C-432A-940A-4A0D98CB935B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
