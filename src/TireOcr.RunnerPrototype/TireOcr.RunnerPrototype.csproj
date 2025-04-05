@@ -16,8 +16,4 @@
       <ProjectReference Include="..\TireOcr.Shared\TireOcr.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Clients\" />
-    </ItemGroup>
-
 </Project>

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using TireOcr.RunnerPrototype.Clients;
 
 namespace TireOcr.RunnerPrototype;
 
@@ -8,6 +9,7 @@ public static class DependencyInjection
     {
         AddControllersConfig(services);
         AddSwagger(services);
+        AddClients(services);
         return services;
     }
 
@@ -19,9 +21,19 @@ public static class DependencyInjection
                 .Add(new JsonStringEnumConverter())
             );
     }
+
     private static void AddSwagger(IServiceCollection serviceCollection)
     {
         serviceCollection.AddEndpointsApiExplorer();
         serviceCollection.AddSwaggerGen();
+    }
+
+    private static void AddClients(IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddHttpClient<PreprocessingClient>(client =>
+        {
+            client.BaseAddress = new("https+http://PreprocessingService");
+        });
+        serviceCollection.AddHttpClient<OcrClient>(client => { client.BaseAddress = new("https+http://OcrService"); });
     }
 }
