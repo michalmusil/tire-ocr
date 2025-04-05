@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TireOcr.RunnerPrototype.Clients;
+using TireOcr.RunnerPrototype.Services;
 
 namespace TireOcr.RunnerPrototype;
 
@@ -10,6 +11,7 @@ public static class DependencyInjection
         AddControllersConfig(services);
         AddSwagger(services);
         AddClients(services);
+        AddServices(services);
         return services;
     }
 
@@ -35,5 +37,10 @@ public static class DependencyInjection
             client.BaseAddress = new("https+http://PreprocessingService");
         });
         serviceCollection.AddHttpClient<OcrClient>(client => { client.BaseAddress = new("https+http://OcrService"); });
+    }
+
+    private static void AddServices(IServiceCollection services)
+    {
+        services.AddScoped<ITireOcrService, TireOcrService>();
     }
 }

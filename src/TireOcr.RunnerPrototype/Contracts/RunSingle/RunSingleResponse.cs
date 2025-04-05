@@ -1,3 +1,7 @@
+using TireOcr.RunnerPrototype.Dtos;
+
 namespace TireOcr.RunnerPrototype.Contracts.RunSingle;
 
-public record RunSingleResponse();
+public record RunSingleResponse(
+    TireOcrResult Result
+);

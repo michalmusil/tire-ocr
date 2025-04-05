@@ -33,7 +33,7 @@ public class RunController : ControllerBase
         var result = await _tireOcrService.RunSingleOcrPipelineAsync(imageToProcess, request.DetectorType);
 
         return result.ToActionResult<TireOcrResult, RunSingleResponse>(
-            onSuccess: res => new RunSingleResponse()
+            onSuccess: res => new RunSingleResponse(res)
         );
     }
 }
