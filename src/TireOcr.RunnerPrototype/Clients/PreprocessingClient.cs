@@ -36,7 +36,7 @@ public class PreprocessingClient
                 }
             });
 
-            var res = await _httpClient.PostAsync("/Preprocess", content);
+            var res = await _httpClient.PostAsync("/api/v1/Preprocess", content);
             res.EnsureSuccessStatusCode();
             var imageData = await res.Content.ReadAsByteArrayAsync();
             return DataResult<Image>.Success(new Image(imageData, image.FileName, image.ContentType));

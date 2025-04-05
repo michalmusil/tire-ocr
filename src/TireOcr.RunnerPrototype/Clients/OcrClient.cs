@@ -19,7 +19,7 @@ public class OcrClient
         _logger = logger;
     }
 
-    public async Task<DataResult<string>> PerformTireCodeOcrOnImage(Image image)
+    public async Task<DataResult<string>> PerformTireCodeOcrOnImage(Image image, TireCodeDetectorType detectorType)
     {
         try
         {
@@ -36,8 +36,9 @@ public class OcrClient
                     }
                 }
             });
+            content.Add(new StringContent(detectorType.ToString()), "DetectorType");
 
-            var res = await _httpClient.PostAsync("/Ocr", content);
+            var res = await _httpClient.PostAsync("/api/v1/Ocr", content);
             res.EnsureSuccessStatusCode();
             var ocrResult = await res.Content.ReadFromJsonAsync<OcrServiceResultDto>();
 
