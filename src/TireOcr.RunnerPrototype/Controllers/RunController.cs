@@ -1,6 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.RunnerPrototype.Contracts.RunSingle;
+using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Extensions;
+using TireOcr.RunnerPrototype.Models;
+using TireOcr.RunnerPrototype.Services;
+using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Controllers;
 
@@ -8,10 +12,12 @@ namespace TireOcr.RunnerPrototype.Controllers;
 [Route("[controller]")]
 public class RunController : ControllerBase
 {
+    private readonly ITireOcrService _tireOcrService;
     private readonly ILogger<RunController> _logger;
 
-    public RunController(ILogger<RunController> logger)
+    public RunController(ITireOcrService tireOcrService, ILogger<RunController> logger)
     {
+        _tireOcrService = tireOcrService;
         _logger = logger;
     }
 
@@ -22,12 +28,12 @@ public class RunController : ControllerBase
     public async Task<ActionResult<RunSingleResponse>> Single([FromForm] RunSingleRequest request)
     {
         var imageData = await request.Image.ToByteArray();
+        var imageToProcess = new Image(imageData, request.Image.FileName, request.Image.ContentType);
 
-        // var result = await _mediator.Send(query);
-        //
-        // return result.ToActionResult<OcrResultDto, PerformOcrResponse>(
-        //     onSuccess: dto => new PerformOcrResponse(dto.DetectedCode)
-        // );
-        return Ok(new RunSingleResponse());
+        var result = await _tireOcrService.RunSingleOcrPipelineAsync(imageToProcess, request.DetectorType);
+
+        return result.ToActionResult<TireOcrResult, RunSingleResponse>(
+            onSuccess: res => new RunSingleResponse()
+        );
     }
 }
