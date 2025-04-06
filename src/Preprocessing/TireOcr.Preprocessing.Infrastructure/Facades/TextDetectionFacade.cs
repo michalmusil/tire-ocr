@@ -28,7 +28,7 @@ public class TextDetectionFacade : ITextDetectionFacade
 
         var sliceSize = new ImageSize(
             image.Size.Height,
-            (int)(image.Size.Width * 0.2)
+            (int)(image.Size.Width * 0.17)
         );
         var slicesResult = await _imageSlicer.SliceImage(image, sliceSize, 0.3, 0);
         if (slicesResult.IsFailure)
