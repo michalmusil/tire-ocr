@@ -10,4 +10,5 @@ public interface IImageManipulationService
     public Image ApplyGrayscale(Image image);
     public Image ApplyClahe(Image image, double clipLimit = 40.0, ImageSize? windowSize = null);
     public Image UnwrapRingIntoRectangle(Image image, ImageCoordinate center, double innerRadius, double outerRadius);
+    public Image CopyAndAppendImagePortionFromLeft(Image image, double appendPortionWidthRatio);
 }

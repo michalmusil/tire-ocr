@@ -87,4 +87,26 @@ public class OpenCvImageManipulationService : IImageManipulationService
 
         return rotatedResult.ToDomain(image.Name);
     }
+
+    public Image CopyAndAppendImagePortionFromLeft(Image image, double appendPortionWidthRatio)
+    {
+        var originalImage = image.ToCv2();
+
+        var width = originalImage.Width;
+        var height = originalImage.Height;
+        var appendixWidth = (int)(width * appendPortionWidthRatio);
+
+        if (appendixWidth <= 0)
+            throw new ArgumentException("Image size and appendPortionWidthRatio must be greater than 0");
+
+        var appendixRect = new Rect(0, 0, appendixWidth, height);
+
+        using var leftStrip = new Mat(originalImage, appendixRect);
+        using var resultImage = new Mat(height, width + appendixWidth, originalImage.Type());
+        
+        originalImage.CopyTo(new Mat(resultImage, new Rect(0, 0, width, height)));
+        leftStrip.CopyTo(new Mat(resultImage, new Rect(width, 0, appendixWidth, height)));
+
+        return resultImage.ToDomain(image.Name);
+    }
 }
