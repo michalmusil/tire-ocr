@@ -17,7 +17,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             return DataResult<IEnumerable<TireCode>>.NotFound("No tire code was detected during Postprocessing");
 
         var validTireCodes = anchors
-            .Select(a => ProcessPotentialTireCode(a, rawTireCodeValue))
+            .Select(a => ProcessPotentialTireCode(a, cleanedUpTireCode))
             .Where(tc => tc.WasProcessedSuccessfully)
             .ToList();
 
@@ -32,6 +32,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         var bestTireCode = tireCodes
             .Select(tc => (tc, GetScoreOfTireCode(tc)))
             .OrderByDescending(x => x.Item2)
+            .ThenBy(x => x.tc.GetProcessedCode().Length)
             .FirstOrDefault().tc;
 
         if (bestTireCode is null)
@@ -87,7 +88,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
         tireCode.AspectRatio = aspectRatio;
 
-        var leftOfAnchor = tireCode.RawCode.Substring(0, tireCodeAnchorMatch.Index + 1);
+        var leftOfAnchor = tireCode.RawCode.Substring(0, tireCodeAnchorMatch.Index);
         ExtractSectionWidth(tireCode, leftOfAnchor);
         leftOfAnchor = GetSubstringWithoutEnd(leftOfAnchor, tireCode.Width?.ToString());
 
@@ -95,13 +96,13 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
         var rightOfAnchor = tireCode.RawCode.Substring(tireCodeAnchorMatch.Index + tireCodeAnchorMatch.Length);
         ExtractConstructionAndDeprecatedSpeedRating(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutEnd(rightOfAnchor, tireCode.Construction);
+        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.Construction);
 
         ExtractDiameter(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutEnd(rightOfAnchor, tireCode.Diameter?.ToString());
+        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.Diameter?.ToString());
 
         ExtractLoadRangeAndIndex(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutEnd(rightOfAnchor, tireCode.LoadRangeAndIndex);
+        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.LoadRangeAndIndex);
 
         ExtractSpeedRating(tireCode, rightOfAnchor);
 
@@ -145,7 +146,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
     private void ExtractDiameter(TireCode code, string leftOfConstruction)
     {
         Match diameterMatch = Regex.Match(leftOfConstruction, @"^(?<Diameter>\d{1,3})");
-        var diameter = diameterMatch.Success ? diameterMatch.Groups["VehicleClass"].Value : null;
+        var diameter = diameterMatch.Success ? diameterMatch.Groups["Diameter"].Value : null;
         if (diameter is not null)
         {
             var diameterIsValid = int.TryParse(diameter, out var diameterValue);
@@ -178,5 +179,16 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             return fullString;
 
         return fullString.Substring(0, fullString.Length - end.Length);
+    }
+
+    private string GetSubstringWithoutBeginning(string fullString, string? beginning)
+    {
+        if (beginning == null)
+            return fullString;
+
+        if (beginning.Length >= fullString.Length)
+            return fullString;
+
+        return fullString.Substring(beginning.Length, fullString.Length - beginning.Length);
     }
 }

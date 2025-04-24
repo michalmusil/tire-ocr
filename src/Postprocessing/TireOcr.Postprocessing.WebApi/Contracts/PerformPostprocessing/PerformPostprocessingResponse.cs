@@ -1,6 +1,6 @@
-namespace TireOcr.Postprocessing.Application.Dtos;
+namespace TireOcr.Postprocessing.WebApi.Contracts.PerformPostprocessing;
 
-public record ProcessedTireCodeResult(
+public record PerformPostprocessingResponse(
     string RawCode,
     string PostprocessedTireCode,
     string? VehicleClass,

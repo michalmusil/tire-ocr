@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ocr\TireOcr.Ocr.WebApi\TireOcr.Ocr.WebApi.csproj" />
+    <ProjectReference Include="..\Postprocessing\TireOcr.Postprocessing.WebApi\TireOcr.Postprocessing.WebApi.csproj" />
     <ProjectReference Include="..\Preprocessing\TireOcr.Preprocessing.WebApi\TireOcr.Preprocessing.WebApi.csproj" />
     <ProjectReference Include="..\TireOcr.RunnerPrototype\TireOcr.RunnerPrototype.csproj" />
   </ItemGroup>

@@ -5,7 +5,7 @@ using TireOcr.Shared.UseCase;
 
 namespace TireOcr.Postprocessing.Application.Queries.TireCodePostprocessing;
 
-public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostprocessingQuery, ProcessedTireCodeResult>
+public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostprocessingQuery, ProcessedTireCodeResultDto>
 {
     private readonly ICodeFeatureExtractionService _codeFeatureExtractionService;
 
@@ -14,20 +14,20 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
         _codeFeatureExtractionService = codeFeatureExtractionService;
     }
 
-    public async Task<DataResult<ProcessedTireCodeResult>> Handle(TireCodePostprocessingQuery request,
+    public async Task<DataResult<ProcessedTireCodeResultDto>> Handle(TireCodePostprocessingQuery request,
         CancellationToken cancellationToken)
     {
         var tireCodesResult = _codeFeatureExtractionService.ExtractTireCodes(request.RawTireCode);
         if (tireCodesResult.IsFailure)
-            return DataResult<ProcessedTireCodeResult>.Failure(tireCodesResult.Failures);
+            return DataResult<ProcessedTireCodeResultDto>.Failure(tireCodesResult.Failures);
 
         var potentialTireCodes = tireCodesResult.Data!;
         var bestTireCodeResult = _codeFeatureExtractionService.PickBestMatchingTireCode(potentialTireCodes);
         if (bestTireCodeResult.IsFailure)
-            return DataResult<ProcessedTireCodeResult>.Failure(bestTireCodeResult.Failures);
+            return DataResult<ProcessedTireCodeResultDto>.Failure(bestTireCodeResult.Failures);
 
         var bestTireCode = bestTireCodeResult.Data!;
-        var result = new ProcessedTireCodeResult
+        var result = new ProcessedTireCodeResultDto
         (
             RawCode: bestTireCode.RawCode,
             PostprocessedTireCode: bestTireCode.GetProcessedCode(),
@@ -39,6 +39,6 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
             SpeedRating: bestTireCode.SpeedRating
         );
 
-        return DataResult<ProcessedTireCodeResult>.Success(result);
+        return DataResult<ProcessedTireCodeResultDto>.Success(result);
     }
 }
