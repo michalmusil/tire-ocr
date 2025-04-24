@@ -9,14 +9,15 @@ public class TireCode
     public string? VehicleClass { get; set; }
     public int? Width { get; set; }
     public int? AspectRatio { get; set; }
+    public string? DeprecatedSpeedRating { get; set; }
     public string? Construction { get; set; }
     public int? Diameter { get; set; }
-    public string? LoadIndexAndRange { get; set; }
+    public string? LoadRangeAndIndex { get; set; }
     public string? SpeedRating { get; set; }
 
     public bool WasProcessedSuccessfully => VehicleClass is not null || Width is not null || AspectRatio is not null ||
                                             Construction is not null || Diameter is not null ||
-                                            LoadIndexAndRange is not null ||
+                                            LoadRangeAndIndex is not null ||
                                             SpeedRating is not null;
 
     public string GetProcessedCode()
@@ -31,9 +32,10 @@ public class TireCode
 
         builder
             .Append(AspectRatio)
+            .Append(DeprecatedSpeedRating)
             .Append(Construction)
             .Append(Diameter)
-            .Append(LoadIndexAndRange)
+            .Append(LoadRangeAndIndex)
             .Append(SpeedRating);
         return builder.ToString();
     }
