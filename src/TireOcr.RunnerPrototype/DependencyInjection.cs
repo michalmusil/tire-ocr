@@ -37,6 +37,7 @@ public static class DependencyInjection
             client.BaseAddress = new("https+http://PreprocessingService");
         });
         serviceCollection.AddHttpClient<OcrClient>(client => { client.BaseAddress = new("https+http://OcrService"); });
+        serviceCollection.AddHttpClient<PostprocessingClient>(client => { client.BaseAddress = new("https+http://PostprocessingService"); });
     }
 
     private static void AddServices(IServiceCollection services)

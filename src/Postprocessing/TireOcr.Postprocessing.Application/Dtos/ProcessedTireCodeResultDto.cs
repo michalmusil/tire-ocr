@@ -7,6 +7,7 @@ public record ProcessedTireCodeResultDto(
     int? Width,
     int? AspectRatio,
     string? Construction,
+    int? Diameter,
     string? LoadRangeAndIndex,
     string? SpeedRating
 );

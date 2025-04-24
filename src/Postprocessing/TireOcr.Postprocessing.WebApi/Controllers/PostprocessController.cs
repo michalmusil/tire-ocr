@@ -12,12 +12,12 @@ namespace TireOcr.Postprocessing.WebApi.Controllers;
 [ApiController]
 [ApiVersion("1.0")]
 [Route("api/v{v:apiVersion}/[controller]")]
-public class PostprocessingController : ControllerBase
+public class PostprocessController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ILogger<PostprocessingController> _logger;
+    private readonly ILogger<PostprocessController> _logger;
 
-    public PostprocessingController(IMediator mediator, ILogger<PostprocessingController> logger)
+    public PostprocessController(IMediator mediator, ILogger<PostprocessController> logger)
     {
         _mediator = mediator;
         _logger = logger;
