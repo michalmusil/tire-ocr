@@ -96,7 +96,8 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
         var rightOfAnchor = tireCode.RawCode.Substring(tireCodeAnchorMatch.Index + tireCodeAnchorMatch.Length);
         ExtractConstructionAndDeprecatedSpeedRating(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.Construction);
+        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor,
+            $"{tireCode.DeprecatedSpeedRating ?? ""}{tireCode.Construction ?? ""}");
 
         ExtractDiameter(tireCode, rightOfAnchor);
         rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.Diameter?.ToString());
@@ -175,7 +176,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         if (end == null)
             return fullString;
 
-        if (end.Length >= fullString.Length)
+        if (end.Length > fullString.Length)
             return fullString;
 
         return fullString.Substring(0, fullString.Length - end.Length);
@@ -186,7 +187,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         if (beginning == null)
             return fullString;
 
-        if (beginning.Length >= fullString.Length)
+        if (beginning.Length > fullString.Length)
             return fullString;
 
         return fullString.Substring(beginning.Length, fullString.Length - beginning.Length);

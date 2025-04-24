@@ -29,12 +29,13 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
         var bestTireCode = bestTireCodeResult.Data!;
         var result = new ProcessedTireCodeResultDto
         (
-            RawCode: bestTireCode.RawCode,
+            RawCode: request.RawTireCode,
             PostprocessedTireCode: bestTireCode.GetProcessedCode(),
             VehicleClass: bestTireCode.VehicleClass,
             Width: bestTireCode.Width,
             AspectRatio: bestTireCode.AspectRatio,
             Construction: bestTireCode.Construction,
+            Diameter: bestTireCode.Diameter,
             LoadRangeAndIndex: bestTireCode.LoadRangeAndIndex,
             SpeedRating: bestTireCode.SpeedRating
         );
