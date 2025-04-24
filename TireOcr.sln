@@ -29,6 +29,16 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Ocr.WebApi", "src\O
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.RunnerPrototype", "src\TireOcr.RunnerPrototype\TireOcr.RunnerPrototype.csproj", "{52E9E848-69C2-49D3-9438-F648B1C2DDD7}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Postprocessing", "Postprocessing", "{FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Postprocessing.Domain", "src\Postprocessing\TireOcr.Postprocessing.Domain\TireOcr.Postprocessing.Domain.csproj", "{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Postprocessing.Application", "src\Postprocessing\TireOcr.Postprocessing.Application\TireOcr.Postprocessing.Application.csproj", "{2D071083-9AAC-4ECD-92CA-455FB469A0CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Postprocessing.Infrastructure", "src\Postprocessing\TireOcr.Postprocessing.Infrastructure\TireOcr.Postprocessing.Infrastructure.csproj", "{9CF04516-5AB2-4546-AF3E-FB12C8A27358}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TireOcr.Postprocessing.WebApi", "src\Postprocessing\TireOcr.Postprocessing.WebApi\TireOcr.Postprocessing.WebApi.csproj", "{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +53,10 @@ Global
 		{F81B0E8C-3F51-49A1-ADB3-D845C20B22CE} = {EEBDFA78-8026-44BA-9866-F2583A3FAA23}
 		{957CDABD-2358-4A7F-8567-B23D257634E8} = {EEBDFA78-8026-44BA-9866-F2583A3FAA23}
 		{1536CDD1-1C2C-432A-940A-4A0D98CB935B} = {EEBDFA78-8026-44BA-9866-F2583A3FAA23}
+		{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
+		{2D071083-9AAC-4ECD-92CA-455FB469A0CE} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
+		{9CF04516-5AB2-4546-AF3E-FB12C8A27358} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
+		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -93,5 +107,21 @@ Global
 		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{52E9E848-69C2-49D3-9438-F648B1C2DDD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D071083-9AAC-4ECD-92CA-455FB469A0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D071083-9AAC-4ECD-92CA-455FB469A0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D071083-9AAC-4ECD-92CA-455FB469A0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D071083-9AAC-4ECD-92CA-455FB469A0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CF04516-5AB2-4546-AF3E-FB12C8A27358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CF04516-5AB2-4546-AF3E-FB12C8A27358}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CF04516-5AB2-4546-AF3E-FB12C8A27358}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CF04516-5AB2-4546-AF3E-FB12C8A27358}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
