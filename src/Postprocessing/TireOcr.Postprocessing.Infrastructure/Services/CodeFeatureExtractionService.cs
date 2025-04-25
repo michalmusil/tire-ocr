@@ -32,7 +32,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         var bestTireCode = tireCodes
             .Select(tc => (tc, GetScoreOfTireCode(tc)))
             .OrderByDescending(x => x.Item2)
-            .ThenBy(x => x.tc.GetProcessedCode().Length)
+            .ThenByDescending(x => x.tc.GetProcessedCode().Length)
             .FirstOrDefault().tc;
 
         if (bestTireCode is null)
@@ -62,8 +62,14 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private string PerformPreMatchingCleanup(string rawCode)
     {
-        var cleanedUp = Regex.Replace(rawCode, @"[\n\s.,]", "");
-        cleanedUp = cleanedUp.Replace("|", "/").Replace(":", "/");
+        string cleanedUp = Regex.Replace(rawCode, @"[\n]", "\\");
+        cleanedUp = cleanedUp
+            .Replace("|", "/")
+            .Replace(";", "")
+            .Replace(":", "")
+            .Replace(",", "")
+            .Replace(".", "");
+        cleanedUp = Regex.Replace(cleanedUp, @"\s+", "|");
         cleanedUp = cleanedUp.ToUpperInvariant();
 
         return cleanedUp;
@@ -89,30 +95,36 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         tireCode.AspectRatio = aspectRatio;
 
         var leftOfAnchor = tireCode.RawCode.Substring(0, tireCodeAnchorMatch.Index);
-        ExtractSectionWidth(tireCode, leftOfAnchor);
-        leftOfAnchor = GetSubstringWithoutEnd(leftOfAnchor, tireCode.Width?.ToString());
+        var widthCharCount = ExtractSectionWidth(tireCode, leftOfAnchor);
+        leftOfAnchor = SubtractCharacters(leftOfAnchor, widthCharCount, fromStart: false);
 
         ExtractVehicleClass(tireCode, leftOfAnchor);
 
         var rightOfAnchor = tireCode.RawCode.Substring(tireCodeAnchorMatch.Index + tireCodeAnchorMatch.Length);
-        ExtractConstructionAndDeprecatedSpeedRating(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor,
-            $"{tireCode.DeprecatedSpeedRating ?? ""}{tireCode.Construction ?? ""}");
+        var constructionAndDeprecatedSpeedRatingCharCount = ExtractConstructionAndDeprecatedSpeedRating(
+            tireCode,
+            rightOfAnchor
+        );
+        rightOfAnchor = SubtractCharacters(
+            rightOfAnchor,
+            constructionAndDeprecatedSpeedRatingCharCount,
+            fromStart: true
+        );
 
-        ExtractDiameter(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.Diameter?.ToString());
+        var diameterCharCount = ExtractDiameter(tireCode, rightOfAnchor);
+        rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, diameterCharCount, fromStart: true);
 
-        ExtractLoadRangeAndIndex(tireCode, rightOfAnchor);
-        rightOfAnchor = GetSubstringWithoutBeginning(rightOfAnchor, tireCode.LoadRangeAndIndex);
+        var rangeAndIndexCharCount = ExtractLoadRangeAndIndex(tireCode, rightOfAnchor);
+        rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, rangeAndIndexCharCount, fromStart: true);
 
         ExtractSpeedRating(tireCode, rightOfAnchor);
 
         return tireCode;
     }
 
-    private void ExtractSectionWidth(TireCode code, string leftOfAspectRatio)
+    private int ExtractSectionWidth(TireCode code, string leftOfAspectRatio)
     {
-        Match widthMatch = Regex.Match(leftOfAspectRatio, @"(?<Width>\d{3})$");
+        Match widthMatch = Regex.Match(leftOfAspectRatio, @"(?<Width>\d{3})\|?$");
         var width = widthMatch.Success ? widthMatch.Groups["Width"].Value : null;
         if (width != null)
         {
@@ -120,19 +132,23 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             if (widthIsValid)
                 code.Width = widthValue;
         }
+
+        return widthMatch.Length;
     }
 
-    private void ExtractVehicleClass(TireCode code, string leftOfWidth)
+    private int ExtractVehicleClass(TireCode code, string leftOfWidth)
     {
-        Match classMatch = Regex.Match(leftOfWidth, @"(?<VehicleClass>[ACLPST]{1,2})$");
+        Match classMatch = Regex.Match(leftOfWidth, @"[\\,|,^]+(?<VehicleClass>[ACLPST]{1,2})\|?$");
         var vehicleClass = classMatch.Success ? classMatch.Groups["VehicleClass"].Value : null;
         code.VehicleClass = vehicleClass;
+
+        return classMatch.Length;
     }
 
-    private void ExtractConstructionAndDeprecatedSpeedRating(TireCode code, string rightOfAspectRatio)
+    private int ExtractConstructionAndDeprecatedSpeedRating(TireCode code, string rightOfAspectRatio)
     {
         Match constructionMatch = Regex.Match(rightOfAspectRatio,
-            @"^(?<DeprecatedSpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})?(?<Construction>[RDB]{1})");
+            @"^\|?(?<DeprecatedSpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})?(?<Construction>[RDB]{1})\|?");
         if (constructionMatch.Success)
         {
             code.Construction = constructionMatch.Groups["Construction"].Success
@@ -142,11 +158,13 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
                 ? constructionMatch.Groups["DeprecatedSpeedRating"].Value
                 : null;
         }
+
+        return constructionMatch.Length;
     }
 
-    private void ExtractDiameter(TireCode code, string leftOfConstruction)
+    private int ExtractDiameter(TireCode code, string leftOfConstruction)
     {
-        Match diameterMatch = Regex.Match(leftOfConstruction, @"^(?<Diameter>\d{1,3})");
+        Match diameterMatch = Regex.Match(leftOfConstruction, @"^(?<Diameter>\d{1,2})\|?");
         var diameter = diameterMatch.Success ? diameterMatch.Groups["Diameter"].Value : null;
         if (diameter is not null)
         {
@@ -154,42 +172,38 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             if (diameterIsValid)
                 code.Diameter = diameterValue;
         }
+
+        return diameterMatch.Length;
     }
 
-    private void ExtractLoadRangeAndIndex(TireCode code, string leftOfDiameter)
+    private int ExtractLoadRangeAndIndex(TireCode code, string leftOfDiameter)
     {
-        Match loadRangeIndexMatch = Regex.Match(leftOfDiameter, @"^(?<LoadRangeIndex>([A-Z]{1,2}\d{1,3}/?)?\d{2,3})");
+        Match loadRangeIndexMatch =
+            Regex.Match(leftOfDiameter, @"^(?<LoadRangeIndex>([A-Z]{1,2}\d{1,3}/?)?\d{2,3})\|?");
         var loadRangeAndIndex = loadRangeIndexMatch.Success ? loadRangeIndexMatch.Groups["LoadRangeIndex"].Value : null;
         code.LoadRangeAndIndex = loadRangeAndIndex;
+
+        return loadRangeIndexMatch.Length;
     }
 
-    private void ExtractSpeedRating(TireCode code, string leftOfLoadIndex)
+    private int ExtractSpeedRating(TireCode code, string leftOfLoadIndex)
     {
         Match speedRatingMatch = Regex.Match(leftOfLoadIndex,
-            @"^(?<SpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})");
+            @"^(?<SpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})\|?");
         var speedRating = speedRatingMatch.Success ? speedRatingMatch.Groups["SpeedRating"].Value : null;
         code.SpeedRating = speedRating;
+
+        return speedRatingMatch.Length;
     }
 
-    private string GetSubstringWithoutEnd(string fullString, string? end)
+    private string SubtractCharacters(string original, int numberOfChars, bool fromStart)
     {
-        if (end == null)
-            return fullString;
+        if (numberOfChars < 1 || numberOfChars > original.Length)
+            return original;
 
-        if (end.Length > fullString.Length)
-            return fullString;
+        if (fromStart)
+            return original.Substring(numberOfChars, original.Length - numberOfChars);
 
-        return fullString.Substring(0, fullString.Length - end.Length);
-    }
-
-    private string GetSubstringWithoutBeginning(string fullString, string? beginning)
-    {
-        if (beginning == null)
-            return fullString;
-
-        if (beginning.Length > fullString.Length)
-            return fullString;
-
-        return fullString.Substring(beginning.Length, fullString.Length - beginning.Length);
+        return original.Substring(0, original.Length - numberOfChars);
     }
 }
