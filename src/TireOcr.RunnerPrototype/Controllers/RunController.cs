@@ -4,6 +4,7 @@ using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.RunnerPrototype.Services;
+using TireOcr.RunnerPrototype.Services.TireOcr;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Controllers;

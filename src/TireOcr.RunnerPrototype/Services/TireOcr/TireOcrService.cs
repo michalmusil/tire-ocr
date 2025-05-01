@@ -4,7 +4,7 @@ using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
-namespace TireOcr.RunnerPrototype.Services;
+namespace TireOcr.RunnerPrototype.Services.TireOcr;
 
 public class TireOcrService : ITireOcrService
 {
@@ -40,14 +40,15 @@ public class TireOcrService : ITireOcrService
         if (ocrResult.Item2.IsFailure)
             return DataResult<TireOcrResult>.Failure(ocrResult.Item2.Failures);
 
-        var tireCode = ocrResult.Item2.Data!;
+        var ocrResultData = ocrResult.Item2.Data!;
 
         var postprocessingResult = await PerformTimeMeasuredTask("Postprocessing",
-            () => _postprocessingClient.PostprocessTireCode(tireCode));
+            () => _postprocessingClient.PostprocessTireCode(ocrResultData.DetectedCode));
         if (postprocessingResult.Item2.IsFailure)
             return DataResult<TireOcrResult>.Failure(ocrResult.Item2.Failures);
-        
+
         var postprocessedTireCode = postprocessingResult.Item2.Data!;
+
 
         List<RunStat> runTrace =
         [
@@ -56,7 +57,17 @@ public class TireOcrService : ITireOcrService
             postprocessingResult.Item1
         ];
 
-        var finalResult = new TireOcrResult(postprocessedTireCode, detectorType, runTrace);
+        var finalResult = new TireOcrResult(
+            postprocessedTireCode,
+            detectorType,
+            new EstimatedCostsDto(
+                ocrResultData.Billing.Amount,
+                ocrResultData.Billing.Unit,
+                0,
+                "$"
+            ),
+            runTrace
+        );
         return DataResult<TireOcrResult>.Success(finalResult);
     }
 

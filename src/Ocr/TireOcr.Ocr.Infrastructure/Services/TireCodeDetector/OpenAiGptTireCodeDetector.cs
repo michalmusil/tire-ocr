@@ -45,7 +45,10 @@ public class OpenAiGptTireCodeDetector : ITireCodeDetector
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
-            var result = new OcrResultDto(foundTireCode);
+            var result = new OcrResultDto(
+                foundTireCode,
+                new OcrRequestBillingDto(completion.Value.Usage.TotalTokenCount, BillingUnit.Token)
+            );
             return DataResult<OcrResultDto>.Success(result);
         }
         catch (Exception e)

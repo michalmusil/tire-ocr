@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using TireOcr.RunnerPrototype.Clients;
-using TireOcr.RunnerPrototype.Services;
+using TireOcr.RunnerPrototype.Services.TireOcr;
 
 namespace TireOcr.RunnerPrototype;
 

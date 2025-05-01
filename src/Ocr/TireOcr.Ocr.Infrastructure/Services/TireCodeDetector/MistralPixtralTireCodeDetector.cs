@@ -45,16 +45,19 @@ public class MistralPixtralTireCodeDetector : ITireCodeDetector
             response.EnsureSuccessStatusCode();
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<MistralResponseDto>(responseContent);
-            
-            var foundTireCode = responseDto.Choices
+
+            var foundTireCode = responseDto!.Choices
                 .Select(c => c.Message)
                 .FirstOrDefault(p => !string.IsNullOrEmpty(p.Content) && p.Content.Contains('/'))
                 ?.Content;
-            
+
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
-            var result = new OcrResultDto(foundTireCode);
+            var result = new OcrResultDto(
+                foundTireCode,
+                new OcrRequestBillingDto(responseDto.Usage.TotalTokens, BillingUnit.Token)
+            );
             return DataResult<OcrResultDto>.Success(result);
         }
         catch (Exception e)

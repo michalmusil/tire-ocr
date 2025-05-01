@@ -19,7 +19,8 @@ public class OcrClient
         _logger = logger;
     }
 
-    public async Task<DataResult<string>> PerformTireCodeOcrOnImage(Image image, TireCodeDetectorType detectorType)
+    public async Task<DataResult<OcrServiceResultDto>> PerformTireCodeOcrOnImage(Image image,
+        TireCodeDetectorType detectorType)
     {
         try
         {
@@ -42,20 +43,22 @@ public class OcrClient
             res.EnsureSuccessStatusCode();
             var ocrResult = await res.Content.ReadFromJsonAsync<OcrServiceResultDto>();
 
-            return DataResult<string>.Success(ocrResult!.DetectedCode);
+            return DataResult<OcrServiceResultDto>.Success(ocrResult!);
         }
         catch (HttpRequestException ex)
         {
             return ex.StatusCode switch
             {
-                HttpStatusCode.NotFound => DataResult<string>.NotFound("No tire code was detected during Ocr"),
-                _ => DataResult<string>.Failure(DefaultFailure)
+                HttpStatusCode.NotFound => DataResult<OcrServiceResultDto>.NotFound(
+                    "No tire code was detected during Ocr"
+                ),
+                _ => DataResult<OcrServiceResultDto>.Failure(DefaultFailure)
             };
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while calling Ocr service.");
-            return DataResult<string>.Failure(DefaultFailure);
+            return DataResult<OcrServiceResultDto>.Failure(DefaultFailure);
         }
     }
 }
