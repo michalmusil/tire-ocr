@@ -3,5 +3,6 @@ using System.ComponentModel.DataAnnotations;
 namespace TireOcr.RunnerPrototype.Dtos;
 
 public record OcrServiceResultDto(
-    [Required] string DetectedCode
+    [Required] string DetectedCode,
+    [Required] BillingDto Billing
 );

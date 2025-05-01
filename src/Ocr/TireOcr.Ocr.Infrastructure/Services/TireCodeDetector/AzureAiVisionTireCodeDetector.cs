@@ -41,7 +41,10 @@ public class AzureAiVisionTireCodedetector : ITireCodeDetector
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
-            var result = new OcrResultDto(foundTireCode);
+            var result = new OcrResultDto(
+                foundTireCode,
+                new OcrRequestBillingDto(1, BillingUnit.Transaction)
+            );
             return DataResult<OcrResultDto>.Success(result);
         }
         catch (Exception e)

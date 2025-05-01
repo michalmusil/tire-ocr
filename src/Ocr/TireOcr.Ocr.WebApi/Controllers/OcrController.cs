@@ -40,7 +40,7 @@ public class OcrController : ControllerBase
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<OcrResultDto, PerformOcrResponse>(
-            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode)
+            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.Billing)
         );
     }
 }
