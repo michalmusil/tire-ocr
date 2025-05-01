@@ -47,7 +47,11 @@ public class OpenAiGptTireCodeDetector : ITireCodeDetector
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(completion.Value.Usage.TotalTokenCount, BillingUnit.Token)
+                new OcrRequestBillingDto(
+                    completion.Value.Usage.InputTokenCount,
+                    completion.Value.Usage.OutputTokenCount,
+                    BillingUnit.Token
+                )
             );
             return DataResult<OcrResultDto>.Success(result);
         }

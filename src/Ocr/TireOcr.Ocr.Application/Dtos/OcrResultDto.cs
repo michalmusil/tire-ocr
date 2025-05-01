@@ -1,3 +1,3 @@
 namespace TireOcr.Ocr.Application.Dtos;
 
-public record OcrResultDto(string DetectedCode, OcrRequestBillingDto Billing);
+public record OcrResultDto(string DetectedCode, OcrRequestBillingDto? Billing);

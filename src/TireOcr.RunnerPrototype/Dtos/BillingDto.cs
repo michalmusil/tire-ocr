@@ -1,6 +1,7 @@
 namespace TireOcr.RunnerPrototype.Dtos;
 
 public record BillingDto(
-    decimal Amount,
+    decimal InputAmount,
+    decimal OutputAmount,
     string Unit
 );

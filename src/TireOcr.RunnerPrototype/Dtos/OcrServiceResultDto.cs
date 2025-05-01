@@ -4,5 +4,5 @@ namespace TireOcr.RunnerPrototype.Dtos;
 
 public record OcrServiceResultDto(
     [Required] string DetectedCode,
-    [Required] BillingDto Billing
+    BillingDto? Billing
 );

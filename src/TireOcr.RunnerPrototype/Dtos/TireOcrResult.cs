@@ -5,6 +5,6 @@ namespace TireOcr.RunnerPrototype.Dtos;
 public record TireOcrResult(
     TirePostprocessingResult TireCode,
     TireCodeDetectorType DetectorType,
-    EstimatedCostsDto EstimatedCosts,
+    EstimatedCostsDto? EstimatedCosts,
     List<RunStat> RunTrace
 );

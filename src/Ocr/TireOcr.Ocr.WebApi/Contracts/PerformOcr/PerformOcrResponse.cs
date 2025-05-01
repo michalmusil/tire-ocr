@@ -5,5 +5,5 @@ namespace TireOcr.Ocr.WebApi.Contracts.PerformOcr;
 
 public record PerformOcrResponse(
     string DetectedCode,
-    OcrRequestBillingDto Billing
+    OcrRequestBillingDto? Billing
 );
