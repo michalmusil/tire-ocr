@@ -1,3 +1,3 @@
 namespace TireOcr.Ocr.Application.Dtos;
 
-public record OcrRequestBillingDto(decimal Amount, BillingUnit Unit);
+public record OcrRequestBillingDto(decimal InputAmount, decimal OutputAmount, BillingUnit Unit);

@@ -56,7 +56,11 @@ public class MistralPixtralTireCodeDetector : ITireCodeDetector
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(responseDto.Usage.TotalTokens, BillingUnit.Token)
+                new OcrRequestBillingDto(
+                    responseDto.Usage.PromptTokens,
+                    responseDto.Usage.CompletionTokens,
+                    BillingUnit.Token
+                )
             );
             return DataResult<OcrResultDto>.Success(result);
         }
