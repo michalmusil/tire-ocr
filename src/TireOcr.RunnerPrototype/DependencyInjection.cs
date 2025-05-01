@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using TireOcr.RunnerPrototype.Clients;
+using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.RunnerPrototype.Services.TireOcr;
 
@@ -33,10 +34,19 @@ public static class DependencyInjection
 
     private static void AddClients(IServiceCollection serviceCollection)
     {
-        serviceCollection.AddHttpClient<PreprocessingClient>(client =>
-        {
-            client.BaseAddress = new("https+http://PreprocessingService");
-        });
+        serviceCollection
+            .AddHttpClient<PreprocessingClient>(client =>
+            {
+                client.BaseAddress = new("https+http://PreprocessingService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(90);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
         serviceCollection.AddHttpClient<OcrClient>(client => { client.BaseAddress = new("https+http://OcrService"); });
         serviceCollection.AddHttpClient<PostprocessingClient>(client =>
         {
