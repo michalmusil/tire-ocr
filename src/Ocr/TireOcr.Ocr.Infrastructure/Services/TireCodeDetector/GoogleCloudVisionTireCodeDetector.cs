@@ -37,7 +37,7 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(1, BillingUnit.Transaction)
+                new OcrRequestBillingDto(0, 1, BillingUnit.Transaction)
             );
             return DataResult<OcrResultDto>.Success(result);
         }
