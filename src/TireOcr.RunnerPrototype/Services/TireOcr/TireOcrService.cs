@@ -29,6 +29,9 @@ public class TireOcrService : ITireOcrService
         Image image,
         TireCodeDetectorType detectorType)
     {
+        var totalStopwatch = new Stopwatch();
+        totalStopwatch.Start();
+
         var preprocessingResult = await PerformTimeMeasuredTask("Preprocessing",
             () => _preprocessingClient.PreprocessImage(image)
         );
@@ -64,13 +67,63 @@ public class TireOcrService : ITireOcrService
             postprocessingResult.Item1
         ];
 
+        totalStopwatch.Stop();
+
         var finalResult = new TireOcrResult(
+            image.FileName,
             postprocessedTireCode,
             detectorType,
             estimatedCostsResult?.Data,
+            totalStopwatch.Elapsed.TotalMilliseconds,
             runTrace
         );
         return DataResult<TireOcrResult>.Success(finalResult);
+    }
+
+    public async Task<DataResult<TireOcrBatchResult>> RunOcrPipelineBatchAsync(IEnumerable<Image> images,
+        TireCodeDetectorType detectorType)
+    {
+        var totalStopwatch = new Stopwatch();
+        totalStopwatch.Start();
+        var tasks = images
+            .Select(async image =>
+            {
+                var result = await RunSingleOcrPipelineAsync(image, detectorType);
+                return (image, result);
+            });
+
+        var intermediateResults = await Task.WhenAll(tasks);
+        var successfulResults = intermediateResults
+            .Where(x => x.result.IsSuccess)
+            .Select(x => x.result.Data!)
+            .ToList();
+        var failingResults = intermediateResults
+            .Where(x => x.result.IsFailure)
+            .Select(x => new TireOcrFailure(
+                x.image.FileName,
+                x.result.PrimaryFailure?.Message ?? "Unknown error occurred")
+            )
+            .ToList();
+
+        var totalEstimatedCosts = successfulResults
+            .Select(r => r.EstimatedCosts?.EstimatedCost ?? 0)
+            .Sum();
+        var estimatedCostsCurrency = successfulResults
+            .FirstOrDefault(r => r.EstimatedCosts is not null)
+            ?.EstimatedCosts?.EstimatedCostCurrency;
+
+        totalStopwatch.Stop();
+        var result = new TireOcrBatchResult(
+            Summary: new BatchSummaryDto(
+                totalEstimatedCosts,
+                estimatedCostsCurrency ?? "",
+                totalStopwatch.Elapsed.TotalMilliseconds
+            ),
+            SuccessfulResults: successfulResults,
+            Failures: failingResults
+        );
+
+        return DataResult<TireOcrBatchResult>.Success(result);
     }
 
     private async Task<(RunStat, T)> PerformTimeMeasuredTask<T>(string taskName, Func<Task<T>> performTask)
