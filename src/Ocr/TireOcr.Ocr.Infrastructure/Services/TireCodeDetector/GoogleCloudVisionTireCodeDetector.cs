@@ -35,7 +35,10 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
-            var result = new OcrResultDto(foundTireCode);
+            var result = new OcrResultDto(
+                foundTireCode,
+                new OcrRequestBillingDto(1, BillingUnit.Transaction)
+            );
             return DataResult<OcrResultDto>.Success(result);
         }
         catch (Exception e)
@@ -51,7 +54,7 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
         {
             var credentialsRelativePath = _configuration.GetValue<string>("ApiKeys:GcpJsonCredentialsRelativePath")!;
             var credPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, credentialsRelativePath);
-            
+
             var clientBuilder = new ImageAnnotatorClientBuilder()
             {
                 CredentialsPath = credPath,

@@ -1,7 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using TireOcr.Ocr.Application.Dtos;
 
 namespace TireOcr.Ocr.WebApi.Contracts.PerformOcr;
 
 public record PerformOcrResponse(
-    [Required] string DetectedCode
+    string DetectedCode,
+    OcrRequestBillingDto Billing
 );
