@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TireOcr.RunnerPrototype.Contracts.RunBatch;
 using TireOcr.RunnerPrototype.Contracts.RunSingle;
 using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Batch;
 using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.RunnerPrototype.Services.TireOcr;
@@ -43,18 +44,11 @@ public class RunController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<RunBatchResponse>> Batch([FromForm] RunBatchRequest request)
     {
-        if (!request.Images.Any())
-            return UnprocessableEntity("At least one image is required.");
-
-        var imageTasks = request.Images
-            .Select(async iff =>
-            {
-                var bytes = await iff.ToByteArray();
-                return new Image(bytes, iff.FileName, iff.ContentType);
-            });
-        var imagesToProcess = await Task.WhenAll(imageTasks);
-
-        var result = await _tireOcrService.RunOcrPipelineBatchAsync(imagesToProcess, request.DetectorType);
+        var result = await _tireOcrService.RunOcrPipelineBatchAsync(
+            request.ImageUrls,
+            request.BatchSize,
+            request.DetectorType
+        );
 
         return result.ToActionResult<TireOcrBatchResult, RunBatchResponse>(
             onSuccess: res => new RunBatchResponse(res)

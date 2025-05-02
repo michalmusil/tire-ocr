@@ -1,4 +1,4 @@
-namespace TireOcr.RunnerPrototype.Dtos;
+namespace TireOcr.RunnerPrototype.Dtos.Batch;
 
 public record TireOcrFailure(
     string ImageFileName,

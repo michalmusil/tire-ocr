@@ -5,5 +5,6 @@ namespace TireOcr.RunnerPrototype.Contracts.RunBatch;
 
 public record RunBatchRequest(
     [Required] TireCodeDetectorType DetectorType,
-    [Required] IEnumerable<IFormFile> Images
+    [Required] [Range(1, 10)] int BatchSize,
+    [Required] [MinLength(1)] IEnumerable<string> ImageUrls
 );

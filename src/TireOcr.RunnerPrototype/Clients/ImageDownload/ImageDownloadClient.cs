@@ -1,4 +1,5 @@
 using System.Net;
+using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
@@ -13,13 +14,14 @@ public class ImageDownloadClient : IImageDownloadClient
         _client = client;
     }
 
-    public async Task<DataResult<Image>> DownloadImage(string imageUrl)
+    public async Task<ImageDownloadResult> DownloadImage(string imageUrl)
     {
         try
         {
             using var response = await _client.GetAsync(imageUrl);
             if (!response.IsSuccessStatusCode)
-                return response.StatusCode switch
+            {
+                var failedResult = response.StatusCode switch
                 {
                     HttpStatusCode.NotFound => DataResult<Image>.NotFound($"Image {imageUrl} not found"),
                     HttpStatusCode.Unauthorized => DataResult<Image>.Unauthorized(
@@ -27,26 +29,40 @@ public class ImageDownloadClient : IImageDownloadClient
                     _ => DataResult<Image>.Failure(new Failure((int)response.StatusCode,
                         $"Failed to download image with provided url: {imageUrl}"))
                 };
+                return new ImageDownloadResult(imageUrl, failedResult);
+            }
 
             var contentType = response.Content.Headers.ContentType?.MediaType;
             if (string.IsNullOrEmpty(contentType))
-                return DataResult<Image>.Invalid($"Could not determine content type of the image {imageUrl}");
+                return new ImageDownloadResult(
+                    imageUrl,
+                    DataResult<Image>.Invalid($"Could not determine content type of the image {imageUrl}")
+                );
 
             var imageData = await response.Content.ReadAsByteArrayAsync();
             if (imageData.Length == 0)
-                return DataResult<Image>.Invalid($"Failed to read image data: {imageUrl}");
+                return new ImageDownloadResult(
+                    imageUrl,
+                    DataResult<Image>.Invalid($"Failed to read image data: {imageUrl}")
+                );
 
             var fileName = GetOriginalFileName(response.Content) ?? imageUrl;
 
-            return DataResult<Image>.Success(new Image(imageData, fileName, contentType));
+            return new ImageDownloadResult(
+                imageUrl,
+                DataResult<Image>.Success(new Image(imageData, fileName, contentType))
+            );
         }
         catch (Exception ex)
         {
-            return DataResult<Image>.Failure(new Failure(500, "Failed to download image"));
+            return new ImageDownloadResult(
+                imageUrl,
+                DataResult<Image>.Failure(new Failure(500, "Failed to download image"))
+            );
         }
     }
 
-    public async Task<IEnumerable<DataResult<Image>>> DownloadImageBatch(
+    public async Task<IEnumerable<ImageDownloadResult>> DownloadImageBatch(
         IEnumerable<string> imageUrls,
         bool sequentially
     )
@@ -57,7 +73,7 @@ public class ImageDownloadClient : IImageDownloadClient
             return await Task.WhenAll(tasks);
         }
 
-        var imageResults = new List<DataResult<Image>>();
+        var imageResults = new List<ImageDownloadResult>();
         imageUrls.ToList().ForEach(async void (url) =>
         {
             var result = await DownloadImage(url);
