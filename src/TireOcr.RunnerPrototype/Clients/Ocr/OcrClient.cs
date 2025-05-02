@@ -4,9 +4,9 @@ using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
-namespace TireOcr.RunnerPrototype.Clients;
+namespace TireOcr.RunnerPrototype.Clients.Ocr;
 
-public class OcrClient
+public class OcrClient : IOcrClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<OcrClient> _logger;

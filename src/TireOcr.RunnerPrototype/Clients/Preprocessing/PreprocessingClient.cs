@@ -3,9 +3,9 @@ using System.Net.Http.Headers;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
-namespace TireOcr.RunnerPrototype.Clients;
+namespace TireOcr.RunnerPrototype.Clients.Preprocessing;
 
-public class PreprocessingClient
+public class PreprocessingClient: IPreprocessingClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<PreprocessingClient> _logger;

@@ -2,9 +2,9 @@ using System.Net;
 using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.Shared.Result;
 
-namespace TireOcr.RunnerPrototype.Clients;
+namespace TireOcr.RunnerPrototype.Clients.Postprocessing;
 
-public class PostprocessingClient
+public class PostprocessingClient : IPostprocessingClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<PostprocessingClient> _logger;
@@ -35,7 +35,8 @@ public class PostprocessingClient
         {
             return ex.StatusCode switch
             {
-                HttpStatusCode.NotFound => DataResult<TirePostprocessingResult>.NotFound("No tire code was detected during Postprocessing."),
+                HttpStatusCode.NotFound => DataResult<TirePostprocessingResult>.NotFound(
+                    "No tire code was detected during Postprocessing."),
                 _ => DataResult<TirePostprocessingResult>.Failure(DefaultFailure)
             };
         }
