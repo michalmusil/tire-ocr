@@ -1,8 +1,11 @@
 using System.Diagnostics;
+using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
 using TireOcr.RunnerPrototype.Clients.Preprocessing;
 using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Batch;
+using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.Shared.Result;
@@ -11,20 +14,25 @@ namespace TireOcr.RunnerPrototype.Services.TireOcr;
 
 public class TireOcrService : ITireOcrService
 {
+    private const int MaxBatchSize = 10;
+
     private readonly IPreprocessingClient _preprocessingClient;
     private readonly IOcrClient _ocrClient;
     private readonly IPostprocessingClient _postprocessingClient;
     private readonly ICostEstimationService _costEstimationService;
+    private readonly IImageDownloadClient _imageDownloadClient;
     private readonly ILogger<TireOcrService> _logger;
 
-    public TireOcrService(IPreprocessingClient preprocessingClient, IOcrClient ocrClient, ILogger<TireOcrService> logger,
-        IPostprocessingClient postprocessingClient, ICostEstimationService costEstimationService)
+    public TireOcrService(IPreprocessingClient preprocessingClient, IOcrClient ocrClient,
+        ILogger<TireOcrService> logger, IPostprocessingClient postprocessingClient,
+        ICostEstimationService costEstimationService, IImageDownloadClient imageDownloadClient)
     {
         _preprocessingClient = preprocessingClient;
         _ocrClient = ocrClient;
         _logger = logger;
         _postprocessingClient = postprocessingClient;
         _costEstimationService = costEstimationService;
+        _imageDownloadClient = imageDownloadClient;
     }
 
     public async Task<DataResult<TireOcrResult>> RunSingleOcrPipelineAsync(
@@ -82,35 +90,57 @@ public class TireOcrService : ITireOcrService
         return DataResult<TireOcrResult>.Success(finalResult);
     }
 
-    public async Task<DataResult<TireOcrBatchResult>> RunOcrPipelineBatchAsync(IEnumerable<Image> images,
-        TireCodeDetectorType detectorType)
+    public async Task<DataResult<TireOcrBatchResult>> RunOcrPipelineBatchAsync(
+        IEnumerable<string> imageUrls,
+        int batchSize,
+        TireCodeDetectorType detectorType
+    )
     {
+        var urls = imageUrls.ToList();
+        if (batchSize > MaxBatchSize)
+            return DataResult<TireOcrBatchResult>.Invalid($"Batch size exceeds maximum of {MaxBatchSize}");
+
         var totalStopwatch = new Stopwatch();
         totalStopwatch.Start();
-        var tasks = images
-            .Select(async image =>
-            {
-                var result = await RunSingleOcrPipelineAsync(image, detectorType);
-                return (image, result);
-            });
 
-        var intermediateResults = await Task.WhenAll(tasks);
-        var successfulResults = intermediateResults
-            .Where(x => x.result.IsSuccess)
-            .Select(x => x.result.Data!)
-            .ToList();
-        var failingResults = intermediateResults
-            .Where(x => x.result.IsFailure)
-            .Select(x => new TireOcrFailure(
-                x.image.FileName,
-                x.result.PrimaryFailure?.Message ?? "Unknown error occurred")
-            )
-            .ToList();
+        var successfullyProcessed = new List<TireOcrResult>();
+        var failed = new List<TireOcrFailure>();
 
-        var totalEstimatedCosts = successfulResults
+        var batches = urls.ToList().GetSubLists(batchSize);
+        foreach (var batch in batches)
+        {
+            var results = (await ProcessOcrPipelineBatch(detectorType, batch))
+                .ToList();
+            var successful = results
+                .Where(r => r.ImageWithOcr.IsSuccess)
+                .Select(r => r.ImageWithOcr.Data!)
+                .Where(r => r.Result.IsSuccess)
+                .Select(r => r.Result.Data!);
+            successfullyProcessed.AddRange(successful);
+
+            var failedDueToDownload = results
+                .Where(r => r.ImageWithOcr.IsFailure)
+                .Select(r => new TireOcrFailure(
+                    r.ImageUrl,
+                    r.ImageWithOcr.PrimaryFailure?.Message ?? "Failed to download image."
+                ));
+
+            var failedDueToOcr = results
+                .Where(r => r.ImageWithOcr.IsSuccess)
+                .Select(r => r.ImageWithOcr.Data!)
+                .Where(r => r.Result.IsFailure)
+                .Select(r => new TireOcrFailure(
+                    r.Image.FileName,
+                    r.Result.PrimaryFailure?.Message ?? "Ocr pipeline failed"
+                ));
+            failed.AddRange(failedDueToDownload);
+            failed.AddRange(failedDueToOcr);
+        }
+
+        var totalEstimatedCosts = successfullyProcessed
             .Select(r => r.EstimatedCosts?.EstimatedCost ?? 0)
             .Sum();
-        var estimatedCostsCurrency = successfulResults
+        var estimatedCostsCurrency = successfullyProcessed
             .FirstOrDefault(r => r.EstimatedCosts is not null)
             ?.EstimatedCosts?.EstimatedCostCurrency;
 
@@ -119,13 +149,54 @@ public class TireOcrService : ITireOcrService
             Summary: new BatchSummaryDto(
                 totalEstimatedCosts,
                 estimatedCostsCurrency ?? "",
-                totalStopwatch.Elapsed.TotalMilliseconds
+                totalStopwatch.Elapsed.TotalMilliseconds,
+                new PipelineCompletionSuccessRateDto(
+                    urls.Count,
+                    successfullyProcessed.Count(),
+                    failed.Count(),
+                    double.Round((double)successfullyProcessed.Count / (double)urls.Count, 2)
+                )
             ),
-            SuccessfulResults: successfulResults,
-            Failures: failingResults
+            SuccessfulResults: successfullyProcessed,
+            Failures: failed
         );
 
         return DataResult<TireOcrBatchResult>.Success(result);
+    }
+
+    private async Task<IEnumerable<BatchFileResult>> ProcessOcrPipelineBatch(
+        TireCodeDetectorType detectorType,
+        IEnumerable<string> imageUrls
+    )
+    {
+        var imageDownloadResults = (await _imageDownloadClient.DownloadImageBatch(imageUrls))
+            .ToList();
+        var notDownloadedImages = imageDownloadResults
+            .Where(r => r.Result.IsFailure);
+        var downloadedImages = imageDownloadResults
+            .Where(r => r.Result.IsSuccess)
+            .Select(r => new { Url = r.ImageUrl, Image = r.Result.Data! });
+
+
+        var pipelineTasks = downloadedImages
+            .Select(async res =>
+            {
+                var result = await RunSingleOcrPipelineAsync(res.Image, detectorType);
+                return new { Url = res.Url, Image = res.Image, Result = result };
+            });
+
+        var processedResults = (await Task.WhenAll(pipelineTasks))
+            .Select(x => new BatchFileResult(
+                x.Url,
+                DataResult<ImageWithOcrResult>.Success(new ImageWithOcrResult(x.Image, x.Result))
+            ));
+        var failedResults = notDownloadedImages
+            .Select(x => new BatchFileResult(
+                x.ImageUrl,
+                DataResult<ImageWithOcrResult>.Failure(x.Result.Failures))
+            );
+
+        return [..processedResults, ..failedResults];
     }
 
     private async Task<(RunStat, T)> PerformTimeMeasuredTask<T>(string taskName, Func<Task<T>> performTask)
@@ -138,4 +209,8 @@ public class TireOcrService : ITireOcrService
         var timeTaken = stopWatch.Elapsed.TotalMilliseconds;
         return (new RunStat(taskName, timeTaken), result);
     }
+
+    private record BatchFileResult(string ImageUrl, DataResult<ImageWithOcrResult> ImageWithOcr);
+
+    private record ImageWithOcrResult(Image Image, DataResult<TireOcrResult> Result);
 }

@@ -1,4 +1,5 @@
 using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Batch;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
@@ -9,7 +10,8 @@ public interface ITireOcrService
     Task<DataResult<TireOcrResult>> RunSingleOcrPipelineAsync(Image image, TireCodeDetectorType detectorType);
 
     Task<DataResult<TireOcrBatchResult>> RunOcrPipelineBatchAsync(
-        IEnumerable<Image> images,
+        IEnumerable<string> imageUrls,
+        int batchSize,
         TireCodeDetectorType detectorType
     );
 }
