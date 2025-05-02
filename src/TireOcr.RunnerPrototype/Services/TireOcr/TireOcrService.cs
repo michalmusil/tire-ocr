@@ -1,5 +1,7 @@
 using System.Diagnostics;
-using TireOcr.RunnerPrototype.Clients;
+using TireOcr.RunnerPrototype.Clients.Ocr;
+using TireOcr.RunnerPrototype.Clients.Postprocessing;
+using TireOcr.RunnerPrototype.Clients.Preprocessing;
 using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
@@ -9,14 +11,14 @@ namespace TireOcr.RunnerPrototype.Services.TireOcr;
 
 public class TireOcrService : ITireOcrService
 {
-    private readonly PreprocessingClient _preprocessingClient;
-    private readonly OcrClient _ocrClient;
-    private readonly PostprocessingClient _postprocessingClient;
+    private readonly IPreprocessingClient _preprocessingClient;
+    private readonly IOcrClient _ocrClient;
+    private readonly IPostprocessingClient _postprocessingClient;
     private readonly ICostEstimationService _costEstimationService;
     private readonly ILogger<TireOcrService> _logger;
 
-    public TireOcrService(PreprocessingClient preprocessingClient, OcrClient ocrClient, ILogger<TireOcrService> logger,
-        PostprocessingClient postprocessingClient, ICostEstimationService costEstimationService)
+    public TireOcrService(IPreprocessingClient preprocessingClient, IOcrClient ocrClient, ILogger<TireOcrService> logger,
+        IPostprocessingClient postprocessingClient, ICostEstimationService costEstimationService)
     {
         _preprocessingClient = preprocessingClient;
         _ocrClient = ocrClient;
