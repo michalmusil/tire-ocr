@@ -1,5 +1,8 @@
 using System.Text.Json.Serialization;
-using TireOcr.RunnerPrototype.Clients;
+using TireOcr.RunnerPrototype.Clients.ImageDownload;
+using TireOcr.RunnerPrototype.Clients.Ocr;
+using TireOcr.RunnerPrototype.Clients.Postprocessing;
+using TireOcr.RunnerPrototype.Clients.Preprocessing;
 using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.RunnerPrototype.Services.TireOcr;
@@ -34,8 +37,7 @@ public static class DependencyInjection
 
     private static void AddClients(IServiceCollection serviceCollection)
     {
-        serviceCollection
-            .AddHttpClient<PreprocessingClient>(client =>
+        serviceCollection.AddHttpClient<IPreprocessingClient, PreprocessingClient>(client =>
             {
                 client.BaseAddress = new("https+http://PreprocessingService");
             })
@@ -47,11 +49,15 @@ public static class DependencyInjection
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
-        serviceCollection.AddHttpClient<OcrClient>(client => { client.BaseAddress = new("https+http://OcrService"); });
-        serviceCollection.AddHttpClient<PostprocessingClient>(client =>
+        serviceCollection.AddHttpClient<IOcrClient, OcrClient>(client =>
+        {
+            client.BaseAddress = new("https+http://OcrService");
+        });
+        serviceCollection.AddHttpClient<IPostprocessingClient, PostprocessingClient>(client =>
         {
             client.BaseAddress = new("https+http://PostprocessingService");
         });
+        serviceCollection.AddHttpClient<IImageDownloadClient, ImageDownloadClient>();
     }
 
     private static void AddServices(IServiceCollection services)

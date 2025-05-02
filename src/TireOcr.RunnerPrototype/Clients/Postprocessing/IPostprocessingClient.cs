@@ -1,0 +1,9 @@
+using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.Shared.Result;
+
+namespace TireOcr.RunnerPrototype.Clients.Postprocessing;
+
+public interface IPostprocessingClient
+{
+    public Task<DataResult<TirePostprocessingResult>> PostprocessTireCode(string rawTireCode);
+}
