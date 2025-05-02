@@ -1,4 +1,4 @@
-using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Batch;
 
 namespace TireOcr.RunnerPrototype.Contracts.RunBatch;
 
