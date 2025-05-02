@@ -3,6 +3,7 @@ using OpenAI.Chat;
 using TireOcr.Ocr.Application.Dtos;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
+using TireOcr.Ocr.Infrastructure.Constants;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
@@ -10,10 +11,6 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 public class OpenAiGptTireCodeDetector : ITireCodeDetector
 {
     private readonly IConfiguration _configuration;
-
-    private readonly string _prompt =
-        "In the following image, there should be a picture of a portion of a car tire. On this picture, there should be embossed tire code. The format is for example: \"185/75R1482S\" or \"P215/55ZR1895V\". Keep in mind that the \"/\" character has to be in the output. Please read the tire code from the image and return only the detected code string itself (for example just \"210/60ZR15\"). If you can't detect any tire code in the photo for whatever reason, just answer with letter \"N\" and nothing else.";
-
 
     public OpenAiGptTireCodeDetector(IConfiguration configuration)
     {
@@ -32,7 +29,7 @@ public class OpenAiGptTireCodeDetector : ITireCodeDetector
             List<ChatMessage> messages =
             [
                 new UserChatMessage(
-                    ChatMessageContentPart.CreateTextPart(_prompt),
+                    ChatMessageContentPart.CreateTextPart(ModelPrompts.TireCodeOcrPrompt),
                     ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data), image.ContentType,
                         ChatImageDetailLevel.High)
                 )
