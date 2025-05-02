@@ -44,20 +44,24 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private int GetScoreOfTireCode(TireCode tireCode)
     {
+        var bonusMultiplierValue = 5;
         var score = 0;
 
-        var properties = typeof(TireCode).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (var property in properties)
-        {
-            if (!property.CanRead)
-                continue;
-
-            var value = property.GetValue(tireCode);
-            if (value is not null)
-                score++;
-        }
+        IncrementIfNotNull(tireCode.VehicleClass, ref score);
+        IncrementIfNotNull(tireCode.Width, ref score, bonusMultiplierValue);
+        IncrementIfNotNull(tireCode.AspectRatio, ref score, bonusMultiplierValue);
+        IncrementIfNotNull(tireCode.Construction, ref score, bonusMultiplierValue);
+        IncrementIfNotNull(tireCode.Diameter, ref score, bonusMultiplierValue);
+        IncrementIfNotNull(tireCode.LoadRangeAndIndex, ref score);
+        IncrementIfNotNull(tireCode.SpeedRating, ref score);
 
         return score;
+    }
+
+    private void IncrementIfNotNull(dynamic? value, ref int score, int multiplier = 1)
+    {
+        if (value is not null)
+            score += 1 * multiplier;
     }
 
     private string PerformPreMatchingCleanup(string rawCode)
@@ -179,8 +183,16 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
     private int ExtractLoadRangeAndIndex(TireCode code, string leftOfDiameter)
     {
         Match loadRangeIndexMatch =
-            Regex.Match(leftOfDiameter, @"^(?<LoadRangeIndex>([A-Z]{1,2}\d{1,3}/?)?\d{2,3})\|?");
-        var loadRangeAndIndex = loadRangeIndexMatch.Success ? loadRangeIndexMatch.Groups["LoadRangeIndex"].Value : null;
+            Regex.Match(leftOfDiameter, @"^\|?(?<LoadRange>[A-Z]{1,2})?\|?(?<LoadIndex>(\d{1,3}/?)?\d{2,3})\|?");
+        if (!loadRangeIndexMatch.Success)
+            return 0;
+
+        var loadRange = loadRangeIndexMatch.Groups["LoadRange"].Success
+            ? loadRangeIndexMatch.Groups["LoadRange"].Value
+            : null;
+        var loadIndex = loadRangeIndexMatch.Groups["LoadIndex"].Value;
+
+        var loadRangeAndIndex = $"{loadRange ?? ""}{loadIndex}";
         code.LoadRangeAndIndex = loadRangeAndIndex;
 
         return loadRangeIndexMatch.Length;
