@@ -3,9 +3,9 @@ using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
 using TireOcr.RunnerPrototype.Clients.Preprocessing;
-using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.RunnerPrototype.Services.TireOcr;
+using TireOcr.ServiceDefaults;
 
 namespace TireOcr.RunnerPrototype;
 

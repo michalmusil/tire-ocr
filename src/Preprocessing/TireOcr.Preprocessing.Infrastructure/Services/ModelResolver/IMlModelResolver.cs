@@ -1,9 +1,10 @@
 using TireOcr.Preprocessing.Infrastructure.Models;
+using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 
 public interface IMlModelResolver
 {
-    public MlModel? Resolve<T>();
-    public Task EnsureAllModelsLoadedAsync();
+    public Task<DataResult<MlModel>> Resolve<T>();
+    public Task<Result> EnsureAllModelsLoadedAsync();
 }

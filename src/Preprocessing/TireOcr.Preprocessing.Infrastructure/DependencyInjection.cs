@@ -12,15 +12,9 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
-        AddClients(services);
         AddServices(services);
         AddFacades(services);
         return services;
-    }
-
-    private static void AddClients(IServiceCollection services)
-    {
-        services.AddHttpClient<IMlModelDownloader>(c => c.Timeout = TimeSpan.FromMinutes(3));
     }
 
     private static void AddServices(IServiceCollection services)

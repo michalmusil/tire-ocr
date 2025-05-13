@@ -23,14 +23,16 @@ public class YoloTextDetectionService : ITextDetectionService
 
     public async Task<DataResult<List<CharacterInImage>>> DetectTextInImage(Image image)
     {
-        var modelToUse = _modelResolver.Resolve<ITextDetectionService>();
-        if (modelToUse is null)
-            return DataResult<List<CharacterInImage>>.Failure(new Failure(500,
-                "Failed to load Ml model for text detection"));
+        var modelResult = await _modelResolver.Resolve<ITextDetectionService>();
+        if (modelResult.IsFailure)
+            return DataResult<List<CharacterInImage>>.Failure(
+                new Failure(500, modelResult.PrimaryFailure?.Message ?? "Failed to resolve ML model")
+            );
 
+        var model = modelResult.Data!;
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = modelToUse.GetAbsolutePath(),
+            OnnxModel = model.GetAbsolutePath(),
             ModelType = ModelType.ObjectDetection,
             Cuda = false,
             PrimeGpu = false
