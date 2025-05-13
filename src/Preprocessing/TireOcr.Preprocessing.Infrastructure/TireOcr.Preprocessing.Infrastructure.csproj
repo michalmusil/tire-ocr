@@ -16,7 +16,9 @@
       <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2" />
       <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.21.0" />
       <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
+      <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.10.0.20241108" />
       <PackageReference Include="OpenCvSharp4.runtime.osx_arm64" Version="4.8.1-rc" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.8" />
       <PackageReference Include="YoloDotNet" Version="2.2.0" />
     </ItemGroup>
 

@@ -1,4 +1,6 @@
 using Asp.Versioning;
+using TireOcr.Preprocessing.Infrastructure.Services.ModelDownloader;
+using TireOcr.ServiceDefaults;
 
 namespace TireOcr.Preprocessing.WebApi;
 
@@ -29,5 +31,18 @@ public static class DependencyInjection
     {
         serviceCollection.AddEndpointsApiExplorer();
         serviceCollection.AddSwaggerGen();
+    }
+    
+    private static void AddClients(IServiceCollection services)
+    {
+        services.AddHttpClient<IMlModelDownloader>()
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromMinutes(3);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });;
     }
 }

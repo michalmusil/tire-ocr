@@ -1,6 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Http.Resilience;
 
-namespace TireOcr.RunnerPrototype.Extensions;
+namespace TireOcr.ServiceDefaults;
 
 public static class HttpClientBuilderExtension
 {

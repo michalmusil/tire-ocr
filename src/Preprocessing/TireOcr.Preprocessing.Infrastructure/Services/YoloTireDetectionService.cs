@@ -31,14 +31,16 @@ public class YoloTireDetectionService : ITireDetectionService
         var stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        var modelToUse = _modelResolver.Resolve<ITireDetectionService>();
-        if (modelToUse is null)
-            return DataResult<TireDetectionResult>.Failure(new Failure(500,
-                "Failed to load Ml model for tire detection"));
+        var modelResult = await _modelResolver.Resolve<ITireDetectionService>();
+        if (modelResult.IsFailure)
+            return DataResult<TireDetectionResult>.Failure(
+                new Failure(500, modelResult.PrimaryFailure?.Message ?? "Failed to resolve ML model")
+            );
 
+        var model = modelResult.Data!;
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = modelToUse.GetAbsolutePath(),
+            OnnxModel = model.GetAbsolutePath(),
             ModelType = ModelType.Segmentation,
             Cuda = false,
             PrimeGpu = false
