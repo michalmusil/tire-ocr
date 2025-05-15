@@ -21,7 +21,7 @@ echo ""
 
 # POSTPROCESSING
 echo "Building image for postprocessing service"
-docker build --platform linux/amd64 -t "${POSTPROCESSING_IMAGE_NAME}:latest" -f src/Preprocessing/TireOcr.Preprocessing.WebApi/Dockerfile .
+docker build --platform linux/amd64 -t "${POSTPROCESSING_IMAGE_NAME}:latest" -f src/Postprocessing/TireOcr.Postprocessing.WebApi/Dockerfile .
 echo "Successfully built ${POSTPROCESSING_IMAGE_NAME}"
 echo ""
 
