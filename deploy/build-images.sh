@@ -2,10 +2,10 @@
 
 set -e
 
-PREPROCESSING_IMAGE_NAME="tire-ocr/preprocessing-service"
-OCR_IMAGE_NAME="tire-ocr/ocr-service"
-POSTPROCESSING_IMAGE_NAME="tire-ocr/postprocessing-service"
-RUNNER_PROTOTYPE_IMAGE_NAME="tire-ocr/runner-prototype"
+PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_preprocessing-service"
+OCR_IMAGE_NAME="michalmusil/tire-ocr_ocr-service"
+POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_postprocessing-service"
+RUNNER_PROTOTYPE_IMAGE_NAME="michalmusil/tire-ocr_runner-prototype"
 
 # PREPROCESSING
 echo "Building image for preprocessing service"
