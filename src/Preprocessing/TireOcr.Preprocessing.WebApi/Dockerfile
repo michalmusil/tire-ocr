@@ -104,38 +104,6 @@ RUN mkdir /opencvsharp/make && cd /opencvsharp/make && \
 
 
 
-# BUILD SKIASHARP
-# FROM mcr.microsoft.com/dotnet/aspnet:8.0-noble-amd64 as skiasharp-builder
-# WORKDIR /
-# RUN apt-get update && apt-get -y install --no-install-recommends \
-#     cmake \
-#     git \
-#     && apt-get -y clean \
-#     && rm -rf /var/lib/apt/lists/*
-
-# RUN git clone https://github.com/mono/skia.git -b v1.60.1
-# RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git
-# WORKDIR /skia
-# RUN python tools/git-sync-deps
-# RUN ./bin/gn gen 'out/linux/x64' --args=' \
-#     is_official_build=true skia_enable_tools=false \
-#     target_os="linux" target_cpu="x64" \
-#     skia_use_icu=false skia_use_sfntly=false skia_use_piex=true \
-#     skia_use_system_expat=false skia_use_system_freetype2=false skia_use_system_libjpeg_turbo=false skia_use_system_libpng=false skia_use_system_libwebp=false skia_use_system_zlib=false \
-#     skia_enable_gpu=true \
-#     extra_cflags=[ "-DSKIA_C_DLL" ] \
-#     linux_soname_version="60.1.0"'
-
-# RUN ../depot_tools/ninja 'SkiaSharp' -C 'out/linux/x64'
-
-
-
-
-
-
-
-
-
 # BUILD APP
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-noble-amd64 AS base
 WORKDIR /app
@@ -166,5 +134,5 @@ COPY --from=opencv-builder /usr/lib /usr/lib
 # COPY --from=skiasharp-builder out/linux/x64/ /usr/lib
 
 EXPOSE 8080
-ENV DOTNET_VERSION=8.0.15 ASPNET_VERSION=8.0.15 APP_UID=1654 ASPNETCORE_HTTP_PORTS=8080 DOTNET_RUNNING_IN_CONTAINER=true
+ENV DOTNET_VERSION=8.0.16 ASPNET_VERSION=8.0.15 APP_UID=1654 ASPNETCORE_HTTP_PORTS=8080 DOTNET_RUNNING_IN_CONTAINER=true
 ENTRYPOINT ["dotnet", "TireOcr.Preprocessing.WebApi.dll"]
