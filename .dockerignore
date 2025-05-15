@@ -3,6 +3,7 @@
 **/.env
 **/.git
 **/.gitignore
+**/*credentials.json
 **/.project
 **/.settings
 **/.toolstarget

@@ -62,7 +62,7 @@ public static class ResultExtension
             409 => CreateActionResult(409, "Conflict", failure, otherFailures),
             422 => CreateActionResult(422, "Invalid request data", failure, otherFailures),
             >= 400 and < 500 => CreateActionResult(400, "Bad request", failure, otherFailures),
-            _ => FallbackResult
+            _ => CreateActionResult(500, "Unexpected result output", failure, otherFailures)
         };
     }
 

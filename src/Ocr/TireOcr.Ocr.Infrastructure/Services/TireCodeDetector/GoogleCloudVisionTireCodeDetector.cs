@@ -23,7 +23,7 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
             var client = GetOcrClient();
             if (client is null)
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
-                    "Failed to retrieve OpenAi endpoint configuration"));
+                    "Failed to retrieve Google Cloud vision endpoint configuration"));
 
             var imageToSend = Google.Cloud.Vision.V1.Image.FromBytes(image.Data);
             var detectedTexts = await client.DetectTextAsync(imageToSend);
@@ -52,12 +52,10 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
     {
         try
         {
-            var credentialsRelativePath = _configuration.GetValue<string>("ApiKeys:GcpJsonCredentialsRelativePath")!;
-            var credPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, credentialsRelativePath);
-
-            var clientBuilder = new ImageAnnotatorClientBuilder()
+            var jsonCredentials = _configuration.GetValue<string>("ApiKeys:GcpJsonCredentials")!;
+            var clientBuilder = new ImageAnnotatorClientBuilder
             {
-                CredentialsPath = credPath,
+                JsonCredentials = jsonCredentials,
             };
             return clientBuilder.Build();
         }
