@@ -1,7 +1,7 @@
 services:
   PreprocessingService:
     container_name: "PreprocessingService"
-    image: "tire-ocr/preprocessing-service:latest"
+    image: "michalmusil/tire-ocr_preprocessing-service:latest"
     volumes:
       - preprocessing-volume:/app/models
     environment:
@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
   OcrService:
     container_name: "OcrService"
-    image: "tire-ocr/ocr-service:latest"
+    image: "michalmusil/tire-ocr_ocr-service:latest"
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
   PostprocessingService:
     container_name: "PostprocessingService"
-    image: "tire-ocr/postprocessing-service:latest"
+    image: "michalmusil/tire-ocr_postprocessing-service:latest"
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
@@ -53,7 +53,7 @@ services:
     restart: unless-stopped
   RunnerPrototype:
     container_name: "RunnerPrototype"
-    image: "tire-ocr/runner-prototype:latest"
+    image: "michalmusil/tire-ocr_runner-prototype:latest"
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
