@@ -1,5 +1,5 @@
-using System.Net;
 using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Exceptions;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Clients.Postprocessing;
@@ -27,18 +27,23 @@ public class PostprocessingClient : IPostprocessingClient
             };
 
             var res = await _httpClient.PostAsJsonAsync("/api/v1/Postprocess", content);
-            res.EnsureSuccessStatusCode();
+            if (!res.IsSuccessStatusCode)
+            {
+                var errorContent = await res.Content.ReadAsStringAsync();
+                throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
+            }
+
             var postprocessResult = await res.Content.ReadFromJsonAsync<TirePostprocessingResult>();
             return DataResult<TirePostprocessingResult>.Success(postprocessResult!);
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestExceptionWithContent ex)
         {
-            return ex.StatusCode switch
-            {
-                HttpStatusCode.NotFound => DataResult<TirePostprocessingResult>.NotFound(
-                    "No tire code was detected during Postprocessing."),
-                _ => DataResult<TirePostprocessingResult>.Failure(DefaultFailure)
-            };
+            var statusCode = ex.StatusCode;
+            ex.TryGetContentJsonProperty("detail", out var content);
+            var failureMessage = content ?? "No tire code was detected during Postprocessing";
+
+            _logger.LogError(ex, failureMessage);
+            return DataResult<TirePostprocessingResult>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
