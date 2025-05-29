@@ -66,7 +66,7 @@ public class ImageTextApproximator : IImageTextApproximator
     {
         var stringsList = strings.ToList();
         if (!stringsList.Any())
-            return DataResult<Dictionary<string, int>>.Invalid("No strings provided");
+            return DataResult<Dictionary<string, int>>.Invalid("No strings for Levenshtein distance provided");
 
         var normalizedReferenceCodes = _normalizedReferenceCodes;
         Dictionary<string, int> results = new Dictionary<string, int>();

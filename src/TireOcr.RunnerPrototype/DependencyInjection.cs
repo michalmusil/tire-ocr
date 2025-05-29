@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
@@ -32,7 +33,11 @@ public static class DependencyInjection
     private static void AddSwagger(IServiceCollection serviceCollection)
     {
         serviceCollection.AddEndpointsApiExplorer();
-        serviceCollection.AddSwaggerGen();
+        serviceCollection.AddSwaggerGen(opt =>
+        {
+            var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            opt.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+        });
     }
 
     private static void AddClients(IServiceCollection serviceCollection)
