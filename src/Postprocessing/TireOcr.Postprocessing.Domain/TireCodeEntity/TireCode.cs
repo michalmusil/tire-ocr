@@ -7,11 +7,11 @@ public class TireCode
     public required string RawCode { get; init; }
 
     public string? VehicleClass { get; set; }
-    public int? Width { get; set; }
-    public int? AspectRatio { get; set; }
+    public decimal? Width { get; set; }
+    public decimal? AspectRatio { get; set; }
     public string? DeprecatedSpeedRating { get; set; }
     public string? Construction { get; set; }
-    public int? Diameter { get; set; }
+    public decimal? Diameter { get; set; }
     public string? LoadIndex { get; set; }
     public string? SpeedRating { get; set; }
 
