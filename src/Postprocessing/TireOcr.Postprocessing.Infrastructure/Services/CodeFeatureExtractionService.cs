@@ -52,7 +52,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         IncrementIfNotNull(tireCode.AspectRatio, ref score, bonusMultiplierValue);
         IncrementIfNotNull(tireCode.Construction, ref score, bonusMultiplierValue);
         IncrementIfNotNull(tireCode.Diameter, ref score, bonusMultiplierValue);
-        IncrementIfNotNull(tireCode.LoadRangeAndIndex, ref score);
+        IncrementIfNotNull(tireCode.LoadIndex, ref score);
         IncrementIfNotNull(tireCode.SpeedRating, ref score);
 
         return score;
@@ -118,7 +118,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         var diameterCharCount = ExtractDiameter(tireCode, rightOfAnchor);
         rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, diameterCharCount, fromStart: true);
 
-        var rangeAndIndexCharCount = ExtractLoadRangeAndIndex(tireCode, rightOfAnchor);
+        var rangeAndIndexCharCount = ExtractLoadIndex(tireCode, rightOfAnchor);
         rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, rangeAndIndexCharCount, fromStart: true);
 
         ExtractSpeedRating(tireCode, rightOfAnchor);
@@ -180,20 +180,19 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         return diameterMatch.Length;
     }
 
-    private int ExtractLoadRangeAndIndex(TireCode code, string leftOfDiameter)
+    private int ExtractLoadIndex(TireCode code, string leftOfDiameter)
     {
         Match loadRangeIndexMatch =
             Regex.Match(leftOfDiameter, @"^\|?(?<LoadRange>[A-Z]{1,2})?\|?(?<LoadIndex>(\d{1,3}/?)?\d{2,3})\|?");
         if (!loadRangeIndexMatch.Success)
             return 0;
 
-        var loadRange = loadRangeIndexMatch.Groups["LoadRange"].Success
-            ? loadRangeIndexMatch.Groups["LoadRange"].Value
-            : null;
         var loadIndex = loadRangeIndexMatch.Groups["LoadIndex"].Value;
-
-        var loadRangeAndIndex = $"{loadRange ?? ""}{loadIndex}";
-        code.LoadRangeAndIndex = loadRangeAndIndex;
+        // var loadRange = loadRangeIndexMatch.Groups["LoadRange"].Success
+        //     ? loadRangeIndexMatch.Groups["LoadRange"].Value
+        //     : null;
+        // var loadRangeAndIndex = $"{loadRange ?? ""}{loadIndex}";
+        code.LoadIndex = loadIndex;
 
         return loadRangeIndexMatch.Length;
     }
