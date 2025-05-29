@@ -8,11 +8,11 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class OpenAiGptTireCodeDetector : ITireCodeDetector
+public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly IConfiguration _configuration;
 
-    public OpenAiGptTireCodeDetector(IConfiguration configuration)
+    public OpenAiGptTireCodeDetectorService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -47,7 +47,7 @@ public class OpenAiGptTireCodeDetector : ITireCodeDetector
                 new OcrRequestBillingDto(
                     completion.Value.Usage.InputTokenCount,
                     completion.Value.Usage.OutputTokenCount,
-                    BillingUnit.Token
+                    BillingUnitDto.Token
                 )
             );
             return DataResult<OcrResultDto>.Success(result);

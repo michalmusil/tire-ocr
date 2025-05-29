@@ -8,11 +8,11 @@ namespace TireOcr.Ocr.Application.Queries.PerformTireImageOcr;
 
 public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcrQuery, OcrResultDto>
 {
-    private readonly ITireCodeDetectionService _tireCodeDetectionService;
+    private readonly ITireCodeOcrService _tireCodeOcrService;
 
-    public PerformTireImageOcrQueryHandler(ITireCodeDetectionService tireCodeDetectionService)
+    public PerformTireImageOcrQueryHandler(ITireCodeOcrService tireCodeOcrService)
     {
-        _tireCodeDetectionService = tireCodeDetectionService;
+        _tireCodeOcrService = tireCodeOcrService;
     }
 
     public async Task<DataResult<OcrResultDto>> Handle(PerformTireImageOcrQuery request,
@@ -20,6 +20,6 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
     {
         var image = new Image(request.ImageData, request.ImageName, request.ImageContentType);
 
-        return await _tireCodeDetectionService.DetectAsync(request.DetectorType, image);
+        return await _tireCodeOcrService.DetectAsync(request.DetectorType, image);
     }
 }

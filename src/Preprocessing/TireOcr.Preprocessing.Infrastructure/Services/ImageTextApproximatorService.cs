@@ -11,7 +11,7 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
     private readonly List<string> _referenceCodes =
         ["LT215/55R16 91V", "LT245/75R16 120/116Q", "P215/55ZR18 95V", "205/55R16 91V", "215/65ZR17 93W", "215/65ZR15"];
 
-    private List<string> _normalizedReferenceCodes => _referenceCodes.Select(NormalizeTireCode).ToList();
+    private List<string> NormalizedReferenceCodes => _referenceCodes.Select(NormalizeTireCode).ToList();
 
     public DataResult<IEnumerable<string>> ApproximateStringsFromCharacters(
         IEnumerable<CharacterInImage> imageCharacters)
@@ -68,7 +68,7 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
         if (!stringsList.Any())
             return DataResult<Dictionary<string, int>>.Invalid("No strings for Levenshtein distance provided");
 
-        var normalizedReferenceCodes = _normalizedReferenceCodes;
+        var normalizedReferenceCodes = NormalizedReferenceCodes;
         Dictionary<string, int> results = new Dictionary<string, int>();
 
         foreach (string detected in stringsList)

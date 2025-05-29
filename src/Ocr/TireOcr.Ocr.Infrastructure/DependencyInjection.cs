@@ -17,14 +17,14 @@ public static class DependencyInjection
 
     private static void AddClients(IServiceCollection services)
     {
-        services.AddHttpClient<ITireCodeDetectorResolver>(c => c.Timeout = TimeSpan.FromSeconds(30));
+        services.AddHttpClient<ITireCodeDetectorResolverService>(c => c.Timeout = TimeSpan.FromSeconds(30));
     }
 
     private static void AddServices(IServiceCollection services)
     {
-        services.AddSingleton<IImageUtils, ImageUtils>();
+        services.AddSingleton<IImageConvertorService, ImageConvertorService>();
 
-        services.AddScoped<ITireCodeDetectorResolver, TireCodeDetectorResolver>();
-        services.AddScoped<ITireCodeDetectionService, TireCodeDetectionService>();
+        services.AddScoped<ITireCodeDetectorResolverService, TireCodeDetectorResolverService>();
+        services.AddScoped<ITireCodeOcrService, TireCodeOcrService>();
     }
 }

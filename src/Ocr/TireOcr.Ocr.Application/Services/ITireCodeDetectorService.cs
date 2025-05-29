@@ -4,7 +4,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Application.Services;
 
-public interface ITireCodeDetector
+public interface ITireCodeDetectorService
 {
     public Task<DataResult<OcrResultDto>> DetectAsync(Image image);
 }

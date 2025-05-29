@@ -7,11 +7,11 @@ using Image = TireOcr.Ocr.Domain.ImageEntity.Image;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
+public class GoogleCloudVisionTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly IConfiguration _configuration;
 
-    public GoogleCloudVisionTireCodeDetector(IConfiguration configuration)
+    public GoogleCloudVisionTireCodeDetectorService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -37,7 +37,7 @@ public class GoogleCloudVisionTireCodeDetector : ITireCodeDetector
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(0, 1, BillingUnit.Transaction)
+                new OcrRequestBillingDto(0, 1, BillingUnitDto.Transaction)
             );
             return DataResult<OcrResultDto>.Success(result);
         }
