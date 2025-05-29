@@ -6,5 +6,5 @@ namespace TireOcr.Preprocessing.Application.Facades;
 
 public interface ITextDetectionFacade
 {
-    public Task<DataResult<TextDetectionResult>> GetTextAreaFromImageAsync(Image image);
+    public Task<DataResult<TextDetectionResultDto>> GetTextAreaFromImageAsync(Image image);
 }

@@ -35,7 +35,7 @@ public static class DependencyInjection
     
     private static void AddClients(IServiceCollection services)
     {
-        services.AddHttpClient<IMlModelDownloader>()
+        services.AddHttpClient<IMlModelDownloaderService>()
             .RemoveResilienceHandlers()
             .AddStandardResilienceHandler(opt =>
             {

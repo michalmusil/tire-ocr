@@ -3,7 +3,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Application.Services;
 
-public interface IImageTextApproximator
+public interface IImageTextApproximatorService
 {
     public DataResult<IEnumerable<string>> ApproximateStringsFromCharacters(
         IEnumerable<CharacterInImage> imageCharacters

@@ -7,17 +7,17 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 
-public class MlModelResolver : IMlModelResolver
+public class MlModelResolverService : IMlModelResolverService
 {
     private const int MaxNumberOfDownloadRetries = 3;
-    private readonly IMlModelDownloader _modelDownloader;
+    private readonly IMlModelDownloaderService _modelDownloaderService;
     private readonly IConfiguration _configuration;
     private readonly Dictionary<Type, Func<MlModel?>> _factories;
 
-    public MlModelResolver(IConfiguration configuration, IMlModelDownloader modelDownloader)
+    public MlModelResolverService(IConfiguration configuration, IMlModelDownloaderService modelDownloaderService)
     {
         _configuration = configuration;
-        _modelDownloader = modelDownloader;
+        _modelDownloaderService = modelDownloaderService;
         _factories = new()
         {
             { typeof(ITireDetectionService), () => GetModel("TireSegmentation") },
@@ -81,7 +81,7 @@ public class MlModelResolver : IMlModelResolver
                 throw new ApplicationException($"Directory of MlModel {modelAbsolutePath} is not valid.");
 
             Directory.CreateDirectory(modelDirectory);
-            var downloaded = await _modelDownloader.DownloadAsync(model);
+            var downloaded = await _modelDownloaderService.DownloadAsync(model);
             if (downloaded)
                 return Result.Success();
             retryCount++;

@@ -3,11 +3,11 @@ using TireOcr.Preprocessing.Infrastructure.Models;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services.ModelDownloader;
 
-public class MlModelDownloader : IMlModelDownloader
+public class MlModelDownloaderService : IMlModelDownloaderService
 {
     private readonly HttpClient _client;
 
-    public MlModelDownloader(HttpClient client)
+    public MlModelDownloaderService(HttpClient client)
     {
         _client = client;
     }

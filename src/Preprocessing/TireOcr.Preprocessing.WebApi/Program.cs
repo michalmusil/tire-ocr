@@ -15,7 +15,7 @@ builder.AddServiceDefaults();
 // Loading ML models into local storage
 await using (var provider = builder.Services.BuildServiceProvider())
 {
-    var modelResolver = provider.GetRequiredService<IMlModelResolver>();
+    var modelResolver = provider.GetRequiredService<IMlModelResolverService>();
     await modelResolver.EnsureAllModelsLoadedAsync();
 }
 

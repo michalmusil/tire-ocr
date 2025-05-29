@@ -14,16 +14,16 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 public class YoloTextDetectionService : ITextDetectionService
 {
     private const double ConfidenceThreshold = 0.05;
-    private readonly IMlModelResolver _modelResolver;
+    private readonly IMlModelResolverService _modelResolverService;
 
-    public YoloTextDetectionService(IMlModelResolver modelResolver)
+    public YoloTextDetectionService(IMlModelResolverService modelResolverService)
     {
-        _modelResolver = modelResolver;
+        _modelResolverService = modelResolverService;
     }
 
     public async Task<DataResult<List<CharacterInImage>>> DetectTextInImage(Image image)
     {
-        var modelResult = await _modelResolver.Resolve<ITextDetectionService>();
+        var modelResult = await _modelResolverService.Resolve<ITextDetectionService>();
         if (modelResult.IsFailure)
             return DataResult<List<CharacterInImage>>.Failure(
                 new Failure(500, modelResult.PrimaryFailure?.Message ?? "Failed to resolve ML model")
