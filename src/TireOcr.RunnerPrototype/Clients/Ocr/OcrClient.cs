@@ -54,7 +54,7 @@ public class OcrClient : IOcrClient
         {
             var statusCode = ex.StatusCode;
             ex.TryGetContentJsonProperty("detail", out var content);
-            var failureMessage = content ?? "No tire code was detected during Ocr";
+            var failureMessage = $"Ocr: {content ?? "No tire code was detected during Ocr"}";
 
             _logger.LogError(ex, failureMessage);
             return DataResult<OcrServiceResultDto>.Failure(new Failure((int)statusCode!, failureMessage));

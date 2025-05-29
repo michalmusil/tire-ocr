@@ -40,7 +40,7 @@ public class PostprocessingClient : IPostprocessingClient
         {
             var statusCode = ex.StatusCode;
             ex.TryGetContentJsonProperty("detail", out var content);
-            var failureMessage = content ?? "No tire code was detected during Postprocessing";
+            var failureMessage = $"Postprocessing: {content ?? "No tire code was detected during Postprocessing"}";
 
             _logger.LogError(ex, failureMessage);
             return DataResult<TirePostprocessingResult>.Failure(new Failure((int)statusCode!, failureMessage));

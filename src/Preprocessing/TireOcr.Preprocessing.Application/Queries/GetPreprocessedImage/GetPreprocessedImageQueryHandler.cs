@@ -41,8 +41,9 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var image = new Image(request.ImageData, request.ImageName, originalSize);
 
-        double tireDetectionSeconds;
-        Image imageToProcess;
+        double tireDetectionSeconds = 0;
+        Image? fallbackImage = null;
+        Image? unwrappedImage = null;
         try
         {
             var resized = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
@@ -50,29 +51,34 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
                 resized,
                 windowSize: new ImageSize(10, 10)
             );
+            fallbackImage = withClahe;
 
             var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
             if (detectedTireResult.IsFailure)
-                return DataResult<PreprocessedImageDto>.Failure(detectedTireResult.Failures);
+                // return DataResult<PreprocessedImageDto>.Failure(detectedTireResult.Failures);
+                throw new Exception("Failed to detect tire rim");
 
             var detectedTire = detectedTireResult.Data!;
             tireDetectionSeconds = detectedTire.TimeTaken.TotalSeconds;
             var unwrapped = GetUnwrappedTireStrip(withClahe, detectedTire.RimCircle);
             var extended = _imageManipulationService.CopyAndAppendImagePortionFromLeft(unwrapped, 0.17);
-            imageToProcess = extended;
+            unwrappedImage = extended;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, ex.StackTrace);
-            return DataResult<PreprocessedImageDto>.Failure(
-                new Failure(500, ex.Message) // TODO: Remove after testing
-            );
+            _logger.LogError(ex, $"Exception during preprocessing: {ex.StackTrace}");
         }
 
-        var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(imageToProcess);
+        if (unwrappedImage is null)
+            return HandleUnsuccessfulPreprocessing(request.OriginalContentType, fallbackImage);
 
+        var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(unwrappedImage);
         return textArea.Map(
-            onFailure: failures => DataResult<PreprocessedImageDto>.Failure(failures),
+            onFailure: failures => HandleUnsuccessfulPreprocessing(
+                request.OriginalContentType,
+                fallbackImage,
+                failures
+            ),
             onSuccess: res =>
             {
                 var textDetectionSeconds = res.TimeTaken.TotalSeconds;
@@ -98,5 +104,25 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
             innerTireRadius,
             outerTireRadius
         );
+    }
+
+    private DataResult<PreprocessedImageDto> HandleUnsuccessfulPreprocessing(string contentType, Image? image = null,
+        Failure[]? failures = null)
+    {
+        if (image == null)
+        {
+            _logger.LogError("Preprocessing failed with no image to return");
+            return DataResult<PreprocessedImageDto>.Failure(failures ??
+            [
+                new Failure(500, "Fatal failure during preprocessing")
+            ]);
+        }
+
+        var resultDto = new PreprocessedImageDto(
+            image.Name,
+            image.Data,
+            contentType
+        );
+        return DataResult<PreprocessedImageDto>.Success(resultDto);
     }
 }
