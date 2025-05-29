@@ -4,7 +4,7 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 
 public class ContentTypeResolver : IContentTypeResolver
 {
-    private static readonly List<string> SupportedContentTypes = ["image/jpeg", "image/png"];
+    private static readonly List<string> SupportedContentTypes = ["image/jpeg", "image/png", "image/heic", "image/heif"];
 
     public bool IsContentTypeSupported(string contentType)
     {

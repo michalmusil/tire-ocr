@@ -1,6 +1,6 @@
-using System.Net;
 using System.Net.Http.Headers;
 using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Exceptions;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
@@ -40,20 +40,24 @@ public class OcrClient : IOcrClient
             content.Add(new StringContent(detectorType.ToString()), "DetectorType");
 
             var res = await _httpClient.PostAsync("/api/v1/Ocr", content);
-            res.EnsureSuccessStatusCode();
+            if (!res.IsSuccessStatusCode)
+            {
+                var errorContent = await res.Content.ReadAsStringAsync();
+                throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
+            }
+            
             var ocrResult = await res.Content.ReadFromJsonAsync<OcrServiceResultDto>();
 
             return DataResult<OcrServiceResultDto>.Success(ocrResult!);
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestExceptionWithContent ex)
         {
-            return ex.StatusCode switch
-            {
-                HttpStatusCode.NotFound => DataResult<OcrServiceResultDto>.NotFound(
-                    "No tire code was detected during Ocr"
-                ),
-                _ => DataResult<OcrServiceResultDto>.Failure(DefaultFailure)
-            };
+            var statusCode = ex.StatusCode;
+            ex.TryGetContentJsonProperty("detail", out var content);
+            var failureMessage = content ?? "No tire code was detected during Ocr";
+
+            _logger.LogError(ex, failureMessage);
+            return DataResult<OcrServiceResultDto>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {

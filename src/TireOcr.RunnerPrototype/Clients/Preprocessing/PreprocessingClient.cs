@@ -1,11 +1,11 @@
-using System.Net;
 using System.Net.Http.Headers;
+using TireOcr.RunnerPrototype.Exceptions;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Clients.Preprocessing;
 
-public class PreprocessingClient: IPreprocessingClient
+public class PreprocessingClient : IPreprocessingClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<PreprocessingClient> _logger;
@@ -37,17 +37,23 @@ public class PreprocessingClient: IPreprocessingClient
             });
 
             var res = await _httpClient.PostAsync("/api/v1/Preprocess", content);
-            res.EnsureSuccessStatusCode();
+            if (!res.IsSuccessStatusCode)
+            {
+                var errorContent = await res.Content.ReadAsStringAsync();
+                throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
+            }
+
             var imageData = await res.Content.ReadAsByteArrayAsync();
             return DataResult<Image>.Success(new Image(imageData, image.FileName, image.ContentType));
         }
-        catch (HttpRequestException ex)
+        catch (HttpRequestExceptionWithContent ex)
         {
-            return ex.StatusCode switch
-            {
-                HttpStatusCode.NotFound => DataResult<Image>.NotFound("No tire code was detected during Preprocessing"),
-                _ => DataResult<Image>.Failure(DefaultFailure)
-            };
+            var statusCode = ex.StatusCode;
+            ex.TryGetContentJsonProperty("detail", out var content);
+            var failureMessage = $"Preprocessing: {content ?? "Failed to detect a tire code"}";
+
+            _logger.LogError(ex, failureMessage);
+            return DataResult<Image>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {

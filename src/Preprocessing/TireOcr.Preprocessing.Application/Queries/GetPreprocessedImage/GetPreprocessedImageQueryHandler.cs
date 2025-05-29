@@ -63,14 +63,11 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, ex.Message);
+            _logger.LogError(ex, ex.StackTrace);
             return DataResult<PreprocessedImageDto>.Failure(
-                new Failure(500, "Fundamental preprocessing steps failed for image")
+                new Failure(500, ex.Message) // TODO: Remove after testing
             );
         }
-
-        // return DataResult<PreprocessedImageDto>.Success(new PreprocessedImageDto(imageToProcess.Name,
-        //     imageToProcess.Data, request.OriginalContentType));
 
         var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(imageToProcess);
 
