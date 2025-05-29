@@ -1,6 +1,6 @@
 namespace TireOcr.RunnerPrototype.Dtos;
 
-public record RunStat(
+public record RunStatDto(
     string TaskName,
     double DurationMs
 );

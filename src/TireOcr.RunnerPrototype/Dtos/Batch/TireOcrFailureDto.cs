@@ -1,6 +1,6 @@
 namespace TireOcr.RunnerPrototype.Dtos.Batch;
 
-public record TireOcrFailure(
+public record TireOcrFailureDto(
     string ImageFileName,
     string Message
 );

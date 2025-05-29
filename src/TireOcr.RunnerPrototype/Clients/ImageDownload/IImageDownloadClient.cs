@@ -4,9 +4,9 @@ namespace TireOcr.RunnerPrototype.Clients.ImageDownload;
 
 public interface IImageDownloadClient
 {
-    public Task<ImageDownloadResult> DownloadImage(string imageUrl);
+    public Task<ImageDownloadResultDto> DownloadImage(string imageUrl);
 
-    public Task<IEnumerable<ImageDownloadResult>> DownloadImageBatch(
+    public Task<IEnumerable<ImageDownloadResultDto>> DownloadImageBatch(
         IEnumerable<string> imageUrls,
         bool sequentially = false
     );

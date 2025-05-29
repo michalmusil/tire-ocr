@@ -17,7 +17,7 @@ public class PostprocessingClient : IPostprocessingClient
         _logger = logger;
     }
 
-    public async Task<DataResult<TirePostprocessingResult>> PostprocessTireCode(string rawTireCode)
+    public async Task<DataResult<TirePostprocessingResultDto>> PostprocessTireCode(string rawTireCode)
     {
         try
         {
@@ -33,8 +33,8 @@ public class PostprocessingClient : IPostprocessingClient
                 throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
             }
 
-            var postprocessResult = await res.Content.ReadFromJsonAsync<TirePostprocessingResult>();
-            return DataResult<TirePostprocessingResult>.Success(postprocessResult!);
+            var postprocessResult = await res.Content.ReadFromJsonAsync<TirePostprocessingResultDto>();
+            return DataResult<TirePostprocessingResultDto>.Success(postprocessResult!);
         }
         catch (HttpRequestExceptionWithContent ex)
         {
@@ -43,12 +43,12 @@ public class PostprocessingClient : IPostprocessingClient
             var failureMessage = $"Postprocessing: {content ?? "No tire code was detected during Postprocessing"}";
 
             _logger.LogError(ex, failureMessage);
-            return DataResult<TirePostprocessingResult>.Failure(new Failure((int)statusCode!, failureMessage));
+            return DataResult<TirePostprocessingResultDto>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while calling Postprocess service.");
-            return DataResult<TirePostprocessingResult>.Failure(DefaultFailure);
+            return DataResult<TirePostprocessingResultDto>.Failure(DefaultFailure);
         }
     }
 }

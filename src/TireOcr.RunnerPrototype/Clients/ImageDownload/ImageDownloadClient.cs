@@ -14,7 +14,7 @@ public class ImageDownloadClient : IImageDownloadClient
         _client = client;
     }
 
-    public async Task<ImageDownloadResult> DownloadImage(string imageUrl)
+    public async Task<ImageDownloadResultDto> DownloadImage(string imageUrl)
     {
         try
         {
@@ -29,40 +29,40 @@ public class ImageDownloadClient : IImageDownloadClient
                     _ => DataResult<Image>.Failure(new Failure((int)response.StatusCode,
                         $"Failed to download image with provided url: {imageUrl}"))
                 };
-                return new ImageDownloadResult(imageUrl, failedResult);
+                return new ImageDownloadResultDto(imageUrl, failedResult);
             }
 
             var contentType = response.Content.Headers.ContentType?.MediaType;
             if (string.IsNullOrEmpty(contentType))
-                return new ImageDownloadResult(
+                return new ImageDownloadResultDto(
                     imageUrl,
                     DataResult<Image>.Invalid($"Could not determine content type of the image {imageUrl}")
                 );
 
             var imageData = await response.Content.ReadAsByteArrayAsync();
             if (imageData.Length == 0)
-                return new ImageDownloadResult(
+                return new ImageDownloadResultDto(
                     imageUrl,
                     DataResult<Image>.Invalid($"Failed to read image data: {imageUrl}")
                 );
 
             var fileName = GetOriginalFileName(response.Content) ?? imageUrl;
 
-            return new ImageDownloadResult(
+            return new ImageDownloadResultDto(
                 imageUrl,
                 DataResult<Image>.Success(new Image(imageData, fileName, contentType))
             );
         }
         catch (Exception ex)
         {
-            return new ImageDownloadResult(
+            return new ImageDownloadResultDto(
                 imageUrl,
                 DataResult<Image>.Failure(new Failure(500, "Failed to download image"))
             );
         }
     }
 
-    public async Task<IEnumerable<ImageDownloadResult>> DownloadImageBatch(
+    public async Task<IEnumerable<ImageDownloadResultDto>> DownloadImageBatch(
         IEnumerable<string> imageUrls,
         bool sequentially
     )
@@ -73,7 +73,7 @@ public class ImageDownloadClient : IImageDownloadClient
             return await Task.WhenAll(tasks);
         }
 
-        var imageResults = new List<ImageDownloadResult>();
+        var imageResults = new List<ImageDownloadResultDto>();
         imageUrls.ToList().ForEach(async void (url) =>
         {
             var result = await DownloadImage(url);

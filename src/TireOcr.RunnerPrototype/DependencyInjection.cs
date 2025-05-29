@@ -5,7 +5,7 @@ using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
 using TireOcr.RunnerPrototype.Clients.Preprocessing;
 using TireOcr.RunnerPrototype.Services.CostEstimation;
-using TireOcr.RunnerPrototype.Services.TireOcr;
+using TireOcr.RunnerPrototype.Services.PipelineRunner;
 using TireOcr.ServiceDefaults;
 
 namespace TireOcr.RunnerPrototype;
@@ -67,7 +67,7 @@ public static class DependencyInjection
 
     private static void AddServices(IServiceCollection services)
     {
-        services.AddScoped<ITireOcrService, TireOcrService>();
+        services.AddScoped<IPipelineRunnerService, PipelineRunnerService>();
         services.AddScoped<ICostEstimationService, StaticCostEstimationService>();
     }
 }
