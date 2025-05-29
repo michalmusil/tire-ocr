@@ -4,10 +4,10 @@ public record ProcessedTireCodeResultDto(
     string RawCode,
     string PostprocessedTireCode,
     string? VehicleClass,
-    int? Width,
-    int? AspectRatio,
+    decimal? Width,
+    decimal? AspectRatio,
     string? Construction,
-    int? Diameter,
+    decimal? Diameter,
     string? LoadIndex,
     string? SpeedRating
 );
