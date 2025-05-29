@@ -5,5 +5,5 @@ namespace TireOcr.RunnerPrototype.Clients.Postprocessing;
 
 public interface IPostprocessingClient
 {
-    public Task<DataResult<TirePostprocessingResult>> PostprocessTireCode(string rawTireCode);
+    public Task<DataResult<TirePostprocessingResultDto>> PostprocessTireCode(string rawTireCode);
 }

@@ -5,7 +5,7 @@ using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Dtos.Batch;
 using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Models;
-using TireOcr.RunnerPrototype.Services.TireOcr;
+using TireOcr.RunnerPrototype.Services.PipelineRunner;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Controllers;
@@ -14,12 +14,12 @@ namespace TireOcr.RunnerPrototype.Controllers;
 [Route("[controller]")]
 public class RunController : ControllerBase
 {
-    private readonly ITireOcrService _tireOcrService;
+    private readonly IPipelineRunnerService _pipelineRunnerService;
     private readonly ILogger<RunController> _logger;
 
-    public RunController(ITireOcrService tireOcrService, ILogger<RunController> logger)
+    public RunController(IPipelineRunnerService pipelineRunnerService, ILogger<RunController> logger)
     {
-        _tireOcrService = tireOcrService;
+        _pipelineRunnerService = pipelineRunnerService;
         _logger = logger;
     }
 
@@ -80,9 +80,9 @@ public class RunController : ControllerBase
         var imageData = await request.Image.ToByteArray();
         var imageToProcess = new Image(imageData, request.Image.FileName, request.Image.ContentType);
 
-        var result = await _tireOcrService.RunSingleOcrPipelineAsync(imageToProcess, request.DetectorType);
+        var result = await _pipelineRunnerService.RunSingleOcrPipelineAsync(imageToProcess, request.DetectorType);
 
-        return result.ToActionResult<TireOcrResult, RunSingleResponse>(
+        return result.ToActionResult<TireOcrResultDto, RunSingleResponse>(
             onSuccess: res => new RunSingleResponse(res)
         );
     }
@@ -137,13 +137,13 @@ public class RunController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<RunBatchResponse>> Batch([FromForm] RunBatchRequest request)
     {
-        var result = await _tireOcrService.RunOcrPipelineBatchAsync(
+        var result = await _pipelineRunnerService.RunOcrPipelineBatchAsync(
             request.ImageUrls,
             request.BatchSize,
             request.DetectorType
         );
 
-        return result.ToActionResult<TireOcrBatchResult, RunBatchResponse>(
+        return result.ToActionResult<TireOcrBatchResultDto, RunBatchResponse>(
             onSuccess: res => new RunBatchResponse(res)
         );
     }

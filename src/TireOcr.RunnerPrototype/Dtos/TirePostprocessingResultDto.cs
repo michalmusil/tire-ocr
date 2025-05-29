@@ -1,6 +1,6 @@
 namespace TireOcr.RunnerPrototype.Dtos;
 
-public record TirePostprocessingResult(
+public record TirePostprocessingResultDto(
     string RawCode,
     string PostprocessedTireCode,
     string? VehicleClass,

@@ -2,11 +2,11 @@ using TireOcr.RunnerPrototype.Models;
 
 namespace TireOcr.RunnerPrototype.Dtos;
 
-public record TireOcrResult(
+public record TireOcrResultDto(
     string ImageFileName,
-    TirePostprocessingResult TireCode,
+    TirePostprocessingResultDto TireCode,
     TireCodeDetectorType DetectorType,
     EstimatedCostsDto? EstimatedCosts,
     double TotalDurationMs,
-    List<RunStat> RunTrace
+    List<RunStatDto> RunTrace
 );
