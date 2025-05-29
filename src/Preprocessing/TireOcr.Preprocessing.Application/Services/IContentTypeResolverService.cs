@@ -1,6 +1,6 @@
 namespace TireOcr.Preprocessing.Application.Services;
 
-public interface IContentTypeResolver
+public interface IContentTypeResolverService
 {
     public bool IsContentTypeSupported(string contentType);
 }

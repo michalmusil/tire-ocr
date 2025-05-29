@@ -19,15 +19,15 @@ public static class DependencyInjection
 
     private static void AddServices(IServiceCollection services)
     {
-        services.AddTransient<IMlModelDownloader, MlModelDownloader>();
-        services.AddSingleton<IMlModelResolver, MlModelResolver>();
+        services.AddTransient<IMlModelDownloaderService, MlModelDownloaderService>();
+        services.AddSingleton<IMlModelResolverService, MlModelResolverService>();
 
         services.AddScoped<IImageManipulationService, OpenCvImageManipulationService>();
         services.AddScoped<ITireDetectionService, YoloTireDetectionService>();
         services.AddScoped<ITextDetectionService, YoloTextDetectionService>();
-        services.AddScoped<IImageSlicer, OpenCvImageSlicer>();
-        services.AddScoped<IImageTextApproximator, ImageTextApproximator>();
-        services.AddScoped<IContentTypeResolver, ContentTypeResolver>();
+        services.AddScoped<IImageSlicerService, OpenCvImageSlicerService>();
+        services.AddScoped<IImageTextApproximatorService, ImageTextApproximatorService>();
+        services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
     }
 
     private static void AddFacades(IServiceCollection services)

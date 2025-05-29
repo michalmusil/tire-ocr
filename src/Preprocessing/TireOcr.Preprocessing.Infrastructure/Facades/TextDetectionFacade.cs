@@ -9,19 +9,19 @@ namespace TireOcr.Preprocessing.Infrastructure.Facades;
 
 public class TextDetectionFacade : ITextDetectionFacade
 {
-    private readonly IImageSlicer _imageSlicer;
-    private readonly IImageTextApproximator _imageTextApproximator;
+    private readonly IImageSlicerService _imageSlicerService;
+    private readonly IImageTextApproximatorService _imageTextApproximatorService;
     private readonly ITextDetectionService _textDetectionService;
 
-    public TextDetectionFacade(IImageSlicer imageSlicer, IImageTextApproximator imageTextApproximator,
+    public TextDetectionFacade(IImageSlicerService imageSlicerService, IImageTextApproximatorService imageTextApproximatorService,
         ITextDetectionService textDetectionService)
     {
-        _imageSlicer = imageSlicer;
-        _imageTextApproximator = imageTextApproximator;
+        _imageSlicerService = imageSlicerService;
+        _imageTextApproximatorService = imageTextApproximatorService;
         _textDetectionService = textDetectionService;
     }
 
-    public async Task<DataResult<TextDetectionResult>> GetTextAreaFromImageAsync(Image image)
+    public async Task<DataResult<TextDetectionResultDto>> GetTextAreaFromImageAsync(Image image)
     {
         var stopWatch = new Stopwatch();
         stopWatch.Start();
@@ -30,9 +30,9 @@ public class TextDetectionFacade : ITextDetectionFacade
             image.Size.Height,
             (int)(image.Size.Width * 0.17)
         );
-        var slicesResult = await _imageSlicer.SliceImage(image, sliceSize, 0.3, 0);
+        var slicesResult = await _imageSlicerService.SliceImage(image, sliceSize, 0.3, 0);
         if (slicesResult.IsFailure)
-            return DataResult<TextDetectionResult>.Failure(slicesResult.Failures);
+            return DataResult<TextDetectionResultDto>.Failure(slicesResult.Failures);
 
         var slices = slicesResult.Data!;
         var results = await Task.WhenAll(slices.Select(ProcessSingleImageSliceAsync));
@@ -43,19 +43,19 @@ public class TextDetectionFacade : ITextDetectionFacade
             .ToList();
 
         if (!successfulResults.Any())
-            return DataResult<TextDetectionResult>.NotFound("No text detected in the image");
+            return DataResult<TextDetectionResultDto>.NotFound("No text detected in the image");
 
         var bestResult = successfulResults
             .MinBy(r => r.DetectedStrings.Values.ToArray().Min());
         if (bestResult is null)
-            return DataResult<TextDetectionResult>.Failure(new Failure(500,
+            return DataResult<TextDetectionResultDto>.Failure(new Failure(500,
                 "Failed to determine image with best text match"));
 
         stopWatch.Stop();
         var timeTaken = stopWatch.Elapsed;
 
-        var result = new TextDetectionResult(bestResult.Image, bestResult.DetectedStrings, timeTaken);
-        return DataResult<TextDetectionResult>.Success(result);
+        var result = new TextDetectionResultDto(bestResult.Image, bestResult.DetectedStrings, timeTaken);
+        return DataResult<TextDetectionResultDto>.Success(result);
     }
 
     private async Task<DataResult<ImageWithDetectedText>> ProcessSingleImageSliceAsync(Image slice)
@@ -65,14 +65,14 @@ public class TextDetectionFacade : ITextDetectionFacade
             return DataResult<ImageWithDetectedText>.Failure(detectedCharactersResult.Failures);
 
         var detectedCharacters = detectedCharactersResult.Data!;
-        var approximatedStringsResult = _imageTextApproximator
+        var approximatedStringsResult = _imageTextApproximatorService
             .ApproximateStringsFromCharacters(detectedCharacters);
 
         if (approximatedStringsResult.IsFailure)
             return DataResult<ImageWithDetectedText>.Failure(approximatedStringsResult.Failures);
         var approximatedStrings = approximatedStringsResult.Data!;
 
-        var scoresResult = _imageTextApproximator.GetTireCodeLevenshteinDistanceOfStrings(approximatedStrings);
+        var scoresResult = _imageTextApproximatorService.GetTireCodeLevenshteinDistanceOfStrings(approximatedStrings);
         if (scoresResult.IsFailure)
             return DataResult<ImageWithDetectedText>.Failure(scoresResult.Failures);
 

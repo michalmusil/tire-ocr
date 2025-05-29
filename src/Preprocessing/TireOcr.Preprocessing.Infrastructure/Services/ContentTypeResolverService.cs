@@ -2,7 +2,7 @@ using TireOcr.Preprocessing.Application.Services;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
 
-public class ContentTypeResolver : IContentTypeResolver
+public class ContentTypeResolverService : IContentTypeResolverService
 {
     private static readonly List<string> SupportedContentTypes = ["image/jpeg", "image/png", "image/webp"];
 

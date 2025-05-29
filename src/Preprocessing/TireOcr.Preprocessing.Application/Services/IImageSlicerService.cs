@@ -3,7 +3,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Application.Services;
 
-public interface IImageSlicer
+public interface IImageSlicerService
 {
     public Task<DataResult<IEnumerable<Image>>> SliceImage(
         Image image,

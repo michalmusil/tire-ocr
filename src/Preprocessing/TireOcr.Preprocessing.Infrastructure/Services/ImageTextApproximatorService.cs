@@ -6,7 +6,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
 
-public class ImageTextApproximator : IImageTextApproximator
+public class ImageTextApproximatorService : IImageTextApproximatorService
 {
     private readonly List<string> _referenceCodes =
         ["LT215/55R16 91V", "LT245/75R16 120/116Q", "P215/55ZR18 95V", "205/55R16 91V", "215/65ZR17 93W", "215/65ZR15"];

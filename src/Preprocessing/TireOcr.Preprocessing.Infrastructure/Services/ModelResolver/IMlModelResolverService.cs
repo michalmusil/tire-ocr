@@ -3,7 +3,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 
-public interface IMlModelResolver
+public interface IMlModelResolverService
 {
     public Task<DataResult<MlModel>> Resolve<T>();
     public Task<Result> EnsureAllModelsLoadedAsync();

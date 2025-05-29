@@ -14,17 +14,17 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
     private readonly ITextDetectionFacade _textDetectionFacade;
-    private readonly IContentTypeResolver _contentTypeResolver;
+    private readonly IContentTypeResolverService _contentTypeResolverService;
     private ILogger<GetPreprocessedImageQueryHandler> _logger;
 
     public GetPreprocessedImageQueryHandler(IImageManipulationService imageManipulationService,
         ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade,
-        IContentTypeResolver contentTypeResolver, ILogger<GetPreprocessedImageQueryHandler> logger)
+        IContentTypeResolverService contentTypeResolverService, ILogger<GetPreprocessedImageQueryHandler> logger)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _textDetectionFacade = textDetectionFacade;
-        _contentTypeResolver = contentTypeResolver;
+        _contentTypeResolverService = contentTypeResolverService;
         _logger = logger;
     }
 
@@ -33,7 +33,7 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         CancellationToken cancellationToken
     )
     {
-        var contentTypeSupported = _contentTypeResolver.IsContentTypeSupported(request.OriginalContentType);
+        var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)
             return DataResult<PreprocessedImageDto>.Invalid(
                 $"Content type {request.OriginalContentType} is not supported");

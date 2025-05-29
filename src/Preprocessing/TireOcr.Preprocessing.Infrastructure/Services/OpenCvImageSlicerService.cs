@@ -6,7 +6,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
 
-public class OpenCvImageSlicer : IImageSlicer
+public class OpenCvImageSlicerService : IImageSlicerService
 {
     public async Task<DataResult<IEnumerable<Image>>> SliceImage(
         Image image,
