@@ -36,7 +36,7 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
             AspectRatio: bestTireCode.AspectRatio,
             Construction: bestTireCode.Construction,
             Diameter: bestTireCode.Diameter,
-            LoadRangeAndIndex: bestTireCode.LoadRangeAndIndex,
+            LoadIndex: bestTireCode.LoadIndex,
             SpeedRating: bestTireCode.SpeedRating
         );
 

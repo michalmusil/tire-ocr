@@ -8,6 +8,6 @@ public record PerformPostprocessingResponse(
     int? AspectRatio,
     string? Construction,
     int? Diameter,
-    string? LoadRangeAndIndex,
+    string? LoadIndex,
     string? SpeedRating
 );
