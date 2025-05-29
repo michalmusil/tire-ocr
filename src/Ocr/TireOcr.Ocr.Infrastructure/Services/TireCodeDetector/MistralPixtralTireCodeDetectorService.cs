@@ -11,16 +11,16 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class MistralPixtralTireCodeDetector : ITireCodeDetector
+public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly HttpClient _httpClient;
-    private readonly IImageUtils _imageUtils;
+    private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
 
-    public MistralPixtralTireCodeDetector(HttpClient httpClient, IImageUtils imageUtils, IConfiguration configuration)
+    public MistralPixtralTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _imageUtils = imageUtils;
+        _imageConvertorService = imageConvertorService;
         _configuration = configuration;
     }
 
@@ -56,7 +56,7 @@ public class MistralPixtralTireCodeDetector : ITireCodeDetector
                 new OcrRequestBillingDto(
                     responseDto.Usage.PromptTokens,
                     responseDto.Usage.CompletionTokens,
-                    BillingUnit.Token
+                    BillingUnitDto.Token
                 )
             );
             return DataResult<OcrResultDto>.Success(result);
@@ -96,7 +96,7 @@ public class MistralPixtralTireCodeDetector : ITireCodeDetector
 
     private StringContent GetPromptJsonBody(Image image)
     {
-        var base64Image = _imageUtils.ConvertToBase64(image);
+        var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
             model = "pixtral-large-latest",

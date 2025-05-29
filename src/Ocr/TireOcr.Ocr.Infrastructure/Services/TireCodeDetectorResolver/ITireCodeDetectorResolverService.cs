@@ -4,7 +4,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetectorResolver;
 
-public interface ITireCodeDetectorResolver
+public interface ITireCodeDetectorResolverService
 {
-    public DataResult<ITireCodeDetector> Resolve(TireCodeDetectorType detectorType);
+    public DataResult<ITireCodeDetectorService> Resolve(TireCodeDetectorType detectorType);
 }

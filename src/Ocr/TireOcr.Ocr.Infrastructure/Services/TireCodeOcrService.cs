@@ -7,18 +7,18 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services;
 
-public class TireCodeDetectionService : ITireCodeDetectionService
+public class TireCodeOcrService : ITireCodeOcrService
 {
-    private readonly ITireCodeDetectorResolver _tireCodeDetectorResolver;
+    private readonly ITireCodeDetectorResolverService _tireCodeDetectorResolverService;
 
-    public TireCodeDetectionService(ITireCodeDetectorResolver tireCodeDetectorResolver)
+    public TireCodeOcrService(ITireCodeDetectorResolverService tireCodeDetectorResolverService)
     {
-        _tireCodeDetectorResolver = tireCodeDetectorResolver;
+        _tireCodeDetectorResolverService = tireCodeDetectorResolverService;
     }
 
     public async Task<DataResult<OcrResultDto>> DetectAsync(TireCodeDetectorType detectorType, Image image)
     {
-        var detectorResult = _tireCodeDetectorResolver.Resolve(detectorType);
+        var detectorResult = _tireCodeDetectorResolverService.Resolve(detectorType);
         return await detectorResult.MapAsync(
             onSuccess: detector => detector.DetectAsync(image),
             onFailure: f => Task.FromResult(DataResult<OcrResultDto>.Failure(f))

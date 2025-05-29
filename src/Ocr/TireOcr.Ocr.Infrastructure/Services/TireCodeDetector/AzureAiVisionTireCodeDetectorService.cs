@@ -8,11 +8,11 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class AzureAiVisionTireCodedetector : ITireCodeDetector
+public class AzureAiVisionTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly IConfiguration _configuration;
 
-    public AzureAiVisionTireCodedetector(IConfiguration configuration)
+    public AzureAiVisionTireCodeDetectorService(IConfiguration configuration)
     {
         _configuration = configuration;
     }
@@ -43,7 +43,7 @@ public class AzureAiVisionTireCodedetector : ITireCodeDetector
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(0, 1, BillingUnit.Transaction)
+                new OcrRequestBillingDto(0, 1, BillingUnitDto.Transaction)
             );
             return DataResult<OcrResultDto>.Success(result);
         }

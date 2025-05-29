@@ -11,16 +11,16 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class GoogleGeminiTireCodeDetector : ITireCodeDetector
+public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly HttpClient _httpClient;
-    private readonly IImageUtils _imageUtils;
+    private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
 
-    public GoogleGeminiTireCodeDetector(HttpClient httpClient, IImageUtils imageUtils, IConfiguration configuration)
+    public GoogleGeminiTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _imageUtils = imageUtils;
+        _imageConvertorService = imageConvertorService;
         _configuration = configuration;
     }
 
@@ -53,7 +53,7 @@ public class GoogleGeminiTireCodeDetector : ITireCodeDetector
                 new OcrRequestBillingDto(
                     responseDto.UsageMetadata.PromptTokenCount,
                     responseDto.UsageMetadata.CandidatesTokenCount,
-                    BillingUnit.Token
+                    BillingUnitDto.Token
                 )
             );
             return DataResult<OcrResultDto>.Success(result);
@@ -82,7 +82,7 @@ public class GoogleGeminiTireCodeDetector : ITireCodeDetector
 
     private StringContent GetPromptJsonBody(Image image)
     {
-        var base64Image = _imageUtils.ConvertToBase64(image);
+        var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
             contents = new[]
