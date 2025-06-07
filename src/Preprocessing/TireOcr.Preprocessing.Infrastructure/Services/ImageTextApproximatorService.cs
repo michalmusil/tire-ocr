@@ -83,7 +83,7 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
                 var distance = lev.DistanceFrom(detectedNormalized);
 
                 if (!detectedNormalized.Contains('/'))
-                    distance += (int)Math.Floor(distance * 0.3);
+                    distance *= 2;
 
                 if (distance < bestScore)
                 {
