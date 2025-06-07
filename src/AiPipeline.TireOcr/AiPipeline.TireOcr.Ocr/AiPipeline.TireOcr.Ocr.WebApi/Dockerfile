@@ -3,23 +3,23 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /
-COPY ["src/Ocr/TireOcr.Ocr.WebApi/TireOcr.Ocr.WebApi.csproj", "src/Ocr/TireOcr.Ocr.WebApi/"]
-COPY ["src/Ocr/TireOcr.Ocr.Application/TireOcr.Ocr.Application.csproj", "src/Ocr/TireOcr.Ocr.Application/"]
-COPY ["src/Ocr/TireOcr.Ocr.Domain/TireOcr.Ocr.Domain.csproj", "src/Ocr/TireOcr.Ocr.Domain/"]
-COPY ["src/Ocr/TireOcr.Ocr.Infrastructure/TireOcr.Ocr.Infrastructure.csproj", "src/Ocr/TireOcr.Ocr.Infrastructure/"]
-COPY ["src/TireOcr.ServiceDefaults/TireOcr.ServiceDefaults.csproj", "src/TireOcr.ServiceDefaults/"]
-COPY ["src/TireOcr.Shared/TireOcr.Shared.csproj", "src/TireOcr.Shared/"]
-RUN dotnet restore "src/Ocr/TireOcr.Ocr.WebApi/TireOcr.Ocr.WebApi.csproj"
+COPY ["src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.WebApi/AiPipeline.TireOcr.Ocr.WebApi.csproj", "src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.WebApi/"]
+COPY ["src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Application/AiPipeline.TireOcr.Ocr.Application.csproj", "src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Application/"]
+COPY ["src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Domain/AiPipeline.TireOcr.Ocr.Domain.csproj", "src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Domain/"]
+COPY ["src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Infrastructure/AiPipeline.TireOcr.Ocr.Infrastructure.csproj", "src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.Infrastructure/"]
+COPY ["src/AiPipeline.ServiceDefaults/AiPipeline.ServiceDefaults.csproj", "src/AiPipeline.ServiceDefaults/"]
+COPY ["src/AiPipeline.Shared/AiPipeline.Shared.csproj", "src/AiPipeline.Shared/"]
+RUN dotnet restore "src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.WebApi/AiPipeline.TireOcr.Ocr.WebApi.csproj"
 COPY . .
-WORKDIR "/src/Ocr/TireOcr.Ocr.WebApi"
-RUN dotnet build "TireOcr.Ocr.WebApi.csproj" -c Release -o /app/build
+WORKDIR "/src/AiPipeline.TireOcr/AiPipeline.TireOcr.Ocr/AiPipeline.TireOcr.Ocr.WebApi"
+RUN dotnet build "AiPipeline.TireOcr.Ocr.WebApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "TireOcr.Ocr.WebApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "AiPipeline.TireOcr.Ocr.WebApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 EXPOSE 8080
 ENV DOTNET_VERSION=8.0.16 ASPNET_VERSION=8.0.16 APP_UID=1654 ASPNETCORE_HTTP_PORTS=8080 DOTNET_RUNNING_IN_CONTAINER=true
-ENTRYPOINT ["dotnet", "TireOcr.Ocr.WebApi.dll"]
+ENTRYPOINT ["dotnet", "AiPipeline.TireOcr.Ocr.WebApi.dll"]
