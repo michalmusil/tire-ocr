@@ -11,6 +11,9 @@ var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
 var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
     .WithHttpsHealthCheck("/health");
 
+var orchestrationRunnerService = builder.AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
+    .WithHttpsHealthCheck("/health");
+
 var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
     .WithHttpsHealthCheck("/health")
     .WithReference(preprocessingService)

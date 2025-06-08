@@ -21,7 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\AiPipeline.Orchestration\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
+      <ProjectReference Include="..\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
     </ItemGroup>
 
 </Project>

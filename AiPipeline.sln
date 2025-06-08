@@ -45,7 +45,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Contracts", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj", "{B5505E35-D808-4890-8F1B-083B63E46B0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Contracts.Tests", "AiPipeline.Orchestration.Contracts.Tests\AiPipeline.Orchestration.Contracts.Tests.csproj", "{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Contracts.Tests", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Contracts.Tests\AiPipeline.Orchestration.Contracts.Tests.csproj", "{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration.Runner", "AiPipeline.Orchestration.Runner", "{A1CC0876-5233-413C-805C-F2FECE70558A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Domain", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Domain\AiPipeline.Orchestration.Runner.Domain.csproj", "{252517A2-D6AA-4026-9595-01B77FA2202F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Application", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Application\AiPipeline.Orchestration.Runner.Application.csproj", "{675F093C-15B9-4472-817E-D484A267D74B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Infrastructure", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj", "{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.WebApi", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj", "{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -71,6 +81,11 @@ Global
 		{EBDF096A-73D6-4FD1-B646-BF021E2CF320} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 		{B5505E35-D808-4890-8F1B-083B63E46B0B} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
 		{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
+		{A1CC0876-5233-413C-805C-F2FECE70558A} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
+		{252517A2-D6AA-4026-9595-01B77FA2202F} = {A1CC0876-5233-413C-805C-F2FECE70558A}
+		{675F093C-15B9-4472-817E-D484A267D74B} = {A1CC0876-5233-413C-805C-F2FECE70558A}
+		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1} = {A1CC0876-5233-413C-805C-F2FECE70558A}
+		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF} = {A1CC0876-5233-413C-805C-F2FECE70558A}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -145,5 +160,21 @@ Global
 		{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2D3AAACF-6F9E-4CA2-BF99-9FE659D42ADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{252517A2-D6AA-4026-9595-01B77FA2202F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{252517A2-D6AA-4026-9595-01B77FA2202F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{252517A2-D6AA-4026-9595-01B77FA2202F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{252517A2-D6AA-4026-9595-01B77FA2202F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{675F093C-15B9-4472-817E-D484A267D74B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{675F093C-15B9-4472-817E-D484A267D74B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{675F093C-15B9-4472-817E-D484A267D74B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{675F093C-15B9-4472-817E-D484A267D74B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
