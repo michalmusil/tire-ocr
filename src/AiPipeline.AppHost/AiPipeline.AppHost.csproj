@@ -14,10 +14,12 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Hosting.AppHost" Version="9.1.0" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Messaging\AiPipeline.TireOcr.Ocr.Messaging.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj" />

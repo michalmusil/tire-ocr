@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Ru
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.WebApi", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj", "{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Messaging\AiPipeline.TireOcr.Ocr.Messaging.csproj", "{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,7 @@ Global
 		{675F093C-15B9-4472-817E-D484A267D74B} = {A1CC0876-5233-413C-805C-F2FECE70558A}
 		{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1} = {A1CC0876-5233-413C-805C-F2FECE70558A}
 		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF} = {A1CC0876-5233-413C-805C-F2FECE70558A}
+		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE} = {EEBDFA78-8026-44BA-9866-F2583A3FAA23}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -176,5 +179,9 @@ Global
 		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
