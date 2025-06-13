@@ -1,17 +1,22 @@
+using AiPipeline.Orchestration.Contracts.Schema;
+
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 
 public class PipelineStep
 {
     public Guid Id { get; }
     public string NodeId { get; }
+    public string NodeProcedureId { get; }
     public int SchemaVersion { get; }
-    public string InputSchema { get; }
-    public string OutputSchema { get; }
+    public IApElement InputSchema { get; }
+    public IApElement OutputSchema { get; }
 
-    public PipelineStep(string nodeId, int schemaVersion, string inputSchema, string outputSchema, Guid? id = null)
+    public PipelineStep(string nodeId, string nodeProcedureId, int schemaVersion, IApElement inputSchema, IApElement outputSchema,
+        Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         NodeId = nodeId;
+        NodeProcedureId = nodeProcedureId;
         SchemaVersion = schemaVersion;
         InputSchema = inputSchema;
         OutputSchema = outputSchema;

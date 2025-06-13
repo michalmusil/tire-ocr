@@ -12,7 +12,7 @@ public record ApBool : IApElement
         Value = value;
     }
 
-    public bool HasEquivalentSchemaWith(IApElement other)
+    public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApBool;
     }

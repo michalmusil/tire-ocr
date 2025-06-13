@@ -4,6 +4,8 @@ namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 
 public class Pipeline
 {
+    private static readonly PipelineValidator Validator = new PipelineValidator();
+
     public Guid Id { get; }
     private readonly List<PipelineStep> _steps;
     public IReadOnlyCollection<PipelineStep> Steps => _steps.AsReadOnly();
@@ -14,6 +16,18 @@ public class Pipeline
         _steps = steps ?? new List<PipelineStep>();
     }
 
+    public Result Validate()
+    {
+        var validationResult = Validator.Validate(this);
+        if (validationResult.IsValid)
+            return Result.Success();
+
+        return Result.Failure(validationResult.Errors
+            .Select(x => new Failure(422, $"{x.PropertyName}: {x.ErrorMessage}"))
+            .ToArray()
+        );
+    }
+
     public Result AddStep(PipelineStep step)
     {
         var alreadyContained = _steps.Any(s => s.Id == step.Id);
@@ -21,10 +35,11 @@ public class Pipeline
         {
             return Result.Conflict($"Pipeline already contains a step with id: {step.Id}");
         }
+
         _steps.Add(step);
         return Result.Success();
     }
-    
+
     public bool RemoveStep(PipelineStep step)
     {
         return _steps.Remove(step);

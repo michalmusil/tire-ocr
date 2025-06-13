@@ -20,7 +20,7 @@ public record ApList : IApElement
         Items = items;
     }
 
-    public bool HasEquivalentSchemaWith(IApElement other)
+    public bool HasCompatibleSchemaWith(IApElement other)
     {
         if (other is not ApList)
             return false;

@@ -29,7 +29,7 @@ public record ApObject : IApElement
         }
     }
 
-    public bool HasEquivalentSchemaWith(IApElement other)
+    public bool HasCompatibleSchemaWith(IApElement other)
     {
         if (other is not ApObject)
             return false;
@@ -57,7 +57,7 @@ public record ApObject : IApElement
             var a = thisRequiredPropertyPairs[i];
             var b = otherRequiredPropertyPairs[i];
 
-            var propertyIsEquivalent = a.Key == b.Key && a.Value.HasEquivalentSchemaWith(b.Value);
+            var propertyIsEquivalent = a.Key == b.Key && a.Value.HasCompatibleSchemaWith(b.Value);
             if (!propertyIsEquivalent)
                 return false;
         }
