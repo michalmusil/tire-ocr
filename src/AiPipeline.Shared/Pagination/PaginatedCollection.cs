@@ -9,17 +9,17 @@ public record PaginatedCollection<T>
     {
     }
 
-    public PaginatedCollection(IReadOnlyCollection<T> items, int count, int pageNumber, int pageSize)
+    public PaginatedCollection(IReadOnlyCollection<T> items, int totalCount, int pageNumber, int pageSize)
     {
         Items = items;
 
-        var totalPages = (int)Math.Ceiling(count / (double)pageSize);
+        var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         Pagination = new Pagination
         (
             PageNumber: pageNumber,
             PageSize: pageSize,
             TotalPages: totalPages,
-            TotalCount: count,
+            TotalCount: totalCount,
             HasPreviousPage: pageNumber > 1,
             HasNextPage: pageNumber < totalPages
         );

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using AiPipeline.Orchestration.Contracts.Schema.Converters;
 using AiPipeline.Orchestration.Runner.WebApi.Constants;
 using Asp.Versioning;
@@ -11,11 +12,23 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
     {
-        services.AddControllers();
+        AddControllersConfig(services);
         AddRoutesConfig(services);
         AddSwagger(services);
         AddMessaging(hostBuilder);
         return services;
+    }
+
+    private static void AddControllersConfig(IServiceCollection serviceCollection)
+    {
+        serviceCollection
+            .AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters
+                    .Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.Converters.Add(new ApElementConverter());
+            });
     }
 
     private static void AddRoutesConfig(IServiceCollection serviceCollection)
@@ -36,13 +49,13 @@ public static class DependencyInjection
         serviceCollection.AddEndpointsApiExplorer();
         serviceCollection.AddSwaggerGen();
     }
-    
+
     private static void AddMessaging(IHostBuilder hostBuilder)
     {
         hostBuilder.UseWolverine(opt =>
         {
             opt.ListenToRabbitQueue(MessagingConstants.AdvertisementsQueueName);
-            
+
             opt.UseRabbitMqUsingNamedConnection("rabbitmq").AutoProvision();
             opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
 

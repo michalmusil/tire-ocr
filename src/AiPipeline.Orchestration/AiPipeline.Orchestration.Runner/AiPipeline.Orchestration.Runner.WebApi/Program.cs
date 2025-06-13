@@ -1,9 +1,11 @@
+using AiPipeline.Orchestration.Runner.Application;
+using AiPipeline.Orchestration.Runner.Infrastructure;
 using AiPipeline.Orchestration.Runner.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
-    // .AddApplication()
-    // .AddInfrastructure()
+    .AddApplication()
+    .AddInfrastructure()
     .AddPresentation(builder.Host);
 
 builder.AddServiceDefaults();
