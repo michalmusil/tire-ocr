@@ -9,12 +9,20 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
 {
     private static List<NodeType> _nodeTypes =
     [
-        new NodeType("fake-node-type", [
+        new NodeType("fnt-1", [
                 new NodeProcedure(
-                    "fake-node-procedure",
+                    "fnp-1",
                     1,
                     new ApBool(false),
                     new ApString(""))
+            ]
+        ),
+        new NodeType("fnt-2", [
+                new NodeProcedure(
+                    "fnp-2",
+                    1,
+                    new ApList([]),
+                    new ApDateTime(DateTime.Now))
             ]
         )
     ];
