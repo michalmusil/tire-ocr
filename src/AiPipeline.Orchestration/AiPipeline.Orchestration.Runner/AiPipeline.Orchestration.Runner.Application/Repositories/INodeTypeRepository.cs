@@ -11,7 +11,7 @@ public interface INodeTypeRepository
 
     public Task<IEnumerable<NodeType>> GetNodeTypesByIdsAsync(params string[] ids);
 
-    public Task<NodeType?> GetNodeTypeById(string nodeId);
+    public Task<NodeType?> GetNodeTypeByIdAsync(string nodeId);
 
     public Task Add(NodeType nodeType);
     public Task Remove(NodeType nodeType);

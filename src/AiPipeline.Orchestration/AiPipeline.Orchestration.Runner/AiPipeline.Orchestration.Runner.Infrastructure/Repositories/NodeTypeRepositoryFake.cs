@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Runner.Application.Repositories;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using TireOcr.Shared.Pagination;
@@ -12,8 +13,8 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
                 new NodeProcedure(
                     "fake-node-procedure",
                     1,
-                    "{\"Type\":\"ApObject\",\"Properties\":{\"FullName\":{\"Type\":\"ApString\",\"Value\":\"John Doe\"},\"Age\":{\"Type\":\"ApInt\",\"Value\":30},\"CreditCard\":{\"Type\":\"ApObject\",\"Properties\":{\"Number\":{\"Type\":\"ApString\",\"Value\":\"12344567890/1111\"},\"OwnerName\":{\"Type\":\"ApString\",\"Value\":\"John Doe\"},\"ActiveAt\":{\"Type\":\"ApList\",\"Items\":[{\"Type\":\"ApDateTime\",\"Value\":\"2025-06-13T15:13:12.880364Z\"},{\"Type\":\"ApDateTime\",\"Value\":\"2025-06-13T15:13:12.880428Z\"}]}},\"NonRequiredProperties\":[]}},\"NonRequiredProperties\":[\"CreditCard\"]}",
-                    "{\"Type\":\"ApObject\",\"Properties\":{\"FullName\":{\"Type\":\"ApString\",\"Value\":\"John Doe\"},\"Age\":{\"Type\":\"ApInt\",\"Value\":30},\"CreditCard\":{\"Type\":\"ApObject\",\"Properties\":{\"Number\":{\"Type\":\"ApString\",\"Value\":\"12344567890/1111\"},\"OwnerName\":{\"Type\":\"ApString\",\"Value\":\"John Doe\"},\"ActiveAt\":{\"Type\":\"ApList\",\"Items\":[{\"Type\":\"ApDateTime\",\"Value\":\"2025-06-13T15:13:12.880364Z\"},{\"Type\":\"ApDateTime\",\"Value\":\"2025-06-13T15:13:12.880428Z\"}]}},\"NonRequiredProperties\":[]}},\"NonRequiredProperties\":[\"CreditCard\"]}")
+                    new ApBool(false),
+                    new ApString(""))
             ]
         )
     ];
@@ -34,7 +35,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
         return Task.FromResult(_nodeTypes.AsEnumerable());
     }
 
-    public Task<NodeType?> GetNodeTypeById(string nodeId)
+    public Task<NodeType?> GetNodeTypeByIdAsync(string nodeId)
     {
         return Task.FromResult(_nodeTypes.FirstOrDefault());
     }

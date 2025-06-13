@@ -1,13 +1,15 @@
+using AiPipeline.Orchestration.Contracts.Schema;
+
 namespace AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
 public class NodeProcedure
 {
     public string Id { get; }
     public int SchemaVersion { get; }
-    public string InputSchema { get; }
-    public string OutputSchema { get; }
+    public IApElement InputSchema { get; }
+    public IApElement OutputSchema { get; }
 
-    public NodeProcedure(string id, int schemaVersion, string inputSchema, string outputSchema)
+    public NodeProcedure(string id, int schemaVersion, IApElement inputSchema, IApElement outputSchema)
     {
         Id = id;
         SchemaVersion = schemaVersion;

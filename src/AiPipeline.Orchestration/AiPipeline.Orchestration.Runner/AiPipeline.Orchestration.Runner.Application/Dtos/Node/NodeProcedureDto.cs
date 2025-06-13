@@ -16,10 +16,8 @@ public record NodeProcedureDto(
     {
         try
         {
-            var input = JsonSerializer.Deserialize<IApElement>(domain.InputSchema,
-                JsonUtils.GetApElementSerializerOptions())!;
-            var output = JsonSerializer.Deserialize<IApElement>(domain.OutputSchema,
-                JsonUtils.GetApElementSerializerOptions())!;
+            var input = domain.InputSchema;
+            var output = domain.OutputSchema;
 
             return new NodeProcedureDto
             (
