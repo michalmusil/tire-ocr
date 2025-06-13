@@ -1,14 +1,20 @@
+using AiPipeline.Orchestration.Contracts.Schema.Converters;
+using AiPipeline.Orchestration.Runner.WebApi.Constants;
 using Asp.Versioning;
+using JasperFx.Resources;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 namespace AiPipeline.Orchestration.Runner.WebApi;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
     {
         services.AddControllers();
         AddRoutesConfig(services);
         AddSwagger(services);
+        AddMessaging(hostBuilder);
         return services;
     }
 
@@ -29,5 +35,18 @@ public static class DependencyInjection
     {
         serviceCollection.AddEndpointsApiExplorer();
         serviceCollection.AddSwaggerGen();
+    }
+    
+    private static void AddMessaging(IHostBuilder hostBuilder)
+    {
+        hostBuilder.UseWolverine(opt =>
+        {
+            opt.ListenToRabbitQueue(MessagingConstants.AdvertisementsQueueName);
+            
+            opt.UseRabbitMqUsingNamedConnection("rabbitmq").AutoProvision();
+            opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
+
+            opt.Services.AddResourceSetupOnStartup();
+        });
     }
 }

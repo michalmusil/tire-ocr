@@ -1,35 +1,40 @@
+using AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Contracts.Schema.Converters;
+using AiPipeline.TireOcr.Ocr.Messaging.Constants;
 using AiPipeline.TireOcr.Ocr.Messaging.Producers;
-using MassTransit;
+using JasperFx.Resources;
+using Wolverine;
+using Wolverine.RabbitMQ;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services)
+    public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
     {
-        AddMessaging(services);
-        AddBackgroundServices(services);
+        AddMessaging(hostBuilder);
         return services;
     }
 
-    private static void AddMessaging(IServiceCollection serviceCollection)
+    private static void AddMessaging(IHostBuilder hostBuilder)
     {
-        serviceCollection.AddMassTransit(busConfigurator =>
+        hostBuilder.UseWolverine(opt =>
         {
-            busConfigurator.SetKebabCaseEndpointNameFormatter();
+            opt.ListenToRabbitQueue(MessagingConstants.NodeQueueName);
 
-            busConfigurator.UsingRabbitMq((busContext, busFactoryConfigurator) =>
-            {
-                var configuration = busContext.GetRequiredService<IConfiguration>();
-                var host = configuration.GetConnectionString("rabbitmq");
-                busFactoryConfigurator.Host(host);
-                busFactoryConfigurator.ConfigureEndpoints(busContext);
-            });
+            opt.PublishMessage<NodeAdvertised>()
+                .ToRabbitExchange(MessagingConstants.AdvertisementsExchangeName, exc =>
+                {
+                    exc.ExchangeType = ExchangeType.Fanout;
+                    exc.BindQueue(MessagingConstants.AdvertisementsQueueName);
+                });
+
+            opt.UseRabbitMqUsingNamedConnection("rabbitmq").AutoProvision();
+
+            opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
+
+            opt.Services.AddResourceSetupOnStartup();
+            opt.Services.AddHostedService<NodeAdvertisementProducer>();
         });
-    }
-
-    private static void AddBackgroundServices(IServiceCollection serviceCollection)
-    {
-        serviceCollection.AddHostedService<NodeAdvertisementProducer>();
     }
 }

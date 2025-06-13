@@ -1,30 +1,39 @@
 using AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
 using AiPipeline.TireOcr.Ocr.Messaging.Constants;
-using MassTransit;
+using Wolverine;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging.Producers;
 
-public class NodeAdvertisementProducer : BackgroundService
+public class NodeAdvertisementProducer : IHostedService
 {
     private const int PeriodSeconds = 30;
-    private readonly IBus _bus;
+    private readonly IServiceProvider _serviceProvider;
 
-    public NodeAdvertisementProducer(IBus bus)
+
+    public NodeAdvertisementProducer(IServiceProvider serviceProvider)
     {
-        _bus = bus;
+        _serviceProvider = serviceProvider;
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            await _bus.Publish(new NodeAdvertised
-            {
-                NodeName = MessagingConstants.NodeName,
-                Procedures = MessagingConstants.AvailableProcedures
-            }, stoppingToken);
+        await using var scope = _serviceProvider.CreateAsyncScope();
+        var bus = scope.ServiceProvider.GetRequiredService<IMessageBus>();
 
-            await Task.Delay(PeriodSeconds * 1000, stoppingToken);
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            await bus.PublishAsync(new NodeAdvertised
+            {
+                NodeName = MessagingConstants.NodeQueueName,
+                Procedures = MessagingConstants.AvailableProcedures
+            });
+
+            await Task.Delay(PeriodSeconds * 1000, cancellationToken);
         }
     }
-} 
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+}

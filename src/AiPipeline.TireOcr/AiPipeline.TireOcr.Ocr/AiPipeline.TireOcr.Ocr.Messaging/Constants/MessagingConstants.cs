@@ -5,7 +5,9 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 
 public static class MessagingConstants
 {
-    public static string NodeName => "tire-ocr-ocr";
+    public static string NodeQueueName => "tire-ocr-ocr";
+    public static string AdvertisementsExchangeName => "node-advertisements";
+    public static string AdvertisementsQueueName => "node-advertisements-queue";
 
     public static List<ProcedureDescriptor> AvailableProcedures =
     [

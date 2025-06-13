@@ -23,7 +23,9 @@ var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing
 
 var orchestrationRunnerService = builder
     .AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
-    .WithHttpsHealthCheck("/health");
+    .WithHttpsHealthCheck("/health")
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq);
 
 var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
     .WithHttpsHealthCheck("/health")

@@ -11,10 +11,13 @@
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13"/>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+        <PackageReference Include="WolverineFx" Version="4.0.0" />
+        <PackageReference Include="WolverineFx.RabbitMQ" Version="4.0.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
+      <ProjectReference Include="..\..\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
       <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj" />
     </ItemGroup>
 

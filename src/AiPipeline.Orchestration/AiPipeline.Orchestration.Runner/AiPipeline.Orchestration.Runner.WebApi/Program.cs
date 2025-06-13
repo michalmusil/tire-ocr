@@ -4,7 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     // .AddApplication()
     // .AddInfrastructure()
-    .AddPresentation();
+    .AddPresentation(builder.Host);
 
 builder.AddServiceDefaults();
 
