@@ -11,4 +11,9 @@ public record ApString : IApElement
     {
         Value = value;
     }
+
+    public bool HasEquivalentSchemaWith(IApElement other)
+    {
+        return other is ApString;
+    }
 }

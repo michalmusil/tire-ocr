@@ -13,4 +13,9 @@ public record ApFile : IApElement
         FileName = fileName;
         FileUrl = fileUrl;
     }
+
+    public bool HasEquivalentSchemaWith(IApElement other)
+    {
+        return other is ApFile;
+    }
 }

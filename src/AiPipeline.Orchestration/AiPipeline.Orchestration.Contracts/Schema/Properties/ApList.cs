@@ -19,4 +19,21 @@ public record ApList : IApElement
         
         Items = items;
     }
+
+    public bool HasEquivalentSchemaWith(IApElement other)
+    {
+        if (other is not ApList)
+            return false;
+        var otherAsApList = (other as ApList)!;
+        
+        var thisChildType = Items.FirstOrDefault()?.GetType();
+        var otherChildType = otherAsApList.Items.FirstOrDefault()?.GetType();
+
+        if (thisChildType is null && otherChildType is null)
+            return true;
+        
+        Type x = typeof(ApList);
+        
+        return thisChildType == otherChildType;
+    }
 }

@@ -11,4 +11,9 @@ public record ApDecimal : IApElement
     {
         Value = value;
     }
+
+    public bool HasEquivalentSchemaWith(IApElement other)
+    {
+        return other is ApDecimal;
+    }
 }

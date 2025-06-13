@@ -11,4 +11,9 @@ public record ApInt : IApElement
     {
         Value = value;
     }
+
+    public bool HasEquivalentSchemaWith(IApElement other)
+    {
+        return other is ApInt;
+    }
 }
