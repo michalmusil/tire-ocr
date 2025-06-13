@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

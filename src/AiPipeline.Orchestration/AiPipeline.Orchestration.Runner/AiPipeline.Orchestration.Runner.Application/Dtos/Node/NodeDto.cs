@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Runner.Domain.NodeTypeEntity;
+using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
 namespace AiPipeline.Orchestration.Runner.Application.Dtos.Node;
 

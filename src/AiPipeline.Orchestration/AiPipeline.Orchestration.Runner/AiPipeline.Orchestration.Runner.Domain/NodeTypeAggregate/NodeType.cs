@@ -1,4 +1,4 @@
-namespace AiPipeline.Orchestration.Runner.Domain.NodeTypeEntity;
+namespace AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
 public class NodeType
 {

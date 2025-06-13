@@ -1,5 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.Repositories;
-using AiPipeline.Orchestration.Runner.Domain.NodeTypeEntity;
+using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Repositories;
@@ -18,7 +18,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
         )
     ];
 
-    public Task<PaginatedCollection<NodeType>> GetMessagesPaginatedAsync(PaginationParams pagination)
+    public Task<PaginatedCollection<NodeType>> GetNodeTypesPaginatedAsync(PaginationParams pagination)
     {
         return Task.FromResult(
             new PaginatedCollection<NodeType>(
@@ -27,6 +27,16 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
                 pagination.PageNumber,
                 pagination.PageSize)
         );
+    }
+
+    public Task<IEnumerable<NodeType>> GetNodeTypesByIdsAsync(params string[] ids)
+    {
+        return Task.FromResult(_nodeTypes.AsEnumerable());
+    }
+
+    public Task<NodeType?> GetNodeTypeById(string nodeId)
+    {
+        return Task.FromResult(_nodeTypes.FirstOrDefault());
     }
 
     public Task Add(NodeType nodeType)

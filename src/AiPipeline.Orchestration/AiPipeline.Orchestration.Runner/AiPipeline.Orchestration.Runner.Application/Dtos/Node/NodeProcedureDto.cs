@@ -1,7 +1,7 @@
 using System.Text.Json;
 using AiPipeline.Orchestration.Contracts.Schema;
 using AiPipeline.Orchestration.Runner.Application.Utils;
-using AiPipeline.Orchestration.Runner.Domain.NodeTypeEntity;
+using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
 namespace AiPipeline.Orchestration.Runner.Application.Dtos.Node;
 
@@ -16,9 +16,9 @@ public record NodeProcedureDto(
     {
         try
         {
-            var input = JsonSerializer.Deserialize<IApElement>(domain.InputDescription,
+            var input = JsonSerializer.Deserialize<IApElement>(domain.InputSchema,
                 JsonUtils.GetApElementSerializerOptions())!;
-            var output = JsonSerializer.Deserialize<IApElement>(domain.OutputDescription,
+            var output = JsonSerializer.Deserialize<IApElement>(domain.OutputSchema,
                 JsonUtils.GetApElementSerializerOptions())!;
 
             return new NodeProcedureDto
