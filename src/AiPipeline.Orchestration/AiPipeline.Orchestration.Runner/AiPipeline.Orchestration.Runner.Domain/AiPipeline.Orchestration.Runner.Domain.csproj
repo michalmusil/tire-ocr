@@ -11,8 +11,4 @@
       <ProjectReference Include="..\..\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Extensions\" />
-    </ItemGroup>
-
 </Project>

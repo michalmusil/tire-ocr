@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Runner.Application.Commands.RunPipeline;
-using AiPipeline.Orchestration.Runner.Application.Dtos.Pipeline;
-using AiPipeline.Orchestration.Runner.Application.Dtos.Pipeline.Run;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipeline;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAsync;
 using Asp.Versioning;
 using MediatR;

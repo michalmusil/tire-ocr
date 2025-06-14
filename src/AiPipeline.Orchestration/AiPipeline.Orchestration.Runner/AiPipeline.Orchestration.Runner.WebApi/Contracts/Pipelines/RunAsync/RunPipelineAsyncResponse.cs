@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Runner.Application.Dtos.Pipeline;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAsync;
 

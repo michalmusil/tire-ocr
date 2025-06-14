@@ -1,5 +1,5 @@
-using AiPipeline.Orchestration.Runner.Application.Dtos.Node;
-using AiPipeline.Orchestration.Runner.Application.Queries.GetAvailableNodes;
+using AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
+using AiPipeline.Orchestration.Runner.Application.NodeType.Queries.GetAvailableNodes;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Nodes.GetAllNodes;
 using Asp.Versioning;
 using MediatR;

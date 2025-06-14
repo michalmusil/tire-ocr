@@ -1,7 +1,7 @@
-using AiPipeline.Orchestration.Runner.Application.Repositories;
-using AiPipeline.Orchestration.Runner.Application.Services;
-using AiPipeline.Orchestration.Runner.Infrastructure.Repositories;
-using AiPipeline.Orchestration.Runner.Infrastructure.Services;
+using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
+using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure;
