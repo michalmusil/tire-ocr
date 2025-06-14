@@ -2,5 +2,8 @@ namespace AiPipeline.Orchestration.Contracts.Schema;
 
 public interface IApElement
 {
-    bool HasCompatibleSchemaWith(IApElement other);
+    public bool HasCompatibleSchemaWith(IApElement other);
+
+    public List<T> GetAllDescendantsOfType<T>()
+        where T : IApElement;
 };

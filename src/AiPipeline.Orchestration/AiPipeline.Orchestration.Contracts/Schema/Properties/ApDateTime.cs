@@ -16,4 +16,6 @@ public record ApDateTime : IApElement
     {
         return other is ApDateTime;
     }
+    
+    public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

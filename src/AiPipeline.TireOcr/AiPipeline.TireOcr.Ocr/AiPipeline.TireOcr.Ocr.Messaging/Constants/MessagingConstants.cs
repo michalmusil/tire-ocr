@@ -14,7 +14,7 @@ public static class MessagingConstants
         new()
         {
             Name = "PerformSingleOcr",
-            Input = new ApFile("", ""),
+            Input = new ApFile("", "", ""),
             Output = new ApObject(new()
             {
                 { "DetectedCode", new ApString("") },

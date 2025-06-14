@@ -16,7 +16,7 @@ public record ApList : IApElement
             if (!isValid)
                 throw new ArgumentException($"Items of {nameof(ApList)} don't share the same type");
         }
-        
+
         Items = items;
     }
 
@@ -25,15 +25,31 @@ public record ApList : IApElement
         if (other is not ApList)
             return false;
         var otherAsApList = (other as ApList)!;
-        
+
         var thisChildType = Items.FirstOrDefault()?.GetType();
         var otherChildType = otherAsApList.Items.FirstOrDefault()?.GetType();
 
         if (thisChildType is null && otherChildType is null)
             return true;
-        
+
         Type x = typeof(ApList);
-        
+
         return thisChildType == otherChildType;
+    }
+
+    public List<T> GetAllDescendantsOfType<T>() where T : IApElement
+    {
+        var childrenOfType = Items
+            .Where(item => item.GetType() == typeof(T))
+            .Select(item => (T)item)
+            .ToList();
+
+        var descendantsOfType = Items
+            .SelectMany(item => item.GetAllDescendantsOfType<T>())
+            .ToList();
+
+        return childrenOfType
+            .Concat(descendantsOfType)
+            .ToList();
     }
 }

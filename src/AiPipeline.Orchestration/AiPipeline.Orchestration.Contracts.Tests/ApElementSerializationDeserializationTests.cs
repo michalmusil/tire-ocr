@@ -158,7 +158,8 @@ public class ApElementSerializationDeserializationTests
         // Arrange
         var filename = "test.json";
         var url = "https://test.com/test";
-        IApElement original = new ApFile(fileName: filename, fileUrl: url);
+        var contentType = "application/json";
+        IApElement original = new ApFile(fileName: filename, contentType: contentType, fileUrl: url);
 
         // Act
         var json = JsonSerializer.Serialize(original, TestUtils.ApElementSerializerOptions);
@@ -167,6 +168,7 @@ public class ApElementSerializationDeserializationTests
         // Assert
         Assert.Equal(filename, result.FileName);
         Assert.Equal(url, result.FileUrl);
+        Assert.Equal(contentType, result.ContentType);
     }
 
     [Fact]

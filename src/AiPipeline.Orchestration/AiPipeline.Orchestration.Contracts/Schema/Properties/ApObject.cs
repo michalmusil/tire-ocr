@@ -38,6 +38,22 @@ public record ApObject : IApElement
         return HasEquivalentRequiredPropertiesWith(otherObject);
     }
 
+    public List<T> GetAllDescendantsOfType<T>() where T : IApElement
+    {
+        var childrenOfType = Properties.Values
+            .Where(item => item.GetType() == typeof(T))
+            .Select(item => (T)item)
+            .ToList();
+
+        var descendantsOfType = Properties.Values
+            .SelectMany(item => item.GetAllDescendantsOfType<T>())
+            .ToList();
+
+        return childrenOfType
+            .Concat(descendantsOfType)
+            .ToList();
+    }
+
     private bool HasEquivalentRequiredPropertiesWith(ApObject other)
     {
         var thisRequiredPropertyPairs = Properties

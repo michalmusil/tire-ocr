@@ -16,4 +16,6 @@ public record ApDecimal : IApElement
     {
         return other is ApDecimal;
     }
+    
+    public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

@@ -16,4 +16,6 @@ public record ApInt : IApElement
     {
         return other is ApInt;
     }
+    
+    public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }
