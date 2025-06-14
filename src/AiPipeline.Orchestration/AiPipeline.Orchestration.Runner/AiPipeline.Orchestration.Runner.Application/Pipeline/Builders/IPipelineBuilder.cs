@@ -2,9 +2,9 @@ using AiPipeline.Orchestration.Contracts.Schema;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using TireOcr.Shared.Result;
 
-namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
+namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 
-public interface IPipelineBuilderService
+public interface IPipelineBuilder
 {
     public IApElement? PipelineInput { get; }
     public IReadOnlyCollection<RunPipelineStepDto> Steps { get; }

@@ -1,5 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
-using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -8,13 +8,13 @@ namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipel
 
 public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, PipelineDto>
 {
-    private readonly IPipelineBuilderService _pipelineBuilderService;
+    private readonly IPipelineBuilderProvider _pipelineBuilderProvider;
     private readonly ILogger<RunPipelineCommandHandler> _logger;
 
-    public RunPipelineCommandHandler(IPipelineBuilderService pipelineBuilderService,
+    public RunPipelineCommandHandler(IPipelineBuilderProvider pipelineBuilderProvider,
         ILogger<RunPipelineCommandHandler> logger)
     {
-        _pipelineBuilderService = pipelineBuilderService;
+        _pipelineBuilderProvider = pipelineBuilderProvider;
         _logger = logger;
     }
 
@@ -23,11 +23,13 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
         CancellationToken cancellationToken
     )
     {
-        _pipelineBuilderService.SetPipelineInput(request.Dto.Input);
-        _pipelineBuilderService.AddSteps(request.Dto.Steps);
-        _pipelineBuilderService.AddFiles(request.Dto.InputFiles);
+        var pipelineBuilder = _pipelineBuilderProvider.GetPipelineBuilder();
 
-        var pipelineResult = await _pipelineBuilderService.BuildAsync();
+        pipelineBuilder.SetPipelineInput(request.Dto.Input);
+        pipelineBuilder.AddSteps(request.Dto.Steps);
+        pipelineBuilder.AddFiles(request.Dto.InputFiles);
+
+        var pipelineResult = await pipelineBuilder.BuildAsync();
 
         return pipelineResult.Map(
             onSuccess: pipeline => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),

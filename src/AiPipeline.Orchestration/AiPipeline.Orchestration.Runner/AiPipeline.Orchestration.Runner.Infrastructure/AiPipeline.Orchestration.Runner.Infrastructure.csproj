@@ -12,7 +12,6 @@
 
     <ItemGroup>
       <Folder Include="NodeType\" />
-      <Folder Include="Pipeline\" />
     </ItemGroup>
 
 </Project>

@@ -1,15 +1,15 @@
 using AiPipeline.Orchestration.Contracts.Schema;
 using AiPipeline.Orchestration.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
-using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 using TireOcr.Shared.Result;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;
 
-public class PipelineBuilderService : IPipelineBuilderService
+public class PipelineBuilder : IPipelineBuilder
 {
     private readonly INodeTypeRepository _nodeTypeRepository;
 
@@ -24,7 +24,7 @@ public class PipelineBuilderService : IPipelineBuilderService
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
 
-    public PipelineBuilderService(INodeTypeRepository nodeTypeRepository)
+    public PipelineBuilder(INodeTypeRepository nodeTypeRepository)
     {
         _nodeTypeRepository = nodeTypeRepository;
     }
@@ -77,7 +77,8 @@ public class PipelineBuilderService : IPipelineBuilderService
             var requestedStep = _steps[i];
             var node = nodes.FirstOrDefault(n => n.Id == requestedStep.NodeId);
             if (node is null)
-                return DataResult<Domain.PipelineAggregate.Pipeline>.NotFound($"Node type {requestedStep.NodeId} not found");
+                return DataResult<Domain.PipelineAggregate.Pipeline>.NotFound(
+                    $"Node type {requestedStep.NodeId} not found");
 
             var procedure = node.AvailableProcedures.FirstOrDefault(p => p.Id == requestedStep.ProcedureId);
             if (procedure is null)
