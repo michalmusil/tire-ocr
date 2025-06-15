@@ -34,14 +34,14 @@ public class ApElementConverter : JsonConverter<IApElement>
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
 
-        if (!root.TryGetProperty("Type", out var typeProp))
+        if (!root.TryGetProperty("type", out var typeProp))
             throw new JsonException(
-                "'Type' property not found. ApElement can't be deserialized without the 'Type' property.");
+                "'type' property not found. ApElement can't be deserialized without the 'type' property.");
 
         var typeName = typeProp.GetString();
 
         if (typeName == null || !NameToType.TryGetValue(typeName, out var targetType))
-            throw new JsonException($"Unknown ApElement Type '{typeName}'.");
+            throw new JsonException($"Unknown ApElement type '{typeName}'.");
 
         return (IApElement?)JsonSerializer.Deserialize(root.GetRawText(), targetType, options);
     }
@@ -55,7 +55,7 @@ public class ApElementConverter : JsonConverter<IApElement>
         var json = JsonSerializer.SerializeToElement(value, type, options);
 
         writer.WriteStartObject();
-        writer.WriteString("Type", typeName);
+        writer.WriteString("type", typeName);
 
         foreach (var property in json.EnumerateObject())
         {

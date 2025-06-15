@@ -21,7 +21,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
                 new NodeProcedure(
                     "fnp-2",
                     1,
-                    new ApList([]),
+                    new ApString(""),
                     new ApDateTime(DateTime.Now))
             ]
         )

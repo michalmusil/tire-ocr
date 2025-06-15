@@ -30,7 +30,13 @@ public class PipelinesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<RunPipelineAsyncResponse>> RunAsync([FromBody] RunPipelineAsyncRequest request)
     {
-        var command = new RunPipelineCommand(new RunPipelineDto(request.Steps));
+        var command = new RunPipelineCommand(
+            new RunPipelineDto(
+                Input: request.Input,
+                InputFiles: [],
+                Steps: request.Steps
+            )
+        );
         var result = await _mediator.Send(command);
 
         return result.ToActionResult<PipelineDto, RunPipelineAsyncResponse>(
