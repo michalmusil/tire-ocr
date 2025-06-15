@@ -1,4 +1,5 @@
-using AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Shared;
+using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.TireOcr.Ocr.Messaging.Constants;
 using Wolverine;
 
@@ -24,8 +25,8 @@ public class NodeAdvertisementProducer : IHostedService
         {
             await bus.PublishAsync(new NodeAdvertised
             {
-                NodeName = MessagingConstants.NodeQueueName,
-                Procedures = MessagingConstants.AvailableProcedures
+                NodeName = MessagingConstants.TireOcrOcrQueueName,
+                Procedures = NodeMessagingConstants.AvailableProcedures
             });
 
             await Task.Delay(PeriodSeconds * 1000, cancellationToken);

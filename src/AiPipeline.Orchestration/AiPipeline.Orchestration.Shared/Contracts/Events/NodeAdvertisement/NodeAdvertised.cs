@@ -1,4 +1,4 @@
-namespace AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
+namespace AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 
 public record NodeAdvertised
 {

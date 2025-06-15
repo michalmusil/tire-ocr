@@ -1,4 +1,5 @@
-using AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
+
+using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Consumers;
 

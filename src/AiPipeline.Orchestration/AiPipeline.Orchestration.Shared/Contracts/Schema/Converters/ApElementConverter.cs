@@ -1,9 +1,9 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AiPipeline.Orchestration.Contracts.Schema.Attributes;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Attributes;
 
-namespace AiPipeline.Orchestration.Contracts.Schema.Converters;
+namespace AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 
 public class ApElementConverter : JsonConverter<IApElement>
 {

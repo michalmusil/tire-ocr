@@ -1,5 +1,5 @@
 using System.Text.Json;
-using AiPipeline.Orchestration.Contracts.Schema.Converters;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 
 namespace AiPipeline.Orchestration.Contracts.Tests;
 

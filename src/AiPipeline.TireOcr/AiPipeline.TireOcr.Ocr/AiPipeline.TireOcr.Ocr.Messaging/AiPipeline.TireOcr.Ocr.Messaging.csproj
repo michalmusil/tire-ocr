@@ -13,7 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
+      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj" />
       <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
       <ProjectReference Include="..\AiPipeline.TireOcr.Ocr.Infrastructure\AiPipeline.TireOcr.Ocr.Infrastructure.csproj" />
     </ItemGroup>

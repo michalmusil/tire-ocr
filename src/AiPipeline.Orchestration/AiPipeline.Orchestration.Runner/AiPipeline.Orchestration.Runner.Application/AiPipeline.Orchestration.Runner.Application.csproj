@@ -8,7 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
-      <ProjectReference Include="..\..\AiPipeline.Orchestration.Contracts\AiPipeline.Orchestration.Contracts.csproj" />
+      <ProjectReference Include="..\..\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj" />
       <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Domain\AiPipeline.Orchestration.Runner.Domain.csproj" />
     </ItemGroup>
 

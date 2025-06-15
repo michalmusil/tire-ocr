@@ -1,10 +1,10 @@
-using AiPipeline.Orchestration.Contracts.Schema;
-using AiPipeline.Orchestration.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
+using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;

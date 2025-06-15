@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;

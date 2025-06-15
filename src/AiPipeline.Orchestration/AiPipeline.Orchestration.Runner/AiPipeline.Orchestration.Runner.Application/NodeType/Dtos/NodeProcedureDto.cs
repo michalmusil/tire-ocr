@@ -1,5 +1,5 @@
-using AiPipeline.Orchestration.Contracts.Schema;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
+using AiPipeline.Orchestration.Shared.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
 

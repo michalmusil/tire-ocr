@@ -1,4 +1,4 @@
-namespace AiPipeline.Orchestration.Contracts.Schema.Attributes;
+namespace AiPipeline.Orchestration.Shared.Contracts.Schema.Attributes;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct,  Inherited = false)]
 public class ApElementTypeAttribute: Attribute

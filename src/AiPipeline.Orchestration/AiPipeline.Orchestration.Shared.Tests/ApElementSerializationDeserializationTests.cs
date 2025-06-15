@@ -1,6 +1,6 @@
 using System.Text.Json;
-using AiPipeline.Orchestration.Contracts.Schema;
-using AiPipeline.Orchestration.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 
 namespace AiPipeline.Orchestration.Contracts.Tests;
 

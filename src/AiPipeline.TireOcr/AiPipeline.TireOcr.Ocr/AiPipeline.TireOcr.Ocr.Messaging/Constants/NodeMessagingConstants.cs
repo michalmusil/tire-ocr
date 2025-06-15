@@ -1,14 +1,10 @@
-using AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
-using AiPipeline.Orchestration.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 
-public static class MessagingConstants
+public static class NodeMessagingConstants
 {
-    public static string NodeQueueName => "tire-ocr-ocr";
-    public static string AdvertisementsExchangeName => "node-advertisements";
-    public static string AdvertisementsQueueName => "node-advertisements-queue";
-
     public static List<ProcedureDescriptor> AvailableProcedures =
     [
         new()

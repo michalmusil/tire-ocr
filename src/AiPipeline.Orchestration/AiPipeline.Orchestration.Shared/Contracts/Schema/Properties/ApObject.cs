@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Contracts.Schema.Attributes;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Attributes;
 
-namespace AiPipeline.Orchestration.Contracts.Schema.Properties;
+namespace AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 
 [ApElementType("ApObject")]
 public record ApObject : IApElement

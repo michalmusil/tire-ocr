@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.Contracts.Schema;
 
-namespace AiPipeline.Orchestration.Contracts.Events.NodeAdvertisement;
+namespace AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 
 public record ProcedureDescriptor
 {

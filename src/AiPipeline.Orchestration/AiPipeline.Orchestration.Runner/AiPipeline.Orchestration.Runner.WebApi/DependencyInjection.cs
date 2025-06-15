@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
-using AiPipeline.Orchestration.Contracts.Schema.Converters;
-using AiPipeline.Orchestration.Runner.WebApi.Constants;
+using AiPipeline.Orchestration.Shared;
+using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
+using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 using Asp.Versioning;
 using JasperFx.Resources;
 using Wolverine;
@@ -54,11 +55,28 @@ public static class DependencyInjection
     {
         hostBuilder.UseWolverine(opt =>
         {
+            opt.UseRabbitMqUsingNamedConnection("rabbitmq")
+                .AutoProvision()
+                .DeclareExchange(MessagingConstants.RunPipelineExchangeName, exc =>
+                {
+                    exc.ExchangeType = ExchangeType.Topic;
+
+                    exc.BindTopic(
+                            $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPreprocessingQueueName}")
+                        .ToQueue(MessagingConstants.TireOcrPreprocessingQueueName);
+                    exc.BindTopic(
+                            $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrOcrQueueName}")
+                        .ToQueue(MessagingConstants.TireOcrOcrQueueName);
+                    exc.BindTopic(
+                            $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPostprocessingQueueName}")
+                        .ToQueue(MessagingConstants.TireOcrPostprocessingQueueName);
+                });
+
             opt.ListenToRabbitQueue(MessagingConstants.AdvertisementsQueueName);
+            opt.PublishMessagesToRabbitMqExchange<RunPipelineStep>(MessagingConstants.RunPipelineExchangeName,
+                src => $"{MessagingConstants.RunPipelineExchangeName}.{src.CurrentStep.NodeId}");
 
-            opt.UseRabbitMqUsingNamedConnection("rabbitmq").AutoProvision();
             opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
-
             opt.Services.AddResourceSetupOnStartup();
         });
     }

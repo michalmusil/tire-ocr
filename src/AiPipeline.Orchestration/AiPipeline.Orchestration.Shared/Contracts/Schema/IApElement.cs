@@ -1,4 +1,4 @@
-namespace AiPipeline.Orchestration.Contracts.Schema;
+namespace AiPipeline.Orchestration.Shared.Contracts.Schema;
 
 public interface IApElement
 {
