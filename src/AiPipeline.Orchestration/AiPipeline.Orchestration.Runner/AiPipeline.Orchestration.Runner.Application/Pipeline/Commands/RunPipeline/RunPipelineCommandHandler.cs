@@ -1,5 +1,6 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -9,12 +10,14 @@ namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipel
 public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, PipelineDto>
 {
     private readonly IPipelineBuilderProvider _pipelineBuilderProvider;
+    private readonly IPipelinePublisherService _pipelinePublisher;
     private readonly ILogger<RunPipelineCommandHandler> _logger;
 
     public RunPipelineCommandHandler(IPipelineBuilderProvider pipelineBuilderProvider,
-        ILogger<RunPipelineCommandHandler> logger)
+        IPipelinePublisherService pipelinePublisher, ILogger<RunPipelineCommandHandler> logger)
     {
         _pipelineBuilderProvider = pipelineBuilderProvider;
+        _pipelinePublisher = pipelinePublisher;
         _logger = logger;
     }
 
@@ -31,8 +34,14 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
 
         var pipelineResult = await pipelineBuilder.BuildAsync();
 
-        return pipelineResult.Map(
-            onSuccess: pipeline => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),
+        if (pipelineResult.IsFailure)
+            return DataResult<PipelineDto>.Failure(pipelineResult.Failures);
+        var pipeline = pipelineResult.Data!;
+
+        var pipelinePublishResult = await _pipelinePublisher.PublishPipeline(pipeline, request.Dto.Input);
+
+        return pipelinePublishResult.Map(
+            onSuccess: () => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),
             onFailure: DataResult<PipelineDto>.Failure
         );
     }

@@ -1,22 +1,29 @@
-
+using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Consumers;
 
 public class NodeAdvertisedHandler
 {
-    private static readonly List<NodeAdvertised> _advertisements = [];
+    private readonly INodeTypeRepository _nodeTypeRepository;
     private readonly ILogger<NodeAdvertisedHandler> _logger;
 
-    public NodeAdvertisedHandler(ILogger<NodeAdvertisedHandler> logger)
+    public NodeAdvertisedHandler(INodeTypeRepository nodeTypeRepository, ILogger<NodeAdvertisedHandler> logger)
     {
+        _nodeTypeRepository = nodeTypeRepository;
         _logger = logger;
     }
 
 
-    public void Handle(NodeAdvertised message)
+    public async Task HandleAsync(NodeAdvertised message)
     {
-        _advertisements.Add(message);
+        var nodeType = new NodeType(
+            id: message.NodeName,
+            availableProcedures: message.Procedures
+                .Select(pd => new NodeProcedure(pd.Name, pd.SchemaVersion, pd.Input, pd.Output))
+        );
+        await _nodeTypeRepository.Put(nodeType);
         _logger.LogInformation($"Message consumed: {@message}");
     }
 }

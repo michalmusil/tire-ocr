@@ -13,5 +13,6 @@ public interface INodeTypeRepository
     public Task<Domain.NodeTypeAggregate.NodeType?> GetNodeTypeByIdAsync(string nodeId);
 
     public Task Add(Domain.NodeTypeAggregate.NodeType nodeType);
+    public Task Put(Domain.NodeTypeAggregate.NodeType nodeType);
     public Task Remove(Domain.NodeTypeAggregate.NodeType nodeType);
 }

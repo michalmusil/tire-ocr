@@ -18,8 +18,4 @@
       <ProjectReference Include="..\AiPipeline.TireOcr.Ocr.Infrastructure\AiPipeline.TireOcr.Ocr.Infrastructure.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Consumers\" />
-    </ItemGroup>
-
 </Project>

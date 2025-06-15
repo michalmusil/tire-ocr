@@ -9,7 +9,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
 {
     private static List<Domain.NodeTypeAggregate.NodeType> _nodeTypes =
     [
-        new Domain.NodeTypeAggregate.NodeType("fnt-1", [
+        new("fnt-1", [
                 new NodeProcedure(
                     "fnp-1",
                     1,
@@ -17,7 +17,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
                     new ApString(""))
             ]
         ),
-        new Domain.NodeTypeAggregate.NodeType("fnt-2", [
+        new("fnt-2", [
                 new NodeProcedure(
                     "fnp-2",
                     1,
@@ -27,7 +27,8 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
         )
     ];
 
-    public Task<PaginatedCollection<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesPaginatedAsync(PaginationParams pagination)
+    public Task<PaginatedCollection<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesPaginatedAsync(
+        PaginationParams pagination)
     {
         return Task.FromResult(
             new PaginatedCollection<Domain.NodeTypeAggregate.NodeType>(
@@ -51,6 +52,24 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
     public Task Add(Domain.NodeTypeAggregate.NodeType nodeType)
     {
         _nodeTypes.Add(nodeType);
+        return Task.CompletedTask;
+    }
+
+    public Task Put(Domain.NodeTypeAggregate.NodeType nodeType)
+    {
+        var alreadyExistingNodeType = _nodeTypes.FirstOrDefault(x => x.Id == nodeType.Id);
+        if (alreadyExistingNodeType is null)
+        {
+            _nodeTypes.Add(nodeType);
+            return Task.CompletedTask;
+        }
+
+        alreadyExistingNodeType.ClearProcedures();
+        foreach (var nodeTypeAvailableProcedure in nodeType.AvailableProcedures)
+        {
+            alreadyExistingNodeType.AddProcedure(nodeTypeAvailableProcedure);
+        }
+
         return Task.CompletedTask;
     }
 
