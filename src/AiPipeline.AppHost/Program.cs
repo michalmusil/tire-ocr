@@ -21,6 +21,12 @@ var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("
 var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
     .WithHttpsHealthCheck("/health");
 
+var postprocessingMessagingService = builder
+    .AddProject<AiPipeline_TireOcr_Postprocessing_Messaging>("PostprocessingMessagingService")
+    .WithHttpsHealthCheck("/health")
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq);
+
 var orchestrationRunnerService = builder
     .AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
     .WithHttpsHealthCheck("/health")

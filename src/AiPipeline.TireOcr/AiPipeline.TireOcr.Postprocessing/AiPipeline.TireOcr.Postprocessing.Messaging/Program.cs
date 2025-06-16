@@ -1,6 +1,6 @@
-using AiPipeline.TireOcr.Ocr.Messaging;
-using TireOcr.Ocr.Application;
-using TireOcr.Ocr.Infrastructure;
+using AiPipeline.TireOcr.Postprocessing.Messaging;
+using TireOcr.Postprocessing.Application;
+using TireOcr.Postprocessing.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
