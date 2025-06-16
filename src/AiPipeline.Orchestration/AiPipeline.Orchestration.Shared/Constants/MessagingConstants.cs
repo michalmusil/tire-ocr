@@ -1,4 +1,4 @@
-namespace AiPipeline.Orchestration.Shared;
+namespace AiPipeline.Orchestration.Shared.Constants;
 
 public static class MessagingConstants
 {

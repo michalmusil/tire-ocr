@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Shared;
+using AiPipeline.Orchestration.Shared.Constants;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 

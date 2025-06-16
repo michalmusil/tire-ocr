@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using AiPipeline.Orchestration.Shared;
+using AiPipeline.Orchestration.Shared.Constants;
 using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 using Asp.Versioning;
