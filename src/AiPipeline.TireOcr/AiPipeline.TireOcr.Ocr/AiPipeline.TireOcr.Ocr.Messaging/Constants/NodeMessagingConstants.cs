@@ -6,6 +6,8 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 
 public static class NodeMessagingConstants
 {
+    public static string PerformSingleOcrProcedureName = "PerformSingleOcr";
+
     public static NodeAdvertised NodeAdvertisement = new()
     {
         NodeName = MessagingConstants.TireOcrOcrQueueName,
