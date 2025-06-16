@@ -14,8 +14,4 @@
       <Folder Include="NodeType\" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="WolverineFx" Version="4.0.0" />
-    </ItemGroup>
-
 </Project>

@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Mess
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj", "{BFA62193-F250-4EDB-A829-ACCE0B6C1D33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Messaging\AiPipeline.TireOcr.Postprocessing.Messaging.csproj", "{208CD580-2879-4987-8455-BF02F7A9487E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,7 @@ Global
 		{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF} = {A1CC0876-5233-413C-805C-F2FECE70558A}
 		{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE} = {EEBDFA78-8026-44BA-9866-F2583A3FAA23}
 		{BFA62193-F250-4EDB-A829-ACCE0B6C1D33} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
+		{208CD580-2879-4987-8455-BF02F7A9487E} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -183,5 +186,9 @@ Global
 		{BFA62193-F250-4EDB-A829-ACCE0B6C1D33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BFA62193-F250-4EDB-A829-ACCE0B6C1D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BFA62193-F250-4EDB-A829-ACCE0B6C1D33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{208CD580-2879-4987-8455-BF02F7A9487E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{208CD580-2879-4987-8455-BF02F7A9487E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{208CD580-2879-4987-8455-BF02F7A9487E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{208CD580-2879-4987-8455-BF02F7A9487E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

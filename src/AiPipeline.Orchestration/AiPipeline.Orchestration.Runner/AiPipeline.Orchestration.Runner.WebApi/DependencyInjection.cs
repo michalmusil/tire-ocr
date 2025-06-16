@@ -57,6 +57,11 @@ public static class DependencyInjection
         {
             opt.UseRabbitMqUsingNamedConnection("rabbitmq")
                 .AutoProvision()
+                .DeclareExchange(MessagingConstants.AdvertisementsExchangeName, exc =>
+                {
+                    exc.ExchangeType = ExchangeType.Fanout;
+                    exc.BindQueue(MessagingConstants.AdvertisementsQueueName);
+                })
                 .DeclareExchange(MessagingConstants.RunPipelineExchangeName, exc =>
                 {
                     exc.ExchangeType = ExchangeType.Topic;

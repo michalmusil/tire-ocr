@@ -8,11 +8,6 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="WolverineFx" Version="4.0.0" />
-        <PackageReference Include="WolverineFx.RabbitMQ" Version="4.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj" />
       <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
       <ProjectReference Include="..\AiPipeline.TireOcr.Ocr.Infrastructure\AiPipeline.TireOcr.Ocr.Infrastructure.csproj" />

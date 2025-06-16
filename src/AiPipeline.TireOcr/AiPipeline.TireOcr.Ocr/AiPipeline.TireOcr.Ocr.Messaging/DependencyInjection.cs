@@ -1,7 +1,8 @@
 using AiPipeline.Orchestration.Shared;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
-using AiPipeline.TireOcr.Ocr.Messaging.Producers;
+using AiPipeline.Orchestration.Shared.Producers;
+using AiPipeline.TireOcr.Ocr.Messaging.Constants;
 using JasperFx.Resources;
 using Wolverine;
 using Wolverine.RabbitMQ;
@@ -21,12 +22,7 @@ public static class DependencyInjection
         hostBuilder.UseWolverine(opt =>
         {
             opt.UseRabbitMqUsingNamedConnection("rabbitmq")
-                .AutoProvision()
-                .DeclareExchange(MessagingConstants.AdvertisementsExchangeName, exc =>
-                {
-                    exc.ExchangeType = ExchangeType.Fanout;
-                    exc.BindQueue(MessagingConstants.AdvertisementsQueueName);
-                });
+                .AutoProvision();
 
             opt.PublishMessage<NodeAdvertised>()
                 .ToRabbitExchange(MessagingConstants.AdvertisementsExchangeName);
@@ -35,7 +31,8 @@ public static class DependencyInjection
 
             opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
             opt.Services.AddResourceSetupOnStartup();
-            opt.Services.AddHostedService<NodeAdvertisementProducer>();
+            opt.Services.AddHostedService(provider =>
+                new NodeAdvertisementProducerService(provider, NodeMessagingConstants.NodeAdvertisement));
         });
     }
 }

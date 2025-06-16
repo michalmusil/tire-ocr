@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Shared;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 
@@ -5,24 +6,28 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 
 public static class NodeMessagingConstants
 {
-    public static List<ProcedureDescriptor> AvailableProcedures =
-    [
-        new()
-        {
-            Name = "PerformSingleOcr",
-            Input = new ApFile("", "", ""),
-            Output = new ApObject(new()
+    public static NodeAdvertised NodeAdvertisement = new()
+    {
+        NodeName = MessagingConstants.TireOcrOcrQueueName,
+        Procedures =
+        [
+            new()
             {
-                { "DetectedCode", new ApString("") },
+                Name = "PerformSingleOcr",
+                Input = new ApFile("", "", ""),
+                Output = new ApObject(new()
                 {
-                    "Billing", new ApObject(new()
+                    { "DetectedCode", new ApString("") },
                     {
-                        { "InputAmount", new ApDecimal(0) },
-                        { "OutputAmount", new ApDecimal(0) },
-                        { "Unit", new ApString("") }
-                    })
-                }
-            })
-        }
-    ];
+                        "Billing", new ApObject(new()
+                        {
+                            { "InputAmount", new ApDecimal(0) },
+                            { "OutputAmount", new ApDecimal(0) },
+                            { "Unit", new ApString("") }
+                        })
+                    }
+                })
+            }
+        ]
+    };
 }
