@@ -1,6 +1,7 @@
 using AiPipeline.Orchestration.Shared.Constants;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
+using AiPipeline.Orchestration.Shared.Extensions;
 using AiPipeline.Orchestration.Shared.Producers;
 using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 using JasperFx.Resources;
@@ -14,6 +15,7 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
     {
         AddMessaging(hostBuilder);
+        services.AddProcedureRoutingFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
         return services;
     }
 
