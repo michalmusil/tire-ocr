@@ -8,6 +8,13 @@ public static class MessagingConstants
 
     public static string RunPipelineExchangeName => "run-pipeline";
 
+    public static string CompletedPipelinesExchangeName => "completed-pipelines";
+    public static string CompletedPipelinesQueueName => "completed-pipelines-queue";
+
+
+    public static string FailedPipelinesExchangeName => "failed-pipelines";
+    public static string FailedPipelinesQueueName => "failed-pipelines-queue";
+
     public static string AdvertisementsExchangeName => "node-advertisements";
     public static string AdvertisementsQueueName => "node-advertisements-queue";
 }

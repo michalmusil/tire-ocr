@@ -2,8 +2,8 @@ using System.Data;
 using System.Reflection;
 using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.Procedures.PipelineCompletion;
 using AiPipeline.Orchestration.Shared.Procedures.PipelineFailure;
-using AiPipeline.Orchestration.Shared.Procedures.PipelineFinish;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using Wolverine;
@@ -17,10 +17,10 @@ public class ProcedureRouter : IProcedureRouter
     private readonly ILogger<ProcedureRouter> _logger;
 
     private readonly Dictionary<string, Func<IProcedure>> _procedureFactories;
-    private readonly Dictionary<Type, IPipelineFinishStrategy> _finishStrategies;
+    private readonly Dictionary<Type, IPipelineCompletionStrategy> _completionStrategies;
     private readonly Dictionary<Type, IPipelineFailureStrategy> _failureStrategies;
 
-    public IPipelineFinishStrategy DefaultFinishStrategy { get; set; }
+    public IPipelineCompletionStrategy DefaultCompletionStrategy { get; set; }
     public IPipelineFailureStrategy DefaultFailureStrategy { get; set; }
 
     public ProcedureRouter(IMessageBus bus, IServiceProvider serviceProvider, ILogger<ProcedureRouter> logger)
@@ -30,10 +30,10 @@ public class ProcedureRouter : IProcedureRouter
         _logger = logger;
 
         _procedureFactories = new();
-        _finishStrategies = new();
+        _completionStrategies = new();
         _failureStrategies = new();
 
-        DefaultFinishStrategy = new DefaultPipelineFinishStrategy();
+        DefaultCompletionStrategy = new DefaultPipelineCompletionStrategy();
         DefaultFailureStrategy = new DefaultPipelineFailureStrategy();
     }
 
@@ -41,7 +41,7 @@ public class ProcedureRouter : IProcedureRouter
     /// Manages routing and execution of a pipeline step.
     /// Finds a registered procedure matched based on the procedureId of current pipeline step and executes it
     /// with the current step input. Then it sends an asynchronous message to the next pipeline step (with output of
-    /// the current step as input) if there are any next steps left, or invokes a pipeline finish strategy otherwise. 
+    /// the current step as input) if there are any next steps left, or invokes a pipeline completion strategy otherwise. 
     /// </summary>
     /// <param name="stepDescription">A pipeline step to process</param>
     /// <returns>A data result containing either the output of current pipeline step or failure</returns>
@@ -88,11 +88,11 @@ public class ProcedureRouter : IProcedureRouter
         }
 
         var nextStepProcedureIdentifier = stepDescription.NextSteps.FirstOrDefault();
-        var pipelineHasFinished = nextStepProcedureIdentifier is null;
-        if (pipelineHasFinished)
+        var pipelineIsCompleted = nextStepProcedureIdentifier is null;
+        if (pipelineIsCompleted)
         {
-            var finishStrategy = GetProcedureFinishStrategy(procedure);
-            await finishStrategy.Execute(_bus, stepDescription, result.Data!);
+            var completionStrategy = GetPipelineCompletionStrategy(procedure);
+            await completionStrategy.Execute(_bus, stepDescription, result.Data!);
             return result;
         }
 
@@ -111,13 +111,13 @@ public class ProcedureRouter : IProcedureRouter
     }
 
     /// <summary>
-    /// Registers a finish strategy that will be used over the default finish strategy when the pipeline
-    /// finishes (has no more steps to route), but only for the specified procedure type.
+    /// Registers a completion strategy that will be used over the default completion strategy when the pipeline
+    /// is completed (has no more steps to route), but only for the specified procedure type.
     /// </summary>
-    /// <param name="strategy">Finish strategy to be used</param>
+    /// <param name="strategy">Completion strategy to be used</param>
     /// <typeparam name="T">Concrete type of procedure for which the strategy should be used</typeparam>
-    public void AddFinishStrategyForProcedureType<T>(IPipelineFinishStrategy strategy) where T : IProcedure
-        => _finishStrategies[typeof(T)] = strategy;
+    public void AddCompletionStrategyForProcedureType<T>(IPipelineCompletionStrategy strategy) where T : IProcedure
+        => _completionStrategies[typeof(T)] = strategy;
 
     /// <summary>
     /// Registers a failure strategy that will be used over the default failure strategy when the step
@@ -204,10 +204,10 @@ public class ProcedureRouter : IProcedureRouter
         }
     }
 
-    private IPipelineFinishStrategy GetProcedureFinishStrategy(IProcedure procedure) =>
-        _finishStrategies.ContainsKey(procedure.GetType())
-            ? _finishStrategies[procedure.GetType()]
-            : DefaultFinishStrategy;
+    private IPipelineCompletionStrategy GetPipelineCompletionStrategy(IProcedure procedure) =>
+        _completionStrategies.ContainsKey(procedure.GetType())
+            ? _completionStrategies[procedure.GetType()]
+            : DefaultCompletionStrategy;
 
     private IPipelineFailureStrategy GetProcedureFailureStrategy(IProcedure procedure) =>
         _failureStrategies.ContainsKey(procedure.GetType())

@@ -19,6 +19,16 @@ public static class WolverineExtension
                 exc.ExchangeType = ExchangeType.Fanout;
                 exc.BindQueue(MessagingConstants.AdvertisementsQueueName);
             })
+            .DeclareExchange(MessagingConstants.CompletedPipelinesExchangeName, exc =>
+            {
+                exc.ExchangeType = ExchangeType.Fanout;
+                exc.BindQueue(MessagingConstants.CompletedPipelinesQueueName);
+            })
+            .DeclareExchange(MessagingConstants.FailedPipelinesExchangeName, exc =>
+            {
+                exc.ExchangeType = ExchangeType.Fanout;
+                exc.BindQueue(MessagingConstants.FailedPipelinesQueueName);
+            })
             .DeclareExchange(MessagingConstants.RunPipelineExchangeName, exc =>
             {
                 exc.ExchangeType = ExchangeType.Topic;

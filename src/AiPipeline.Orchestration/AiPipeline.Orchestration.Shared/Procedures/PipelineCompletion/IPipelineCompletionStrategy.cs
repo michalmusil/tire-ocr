@@ -3,9 +3,9 @@ using AiPipeline.Orchestration.Shared.Contracts.Schema;
 using TireOcr.Shared.Result;
 using Wolverine;
 
-namespace AiPipeline.Orchestration.Shared.Procedures.PipelineFinish;
+namespace AiPipeline.Orchestration.Shared.Procedures.PipelineCompletion;
 
-public interface IPipelineFinishStrategy
+public interface IPipelineCompletionStrategy
 {
     public Task<Result> Execute(IMessageBus bus, RunPipelineStep processedStep, IApElement? result);
 }
