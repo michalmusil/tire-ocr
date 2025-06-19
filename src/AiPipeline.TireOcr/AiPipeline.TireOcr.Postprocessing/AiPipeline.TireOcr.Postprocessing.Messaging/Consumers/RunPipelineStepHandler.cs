@@ -16,6 +16,6 @@ public class RunPipelineStepHandler
 
     public async Task HandleAsync(RunPipelineStep message)
     {
-        _logger.LogInformation($"Run pipeline message consumed: {@message}");
+        await _procedureRouter.ProcessPipelineStep(message);
     }
 }

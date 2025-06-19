@@ -6,14 +6,16 @@ namespace AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 
 public static class NodeMessagingConstants
 {
+    public static readonly string PerformTireCodePostprocessingProcedureId = "PerformTireCodePostprocessing";
+
     public static NodeAdvertised NodeAdvertisement = new()
     {
-        NodeName = MessagingConstants.TireOcrPostprocessingQueueName,
+        NodeId = MessagingConstants.TireOcrPostprocessingQueueName,
         Procedures =
         [
             new()
             {
-                Name = "PerformTireCodePostprocessing",
+                Id = PerformTireCodePostprocessingProcedureId,
                 Input = new ApString(""),
                 Output = new ApObject(
                     properties: new()

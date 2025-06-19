@@ -1,6 +1,8 @@
 using System.Reflection;
 using AiPipeline.Orchestration.Shared.Procedures;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Wolverine.Runtime;
 
 namespace AiPipeline.Orchestration.Shared.Extensions;
 
@@ -22,7 +24,11 @@ public static class ServiceCollectionExtension
 
         services.AddSingleton<IProcedureRouter>(provider =>
         {
-            var procedureRouter = new ProcedureRouter(provider);
+            var wolverineRuntime = provider.GetRequiredService<IWolverineRuntime>();
+            var messageBus = new MessageBus(wolverineRuntime);
+            var logger = provider.GetRequiredService<ILogger<ProcedureRouter>>();
+            var procedureRouter = new ProcedureRouter(messageBus, provider, logger);
+
             procedureRouter.RegisterProceduresFromAssemblies(assemblies);
             return procedureRouter;
         });

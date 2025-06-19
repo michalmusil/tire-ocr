@@ -19,9 +19,9 @@ public class NodeAdvertisedHandler
     public async Task HandleAsync(NodeAdvertised message)
     {
         var nodeType = new NodeType(
-            id: message.NodeName,
+            id: message.NodeId,
             availableProcedures: message.Procedures
-                .Select(pd => new NodeProcedure(pd.Name, pd.SchemaVersion, pd.Input, pd.Output))
+                .Select(pd => new NodeProcedure(pd.Id, pd.SchemaVersion, pd.Input, pd.Output))
         );
         await _nodeTypeRepository.Put(nodeType);
         _logger.LogInformation($"Message consumed: {@message}");

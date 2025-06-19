@@ -5,7 +5,7 @@ namespace AiPipeline.Orchestration.Shared.Procedures;
 
 public interface IProcedure
 {
-    public string Name { get; }
+    public string Id { get; }
     public int SchemaVersion { get; }
     public IApElement InputSchema { get; }
     public IApElement OutputSchema { get; }

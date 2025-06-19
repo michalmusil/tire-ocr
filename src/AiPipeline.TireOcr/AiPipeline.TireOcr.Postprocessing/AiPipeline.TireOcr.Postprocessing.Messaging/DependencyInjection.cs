@@ -1,10 +1,7 @@
 using AiPipeline.Orchestration.Shared.Constants;
-using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 using AiPipeline.Orchestration.Shared.Extensions;
 using AiPipeline.Orchestration.Shared.Producers;
 using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
-using JasperFx.Resources;
 using Wolverine;
 using Wolverine.RabbitMQ;
 
@@ -15,7 +12,7 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
     {
         AddMessaging(hostBuilder);
-        services.AddProcedureRoutingFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+        services.AddProcedureRoutingFromAssemblies(typeof(DependencyInjection).Assembly);
         return services;
     }
 
@@ -24,15 +21,14 @@ public static class DependencyInjection
         hostBuilder.UseWolverine(opt =>
         {
             opt.UseRabbitMqUsingNamedConnection("rabbitmq")
+                .DeclareExchanges()
                 .AutoProvision();
 
-            opt.PublishMessage<NodeAdvertised>()
-                .ToRabbitExchange(MessagingConstants.AdvertisementsExchangeName);
+            opt.ConfigureMessagePublishing();
+            opt.ApplyCustomConfiguration();
 
             opt.ListenToRabbitQueue(MessagingConstants.TireOcrPostprocessingQueueName);
 
-            opt.UseSystemTextJsonForSerialization(stj => { stj.Converters.Add(new ApElementConverter()); });
-            opt.Services.AddResourceSetupOnStartup();
             opt.Services.AddHostedService(provider =>
                 new NodeAdvertisementProducerService(provider, NodeMessagingConstants.NodeAdvertisement));
         });

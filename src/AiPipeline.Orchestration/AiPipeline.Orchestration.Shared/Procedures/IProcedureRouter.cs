@@ -7,6 +7,6 @@ namespace AiPipeline.Orchestration.Shared.Procedures;
 
 public interface IProcedureRouter
 {
-    public Task<DataResult<IApElement>> ProcessPipelineStep(RunPipelineStep step);
+    public Task<DataResult<IApElement>> ProcessPipelineStep(RunPipelineStep stepDescription);
     public void RegisterProceduresFromAssemblies(params Assembly[] assemblies);
 }

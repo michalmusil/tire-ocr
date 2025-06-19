@@ -6,16 +6,16 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 
 public static class NodeMessagingConstants
 {
-    public static string PerformSingleOcrProcedureName = "PerformSingleOcr";
+    public static readonly string PerformSingleOcrProcedureId = "PerformSingleOcr";
 
     public static NodeAdvertised NodeAdvertisement = new()
     {
-        NodeName = MessagingConstants.TireOcrOcrQueueName,
+        NodeId = MessagingConstants.TireOcrOcrQueueName,
         Procedures =
         [
             new()
             {
-                Name = "PerformSingleOcr",
+                Id = PerformSingleOcrProcedureId,
                 Input = new ApFile("", "", ""),
                 Output = new ApString("")
             }

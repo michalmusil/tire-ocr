@@ -18,20 +18,20 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
     public async Task<Result> PublishPipeline(Domain.PipelineAggregate.Pipeline pipeline, IApElement input)
     {
         var firstStep = pipeline.Steps.FirstOrDefault();
-        var secondStep = pipeline.Steps.Skip(1).FirstOrDefault();
 
         if (firstStep is null)
             return Result.Invalid("Pipeline must contain at least one step to be published.");
-
         var currentProcedureIdentifier = new ProcedureIdentifier(firstStep.NodeId, firstStep.NodeProcedureId);
-        var secondProcedureIdentifier = secondStep is null
-            ? null
-            : new ProcedureIdentifier(secondStep.NodeId, secondStep.NodeProcedureId);
+
+        var nextSteps = pipeline.Steps.Skip(1).ToList();
+        var nextProcedureIdentifiers = nextSteps
+            .Select(s => new ProcedureIdentifier(s.NodeId, s.NodeProcedureId))
+            .ToList();
 
         var command = new RunPipelineStep(
             CurrentStep: currentProcedureIdentifier,
-            NextStep: secondProcedureIdentifier,
-            CurrentStepInput: input
+            CurrentStepInput: input,
+            NextSteps: nextProcedureIdentifiers
         );
 
         try

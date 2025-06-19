@@ -1,12 +1,13 @@
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.Procedures;
+using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Postprocessing.Messaging.Procedures;
 
-public class PerformTireCodePostprocessingProcedure
+public class PerformTireCodePostprocessingProcedure: IProcedure
 {
-    private const string _name = "PerformTireCodePostprocessing";
     private const int _schemaVersion = 1;
     private static readonly IApElement _inputSchema = new ApString("");
 
@@ -29,13 +30,13 @@ public class PerformTireCodePostprocessingProcedure
         ]
     );
 
-    public string Name => _name;
+    public string Id => NodeMessagingConstants.PerformTireCodePostprocessingProcedureId;
     public int SchemaVersion => _schemaVersion;
     public IApElement InputSchema => _inputSchema;
     public IApElement OutputSchema => _outputSchema;
 
     public Task<DataResult<IApElement>> Execute(IApElement input)
     {
-        throw new NotImplementedException();
+        return Task.FromResult(DataResult<IApElement>.Success(_outputSchema));
     }
 }

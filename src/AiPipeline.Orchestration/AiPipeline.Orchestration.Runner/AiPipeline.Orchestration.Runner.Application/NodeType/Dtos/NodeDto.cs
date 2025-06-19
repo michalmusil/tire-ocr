@@ -1,7 +1,7 @@
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
 
 public record NodeDto(
-    String NodeName,
+    string Id,
     List<NodeProcedureDto> Procedures
 )
 {
@@ -9,7 +9,7 @@ public record NodeDto(
     {
         return new NodeDto
         (
-            NodeName: domain.Id,
+            Id: domain.Id,
             Procedures: domain.AvailableProcedures
                 .Select(NodeProcedureDto.FromDomain)
                 .Where(dto => dto is not null)
