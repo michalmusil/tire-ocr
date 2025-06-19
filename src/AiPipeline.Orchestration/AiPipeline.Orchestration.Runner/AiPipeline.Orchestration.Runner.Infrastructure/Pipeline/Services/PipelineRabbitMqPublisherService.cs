@@ -29,6 +29,7 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
             .ToList();
 
         var command = new RunPipelineStep(
+            PipelineId: pipeline.Id,
             CurrentStep: currentProcedureIdentifier,
             CurrentStepInput: input,
             NextSteps: nextProcedureIdentifiers

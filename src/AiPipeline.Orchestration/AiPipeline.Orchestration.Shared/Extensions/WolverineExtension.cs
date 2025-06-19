@@ -1,6 +1,8 @@
 using AiPipeline.Orchestration.Shared.Constants;
 using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineCompletion;
+using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineFailure;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 using JasperFx.Resources;
 using Wolverine;
@@ -49,9 +51,16 @@ public static class WolverineExtension
     {
         options.PublishMessagesToRabbitMqExchange<RunPipelineStep>(MessagingConstants.RunPipelineExchangeName,
             src => $"{MessagingConstants.RunPipelineExchangeName}.{src.CurrentStep.NodeId}");
+
         options.PublishMessage<NodeAdvertised>()
             .ToRabbitExchange(MessagingConstants.AdvertisementsExchangeName);
 
+        options.PublishMessage<PipelineCompleted>()
+            .ToRabbitExchange(MessagingConstants.CompletedPipelinesExchangeName);
+
+        options.PublishMessage<PipelineFailed>()
+            .ToRabbitExchange(MessagingConstants.FailedPipelinesExchangeName);
+        
         return options;
     }
 

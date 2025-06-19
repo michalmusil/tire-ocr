@@ -79,7 +79,7 @@ public class ProcedureRouter : IProcedureRouter
             await strategy.Execute(_bus, stepDescription, failure, ex);
             return DataResult<IApElement>.Failure(failure);
         }
-        
+
         if (result.IsFailure)
         {
             var failureStrategy = GetProcedureFailureStrategy(procedure);
@@ -101,6 +101,7 @@ public class ProcedureRouter : IProcedureRouter
             .ToList();
 
         var nextStepMessage = new RunPipelineStep(
+            PipelineId: stepDescription.PipelineId,
             CurrentStep: nextStepProcedureIdentifier!,
             CurrentStepInput: result.Data!,
             NextSteps: followingStepsProcedureIdentifiers
