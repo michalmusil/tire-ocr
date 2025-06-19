@@ -2,25 +2,39 @@ using System.Data;
 using System.Reflection;
 using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.Procedures.PipelineFailure;
+using AiPipeline.Orchestration.Shared.Procedures.PipelineFinish;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using Wolverine;
 
-namespace AiPipeline.Orchestration.Shared.Procedures;
+namespace AiPipeline.Orchestration.Shared.Procedures.Routing;
 
 public class ProcedureRouter : IProcedureRouter
 {
     private readonly IMessageBus _bus;
     private readonly IServiceProvider _serviceProvider;
-    private readonly Dictionary<string, Func<IProcedure>> _procedureFactories;
     private readonly ILogger<ProcedureRouter> _logger;
+
+    private readonly Dictionary<string, Func<IProcedure>> _procedureFactories;
+    private readonly Dictionary<Type, IPipelineFinishStrategy> _finishStrategies;
+    private readonly Dictionary<Type, IPipelineFailureStrategy> _failureStrategies;
+
+    public IPipelineFinishStrategy DefaultFinishStrategy { get; set; }
+    public IPipelineFailureStrategy DefaultFailureStrategy { get; set; }
 
     public ProcedureRouter(IMessageBus bus, IServiceProvider serviceProvider, ILogger<ProcedureRouter> logger)
     {
         _bus = bus;
         _serviceProvider = serviceProvider;
-        _procedureFactories = new Dictionary<string, Func<IProcedure>>();
         _logger = logger;
+
+        _procedureFactories = new();
+        _finishStrategies = new();
+        _failureStrategies = new();
+
+        DefaultFinishStrategy = new DefaultPipelineFinishStrategy();
+        DefaultFailureStrategy = new DefaultPipelineFailureStrategy();
     }
 
     /// <summary>
@@ -33,7 +47,6 @@ public class ProcedureRouter : IProcedureRouter
     /// <returns>A data result containing either the output of current pipeline step or failure</returns>
     public async Task<DataResult<IApElement>> ProcessPipelineStep(RunPipelineStep stepDescription)
     {
-        var hash = this.GetHashCode();
         var input = stepDescription.CurrentStepInput;
         var currentStep = stepDescription.CurrentStep;
 
@@ -42,35 +55,53 @@ public class ProcedureRouter : IProcedureRouter
         if (currentStepProcedureFactory is null)
             return DataResult<IApElement>.NotFound($"Procedure with id: {currentStep.ProcedureId} is not registered");
 
+        IProcedure? procedure = null;
         DataResult<IApElement> result;
         try
         {
             var currentProcedure = currentStepProcedureFactory();
+            procedure = currentProcedure;
             result = await currentProcedure.Execute(input);
         }
         catch (InvalidOperationException ex)
         {
-            return DataResult<IApElement>.NotFound($"Procedure with id: {currentStep.ProcedureId} is not registered");
+            var failedResult = DataResult<IApElement>
+                .NotFound($"Procedure with id: {currentStep.ProcedureId} is not registered");
+            await DefaultFailureStrategy.Execute(_bus, stepDescription, failedResult.PrimaryFailure!, ex);
+            return failedResult;
         }
-        catch
+        catch (Exception ex)
         {
-            return DataResult<IApElement>.Failure(new Failure(500,
-                $"Failed to execute procedure {currentStep.ProcedureId}"));
+            var failure = new Failure(500, $"Failed to execute procedure {currentStep.ProcedureId}");
+            var strategy = procedure is null
+                ? DefaultFailureStrategy
+                : GetProcedureFailureStrategy(procedure);
+            await strategy.Execute(_bus, stepDescription, failure, ex);
+            return DataResult<IApElement>.Failure(failure);
         }
-
+        
         if (result.IsFailure)
+        {
+            var failureStrategy = GetProcedureFailureStrategy(procedure);
+            await failureStrategy.Execute(_bus, stepDescription, result.PrimaryFailure!);
             return result;
+        }
 
         var nextStepProcedureIdentifier = stepDescription.NextSteps.FirstOrDefault();
-        if (nextStepProcedureIdentifier is null)
-            throw new RowNotInTableException("Implement executing pipeline finish strategy");
+        var pipelineHasFinished = nextStepProcedureIdentifier is null;
+        if (pipelineHasFinished)
+        {
+            var finishStrategy = GetProcedureFinishStrategy(procedure);
+            await finishStrategy.Execute(_bus, stepDescription, result.Data!);
+            return result;
+        }
 
         var followingStepsProcedureIdentifiers = stepDescription.NextSteps
             .Skip(1)
             .ToList();
 
         var nextStepMessage = new RunPipelineStep(
-            CurrentStep: nextStepProcedureIdentifier,
+            CurrentStep: nextStepProcedureIdentifier!,
             CurrentStepInput: result.Data!,
             NextSteps: followingStepsProcedureIdentifiers
         );
@@ -78,6 +109,24 @@ public class ProcedureRouter : IProcedureRouter
 
         return result;
     }
+
+    /// <summary>
+    /// Registers a finish strategy that will be used over the default finish strategy when the pipeline
+    /// finishes (has no more steps to route), but only for the specified procedure type.
+    /// </summary>
+    /// <param name="strategy">Finish strategy to be used</param>
+    /// <typeparam name="T">Concrete type of procedure for which the strategy should be used</typeparam>
+    public void AddFinishStrategyForProcedureType<T>(IPipelineFinishStrategy strategy) where T : IProcedure
+        => _finishStrategies[typeof(T)] = strategy;
+
+    /// <summary>
+    /// Registers a failure strategy that will be used over the default failure strategy when the step
+    /// execution fails, but only for the specified procedure type.
+    /// </summary>
+    /// <param name="strategy">Failure strategy to be used</param>
+    /// <typeparam name="T">Concrete type of procedure for which the strategy should be used</typeparam>
+    public void AddFailureStrategyForProcedureType<T>(IPipelineFailureStrategy strategy) where T : IProcedure
+        => _failureStrategies[typeof(T)] = strategy;
 
     /// <summary>
     /// Scans provided assemblies for concrete implementations of IProcedure and registers factories for their construction.
@@ -154,4 +203,14 @@ public class ProcedureRouter : IProcedureRouter
             }
         }
     }
+
+    private IPipelineFinishStrategy GetProcedureFinishStrategy(IProcedure procedure) =>
+        _finishStrategies.ContainsKey(procedure.GetType())
+            ? _finishStrategies[procedure.GetType()]
+            : DefaultFinishStrategy;
+
+    private IPipelineFailureStrategy GetProcedureFailureStrategy(IProcedure procedure) =>
+        _failureStrategies.ContainsKey(procedure.GetType())
+            ? _failureStrategies[procedure.GetType()]
+            : DefaultFailureStrategy;
 }
