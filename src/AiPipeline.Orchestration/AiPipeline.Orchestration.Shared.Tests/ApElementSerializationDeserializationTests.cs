@@ -21,8 +21,8 @@ public class ApElementSerializationDeserializationTests
                     { "OwnerName", new ApString("John Doe") },
                     {
                         "ActiveAt", new ApList([
-                            new ApDateTime(DateTime.UtcNow),
-                            new ApDateTime(DateTime.UtcNow)
+                            new ApDateTime(DateTime.Now),
+                            new ApDateTime(DateTime.Now)
                         ])
                     }
                 })
@@ -126,7 +126,7 @@ public class ApElementSerializationDeserializationTests
     public void ApDateTime_ValidApDateTime_SerializesCorrectly()
     {
         // Arrange
-        var currentDateTime = DateTime.UtcNow;
+        var currentDateTime = DateTime.Now;
         IApElement original = new ApDateTime(currentDateTime);
 
         // Act

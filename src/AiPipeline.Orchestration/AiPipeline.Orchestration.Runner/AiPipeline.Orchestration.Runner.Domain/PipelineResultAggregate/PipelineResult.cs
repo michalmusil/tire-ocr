@@ -1,0 +1,53 @@
+using TireOcr.Shared.Result;
+
+namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
+
+public class PipelineResult
+{
+    private static readonly PipelineResultValidator Validator = new PipelineResultValidator();
+    public Guid Id { get; }
+    public Guid PipelineId { get; }
+    public DateTime CreatedAt { get; }
+    public DateTime UpdatedAt { get; private set; }
+    public DateTime? FinishedAt { get; private set; }
+    private readonly List<PipelineStepResult> _stepResults;
+    public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
+
+    public PipelineResult(Guid pipelineId, Guid? id = null)
+    {
+        var currentDateTime = DateTime.Now;
+        Id = id ?? Guid.NewGuid();
+        PipelineId = pipelineId;
+        CreatedAt = currentDateTime;
+        UpdatedAt = currentDateTime;
+        FinishedAt = null;
+        _stepResults = new List<PipelineStepResult>();
+    }
+    
+    public Result Validate()
+    {
+        var validationResult = Validator.Validate(this);
+        if (validationResult.IsValid)
+            return Result.Success();
+
+        return Result.Failure(validationResult.Errors
+            .Select(x => new Failure(422, $"{x.PropertyName}: {x.ErrorMessage}"))
+            .ToArray()
+        );
+    }
+
+    public Result AddStepResult(PipelineStepResult stepResult)
+    {
+        var existingStepResult = _stepResults.FirstOrDefault(s => s.Id == stepResult.Id);
+        if (existingStepResult is not null)
+            return Result.Conflict($"Step result {stepResult.Id} is already stored in result {Id}");
+        _stepResults.Add(stepResult);
+        UpdatedAt = DateTime.Now;
+        return Result.Success();
+    }
+
+    public void MarkAsFinished(DateTime? finishedAt = null)
+    {
+        FinishedAt = finishedAt ?? DateTime.Now;
+    }
+}

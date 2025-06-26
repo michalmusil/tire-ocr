@@ -1,8 +1,10 @@
+using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
+
 namespace AiPipeline.Orchestration.Shared.Contracts.Events.PipelineFailure;
 
 public record PipelineFailed(
     Guid PipelineId,
-    string ProcedureId,
+    ProcedureIdentifier ProcedureIdentifier,
     DateTime FailedAt,
     int FailureCode,
     string FailureReason,
