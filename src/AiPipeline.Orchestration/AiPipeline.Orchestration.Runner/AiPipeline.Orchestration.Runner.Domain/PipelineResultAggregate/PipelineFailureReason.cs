@@ -2,14 +2,14 @@ namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 
 public class PipelineFailureReason
 {
-    public int FailureCode { get; }
-    public string FailureReason { get; }
+    public int Code { get; }
+    public string Reason { get; }
     public string? ExceptionMessage { get; }
 
-    public PipelineFailureReason(int failureCode, string failureReason, string? exceptionMessage)
+    public PipelineFailureReason(int code, string reason, string? exceptionMessage)
     {
-        FailureCode = failureCode;
-        FailureReason = failureReason;
+        Code = code;
+        Reason = reason;
         ExceptionMessage = exceptionMessage;
     }
 }
