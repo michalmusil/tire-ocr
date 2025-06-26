@@ -13,8 +13,6 @@ public class AddStepToResultCommandValidator : AbstractValidator<AddStepToResult
         
         RuleFor(x => x.Dto.Id.ToString())
             .IsGuid();
-        RuleFor(x => x.Dto.ResultId.ToString())
-            .IsGuid();
         RuleFor(x => x.Dto.NodeId)
             .NotEmpty();
         RuleFor(x => x.Dto.NodeProcedureId)

@@ -28,13 +28,13 @@ public class AddStepToResultCommandHandler : ICommandHandler<AddStepToResultComm
         if (existingResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} not found");
 
-        var newStep = request.Dto.ToDomain();
+        var newStep = request.Dto.ToDomain(existingResult.Id);
         var addStepResult = existingResult.AddStepResult(newStep);
         if (addStepResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(addStepResult.Failures);
 
         var validationResult = existingResult.Validate();
-        if (!validationResult.IsFailure)
+        if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);
 
         await _pipelineResultRepository.SaveChangesAsync();
