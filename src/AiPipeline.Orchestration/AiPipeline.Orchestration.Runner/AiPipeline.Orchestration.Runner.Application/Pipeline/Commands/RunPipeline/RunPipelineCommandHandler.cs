@@ -1,6 +1,9 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
+using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.InitPipelineResult;
+using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -9,13 +12,15 @@ namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipel
 
 public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, PipelineDto>
 {
+    private readonly IMediator _mediator;
     private readonly IPipelineBuilderProvider _pipelineBuilderProvider;
     private readonly IPipelinePublisherService _pipelinePublisher;
     private readonly ILogger<RunPipelineCommandHandler> _logger;
 
-    public RunPipelineCommandHandler(IPipelineBuilderProvider pipelineBuilderProvider,
+    public RunPipelineCommandHandler(IMediator mediator, IPipelineBuilderProvider pipelineBuilderProvider,
         IPipelinePublisherService pipelinePublisher, ILogger<RunPipelineCommandHandler> logger)
     {
+        _mediator = mediator;
         _pipelineBuilderProvider = pipelineBuilderProvider;
         _pipelinePublisher = pipelinePublisher;
         _logger = logger;
@@ -40,9 +45,13 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
 
         var pipelinePublishResult = await _pipelinePublisher.PublishPipeline(pipeline, request.Dto.Input);
 
-        return pipelinePublishResult.Map(
-            onSuccess: () => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),
-            onFailure: DataResult<PipelineDto>.Failure
+        return await pipelinePublishResult.MapAsync(
+            onSuccess: async () =>
+            {
+                await _mediator.Send(new InitPipelineResultCommand(pipeline.Id), cancellationToken);
+                return DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline));
+            },
+            onFailure: failures => Task.FromResult(DataResult<PipelineDto>.Failure(failures))
         );
     }
 }

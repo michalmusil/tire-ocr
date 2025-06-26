@@ -39,14 +39,14 @@ public class PipelineResultsController : ControllerBase
         );
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{pipelineId:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<GetResultOfPipelineResponse>> GetResultOfPipeline([FromRoute] Guid id)
+    public async Task<ActionResult<GetResultOfPipelineResponse>> GetResultOfPipeline([FromRoute] Guid pipelineId)
     {
-        var query = new GetResultOfPipelineQuery(id);
+        var query = new GetResultOfPipelineQuery(pipelineId);
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<GetPipelineResultDto, GetResultOfPipelineResponse>(
