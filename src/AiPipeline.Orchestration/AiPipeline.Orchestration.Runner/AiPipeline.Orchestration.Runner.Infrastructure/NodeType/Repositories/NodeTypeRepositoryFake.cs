@@ -1,6 +1,4 @@
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
-using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
@@ -26,9 +24,9 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
         return Task.FromResult(_nodeTypes.AsEnumerable());
     }
 
-    public Task<Domain.NodeTypeAggregate.NodeType?> GetNodeTypeByIdAsync(string nodeId)
+    public Task<Domain.NodeTypeAggregate.NodeType?> GetNodeTypeByIdAsync(string id)
     {
-        return Task.FromResult(_nodeTypes.FirstOrDefault());
+        return Task.FromResult(_nodeTypes.FirstOrDefault(nt => nt.Id == id));
     }
 
     public Task Add(Domain.NodeTypeAggregate.NodeType nodeType)
@@ -58,6 +56,11 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
     public Task Remove(Domain.NodeTypeAggregate.NodeType nodeType)
     {
         _nodeTypes.Remove(nodeType);
+        return Task.CompletedTask;
+    }
+
+    public Task SaveChangesAsync()
+    {
         return Task.CompletedTask;
     }
 }

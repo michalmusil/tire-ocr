@@ -23,7 +23,7 @@ public class GetResultOfPipelineQueryHandler : IQueryHandler<GetResultOfPipeline
         CancellationToken cancellationToken
     )
     {
-        var foundResult = await _pipelineResultRepository.GetPipelineResultByIdAsync(request.PipelineId.ToString());
+        var foundResult = await _pipelineResultRepository.GetPipelineResultByPipelineIdAsync(request.PipelineId.ToString());
         if (foundResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} doesn't exist");
         

@@ -24,6 +24,7 @@ public class NodeAdvertisedHandler
                 .Select(pd => new NodeProcedure(pd.Id, pd.SchemaVersion, pd.Input, pd.Output))
         );
         await _nodeTypeRepository.Put(nodeType);
+        await _nodeTypeRepository.SaveChangesAsync();
         _logger.LogInformation($"Message consumed: {@message}");
     }
 }

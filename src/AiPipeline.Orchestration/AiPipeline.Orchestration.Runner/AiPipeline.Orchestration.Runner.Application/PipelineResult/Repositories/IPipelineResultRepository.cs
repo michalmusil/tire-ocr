@@ -9,8 +9,9 @@ public interface IPipelineResultRepository
     );
 
     public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(string id);
+    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(string pipelineId);
 
-    public Task Add(Domain.NodeTypeAggregate.NodeType nodeType);
-    public Task Put(Domain.NodeTypeAggregate.NodeType nodeType);
-    public Task Remove(Domain.NodeTypeAggregate.NodeType nodeType);
+    public Task Add(Domain.PipelineResultAggregate.PipelineResult pipelineResult);
+    public Task Remove(Domain.PipelineResultAggregate.PipelineResult pipelineResult);
+    public Task SaveChangesAsync();
 }
