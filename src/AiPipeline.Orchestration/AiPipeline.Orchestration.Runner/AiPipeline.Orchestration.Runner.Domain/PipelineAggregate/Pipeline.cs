@@ -32,9 +32,8 @@ public class Pipeline
     {
         var alreadyContained = _steps.Any(s => s.Id == step.Id);
         if (alreadyContained)
-        {
             return Result.Conflict($"Pipeline already contains a step with id: {step.Id}");
-        }
+
 
         _steps.Add(step);
         return Result.Success();

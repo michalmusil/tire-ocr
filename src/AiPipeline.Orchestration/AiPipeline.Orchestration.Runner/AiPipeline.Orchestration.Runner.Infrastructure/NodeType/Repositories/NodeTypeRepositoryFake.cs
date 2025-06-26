@@ -7,25 +7,7 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 
 public class NodeTypeRepositoryFake : INodeTypeRepository
 {
-    private static List<Domain.NodeTypeAggregate.NodeType> _nodeTypes =
-    [
-        new("fnt-1", [
-                new NodeProcedure(
-                    "fnp-1",
-                    1,
-                    new ApBool(false),
-                    new ApString(""))
-            ]
-        ),
-        new("fnt-2", [
-                new NodeProcedure(
-                    "fnp-2",
-                    1,
-                    new ApString(""),
-                    new ApDateTime(DateTime.Now))
-            ]
-        )
-    ];
+    private static List<Domain.NodeTypeAggregate.NodeType> _nodeTypes = [];
 
     public Task<PaginatedCollection<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesPaginatedAsync(
         PaginationParams pagination)

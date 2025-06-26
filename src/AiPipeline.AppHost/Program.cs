@@ -7,19 +7,19 @@ var rabbitMq = builder
     .WithDataVolume()
     .WithManagementPlugin(port: 15672);
 
-var preprocessingService = builder.AddProject<AiPipeline_TireOcr_Preprocessing_WebApi>("PreprocessingService")
-    .WithHttpsHealthCheck("/health");
-
-var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
-    .WithHttpsHealthCheck("/health");
+// var preprocessingService = builder.AddProject<AiPipeline_TireOcr_Preprocessing_WebApi>("PreprocessingService")
+//     .WithHttpsHealthCheck("/health");
+//
+// var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
+//     .WithHttpsHealthCheck("/health");
 
 var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("OcrMessagingService")
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq);
 
-var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
-    .WithHttpsHealthCheck("/health");
+// var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
+//     .WithHttpsHealthCheck("/health");
 
 var postprocessingMessagingService = builder
     .AddProject<AiPipeline_TireOcr_Postprocessing_Messaging>("PostprocessingMessagingService")
@@ -33,13 +33,13 @@ var orchestrationRunnerService = builder
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq);
 
-var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
-    .WithHttpsHealthCheck("/health")
-    .WithReference(preprocessingService)
-    .WaitFor(preprocessingService)
-    .WithReference(ocrService)
-    .WaitFor(ocrService)
-    .WithReference(postprocessingService)
-    .WaitFor(postprocessingService);
+// var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
+//     .WithHttpsHealthCheck("/health")
+//     .WithReference(preprocessingService)
+//     .WaitFor(preprocessingService)
+//     .WithReference(ocrService)
+//     .WaitFor(ocrService)
+//     .WithReference(postprocessingService)
+//     .WaitFor(postprocessingService);
 
 builder.Build().Run();

@@ -3,6 +3,7 @@ using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
 using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineCompletion;
 using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineFailure;
+using AiPipeline.Orchestration.Shared.Contracts.Events.StepCompletion;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
 using JasperFx.Resources;
 using Wolverine;
@@ -20,6 +21,11 @@ public static class WolverineExtension
             {
                 exc.ExchangeType = ExchangeType.Fanout;
                 exc.BindQueue(MessagingConstants.AdvertisementsQueueName);
+            })
+            .DeclareExchange(MessagingConstants.CompletedPipelineStepsExchangeName, exc =>
+            {
+                exc.ExchangeType = ExchangeType.Fanout;
+                exc.BindQueue(MessagingConstants.CompletedPipelineStepsQueueName);
             })
             .DeclareExchange(MessagingConstants.CompletedPipelinesExchangeName, exc =>
             {
@@ -55,12 +61,15 @@ public static class WolverineExtension
         options.PublishMessage<NodeAdvertised>()
             .ToRabbitExchange(MessagingConstants.AdvertisementsExchangeName);
 
+        options.PublishMessage<StepCompleted>()
+            .ToRabbitExchange(MessagingConstants.CompletedPipelineStepsExchangeName);
+
         options.PublishMessage<PipelineCompleted>()
             .ToRabbitExchange(MessagingConstants.CompletedPipelinesExchangeName);
 
         options.PublishMessage<PipelineFailed>()
             .ToRabbitExchange(MessagingConstants.FailedPipelinesExchangeName);
-        
+
         return options;
     }
 
