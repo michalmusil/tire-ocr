@@ -4,4 +4,4 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Queries.GetAvailableNodes;
 
-public record GetAvailableNodesQuery(PaginationParams Pagination) : IQuery<PaginatedCollection<NodeDto>>;
+public record GetAvailableNodesQuery(PaginationParams Pagination) : IQuery<PaginatedCollection<GetNodeDto>>;

@@ -32,7 +32,7 @@ public class NodesController : ControllerBase
         var query = new GetAvailableNodesQuery(new PaginationParams(request.PageNumber, request.PageSize));
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<PaginatedCollection<NodeDto>, GetAllNodesResponse>(
+        return result.ToActionResult<PaginatedCollection<GetNodeDto>, GetAllNodesResponse>(
             onSuccess: dto => new GetAllNodesResponse(dto.Items, dto.Pagination)
         );
     }

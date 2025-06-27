@@ -3,21 +3,21 @@ using AiPipeline.Orchestration.Shared.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
 
-public record NodeProcedureDto(
+public record GetNodeProcedureDto(
     string Id,
     int SchemaVersion,
     IApElement Input,
     IApElement Output
 )
 {
-    public static NodeProcedureDto? FromDomain(NodeProcedure domain)
+    public static GetNodeProcedureDto? FromDomain(NodeProcedure domain)
     {
         try
         {
             var input = domain.InputSchema;
             var output = domain.OutputSchema;
 
-            return new NodeProcedureDto
+            return new GetNodeProcedureDto
             (
                 Id: domain.Id,
                 SchemaVersion: domain.SchemaVersion,

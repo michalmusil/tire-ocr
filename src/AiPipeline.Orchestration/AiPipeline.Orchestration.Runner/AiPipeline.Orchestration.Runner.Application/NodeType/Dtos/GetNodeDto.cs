@@ -1,17 +1,17 @@
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
 
-public record NodeDto(
+public record GetNodeDto(
     string Id,
-    List<NodeProcedureDto> Procedures
+    List<GetNodeProcedureDto> Procedures
 )
 {
-    public static NodeDto FromDomain(Domain.NodeTypeAggregate.NodeType domain)
+    public static GetNodeDto FromDomain(Domain.NodeTypeAggregate.NodeType domain)
     {
-        return new NodeDto
+        return new GetNodeDto
         (
             Id: domain.Id,
             Procedures: domain.AvailableProcedures
-                .Select(NodeProcedureDto.FromDomain)
+                .Select(GetNodeProcedureDto.FromDomain)
                 .Where(dto => dto is not null)
                 .ToList()!
         );

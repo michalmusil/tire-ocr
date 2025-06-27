@@ -3,4 +3,4 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Contracts.Nodes.GetAllNodes;
 
-public record GetAllNodesResponse(IEnumerable<NodeDto> Items, Pagination Pagination);
+public record GetAllNodesResponse(IEnumerable<GetNodeDto> Items, Pagination Pagination);

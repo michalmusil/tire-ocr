@@ -7,7 +7,7 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.NodeType.Queries.GetAvailableNodes;
 
-public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuery, PaginatedCollection<NodeDto>>
+public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuery, PaginatedCollection<GetNodeDto>>
 {
     private readonly INodeTypeRepository _nodeTypeRepository;
     private readonly ILogger<GetAvailableNodesQueryHandler> _logger;
@@ -19,22 +19,22 @@ public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuer
         _logger = logger;
     }
 
-    public async Task<DataResult<PaginatedCollection<NodeDto>>> Handle(
+    public async Task<DataResult<PaginatedCollection<GetNodeDto>>> Handle(
         GetAvailableNodesQuery request,
         CancellationToken cancellationToken
     )
     {
         var foundNodes = await _nodeTypeRepository.GetNodeTypesPaginatedAsync(request.Pagination);
         var nodeDtos = foundNodes.Items
-            .Select(NodeDto.FromDomain)
+            .Select(GetNodeDto.FromDomain)
             .ToList();
-        var dtosCollection = new PaginatedCollection<NodeDto>(
+        var dtosCollection = new PaginatedCollection<GetNodeDto>(
             nodeDtos,
             totalCount: foundNodes.Pagination.TotalCount,
             pageNumber: foundNodes.Pagination.PageNumber,
             pageSize: foundNodes.Pagination.PageSize
         );
 
-        return DataResult<PaginatedCollection<NodeDto>>.Success(dtosCollection);
+        return DataResult<PaginatedCollection<GetNodeDto>>.Success(dtosCollection);
     }
 }
