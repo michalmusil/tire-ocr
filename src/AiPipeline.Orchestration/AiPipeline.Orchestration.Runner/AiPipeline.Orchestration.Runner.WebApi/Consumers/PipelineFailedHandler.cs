@@ -4,6 +4,7 @@ using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineFailure;
 using MediatR;
+using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Consumers;
 
@@ -32,14 +33,23 @@ public class PipelineFailedHandler
         );
         var saveStepResult = await _mediator.Send(new AddStepToResultCommand(message.PipelineId, dto));
         if (saveStepResult.IsFailure)
+        {
             _logger.LogCritical(
                 $"Failed to persist failed pipeline {message.PipelineId} step: {saveStepResult.PrimaryFailure!.Code} - {saveStepResult.PrimaryFailure.Message}"
             );
+            var failure = saveStepResult.PrimaryFailure ?? new Failure(500, "Failed to persist failed pipeline step");
+            failure.ThrowAsException();
+        }
 
         var result = await _mediator.Send(new MarkPipelineCompletedCommand(message.PipelineId, message.FailedAt));
         if (result.IsFailure)
+        {
             _logger.LogCritical(
                 $"Failed to persist marking pipeline {message.PipelineId} as completed after failing step: {result.PrimaryFailure!.Code} - {result.PrimaryFailure.Message}"
             );
+            var failure = result.PrimaryFailure ??
+                          new Failure(500, "Failed mark pipeline as completed after failing step");
+            failure.ThrowAsException();
+        }
     }
 }

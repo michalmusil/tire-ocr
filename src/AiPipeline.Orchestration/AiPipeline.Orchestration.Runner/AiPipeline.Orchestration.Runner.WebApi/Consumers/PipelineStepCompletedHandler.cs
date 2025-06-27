@@ -2,6 +2,7 @@ using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.AddSte
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Shared.Contracts.Events.StepCompletion;
 using MediatR;
+using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Consumers;
 
@@ -29,8 +30,12 @@ public class PipelineStepCompletedHandler
         );
         var result = await _mediator.Send(new AddStepToResultCommand(message.PipelineId, dto));
         if (result.IsFailure)
+        {
             _logger.LogCritical(
                 $"Failed to persist completed pipeline {message.PipelineId} step: {result.PrimaryFailure!.Code} - {result.PrimaryFailure.Message}"
             );
+            var failure = result.PrimaryFailure ?? new Failure(500, "Failed to persist completed pipeline step");
+            failure.ThrowAsException();
+        }
     }
 }
