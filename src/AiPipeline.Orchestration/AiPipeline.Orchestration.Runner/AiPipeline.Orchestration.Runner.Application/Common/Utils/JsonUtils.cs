@@ -7,6 +7,7 @@ public static class JsonUtils
 {
     public static JsonSerializerOptions GetApElementSerializerOptions() => new()
     {
-        Converters = { new ApElementConverter() }
+        Converters = { new ApElementConverter() },
+        PropertyNameCaseInsensitive = true
     };
 }

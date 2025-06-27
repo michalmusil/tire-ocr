@@ -7,7 +7,5 @@ public class SaveNodeTypeCommandValidator : AbstractValidator<SaveNodeTypeComman
 {
     public SaveNodeTypeCommandValidator()
     {
-        RuleFor(x => x.Dto.NodeId.ToString())
-            .IsGuid();
     }
 }
