@@ -5,7 +5,7 @@ using AiPipeline.Orchestration.Runner.WebApi;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddApplication()
-    .AddInfrastructure()
+    .AddInfrastructure(builder.Configuration)
     .AddPresentation(builder.Host);
 
 builder.AddServiceDefaults();

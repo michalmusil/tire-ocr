@@ -1,6 +1,9 @@
 using Projects;
+using TireOcr.AppHost.CustomIntegrations.Minio;
 
 var builder = DistributedApplication.CreateBuilder(args);
+
+var minio = builder.AddMinio("minio");
 
 var rabbitMq = builder
     .AddRabbitMQ("rabbitmq")
@@ -16,7 +19,10 @@ var rabbitMq = builder
 var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("OcrMessagingService")
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)
-    .WaitFor(rabbitMq);
+    .WaitFor(rabbitMq)
+    .WithReference(minio)
+    .WithMinioCredentials(minio)
+    .WaitFor(minio);
 
 // var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
 //     .WithHttpsHealthCheck("/health");
@@ -31,7 +37,10 @@ var orchestrationRunnerService = builder
     .AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)
-    .WaitFor(rabbitMq);
+    .WaitFor(rabbitMq)
+    .WithReference(minio)
+    .WithMinioCredentials(minio)
+    .WaitFor(minio);
 
 // var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
 //     .WithHttpsHealthCheck("/health")
