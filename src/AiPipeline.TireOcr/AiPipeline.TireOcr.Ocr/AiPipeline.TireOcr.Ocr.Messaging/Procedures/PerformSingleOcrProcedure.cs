@@ -9,7 +9,10 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Procedures;
 public class PerformSingleOcrProcedure : IProcedure
 {
     private const int _schemaVersion = 1;
-    private static readonly IApElement _inputSchema = new ApFile("", "", "");
+
+    private static readonly IApElement _inputSchema =
+        new ApFile(Guid.Empty, "", supportedContentTypes: ["image/jpeg", "image/png", "image/webp"]);
+
     private static readonly IApElement _outputSchema = new ApString("");
 
     public string Id => NodeMessagingConstants.PerformSingleOcrProcedureId;

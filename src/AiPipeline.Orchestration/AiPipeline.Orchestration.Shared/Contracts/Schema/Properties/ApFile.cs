@@ -5,21 +5,35 @@ namespace AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 [ApElementType("ApFile")]
 public record ApFile : IApElement
 {
-    public string FileName { get; }
+    public Guid Id { get; }
     public string ContentType { get; }
-    public string FileUrl { get; }
+    public string[]? SupportedContentTypes { get; set; }
 
-    public ApFile(string fileName, string contentType, string fileUrl)
+    public ApFile(Guid id, string contentType, string[]? supportedContentTypes = null)
     {
-        FileName = fileName;
+        Id = id;
         ContentType = contentType;
-        FileUrl = fileUrl;
+        SupportedContentTypes = supportedContentTypes;
     }
 
     public bool HasCompatibleSchemaWith(IApElement other)
     {
-        return other is ApFile;
+        if (other is not ApFile otherAsFile)
+            return false;
+
+        var othersContentTypeMismatch = SupportedContentTypes?.Length > 0 && !SupportedContentTypes
+            .Contains(otherAsFile.ContentType, StringComparer.OrdinalIgnoreCase);
+        if (othersContentTypeMismatch)
+            return false;
+
+        var thisContentTypeMismatch = otherAsFile.SupportedContentTypes?.Length > 0 &&
+                                      !otherAsFile.SupportedContentTypes
+                                          .Contains(ContentType, StringComparer.OrdinalIgnoreCase);
+        if (thisContentTypeMismatch)
+            return false;
+
+        return true;
     }
-    
+
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

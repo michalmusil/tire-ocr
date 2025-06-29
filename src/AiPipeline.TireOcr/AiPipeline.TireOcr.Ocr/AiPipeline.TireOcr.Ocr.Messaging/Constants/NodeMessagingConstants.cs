@@ -16,7 +16,7 @@ public static class NodeMessagingConstants
             new()
             {
                 Id = PerformSingleOcrProcedureId,
-                Input = new ApFile("", "", ""),
+                Input = new ApFile(Guid.Empty, "", supportedContentTypes: ["image/jpeg", "image/png", "image/webp"]),
                 Output = new ApString("")
             }
         ]

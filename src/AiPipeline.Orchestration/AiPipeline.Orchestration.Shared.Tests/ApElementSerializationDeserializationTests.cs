@@ -156,18 +156,16 @@ public class ApElementSerializationDeserializationTests
     public void ApFile_ValidApFile_SerializesCorrectly()
     {
         // Arrange
-        var filename = "test.json";
-        var url = "https://test.com/test";
+        var id = Guid.NewGuid();
         var contentType = "application/json";
-        IApElement original = new ApFile(fileName: filename, contentType: contentType, fileUrl: url);
+        IApElement original = new ApFile(id: id, contentType: contentType);
 
         // Act
         var json = JsonSerializer.Serialize(original, TestUtils.ApElementSerializerOptions);
         var result = JsonSerializer.Deserialize<ApFile>(json, TestUtils.ApElementSerializerOptions)!;
 
         // Assert
-        Assert.Equal(filename, result.FileName);
-        Assert.Equal(url, result.FileUrl);
+        Assert.Equal(id, result.Id);
         Assert.Equal(contentType, result.ContentType);
     }
 

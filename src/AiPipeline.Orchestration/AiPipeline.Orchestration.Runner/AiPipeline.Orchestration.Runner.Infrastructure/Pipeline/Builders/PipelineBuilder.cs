@@ -15,11 +15,9 @@ public class PipelineBuilder : IPipelineBuilder
 
     private IApElement? _pipelineInput = null;
     private readonly List<RunPipelineStepDto> _steps = [];
-    private readonly List<PipelineInputFileDto> _inputFiles = [];
 
     public IApElement? PipelineInput => _pipelineInput;
     public IReadOnlyCollection<RunPipelineStepDto> Steps => _steps.AsReadOnly();
-    public IReadOnlyCollection<PipelineInputFileDto> Files => _inputFiles.AsReadOnly();
 
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
@@ -48,21 +46,6 @@ public class PipelineBuilder : IPipelineBuilder
     public bool RemoveStep(RunPipelineStepDto step)
     {
         return _steps.Remove(step);
-    }
-
-    public void AddFile(PipelineInputFileDto file)
-    {
-        _inputFiles.Add(file);
-    }
-
-    public void AddFiles(IEnumerable<PipelineInputFileDto> files)
-    {
-        _inputFiles.AddRange(files);
-    }
-
-    public bool RemoveFile(PipelineInputFileDto file)
-    {
-        return _inputFiles.Remove(file);
     }
 
     public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> BuildAsync()
@@ -127,18 +110,7 @@ public class PipelineBuilder : IPipelineBuilder
         var schemaIsValid = _pipelineInput.HasCompatibleSchemaWith(procedure.InputSchema);
         if (!schemaIsValid)
             return Result.Invalid($"Pipeline input doesn't match the '{procedure.Id}' procedure input schema.");
-
-        var schemaFileInputs = procedure.InputSchema.GetAllDescendantsOfType<ApFile>();
-        var providedFileNames = _inputFiles.Select(f => f.FileName).ToArray();
-        var nonProvidedFileNames = schemaFileInputs
-            .Where(sfi => !providedFileNames.Contains(sfi.FileName))
-            .Select(sfi => sfi.FileName)
-            .ToList();
-
-        if (nonProvidedFileNames.Any())
-            return Result.Invalid(
-                $"Pipeline input contains files that have not been provided. Not provided files: {string.Join(',', nonProvidedFileNames)}");
-
+        
         return Result.Success();
     }
 }

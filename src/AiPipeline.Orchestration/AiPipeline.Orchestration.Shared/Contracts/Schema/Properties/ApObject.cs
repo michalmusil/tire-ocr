@@ -35,7 +35,7 @@ public record ApObject : IApElement
             return false;
         var otherObject = (other as ApObject)!;
 
-        return HasEquivalentRequiredPropertiesWith(otherObject);
+        return HasEquivalentRequiredPropertiesWith(otherObject) && HasEquivalentNonRequiredPropertiesWith(otherObject);
     }
 
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement
@@ -56,14 +56,8 @@ public record ApObject : IApElement
 
     private bool HasEquivalentRequiredPropertiesWith(ApObject other)
     {
-        var thisRequiredPropertyPairs = Properties
-            .Where(p => !NonRequiredProperties.Contains(p.Key))
-            .OrderBy(p => p.Key)
-            .ToList();
-        var otherRequiredPropertyPairs = other.Properties
-            .Where(p => !other.NonRequiredProperties.Contains(p.Key))
-            .OrderBy(p => p.Key)
-            .ToList();
+        var thisRequiredPropertyPairs = GetOrderedPropertyPairs(this, required: true);
+        var otherRequiredPropertyPairs = GetOrderedPropertyPairs(other, required: true);
 
         if (thisRequiredPropertyPairs.Count != otherRequiredPropertyPairs.Count)
             return false;
@@ -79,6 +73,35 @@ public record ApObject : IApElement
         }
 
         return true;
+    }
+
+    private bool HasEquivalentNonRequiredPropertiesWith(ApObject other)
+    {
+        var thisNonRequiredPropertyPairs = GetOrderedPropertyPairs(this, required: false);
+        var otherNonRequiredPropertyPairs = GetOrderedPropertyPairs(other, required: false);
+
+        foreach (var thisPair in thisNonRequiredPropertyPairs)
+        {
+            var hasMatchInOther = otherNonRequiredPropertyPairs.Any(opp => opp.Key == thisPair.Key);
+            if (!hasMatchInOther)
+                continue;
+
+            var otherPair = otherNonRequiredPropertyPairs
+                .First(opp => opp.Key == thisPair.Key);
+            var pairsSchemaMatches = thisPair.Value.HasCompatibleSchemaWith(otherPair.Value);
+            if (!pairsSchemaMatches)
+                return false;
+        }
+
+        return true;
+    }
+
+    private List<KeyValuePair<string, IApElement>> GetOrderedPropertyPairs(ApObject obj, bool required)
+    {
+        return obj.Properties
+            .Where(p => required ? !NonRequiredProperties.Contains(p.Key) : NonRequiredProperties.Contains(p.Key))
+            .OrderBy(p => p.Key)
+            .ToList();
     }
 
     private bool HasDuplicatePropertyKeys(out string? duplicatePropertyKey)

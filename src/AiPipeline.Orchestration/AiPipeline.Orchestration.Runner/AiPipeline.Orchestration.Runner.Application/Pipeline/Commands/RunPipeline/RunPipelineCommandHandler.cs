@@ -35,7 +35,6 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
 
         pipelineBuilder.SetPipelineInput(request.Dto.Input);
         pipelineBuilder.AddSteps(request.Dto.Steps);
-        pipelineBuilder.AddFiles(request.Dto.InputFiles);
 
         var pipelineResult = await pipelineBuilder.BuildAsync();
 

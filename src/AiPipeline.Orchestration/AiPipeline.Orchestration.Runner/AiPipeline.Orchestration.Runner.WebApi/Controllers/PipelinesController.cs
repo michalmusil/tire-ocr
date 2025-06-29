@@ -33,7 +33,6 @@ public class PipelinesController : ControllerBase
         var command = new RunPipelineCommand(
             new RunPipelineDto(
                 Input: request.Input,
-                InputFiles: [],
                 Steps: request.Steps
             )
         );
