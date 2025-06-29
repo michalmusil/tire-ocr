@@ -118,6 +118,9 @@ public class FileStorageMinioRepository : IFileStorageProviderRepository
 
     public string GetProviderName() => "minio";
 
+    public string GetFullFilePathFor(FileStorageScope scope, string fileName, string? prefix = null)
+        => $"{scope.GetBucketName()}/{GetFullObjectName(fileName, prefix)}";
+
     private string GetFullObjectName(string fileName, string? prefix) =>
         prefix == null ? fileName : $"{prefix}/{fileName}";
 

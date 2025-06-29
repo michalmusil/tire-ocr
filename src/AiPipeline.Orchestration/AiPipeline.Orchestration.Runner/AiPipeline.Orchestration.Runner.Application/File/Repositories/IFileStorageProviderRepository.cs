@@ -10,4 +10,5 @@ public interface IFileStorageProviderRepository
     public Task<Stream?> DownloadFileAsync(FileStorageScope scope, string fileName, string? prefix = null);
     public Task<bool> RemoveFileAsync(FileStorageScope scope, string fileName, string? prefix = null);
     public string GetProviderName();
+    public string GetFullFilePathFor(FileStorageScope scope, string fileName, string? prefix = null);
 }

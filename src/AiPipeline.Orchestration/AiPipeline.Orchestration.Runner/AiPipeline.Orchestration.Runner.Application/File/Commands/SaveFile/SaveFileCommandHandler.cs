@@ -1,0 +1,61 @@
+using AiPipeline.Orchestration.Runner.Application.File.Dtos;
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
+using Microsoft.Extensions.Logging;
+using TireOcr.Shared.Result;
+using TireOcr.Shared.UseCase;
+
+namespace AiPipeline.Orchestration.Runner.Application.File.Commands.SaveFile;
+
+public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDto>
+{
+    private readonly IFileRepository _fileRepository;
+    private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
+    private readonly ILogger<SaveFileCommandHandler> _logger;
+
+    public SaveFileCommandHandler(IFileRepository fileRepository,
+        IFileStorageProviderRepository fileStorageProviderRepository, ILogger<SaveFileCommandHandler> logger)
+    {
+        _fileRepository = fileRepository;
+        _fileStorageProviderRepository = fileStorageProviderRepository;
+        _logger = logger;
+    }
+
+
+    public async Task<DataResult<GetFileDto>> Handle(
+        SaveFileCommand request,
+        CancellationToken cancellationToken
+    )
+    {
+        var fileId = request.Id ?? Guid.NewGuid();
+        var fileExtension = Path.GetExtension(request.OriginalFileName);
+        if (string.IsNullOrEmpty(fileExtension))
+            return DataResult<GetFileDto>.Invalid($"File name {request.OriginalFileName} is invalid.");
+
+        var fileName = $"{fileId}{fileExtension}";
+        var saved = await _fileStorageProviderRepository.UploadFileAsync(
+            fileStream: request.FileStream,
+            contentType: request.ContentType,
+            scope: request.FileStorageScope,
+            fileName: fileName
+        );
+
+        if (!saved)
+            return DataResult<GetFileDto>.Failure(new Failure(500, "Failed to store file data"));
+
+        var storageProviderName = _fileStorageProviderRepository.GetProviderName();
+        var filePath = _fileStorageProviderRepository.GetFullFilePathFor(request.FileStorageScope, fileName);
+        var file = new Domain.FileAggregate.File(
+            fileStorageScope: request.FileStorageScope,
+            storageProvider: storageProviderName,
+            path: filePath,
+            contentType: request.ContentType,
+            id: fileId
+        );
+
+        await _fileRepository.Add(file);
+        await _fileRepository.SaveChangesAsync();
+        
+        var dto = GetFileDto.FromDomain(file);
+        return DataResult<GetFileDto>.Success(dto);
+    }
+}
