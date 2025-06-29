@@ -5,15 +5,15 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 
 public class NodeTypeRepositoryFake : INodeTypeRepository
 {
-    private static List<Domain.NodeTypeAggregate.NodeType> _nodeTypes = [];
+    private static readonly List<Domain.NodeTypeAggregate.NodeType> NodeTypes = [];
 
     public Task<PaginatedCollection<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesPaginatedAsync(
         PaginationParams pagination)
     {
         return Task.FromResult(
             new PaginatedCollection<Domain.NodeTypeAggregate.NodeType>(
-                _nodeTypes,
-                _nodeTypes.Count,
+                NodeTypes,
+                NodeTypes.Count,
                 pagination.PageNumber,
                 pagination.PageSize)
         );
@@ -21,26 +21,26 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
 
     public Task<IEnumerable<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesByIdsAsync(params string[] ids)
     {
-        return Task.FromResult(_nodeTypes.AsEnumerable());
+        return Task.FromResult(NodeTypes.Where(nt => ids.Contains(nt.Id)));
     }
 
     public Task<Domain.NodeTypeAggregate.NodeType?> GetNodeTypeByIdAsync(string id)
     {
-        return Task.FromResult(_nodeTypes.FirstOrDefault(nt => nt.Id == id));
+        return Task.FromResult(NodeTypes.FirstOrDefault(nt => nt.Id == id));
     }
 
     public Task Add(Domain.NodeTypeAggregate.NodeType nodeType)
     {
-        _nodeTypes.Add(nodeType);
+        NodeTypes.Add(nodeType);
         return Task.CompletedTask;
     }
 
     public Task Put(Domain.NodeTypeAggregate.NodeType nodeType)
     {
-        var alreadyExistingNodeType = _nodeTypes.FirstOrDefault(x => x.Id == nodeType.Id);
+        var alreadyExistingNodeType = NodeTypes.FirstOrDefault(x => x.Id == nodeType.Id);
         if (alreadyExistingNodeType is null)
         {
-            _nodeTypes.Add(nodeType);
+            NodeTypes.Add(nodeType);
             return Task.CompletedTask;
         }
 
@@ -55,7 +55,7 @@ public class NodeTypeRepositoryFake : INodeTypeRepository
 
     public Task Remove(Domain.NodeTypeAggregate.NodeType nodeType)
     {
-        _nodeTypes.Remove(nodeType);
+        NodeTypes.Remove(nodeType);
         return Task.CompletedTask;
     }
 
