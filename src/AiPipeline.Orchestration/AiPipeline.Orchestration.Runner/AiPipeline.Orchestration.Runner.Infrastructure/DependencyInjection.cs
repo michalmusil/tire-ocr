@@ -1,7 +1,9 @@
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.File.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
@@ -27,6 +29,8 @@ public static class DependencyInjection
     {
         services.AddScoped<INodeTypeRepository, NodeTypeRepositoryFake>();
         services.AddScoped<IPipelineResultRepository, PipelineResultRepositoryFake>();
+        services.AddScoped<IFileRepository, FileRepositoryFake>();
+        services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
 
     private static void AddProviders(IServiceCollection services)

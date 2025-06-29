@@ -26,6 +26,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
         CancellationToken cancellationToken
     )
     {
+        await using var stream = request.FileStream;
         var fileId = request.Id ?? Guid.NewGuid();
         var fileExtension = Path.GetExtension(request.OriginalFileName);
         if (string.IsNullOrEmpty(fileExtension))
@@ -33,7 +34,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
 
         var fileName = $"{fileId}{fileExtension}";
         var saved = await _fileStorageProviderRepository.UploadFileAsync(
-            fileStream: request.FileStream,
+            fileStream: stream,
             contentType: request.ContentType,
             scope: request.FileStorageScope,
             fileName: fileName
@@ -54,7 +55,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
 
         await _fileRepository.Add(file);
         await _fileRepository.SaveChangesAsync();
-        
+
         var dto = GetFileDto.FromDomain(file);
         return DataResult<GetFileDto>.Success(dto);
     }
