@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Runner.Application.File.Repositories;
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
@@ -9,12 +9,13 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetAllFileEnt
 public class GetAllFileEntitiesOfApFilesQueryHandler : IQueryHandler<GetAllFileEntitiesOfApFilesQuery,
     Dictionary<ApFile, Domain.FileAggregate.File>>
 {
-    private readonly IFileRepository _fileRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetAllFileEntitiesOfApFilesQueryHandler> _logger;
 
-    public GetAllFileEntitiesOfApFilesQueryHandler(IFileRepository fileRepository, ILogger<GetAllFileEntitiesOfApFilesQueryHandler> logger)
+    public GetAllFileEntitiesOfApFilesQueryHandler(IUnitOfWork unitOfWork,
+        ILogger<GetAllFileEntitiesOfApFilesQueryHandler> logger)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -28,7 +29,7 @@ public class GetAllFileEntitiesOfApFilesQueryHandler : IQueryHandler<GetAllFileE
             .Distinct()
             .ToArray();
 
-        var foundFiles = (await _fileRepository.GetFilesByIdsAsync(fileIds))
+        var foundFiles = (await _unitOfWork.FileRepository.GetFilesByIdsAsync(fileIds))
             .ToList();
 
         var notFoundFileIds = fileIds

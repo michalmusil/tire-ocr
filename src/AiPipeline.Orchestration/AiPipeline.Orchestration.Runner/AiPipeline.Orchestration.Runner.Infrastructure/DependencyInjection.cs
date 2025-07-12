@@ -1,8 +1,10 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Infrastructure.File.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
@@ -19,6 +21,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         AddRepositories(services);
+        AddUnitOfWork(services);
         AddProviders(services);
         AddServices(services);
         AddS3Storage(services, configuration);
@@ -31,6 +34,11 @@ public static class DependencyInjection
         services.AddScoped<IPipelineResultRepository, PipelineResultRepositoryFake>();
         services.AddScoped<IFileRepository, FileRepositoryFake>();
         services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
+    }
+    
+    public static void AddUnitOfWork(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
     private static void AddProviders(IServiceCollection services)

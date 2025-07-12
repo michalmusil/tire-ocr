@@ -1,5 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
-using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -9,13 +9,13 @@ namespace AiPipeline.Orchestration.Runner.Application.NodeType.Queries.GetAvaila
 
 public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuery, PaginatedCollection<GetNodeDto>>
 {
-    private readonly INodeTypeRepository _nodeTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetAvailableNodesQueryHandler> _logger;
 
-    public GetAvailableNodesQueryHandler(INodeTypeRepository nodeTypeRepository,
+    public GetAvailableNodesQueryHandler(IUnitOfWork unitOfWork,
         ILogger<GetAvailableNodesQueryHandler> logger)
     {
-        _nodeTypeRepository = nodeTypeRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -24,7 +24,7 @@ public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuer
         CancellationToken cancellationToken
     )
     {
-        var foundNodes = await _nodeTypeRepository.GetNodeTypesPaginatedAsync(request.Pagination);
+        var foundNodes = await _unitOfWork.NodeTypeRepository.GetNodeTypesPaginatedAsync(request.Pagination);
         var nodeDtos = foundNodes.Items
             .Select(GetNodeDto.FromDomain)
             .ToList();

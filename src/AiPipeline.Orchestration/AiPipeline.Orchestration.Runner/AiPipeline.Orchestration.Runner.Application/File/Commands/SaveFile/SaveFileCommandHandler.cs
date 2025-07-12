@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using Microsoft.Extensions.Logging;
@@ -8,14 +9,14 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Commands.SaveFile;
 
 public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDto>
 {
-    private readonly IFileRepository _fileRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
     private readonly ILogger<SaveFileCommandHandler> _logger;
 
-    public SaveFileCommandHandler(IFileRepository fileRepository,
-        IFileStorageProviderRepository fileStorageProviderRepository, ILogger<SaveFileCommandHandler> logger)
+    public SaveFileCommandHandler(IUnitOfWork unitOfWork, IFileStorageProviderRepository fileStorageProviderRepository,
+        ILogger<SaveFileCommandHandler> logger)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
         _fileStorageProviderRepository = fileStorageProviderRepository;
         _logger = logger;
     }
@@ -53,8 +54,10 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
             id: fileId
         );
 
-        await _fileRepository.Add(file);
-        await _fileRepository.SaveChangesAsync();
+        await _unitOfWork
+            .FileRepository
+            .Add(file);
+        await _unitOfWork.SaveChangesAsync();
 
         var dto = GetFileDto.FromDomain(file);
         return DataResult<GetFileDto>.Success(dto);

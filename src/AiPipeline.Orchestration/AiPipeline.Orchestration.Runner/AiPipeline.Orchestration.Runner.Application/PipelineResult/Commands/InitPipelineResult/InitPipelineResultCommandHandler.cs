@@ -1,5 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
-using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -8,13 +8,13 @@ namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.In
 
 public class InitPipelineResultCommandHandler : ICommandHandler<InitPipelineResultCommand, GetPipelineResultDto>
 {
-    private readonly IPipelineResultRepository _pipelineResultRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<InitPipelineResultCommandHandler> _logger;
 
-    public InitPipelineResultCommandHandler(IPipelineResultRepository pipelineResultRepository,
+    public InitPipelineResultCommandHandler(IUnitOfWork unitOfWork,
         ILogger<InitPipelineResultCommandHandler> logger)
     {
-        _pipelineResultRepository = pipelineResultRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -28,8 +28,8 @@ public class InitPipelineResultCommandHandler : ICommandHandler<InitPipelineResu
         if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);
 
-        await _pipelineResultRepository.Add(newResult);
-        await _pipelineResultRepository.SaveChangesAsync();
+        await _unitOfWork.PipelineResultRepository.Add(newResult);
+        await _unitOfWork.SaveChangesAsync();
 
         var dto = GetPipelineResultDto.FromDomain(newResult);
         return DataResult<GetPipelineResultDto>.Success(dto);

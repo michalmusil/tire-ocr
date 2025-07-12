@@ -1,7 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
-using AiPipeline.Orchestration.Runner.Application.File.Repositories;
-using AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
-using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -11,13 +9,13 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetFilesPagin
 
 public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuery, PaginatedCollection<GetFileDto>>
 {
-    private readonly IFileRepository _fileRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetFilesPaginatedQueryHandler> _logger;
 
-    public GetFilesPaginatedQueryHandler(IFileRepository fileRepository,
+    public GetFilesPaginatedQueryHandler(IUnitOfWork unitOfWork,
         ILogger<GetFilesPaginatedQueryHandler> logger)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -27,9 +25,11 @@ public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuer
     )
     {
         var foundFiles =
-            await _fileRepository.GetFilesPaginatedAsync(request.Pagination,
-                storageScope: request.ScopeFilter
-            );
+            await _unitOfWork
+                .FileRepository
+                .GetFilesPaginatedAsync(request.Pagination,
+                    storageScope: request.ScopeFilter
+                );
 
         var fileDtos = foundFiles.Items
             .Select(GetFileDto.FromDomain)

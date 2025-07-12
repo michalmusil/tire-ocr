@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using Microsoft.Extensions.Logging;
@@ -8,14 +9,14 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetFileWithDa
 
 public class GetFileByIdQueryHandler : IQueryHandler<GetFileWithDataByIdQuery, GetFileWithDataStreamDto>
 {
-    private readonly IFileRepository _fileRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
     private readonly ILogger<GetFileByIdQueryHandler> _logger;
 
-    public GetFileByIdQueryHandler(IFileRepository fileRepository,
+    public GetFileByIdQueryHandler(IUnitOfWork unitOfWork,
         IFileStorageProviderRepository fileStorageProviderRepository, ILogger<GetFileByIdQueryHandler> logger)
     {
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
         _fileStorageProviderRepository = fileStorageProviderRepository;
     }
@@ -25,7 +26,9 @@ public class GetFileByIdQueryHandler : IQueryHandler<GetFileWithDataByIdQuery, G
         CancellationToken cancellationToken
     )
     {
-        var foundFile = await _fileRepository.GetFileByIdAsync(request.Id);
+        var foundFile = await _unitOfWork
+            .FileRepository
+            .GetFileByIdAsync(request.Id);
         if (foundFile is null)
             return DataResult<GetFileWithDataStreamDto>.NotFound($"File with id {request.Id} not found");
 

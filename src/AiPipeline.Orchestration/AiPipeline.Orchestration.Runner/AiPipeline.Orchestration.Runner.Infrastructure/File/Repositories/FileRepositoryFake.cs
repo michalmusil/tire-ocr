@@ -53,8 +53,8 @@ public class FileRepositoryFake : IFileRepository
         return Task.CompletedTask;
     }
 
-    public Task SaveChangesAsync()
+    public Task<int> SaveChangesAsync()
     {
-        return Task.CompletedTask;
+        return Task.FromResult(1);
     }
 }

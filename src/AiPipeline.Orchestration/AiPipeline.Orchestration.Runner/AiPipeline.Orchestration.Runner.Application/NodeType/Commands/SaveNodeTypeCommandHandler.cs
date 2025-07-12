@@ -1,5 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
-using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -8,13 +8,13 @@ namespace AiPipeline.Orchestration.Runner.Application.NodeType.Commands;
 
 public class SaveNodeTypeCommandHandler : ICommandHandler<SaveNodeTypeCommand, GetNodeDto>
 {
-    private readonly INodeTypeRepository _nodeTypeRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<SaveNodeTypeCommandHandler> _logger;
 
-    public SaveNodeTypeCommandHandler(INodeTypeRepository nodeTypeRepository,
+    public SaveNodeTypeCommandHandler(IUnitOfWork unitOfWork,
         ILogger<SaveNodeTypeCommandHandler> logger)
     {
-        _nodeTypeRepository = nodeTypeRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -23,11 +23,12 @@ public class SaveNodeTypeCommandHandler : ICommandHandler<SaveNodeTypeCommand, G
         CancellationToken cancellationToken
     )
     {
+        var nodeTypeRepository = _unitOfWork.NodeTypeRepository;
         var nodeTypeToPut = request.Dto.ToDomain();
-        await _nodeTypeRepository.Put(nodeTypeToPut);
-        await _nodeTypeRepository.SaveChangesAsync();
+        await nodeTypeRepository.Put(nodeTypeToPut);
+        await _unitOfWork.SaveChangesAsync();
 
-        var nodeType = await _nodeTypeRepository.GetNodeTypeByIdAsync(nodeTypeToPut.Id);
+        var nodeType = await nodeTypeRepository.GetNodeTypeByIdAsync(nodeTypeToPut.Id);
         if (nodeType is null)
             return DataResult<GetNodeDto>.Failure(new Failure(500, "Failed to save node type"));
 

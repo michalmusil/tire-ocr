@@ -1,5 +1,4 @@
-using AiPipeline.Orchestration.Runner.Application.File.Repositories;
-using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
@@ -12,8 +11,7 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;
 
 public class PipelineBuilder : IPipelineBuilder
 {
-    private readonly INodeTypeRepository _nodeTypeRepository;
-    private readonly IFileRepository _fileRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     private IApElement? _pipelineInput = null;
     private readonly List<RunPipelineStepDto> _steps = [];
@@ -24,10 +22,9 @@ public class PipelineBuilder : IPipelineBuilder
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
 
-    public PipelineBuilder(INodeTypeRepository nodeTypeRepository, IFileRepository fileRepository)
+    public PipelineBuilder(IUnitOfWork unitOfWork)
     {
-        _nodeTypeRepository = nodeTypeRepository;
-        _fileRepository = fileRepository;
+        _unitOfWork = unitOfWork;
     }
 
 
@@ -104,7 +101,7 @@ public class PipelineBuilder : IPipelineBuilder
     private async Task<List<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesForAllStepsAsync()
     {
         var nodeIds = _steps.Select(s => s.NodeId).ToArray();
-        return (await _nodeTypeRepository.GetNodeTypesByIdsAsync(nodeIds))
+        return (await _unitOfWork.NodeTypeRepository.GetNodeTypesByIdsAsync(nodeIds))
             .ToList();
     }
 
@@ -132,7 +129,7 @@ public class PipelineBuilder : IPipelineBuilder
             .Distinct()
             .ToArray();
 
-        var foundFiles = (await _fileRepository.GetFilesByIdsAsync(fileIds))
+        var foundFiles = (await _unitOfWork.FileRepository.GetFilesByIdsAsync(fileIds))
             .ToList();
 
         var notFoundFileIds = fileIds

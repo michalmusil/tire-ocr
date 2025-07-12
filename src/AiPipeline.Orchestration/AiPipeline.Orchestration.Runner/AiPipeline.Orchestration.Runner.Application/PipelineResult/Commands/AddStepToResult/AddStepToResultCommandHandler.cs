@@ -1,5 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
-using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -8,13 +8,13 @@ namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.Ad
 
 public class AddStepToResultCommandHandler : ICommandHandler<AddStepToResultCommand, GetPipelineResultDto>
 {
-    private readonly IPipelineResultRepository _pipelineResultRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<AddStepToResultCommandHandler> _logger;
 
-    public AddStepToResultCommandHandler(IPipelineResultRepository pipelineResultRepository,
+    public AddStepToResultCommandHandler(IUnitOfWork unitOfWork,
         ILogger<AddStepToResultCommandHandler> logger)
     {
-        _pipelineResultRepository = pipelineResultRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -23,8 +23,9 @@ public class AddStepToResultCommandHandler : ICommandHandler<AddStepToResultComm
         CancellationToken cancellationToken
     )
     {
-        var existingResult =
-            await _pipelineResultRepository.GetPipelineResultByPipelineIdAsync(request.PipelineId.ToString());
+        var existingResult = await _unitOfWork
+            .PipelineResultRepository
+            .GetPipelineResultByPipelineIdAsync(request.PipelineId.ToString());
         if (existingResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} not found");
 
@@ -37,7 +38,7 @@ public class AddStepToResultCommandHandler : ICommandHandler<AddStepToResultComm
         if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);
 
-        await _pipelineResultRepository.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
 
         var dto = GetPipelineResultDto.FromDomain(existingResult);
         return DataResult<GetPipelineResultDto>.Success(dto);

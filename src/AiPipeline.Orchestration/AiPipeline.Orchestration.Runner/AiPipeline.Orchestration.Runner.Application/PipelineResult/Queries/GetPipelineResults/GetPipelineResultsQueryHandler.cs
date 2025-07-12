@@ -1,5 +1,5 @@
+using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
-using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -10,13 +10,13 @@ namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.Get
 public class
     GetPipelineResultsQueryHandler : IQueryHandler<GetPipelineResultsQuery, PaginatedCollection<GetPipelineResultDto>>
 {
-    private readonly IPipelineResultRepository _pipelineResultRepository;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GetPipelineResultsQueryHandler> _logger;
 
-    public GetPipelineResultsQueryHandler(IPipelineResultRepository pipelineResultRepository,
+    public GetPipelineResultsQueryHandler(IUnitOfWork unitOfWork,
         ILogger<GetPipelineResultsQueryHandler> logger)
     {
-        _pipelineResultRepository = pipelineResultRepository;
+        _unitOfWork = unitOfWork;
         _logger = logger;
     }
 
@@ -25,7 +25,9 @@ public class
         CancellationToken cancellationToken
     )
     {
-        var foundResults = await _pipelineResultRepository.GetPipelineResultsPaginatedAsync(request.Pagination);
+        var foundResults = await _unitOfWork
+            .PipelineResultRepository
+            .GetPipelineResultsPaginatedAsync(request.Pagination);
         var resultDtos = foundResults.Items
             .Select(GetPipelineResultDto.FromDomain)
             .ToList();
