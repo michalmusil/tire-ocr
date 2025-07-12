@@ -2,7 +2,6 @@ using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.InitPipelineResult;
-using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
@@ -36,11 +35,11 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
         pipelineBuilder.SetPipelineInput(request.Dto.Input);
         pipelineBuilder.AddSteps(request.Dto.Steps);
 
-        var pipelineResult = await pipelineBuilder.BuildAsync();
+        var pipelineBuildResult = await pipelineBuilder.BuildAsync();
 
-        if (pipelineResult.IsFailure)
-            return DataResult<PipelineDto>.Failure(pipelineResult.Failures);
-        var pipeline = pipelineResult.Data!;
+        if (pipelineBuildResult.IsFailure)
+            return DataResult<PipelineDto>.Failure(pipelineBuildResult.Failures);
+        var pipeline = pipelineBuildResult.Data!;
 
         var pipelinePublishResult = await _pipelinePublisher.PublishPipeline(pipeline, request.Dto.Input);
 

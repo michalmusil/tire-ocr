@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
@@ -12,6 +13,7 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;
 public class PipelineBuilder : IPipelineBuilder
 {
     private readonly INodeTypeRepository _nodeTypeRepository;
+    private readonly IFileRepository _fileRepository;
 
     private IApElement? _pipelineInput = null;
     private readonly List<RunPipelineStepDto> _steps = [];
@@ -22,9 +24,10 @@ public class PipelineBuilder : IPipelineBuilder
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
 
-    public PipelineBuilder(INodeTypeRepository nodeTypeRepository)
+    public PipelineBuilder(INodeTypeRepository nodeTypeRepository, IFileRepository fileRepository)
     {
         _nodeTypeRepository = nodeTypeRepository;
+        _fileRepository = fileRepository;
     }
 
 
@@ -53,6 +56,10 @@ public class PipelineBuilder : IPipelineBuilder
         if (_pipelineInput is null)
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(NoInputProvidedFailure);
 
+        var inputFilesValidationResult = await ValidateInputFilesExistAsync();
+        if (inputFilesValidationResult.IsFailure)
+            return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(inputFilesValidationResult.Failures);
+
         var nodes = await GetNodeTypesForAllStepsAsync();
         List<PipelineStep> pipelineSteps = [];
         for (var i = 0; i < _steps.Count; i++)
@@ -61,12 +68,12 @@ public class PipelineBuilder : IPipelineBuilder
             var node = nodes.FirstOrDefault(n => n.Id == requestedStep.NodeId);
             if (node is null)
                 return DataResult<Domain.PipelineAggregate.Pipeline>.NotFound(
-                    $"Node type {requestedStep.NodeId} not found");
+                    $"Node type '{requestedStep.NodeId}' not found");
 
             var procedure = node.AvailableProcedures.FirstOrDefault(p => p.Id == requestedStep.ProcedureId);
             if (procedure is null)
                 return DataResult<Domain.PipelineAggregate.Pipeline>.NotFound(
-                    $"Procedure {requestedStep.ProcedureId} not found on node {node.Id}");
+                    $"Procedure '{requestedStep.ProcedureId}' not found on node {node.Id}");
 
             var isFirstStep = i == 0;
             if (isFirstStep)
@@ -110,7 +117,32 @@ public class PipelineBuilder : IPipelineBuilder
         var schemaIsValid = _pipelineInput.HasCompatibleSchemaWith(procedure.InputSchema);
         if (!schemaIsValid)
             return Result.Invalid($"Pipeline input doesn't match the '{procedure.Id}' procedure input schema.");
-        
+
+        return Result.Success();
+    }
+
+    private async Task<Result> ValidateInputFilesExistAsync()
+    {
+        if (_pipelineInput is null)
+            return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(NoInputProvidedFailure);
+
+        var allApFilesOfInput = _pipelineInput.GetAllDescendantsOfType<ApFile>();
+        var fileIds = allApFilesOfInput
+            .Select(x => x.Id)
+            .Distinct()
+            .ToArray();
+
+        var foundFiles = (await _fileRepository.GetFilesByIdsAsync(fileIds))
+            .ToList();
+
+        var notFoundFileIds = fileIds
+            .Except(foundFiles.Select(x => x.Id))
+            .ToArray();
+
+        if (notFoundFileIds.Any())
+            return Result.NotFound(
+                $"Some files from the pipeline input were not found. Not found file ids: {string.Join(", ", notFoundFileIds)}");
+
         return Result.Success();
     }
 }

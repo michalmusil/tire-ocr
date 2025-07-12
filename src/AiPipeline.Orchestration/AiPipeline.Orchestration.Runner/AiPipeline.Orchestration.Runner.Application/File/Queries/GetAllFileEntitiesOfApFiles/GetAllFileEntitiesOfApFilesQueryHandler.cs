@@ -6,20 +6,20 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetAllFileEntitiesOfApFiles;
 
-public class GetAvailableNodesQueryHandler : IQueryHandler<GetAllFileEntitiesOfApFiles,
+public class GetAllFileEntitiesOfApFilesQueryHandler : IQueryHandler<GetAllFileEntitiesOfApFilesQuery,
     Dictionary<ApFile, Domain.FileAggregate.File>>
 {
     private readonly IFileRepository _fileRepository;
-    private readonly ILogger<GetAvailableNodesQueryHandler> _logger;
+    private readonly ILogger<GetAllFileEntitiesOfApFilesQueryHandler> _logger;
 
-    public GetAvailableNodesQueryHandler(IFileRepository fileRepository, ILogger<GetAvailableNodesQueryHandler> logger)
+    public GetAllFileEntitiesOfApFilesQueryHandler(IFileRepository fileRepository, ILogger<GetAllFileEntitiesOfApFilesQueryHandler> logger)
     {
         _fileRepository = fileRepository;
         _logger = logger;
     }
 
     public async Task<DataResult<Dictionary<ApFile, Domain.FileAggregate.File>>> Handle(
-        GetAllFileEntitiesOfApFiles request,
+        GetAllFileEntitiesOfApFilesQuery request,
         CancellationToken cancellationToken
     )
     {
