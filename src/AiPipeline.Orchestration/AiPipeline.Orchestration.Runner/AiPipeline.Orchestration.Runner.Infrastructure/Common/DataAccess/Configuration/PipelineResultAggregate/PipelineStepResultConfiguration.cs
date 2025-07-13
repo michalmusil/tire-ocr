@@ -28,13 +28,20 @@ public class PipelineStepResultConfiguration : IEntityTypeConfiguration<Pipeline
 
         builder.Property(pr => pr.WasSuccessful)
             .IsRequired();
-
-        builder.Property(pr => pr.Result)
-            .HasConversion(JsonUtils.GetApElementJsonValueConverter()!);
-
+        
+        builder.Property(nt => nt.CreatedAt)
+            .IsRequired();
+        
+        builder.Property(nt => nt.UpdatedAt)
+            .IsRequired();
+        
         builder.Property(pr => pr.FailureReason)
+            .IsRequired(false)
             .HasConversion(JsonUtils.GetDefaultJsonValueConverter<PipelineFailureReason?>());
 
+        builder.Property(pr => pr.Result)
+            .IsRequired(false)
+            .HasConversion(JsonUtils.GetApElementJsonValueConverter()!);
 
         builder.HasOne<Domain.PipelineResultAggregate.PipelineResult>()
             .WithMany(pr => pr._stepResults)

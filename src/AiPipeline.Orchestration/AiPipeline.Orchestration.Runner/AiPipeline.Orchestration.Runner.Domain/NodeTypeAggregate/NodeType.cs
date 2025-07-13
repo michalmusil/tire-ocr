@@ -1,13 +1,18 @@
+using AiPipeline.Orchestration.Runner.Domain.Common;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
-public class NodeType
+public class NodeType: TimestampedEntity
 {
     public string Id { get; }
 
     public readonly List<NodeProcedure> _availableProcedures;
     public IReadOnlyCollection<NodeProcedure> AvailableProcedures => _availableProcedures.AsReadOnly();
+
+    private NodeType()
+    {
+    }
 
     public NodeType(string id, IEnumerable<NodeProcedure> availableProcedures)
     {
@@ -22,6 +27,7 @@ public class NodeType
             return Result.Conflict($"A procedure with id {nodeProcedure.Id} already exists in the node type {Id}");
 
         _availableProcedures.Add(nodeProcedure);
+        SetUpdated();
         return Result.Success();
     }
 

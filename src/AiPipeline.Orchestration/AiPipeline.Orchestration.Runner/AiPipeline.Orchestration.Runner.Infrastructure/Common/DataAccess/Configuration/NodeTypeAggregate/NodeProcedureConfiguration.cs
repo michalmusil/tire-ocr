@@ -17,6 +17,9 @@ public class NodeProcedureConfiguration : IEntityTypeConfiguration<Domain.NodeTy
         builder.Property(np => np.NodeTypeId)
             .IsRequired();
 
+        builder.Property(np => np.SchemaVersion)
+            .IsRequired();
+
         builder.Property(np => np.InputSchema)
             .IsRequired()
             .HasConversion(JsonUtils.GetApElementJsonValueConverter());
@@ -24,6 +27,12 @@ public class NodeProcedureConfiguration : IEntityTypeConfiguration<Domain.NodeTy
         builder.Property(np => np.OutputSchema)
             .IsRequired()
             .HasConversion(JsonUtils.GetApElementJsonValueConverter());
+        
+        builder.Property(nt => nt.CreatedAt)
+            .IsRequired();
+        
+        builder.Property(nt => nt.UpdatedAt)
+            .IsRequired();
 
         builder.HasOne<Domain.NodeTypeAggregate.NodeType>()
             .WithMany(nt => nt._availableProcedures)

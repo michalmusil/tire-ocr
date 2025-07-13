@@ -1,8 +1,9 @@
+using AiPipeline.Orchestration.Runner.Domain.Common;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 
-public class PipelineStepResult
+public class PipelineStepResult: TimestampedEntity
 {
     public Guid Id { get; }
     public Guid ResultId { get; }
@@ -12,6 +13,10 @@ public class PipelineStepResult
     public bool WasSuccessful { get; }
     public PipelineFailureReason? FailureReason { get; }
     public IApElement? Result { get; }
+
+    private PipelineStepResult()
+    {
+    }
 
     public PipelineStepResult(bool wasSuccessful, Guid resultId, string nodeId, string nodeProcedureId,
         DateTime finishedAt,

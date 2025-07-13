@@ -14,11 +14,14 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
 
         builder.Property(pr => pr.PipelineId)
             .IsRequired();
+
+        builder.Property(pr => pr.FinishedAt)
+            .IsRequired(false);
         
-        builder.Property(pr => pr.CreatedAt)
+        builder.Property(nt => nt.CreatedAt)
             .IsRequired();
         
-        builder.Property(pr => pr.UpdatedAt)
+        builder.Property(nt => nt.UpdatedAt)
             .IsRequired();
 
         builder.Ignore(pr => pr.StepResults);

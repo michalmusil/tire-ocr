@@ -23,5 +23,11 @@ public class FileConfiguration : IEntityTypeConfiguration<Domain.FileAggregate.F
         
         builder.Property(f => f.ContentType)
             .IsRequired();
+        
+        builder.Property(nt => nt.CreatedAt)
+            .IsRequired();
+        
+        builder.Property(nt => nt.UpdatedAt)
+            .IsRequired();
     }
 }

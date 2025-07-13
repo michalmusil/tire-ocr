@@ -10,6 +10,7 @@ using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -25,6 +26,7 @@ public static class DependencyInjection
         AddProviders(services);
         AddServices(services);
         AddS3Storage(services, configuration);
+        AddDbContext(services, configuration);
         return services;
     }
 
@@ -35,7 +37,7 @@ public static class DependencyInjection
         services.AddScoped<IFileRepository, FileRepositoryFake>();
         services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
-    
+
     public static void AddUnitOfWork(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -67,5 +69,11 @@ public static class DependencyInjection
             .WithSSL(false)
             .Build()
         );
+    }
+
+    private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("AiPipelineDb");
+        services.AddDbContextFactory<OrchestrationRunnerDbContext>(options => { options.UseNpgsql(connectionString); });
     }
 }

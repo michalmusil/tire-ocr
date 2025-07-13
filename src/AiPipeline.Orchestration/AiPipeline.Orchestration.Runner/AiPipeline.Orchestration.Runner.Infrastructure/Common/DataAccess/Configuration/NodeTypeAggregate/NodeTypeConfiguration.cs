@@ -12,6 +12,12 @@ public class NodeTypeConfiguration : IEntityTypeConfiguration<Domain.NodeTypeAgg
             .IsRequired()
             .ValueGeneratedNever();
 
+        builder.Property(nt => nt.CreatedAt)
+            .IsRequired();
+        
+        builder.Property(nt => nt.UpdatedAt)
+            .IsRequired();
+
         builder.Ignore(nt => nt.AvailableProcedures);
 
         builder.HasMany(nt => nt._availableProcedures)

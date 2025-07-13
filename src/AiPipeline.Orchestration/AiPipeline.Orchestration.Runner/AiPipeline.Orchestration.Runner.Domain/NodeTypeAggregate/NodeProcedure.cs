@@ -1,8 +1,9 @@
+using AiPipeline.Orchestration.Runner.Domain.Common;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 
-public class NodeProcedure
+public class NodeProcedure: TimestampedEntity
 {
     public string Id { get; }
     public string NodeTypeId { get; }

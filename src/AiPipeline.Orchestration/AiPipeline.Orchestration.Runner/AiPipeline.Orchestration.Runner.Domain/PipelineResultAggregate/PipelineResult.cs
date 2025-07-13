@@ -1,29 +1,29 @@
+using AiPipeline.Orchestration.Runner.Domain.Common;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 
-public class PipelineResult
+public class PipelineResult: TimestampedEntity
 {
     private static readonly PipelineResultValidator Validator = new PipelineResultValidator();
     public Guid Id { get; }
     public Guid PipelineId { get; }
-    public DateTime CreatedAt { get; }
-    public DateTime UpdatedAt { get; private set; }
     public DateTime? FinishedAt { get; private set; }
     public readonly List<PipelineStepResult> _stepResults;
     public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
 
+    private PipelineResult()
+    {
+    }
+
     public PipelineResult(Guid pipelineId, Guid? id = null)
     {
-        var currentDateTime = DateTime.Now;
         Id = id ?? Guid.NewGuid();
         PipelineId = pipelineId;
-        CreatedAt = currentDateTime;
-        UpdatedAt = currentDateTime;
         FinishedAt = null;
         _stepResults = new List<PipelineStepResult>();
     }
-    
+
     public Result Validate()
     {
         var validationResult = Validator.Validate(this);
@@ -42,12 +42,13 @@ public class PipelineResult
         if (existingStepResult is not null)
             return Result.Conflict($"Step result {stepResult.Id} is already stored in result {Id}");
         _stepResults.Add(stepResult);
-        UpdatedAt = DateTime.Now;
+        SetUpdated();
         return Result.Success();
     }
 
     public void MarkAsFinished(DateTime? finishedAt = null)
     {
+        SetUpdated();
         FinishedAt = finishedAt ?? DateTime.Now;
     }
 }
