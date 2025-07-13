@@ -6,7 +6,7 @@ public class NodeType
 {
     public string Id { get; }
 
-    private readonly List<NodeProcedure> _availableProcedures;
+    public readonly List<NodeProcedure> _availableProcedures;
     public IReadOnlyCollection<NodeProcedure> AvailableProcedures => _availableProcedures.AsReadOnly();
 
     public NodeType(string id, IEnumerable<NodeProcedure> availableProcedures)

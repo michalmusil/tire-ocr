@@ -1,0 +1,31 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.PipelineResultAggregate;
+
+public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.PipelineResultAggregate.PipelineResult>
+{
+    public void Configure(EntityTypeBuilder<Domain.PipelineResultAggregate.PipelineResult> builder)
+    {
+        builder.HasKey(pr => pr.Id);
+        builder.Property(pr => pr.Id)
+            .IsRequired()
+            .ValueGeneratedNever();
+
+        builder.Property(pr => pr.PipelineId)
+            .IsRequired();
+        
+        builder.Property(pr => pr.CreatedAt)
+            .IsRequired();
+        
+        builder.Property(pr => pr.UpdatedAt)
+            .IsRequired();
+
+        builder.Ignore(pr => pr.StepResults);
+
+        builder.HasMany(pr => pr._stepResults)
+            .WithOne()
+            .HasForeignKey(psr => psr.ResultId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}

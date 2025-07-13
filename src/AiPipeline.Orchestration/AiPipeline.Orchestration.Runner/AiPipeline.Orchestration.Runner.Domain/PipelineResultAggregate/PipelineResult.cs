@@ -10,7 +10,7 @@ public class PipelineResult
     public DateTime CreatedAt { get; }
     public DateTime UpdatedAt { get; private set; }
     public DateTime? FinishedAt { get; private set; }
-    private readonly List<PipelineStepResult> _stepResults;
+    public readonly List<PipelineStepResult> _stepResults;
     public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
 
     public PipelineResult(Guid pipelineId, Guid? id = null)

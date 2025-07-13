@@ -26,6 +26,7 @@ public class NodeAdvertisedHandler
             Procedures: message.Procedures
                 .Select(p => new SaveNodeProcedureDto(
                         ProcedureId: p.Id,
+                        NodeTypeId: message.NodeId,
                         SchemaVersion: p.SchemaVersion,
                         InputSchema: p.Input,
                         OutputSchema: p.Output

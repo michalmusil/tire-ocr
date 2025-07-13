@@ -5,6 +5,7 @@ namespace AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
 
 public record SaveNodeProcedureDto(
     string ProcedureId,
+    string NodeTypeId,
     int SchemaVersion,
     IApElement InputSchema,
     IApElement OutputSchema
@@ -12,6 +13,7 @@ public record SaveNodeProcedureDto(
 {
     public NodeProcedure ToDomain() => new NodeProcedure(
         id: ProcedureId,
+        nodeTypeId: NodeTypeId,
         schemaVersion: SchemaVersion,
         inputSchema: InputSchema,
         outputSchema: OutputSchema
