@@ -11,7 +11,7 @@ public class DefaultProcedureCompletionStrategy : IProcedureCompletionStrategy
 {
     public async Task<Result> Execute(IMessageBus bus, RunPipelineStep processedStep, IApElement? result)
     {
-        var completionDateTime = DateTime.Now;
+        var completionDateTime = DateTime.UtcNow;
 
         var stepCompletionMessage = new StepCompleted(
             PipelineId: processedStep.PipelineId,

@@ -25,7 +25,7 @@ public class MarkPipelineCompletedCommandHandler : ICommandHandler<MarkPipelineC
     {
         var existingResult = await _unitOfWork
             .PipelineResultRepository
-            .GetPipelineResultByPipelineIdAsync(request.PipelineId.ToString());
+            .GetPipelineResultByPipelineIdAsync(request.PipelineId);
         if (existingResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} not found");
 

@@ -7,7 +7,7 @@ public abstract class TimestampedEntity
 
     protected TimestampedEntity()
     {
-        var now = DateTime.Now;
+        var now = DateTime.UtcNow;
         CreatedAt = now;
         UpdatedAt = now;
     }
@@ -20,6 +20,6 @@ public abstract class TimestampedEntity
 
     protected void SetUpdated()
     {
-        UpdatedAt = DateTime.Now;
+        UpdatedAt = DateTime.UtcNow;
     }
 }

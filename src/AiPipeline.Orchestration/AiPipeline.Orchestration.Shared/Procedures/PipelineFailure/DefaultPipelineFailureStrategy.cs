@@ -13,7 +13,7 @@ public class DefaultPipelineFailureStrategy : IPipelineFailureStrategy
         var failureMessage = new PipelineFailed(
             PipelineId: failedStep.PipelineId,
             ProcedureIdentifier: failedStep.CurrentStep,
-            FailedAt: DateTime.Now,
+            FailedAt: DateTime.UtcNow,
             FailureCode: failure.Code,
             FailureReason: failure.Message,
             ExceptionMessage: exception is null

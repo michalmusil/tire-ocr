@@ -9,8 +9,8 @@ public interface IPipelineResultRepository: IRepository
         PaginationParams pagination
     );
 
-    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(string id);
-    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(string pipelineId);
+    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(Guid id);
+    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(Guid pipelineId);
 
     public Task Add(Domain.PipelineResultAggregate.PipelineResult pipelineResult);
     public Task Remove(Domain.PipelineResultAggregate.PipelineResult pipelineResult);

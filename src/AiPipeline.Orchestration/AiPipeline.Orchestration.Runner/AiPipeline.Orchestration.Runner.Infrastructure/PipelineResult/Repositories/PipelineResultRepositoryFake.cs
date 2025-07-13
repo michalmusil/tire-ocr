@@ -19,14 +19,14 @@ public class PipelineResultRepositoryFake : IPipelineResultRepository
         );
     }
 
-    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(string id)
+    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(Guid id)
     {
-        return Task.FromResult(_pipelineResults.FirstOrDefault(pr => pr.Id.ToString() == id));
+        return Task.FromResult(_pipelineResults.FirstOrDefault(pr => pr.Id == id));
     }
 
-    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(string pipelineId)
+    public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(Guid pipelineId)
     {
-        return Task.FromResult(_pipelineResults.FirstOrDefault(pr => pr.PipelineId.ToString() == pipelineId));
+        return Task.FromResult(_pipelineResults.FirstOrDefault(pr => pr.PipelineId == pipelineId));
     }
 
     public Task Add(Domain.PipelineResultAggregate.PipelineResult pipelineResult)

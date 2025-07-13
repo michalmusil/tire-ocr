@@ -25,7 +25,7 @@ public class GetResultOfPipelineQueryHandler : IQueryHandler<GetResultOfPipeline
     {
         var foundResult = await _unitOfWork
             .PipelineResultRepository
-            .GetPipelineResultByPipelineIdAsync(request.PipelineId.ToString());
+            .GetPipelineResultByPipelineIdAsync(request.PipelineId);
         if (foundResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} doesn't exist");
 

@@ -3,7 +3,7 @@ using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 
-public class PipelineResult: TimestampedEntity
+public class PipelineResult : TimestampedEntity
 {
     private static readonly PipelineResultValidator Validator = new PipelineResultValidator();
     public Guid Id { get; }
@@ -49,6 +49,7 @@ public class PipelineResult: TimestampedEntity
     public void MarkAsFinished(DateTime? finishedAt = null)
     {
         SetUpdated();
-        FinishedAt = finishedAt ?? DateTime.Now;
+        var inUtc = finishedAt == null ? DateTime.UtcNow : finishedAt.Value.ToUniversalTime();
+        FinishedAt = inUtc;
     }
 }

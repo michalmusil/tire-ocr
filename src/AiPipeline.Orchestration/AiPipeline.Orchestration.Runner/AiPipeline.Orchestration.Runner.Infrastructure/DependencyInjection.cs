@@ -32,9 +32,9 @@ public static class DependencyInjection
 
     private static void AddRepositories(IServiceCollection services)
     {
-        services.AddScoped<INodeTypeRepository, NodeTypeRepositoryFake>();
-        services.AddScoped<IPipelineResultRepository, PipelineResultRepositoryFake>();
-        services.AddScoped<IFileRepository, FileRepositoryFake>();
+        services.AddScoped<INodeTypeRepository, NodeTypeRepository>();
+        services.AddScoped<IPipelineResultRepository, PipelineResultRepository>();
+        services.AddScoped<IFileRepository, FileRepository>();
         services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
 
