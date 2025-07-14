@@ -8,12 +8,16 @@ public class Pipeline
 
     public Guid Id { get; }
     private readonly List<PipelineStep> _steps;
+    private readonly List<Domain.FileAggregate.File> _pipelineFiles;
     public IReadOnlyCollection<PipelineStep> Steps => _steps.AsReadOnly();
+    public IReadOnlyCollection<Domain.FileAggregate.File> Files => _pipelineFiles.AsReadOnly();
 
-    public Pipeline(Guid? id = null, List<PipelineStep>? steps = null)
+    public Pipeline(Guid? id = null, List<PipelineStep>? steps = null,
+        List<Domain.FileAggregate.File>? pipelineFiles = null)
     {
         Id = id ?? Guid.NewGuid();
         _steps = steps ?? new List<PipelineStep>();
+        _pipelineFiles = pipelineFiles ?? new List<Domain.FileAggregate.File>();
     }
 
     public Result Validate()
@@ -42,5 +46,19 @@ public class Pipeline
     public bool RemoveStep(PipelineStep step)
     {
         return _steps.Remove(step);
+    }
+
+    public Result AddFile(Domain.FileAggregate.File file)
+    {
+        var alreadyContained = _pipelineFiles.Any(s => s.Id == file.Id);
+        if (alreadyContained)
+            return Result.Conflict($"Pipeline already contains a file with id: {file.Id}");
+
+        return Result.Success();
+    }
+
+    public bool RemoveFile(Domain.FileAggregate.File file)
+    {
+        return _pipelineFiles.Remove(file);
     }
 }

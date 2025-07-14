@@ -13,8 +13,9 @@ public class PipelineBuilder : IPipelineBuilder
 {
     private readonly IUnitOfWork _unitOfWork;
 
-    private IApElement? _pipelineInput = null;
-    private readonly List<RunPipelineStepDto> _steps = [];
+    private IApElement? _pipelineInput;
+    private readonly List<RunPipelineStepDto> _steps;
+    private readonly List<Domain.FileAggregate.File> _files;
 
     public IApElement? PipelineInput => _pipelineInput;
     public IReadOnlyCollection<RunPipelineStepDto> Steps => _steps.AsReadOnly();
@@ -25,6 +26,9 @@ public class PipelineBuilder : IPipelineBuilder
     public PipelineBuilder(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
+        _pipelineInput = null;
+        _steps = new List<RunPipelineStepDto>();
+        _files = new List<Domain.FileAggregate.File>();
     }
 
 
@@ -52,6 +56,10 @@ public class PipelineBuilder : IPipelineBuilder
     {
         if (_pipelineInput is null)
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(NoInputProvidedFailure);
+
+        var loadFilesResult = await LoadInputFilesAsync();
+        if (loadFilesResult.IsFailure)
+            return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(loadFilesResult.Failures);
 
         var inputFilesValidationResult = await ValidateInputFilesExistAsync();
         if (inputFilesValidationResult.IsFailure)
@@ -90,7 +98,10 @@ public class PipelineBuilder : IPipelineBuilder
             ));
         }
 
-        var pipeline = new Domain.PipelineAggregate.Pipeline(steps: pipelineSteps);
+        var pipeline = new Domain.PipelineAggregate.Pipeline(
+            steps: pipelineSteps,
+            pipelineFiles: _files
+        );
         var validationResult = pipeline.Validate();
         return validationResult.Map(
             onSuccess: () => DataResult<Domain.PipelineAggregate.Pipeline>.Success(pipeline),
@@ -118,28 +129,64 @@ public class PipelineBuilder : IPipelineBuilder
         return Result.Success();
     }
 
+    private async Task<Result> LoadInputFilesAsync()
+    {
+        var allApFilesOfInputResult = GetAllApFilesOfInput();
+        return await allApFilesOfInputResult.MapAsync(
+            onFailure: failures => Task.FromResult(Result.Failure(failures)),
+            onSuccess: async apFiles =>
+            {
+                var fileIds = apFiles
+                    .Select(x => x.Id)
+                    .Distinct()
+                    .ToArray();
+
+                var foundFiles = (await _unitOfWork.FileRepository.GetFilesByIdsAsync(fileIds))
+                    .ToList();
+                _files.Clear();
+                _files.AddRange(foundFiles);
+                return Result.Success();
+            }
+        );
+    }
+
     private async Task<Result> ValidateInputFilesExistAsync()
     {
+        var allApFilesOfInputResult = GetAllApFilesOfInput();
+        return await allApFilesOfInputResult.MapAsync(
+            onFailure: failures => Task.FromResult(Result.Failure(failures)),
+            onSuccess: apFiles =>
+            {
+                var fileIds = apFiles
+                    .Select(x => x.Id)
+                    .Distinct()
+                    .ToArray();
+
+                var notLoadedFileIds = fileIds
+                    .Except(_files.Select(x => x.Id))
+                    .ToArray();
+
+                if (notLoadedFileIds.Any())
+                    return Task.FromResult(
+                        Result.NotFound(
+                            $"Some files from the pipeline input were not found. Not found file ids: {string.Join(", ", notLoadedFileIds)}"
+                        )
+                    );
+
+                return Task.FromResult(Result.Success());
+            }
+        );
+    }
+
+    private DataResult<List<ApFile>> GetAllApFilesOfInput()
+    {
         if (_pipelineInput is null)
-            return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(NoInputProvidedFailure);
+            return DataResult<List<ApFile>>.Failure(NoInputProvidedFailure);
 
-        var allApFilesOfInput = _pipelineInput.GetAllDescendantsOfType<ApFile>();
-        var fileIds = allApFilesOfInput
-            .Select(x => x.Id)
-            .Distinct()
-            .ToArray();
+        var apFiles = _pipelineInput.GetAllDescendantsOfType<ApFile>();
+        if (_pipelineInput is ApFile inputApFile)
+            apFiles.Add(inputApFile);
 
-        var foundFiles = (await _unitOfWork.FileRepository.GetFilesByIdsAsync(fileIds))
-            .ToList();
-
-        var notFoundFileIds = fileIds
-            .Except(foundFiles.Select(x => x.Id))
-            .ToArray();
-
-        if (notFoundFileIds.Any())
-            return Result.NotFound(
-                $"Some files from the pipeline input were not found. Not found file ids: {string.Join(", ", notFoundFileIds)}");
-
-        return Result.Success();
+        return DataResult<List<ApFile>>.Success(apFiles);
     }
 }

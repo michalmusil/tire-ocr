@@ -6,5 +6,6 @@ public record RunPipelineStep(
     Guid PipelineId,
     ProcedureIdentifier CurrentStep,
     IApElement CurrentStepInput,
-    List<ProcedureIdentifier> NextSteps
+    List<ProcedureIdentifier> NextSteps,
+    List<FileReference> FileReferences
 );

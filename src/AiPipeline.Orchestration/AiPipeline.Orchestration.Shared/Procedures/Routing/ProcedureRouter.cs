@@ -47,6 +47,7 @@ public class ProcedureRouter : IProcedureRouter
     public async Task<DataResult<IApElement>> ProcessPipelineStep(RunPipelineStep stepDescription)
     {
         var input = stepDescription.CurrentStepInput;
+        var fileReferences = stepDescription.FileReferences;
         var currentStep = stepDescription.CurrentStep;
 
         var currentStepProcedureFactory =
@@ -60,7 +61,7 @@ public class ProcedureRouter : IProcedureRouter
         {
             var currentProcedure = currentStepProcedureFactory();
             procedure = currentProcedure;
-            result = await currentProcedure.Execute(input);
+            result = await currentProcedure.ExecuteAsync(input, fileReferences);
         }
         catch (InvalidOperationException ex)
         {
@@ -98,7 +99,8 @@ public class ProcedureRouter : IProcedureRouter
                 PipelineId: stepDescription.PipelineId,
                 CurrentStep: nextStepProcedureIdentifier!,
                 CurrentStepInput: result.Data!,
-                NextSteps: followingStepsProcedureIdentifiers
+                NextSteps: followingStepsProcedureIdentifiers,
+                FileReferences: fileReferences
             );
             await _bus.PublishAsync(nextStepMessage);
         }

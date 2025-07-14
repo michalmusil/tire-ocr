@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
 using TireOcr.Shared.Result;
 
@@ -10,5 +11,5 @@ public interface IProcedure
     public IApElement InputSchema { get; }
     public IApElement OutputSchema { get; }
 
-    public Task<DataResult<IApElement>> Execute(IApElement input);
+    public Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences);
 }

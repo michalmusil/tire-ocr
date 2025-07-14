@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Shared.Procedures;
@@ -35,7 +36,7 @@ public class PerformTireCodePostprocessingProcedure: IProcedure
     public IApElement InputSchema => _inputSchema;
     public IApElement OutputSchema => _outputSchema;
 
-    public Task<DataResult<IApElement>> Execute(IApElement input)
+    public Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
     {
         return Task.FromResult(DataResult<IApElement>.Success(_outputSchema));
     }

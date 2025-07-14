@@ -28,11 +28,16 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
             .Select(s => new ProcedureIdentifier(s.NodeId, s.NodeProcedureId))
             .ToList();
 
+        var fileReferences = pipeline.Files
+            .Select(f => new FileReference(f.Id, f.StorageProvider, f.Path, f.ContentType))
+            .ToList();
+
         var command = new RunPipelineStep(
             PipelineId: pipeline.Id,
             CurrentStep: currentProcedureIdentifier,
             CurrentStepInput: input,
-            NextSteps: nextProcedureIdentifiers
+            NextSteps: nextProcedureIdentifiers,
+            FileReferences: fileReferences
         );
 
         try
