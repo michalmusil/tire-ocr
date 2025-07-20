@@ -1,5 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;

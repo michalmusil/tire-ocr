@@ -1,5 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.MarkPipelineCompleted;
-using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineCompletion;
+using AiPipeline.Orchestration.Shared.All.Contracts.Events.PipelineCompletion;
 using MediatR;
 using TireOcr.Shared.Result;
 

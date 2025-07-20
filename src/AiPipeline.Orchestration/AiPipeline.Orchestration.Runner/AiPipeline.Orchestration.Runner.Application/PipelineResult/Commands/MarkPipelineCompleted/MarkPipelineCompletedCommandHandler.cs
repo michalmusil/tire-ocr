@@ -32,7 +32,7 @@ public class MarkPipelineCompletedCommandHandler : ICommandHandler<MarkPipelineC
         existingResult.MarkAsFinished(request.CompletedAt);
 
         var validationResult = existingResult.Validate();
-        if (!validationResult.IsFailure)
+        if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);
 
         await _unitOfWork.SaveChangesAsync();

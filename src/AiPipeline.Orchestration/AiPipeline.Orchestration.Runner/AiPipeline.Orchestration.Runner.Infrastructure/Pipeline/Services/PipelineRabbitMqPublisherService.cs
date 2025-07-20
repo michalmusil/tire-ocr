@@ -1,6 +1,6 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
-using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
-using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using TireOcr.Shared.Result;
 using Wolverine;
 

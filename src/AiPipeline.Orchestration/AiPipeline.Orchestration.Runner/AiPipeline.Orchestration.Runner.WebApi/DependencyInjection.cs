@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using AiPipeline.Orchestration.Shared.Constants;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
-using AiPipeline.Orchestration.Shared.Extensions;
+using AiPipeline.Orchestration.Shared.All.Constants;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Converters;
+using AiPipeline.Orchestration.Shared.All.Extensions;
 using Asp.Versioning;
 using Wolverine;
 using Wolverine.RabbitMQ;

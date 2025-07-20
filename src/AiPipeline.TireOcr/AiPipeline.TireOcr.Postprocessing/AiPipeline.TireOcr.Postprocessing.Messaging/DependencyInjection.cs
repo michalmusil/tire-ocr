@@ -1,6 +1,7 @@
-using AiPipeline.Orchestration.Shared.Constants;
-using AiPipeline.Orchestration.Shared.Extensions;
-using AiPipeline.Orchestration.Shared.Producers;
+using AiPipeline.Orchestration.Shared.All.Constants;
+using AiPipeline.Orchestration.Shared.All.Extensions;
+using AiPipeline.Orchestration.Shared.Nodes.Extensions;
+using AiPipeline.Orchestration.Shared.Nodes.Producers;
 using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 using Wolverine;
 using Wolverine.RabbitMQ;

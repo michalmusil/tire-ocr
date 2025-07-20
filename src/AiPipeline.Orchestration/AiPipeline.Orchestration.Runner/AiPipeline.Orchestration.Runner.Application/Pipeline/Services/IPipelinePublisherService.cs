@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Services;

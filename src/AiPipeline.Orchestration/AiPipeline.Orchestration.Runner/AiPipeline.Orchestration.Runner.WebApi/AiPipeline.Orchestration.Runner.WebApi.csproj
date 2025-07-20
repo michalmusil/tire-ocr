@@ -20,7 +20,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
-      <ProjectReference Include="..\..\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj" />
+      <ProjectReference Include="..\..\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
       <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj" />
     </ItemGroup>
 

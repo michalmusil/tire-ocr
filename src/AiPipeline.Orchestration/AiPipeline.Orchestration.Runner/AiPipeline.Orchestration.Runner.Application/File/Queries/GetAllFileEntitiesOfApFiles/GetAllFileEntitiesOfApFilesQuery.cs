@@ -1,4 +1,5 @@
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
+
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetAllFileEntitiesOfApFiles;

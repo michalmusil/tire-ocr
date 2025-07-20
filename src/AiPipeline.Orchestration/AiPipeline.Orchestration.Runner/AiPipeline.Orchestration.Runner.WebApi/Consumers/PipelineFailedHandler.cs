@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.AddSte
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.MarkPipelineCompleted;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
-using AiPipeline.Orchestration.Shared.Contracts.Events.PipelineFailure;
+using AiPipeline.Orchestration.Shared.All.Contracts.Events.PipelineFailure;
 using MediatR;
 using TireOcr.Shared.Result;
 

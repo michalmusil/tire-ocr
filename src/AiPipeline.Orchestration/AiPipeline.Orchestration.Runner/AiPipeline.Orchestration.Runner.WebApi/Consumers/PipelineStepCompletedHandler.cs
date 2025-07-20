@@ -1,6 +1,6 @@
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.AddStepToResult;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
-using AiPipeline.Orchestration.Shared.Contracts.Events.StepCompletion;
+using AiPipeline.Orchestration.Shared.All.Contracts.Events.StepCompletion;
 using MediatR;
 using TireOcr.Shared.Result;
 

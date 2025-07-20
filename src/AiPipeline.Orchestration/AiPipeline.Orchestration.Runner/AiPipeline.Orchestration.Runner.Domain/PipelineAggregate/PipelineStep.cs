@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Shared.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 

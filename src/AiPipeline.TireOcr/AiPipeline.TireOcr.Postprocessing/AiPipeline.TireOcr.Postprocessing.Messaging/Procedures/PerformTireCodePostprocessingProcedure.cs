@@ -1,13 +1,13 @@
-using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
-using AiPipeline.Orchestration.Shared.Contracts.Schema;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
-using AiPipeline.Orchestration.Shared.Procedures;
+using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Postprocessing.Messaging.Procedures;
 
-public class PerformTireCodePostprocessingProcedure: IProcedure
+public class PerformTireCodePostprocessingProcedure : IProcedure
 {
     private const int _schemaVersion = 1;
     private static readonly IApElement _inputSchema = new ApString("");

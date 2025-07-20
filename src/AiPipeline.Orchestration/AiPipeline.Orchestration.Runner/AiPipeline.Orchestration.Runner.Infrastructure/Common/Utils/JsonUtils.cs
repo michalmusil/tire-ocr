@@ -1,6 +1,6 @@
 using System.Text.Json;
-using AiPipeline.Orchestration.Shared.Contracts.Schema;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Converters;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Converters;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.Utils;

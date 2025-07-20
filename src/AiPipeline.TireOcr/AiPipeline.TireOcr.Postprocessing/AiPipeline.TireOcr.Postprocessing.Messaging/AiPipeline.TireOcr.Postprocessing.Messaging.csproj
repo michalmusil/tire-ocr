@@ -12,11 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.csproj" />
-      <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
-      <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Application\AiPipeline.TireOcr.Postprocessing.Application.csproj" />
-      <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj" />
-      <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Infrastructure\AiPipeline.TireOcr.Postprocessing.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
+        <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Nodes\AiPipeline.Orchestration.Shared.Nodes.csproj"/>
+        <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Application\AiPipeline.TireOcr.Postprocessing.Application.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Infrastructure\AiPipeline.TireOcr.Postprocessing.Infrastructure.csproj"/>
     </ItemGroup>
 
 </Project>

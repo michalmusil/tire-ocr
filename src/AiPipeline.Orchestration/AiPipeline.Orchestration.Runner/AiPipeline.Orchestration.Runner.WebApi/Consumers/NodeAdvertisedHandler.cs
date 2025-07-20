@@ -1,6 +1,6 @@
 using AiPipeline.Orchestration.Runner.Application.NodeType.Commands;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Dtos;
-using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Shared.All.Contracts.Events.NodeAdvertisement;
 using MediatR;
 using TireOcr.Shared.Result;
 

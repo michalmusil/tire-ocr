@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Shared.Constants;
-using AiPipeline.Orchestration.Shared.Contracts.Events.NodeAdvertisement;
-using AiPipeline.Orchestration.Shared.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.All.Constants;
+using AiPipeline.Orchestration.Shared.All.Contracts.Events.NodeAdvertisement;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging.Constants;
 

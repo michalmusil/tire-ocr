@@ -1,5 +1,5 @@
-using AiPipeline.Orchestration.Shared.Contracts.Commands.RunPipelineStep;
-using AiPipeline.Orchestration.Shared.Procedures.Routing;
+using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
+using AiPipeline.Orchestration.Shared.Nodes.Procedures.Routing;
 
 namespace AiPipeline.TireOcr.Postprocessing.Messaging.Consumers;
 
