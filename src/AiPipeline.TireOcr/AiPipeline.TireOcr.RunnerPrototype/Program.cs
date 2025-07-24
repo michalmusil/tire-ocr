@@ -1,4 +1,5 @@
 using TireOcr.RunnerPrototype;
+using TireOcr.RunnerPrototype.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,10 +9,9 @@ builder.Services
 builder.AddServiceDefaults();
 
 var app = builder.Build();
-app.MapDefaultEndpoints();
 
-app.UseSwagger();
-app.UseSwaggerUI();
+app.MapDefaultEndpoints();
+app.AddSwagger();
 app.UseHttpsRedirection();
 app.MapControllers();
 
