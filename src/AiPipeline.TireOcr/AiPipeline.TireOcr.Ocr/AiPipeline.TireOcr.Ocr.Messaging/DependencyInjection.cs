@@ -10,9 +10,11 @@ namespace AiPipeline.TireOcr.Ocr.Messaging;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder)
+    public static IServiceCollection AddPresentation(this IServiceCollection services, IHostBuilder hostBuilder,
+        IConfiguration configuration)
     {
         AddMessaging(hostBuilder);
+        services.AddFileManipulation(configuration);
         services.AddProcedureRoutingFromAssemblies(typeof(DependencyInjection).Assembly);
         return services;
     }
