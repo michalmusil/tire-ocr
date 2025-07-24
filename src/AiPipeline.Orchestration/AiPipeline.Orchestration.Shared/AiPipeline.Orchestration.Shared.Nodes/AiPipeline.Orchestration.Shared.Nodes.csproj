@@ -10,4 +10,8 @@
       <ProjectReference Include="..\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Minio" Version="6.0.5" />
+    </ItemGroup>
+
 </Project>
