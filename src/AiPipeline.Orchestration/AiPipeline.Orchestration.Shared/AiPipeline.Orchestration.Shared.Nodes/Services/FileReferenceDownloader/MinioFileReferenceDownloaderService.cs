@@ -7,13 +7,13 @@ using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
 
-public class MinioFileReferenceDownloadService : IFileReferenceDownloaderService
+public class MinioFileReferenceDownloaderService : IFileReferenceDownloaderService
 {
     private readonly IMinioClient _minioClient;
-    private readonly ILogger<MinioFileReferenceDownloadService> _logger;
+    private readonly ILogger<MinioFileReferenceDownloaderService> _logger;
 
-    public MinioFileReferenceDownloadService(IMinioClient minioClient,
-        ILogger<MinioFileReferenceDownloadService> logger)
+    public MinioFileReferenceDownloaderService(IMinioClient minioClient,
+        ILogger<MinioFileReferenceDownloaderService> logger)
     {
         _minioClient = minioClient;
         _logger = logger;

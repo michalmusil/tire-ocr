@@ -5,7 +5,6 @@ namespace AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
 
 public interface IFileReferenceUploaderService
 {
-    public Task<Result> UploadTemporaryFileReferenceDataAsync(FileReference reference);
-    
-    public Task<Result> UploadPermanentFileReferenceDataAsync(FileReference reference);
+    public Task<DataResult<FileReference>> UploadFileDataAsync(Guid fileId, Stream fileStream, string contentType,
+        string fileName, bool storePermanently);
 }
