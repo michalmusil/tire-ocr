@@ -12,10 +12,12 @@ public record ApDateTime : IApElement
         Value = value;
     }
 
+    public static ApDateTime Template() => new(DateTime.UtcNow);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApDateTime;
     }
-    
+
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

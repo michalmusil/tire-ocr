@@ -12,6 +12,8 @@ public record ApBool : IApElement
         Value = value;
     }
 
+    public static ApBool Template() => new(false);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApBool;

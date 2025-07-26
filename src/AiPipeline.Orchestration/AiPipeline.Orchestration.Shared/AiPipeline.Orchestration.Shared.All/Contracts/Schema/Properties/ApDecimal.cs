@@ -12,10 +12,12 @@ public record ApDecimal : IApElement
         Value = value;
     }
 
+    public static ApDecimal Template() => new(0m);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApDecimal;
     }
-    
+
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

@@ -2,7 +2,12 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
+using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
 using AiPipeline.TireOcr.Ocr.Messaging.Constants;
+using JasperFx.Core;
+using MediatR;
+using TireOcr.Ocr.Application.Queries.PerformTireImageOcr;
+using TireOcr.Ocr.Domain;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging.Procedures;
@@ -11,8 +16,13 @@ public class PerformSingleOcrProcedure : IProcedure
 {
     private const int _schemaVersion = 1;
 
-    private static readonly IApElement _inputSchema =
-        new ApFile(Guid.Empty, "", supportedContentTypes: ["image/jpeg", "image/png", "image/webp"]);
+    private static readonly IApElement _inputSchema = new ApObject(
+        properties: new()
+        {
+            { "detectorType", ApString.Template() },
+            { "image", ApFile.Template(["image/jpeg", "image/png", "image/webp"]) }
+        }
+    );
 
     private static readonly IApElement _outputSchema = new ApString("");
 
@@ -21,8 +31,83 @@ public class PerformSingleOcrProcedure : IProcedure
     public IApElement InputSchema => _inputSchema;
     public IApElement OutputSchema => _outputSchema;
 
-    public Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
+    private readonly IFileReferenceDownloaderService _fileReferenceDownloaderService;
+    private readonly IMediator _mediator;
+
+    public PerformSingleOcrProcedure(IFileReferenceDownloaderService fileReferenceDownloaderService, IMediator mediator)
     {
-        return Task.FromResult(DataResult<IApElement>.Success(_outputSchema));
+        _fileReferenceDownloaderService = fileReferenceDownloaderService;
+        _mediator = mediator;
+    }
+
+    public async Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
+    {
+        var schemaIsCompatible = _inputSchema.HasCompatibleSchemaWith(input);
+        if (!schemaIsCompatible)
+            return DataResult<IApElement>.Invalid(
+                $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: input schema is not compatible");
+
+        var parseResult = ParseValuesFromInput(input);
+        if (parseResult.IsFailure)
+            return DataResult<IApElement>.Failure(parseResult.Failures);
+
+        TireCodeDetectorType detectorType = parseResult.Data.Item1;
+        ApFile inputFile = parseResult.Data.Item2;
+
+        var inputFileReference = fileReferences.FirstOrDefault(f => f.Id == inputFile.Id);
+        if (inputFileReference is null)
+            return DataResult<IApElement>.Invalid(
+                $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: missing file reference '{inputFile.Id}'");
+
+        var imageDataResult = await _fileReferenceDownloaderService.DownloadFileReferenceDataAsync(inputFileReference);
+        if (imageDataResult.IsFailure)
+            return DataResult<IApElement>.Failure(imageDataResult.Failures);
+
+        var imageData = await imageDataResult.Data!.ReadAllBytesAsync();
+        var query = new PerformTireImageOcrQuery(
+            detectorType,
+            imageData,
+            Path.GetFileName(inputFileReference.Path),
+            inputFile.ContentType
+        );
+
+        var result = await _mediator.Send(query);
+
+        return result.Map(
+            onSuccess: ocrResult => DataResult<IApElement>.Success(new ApString(ocrResult.DetectedCode)),
+            onFailure: DataResult<IApElement>.Failure
+        );
+    }
+
+    private DataResult<(TireCodeDetectorType, ApFile)> ParseValuesFromInput(IApElement input)
+    {
+        try
+        {
+            var inputObject = (ApObject)input;
+            inputObject.TryGetValueCaseInsensitive("Image", out var inputFile);
+            inputObject.TryGetValueCaseInsensitive("DetectorType", out var inputDetectorTypeValue);
+            var detectorType = GetTireCodeDetectorTypeFromString(((ApString)inputDetectorTypeValue!).Value);
+            if (detectorType is null)
+                return DataResult<(TireCodeDetectorType, ApFile)>.Invalid(
+                    $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: unsupported detector type '{inputDetectorTypeValue}'");
+
+            return DataResult<(TireCodeDetectorType, ApFile)>.Success(
+                ((TireCodeDetectorType)detectorType, (ApFile)inputFile!)
+            );
+        }
+        catch
+        {
+            return DataResult<(TireCodeDetectorType, ApFile)>.Failure(new Failure(500,
+                $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed unexpectedly: Failed to parse procedure input"));
+        }
+    }
+
+    private TireCodeDetectorType? GetTireCodeDetectorTypeFromString(string value)
+    {
+        var parsedSuccessfully = Enum.TryParse(typeof(TireCodeDetectorType), value, true, out var detectorType);
+        if (!parsedSuccessfully || detectorType is null)
+            return null;
+
+        return (TireCodeDetectorType)detectorType;
     }
 }

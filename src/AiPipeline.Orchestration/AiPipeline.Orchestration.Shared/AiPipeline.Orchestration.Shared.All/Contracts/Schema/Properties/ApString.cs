@@ -12,10 +12,12 @@ public record ApString : IApElement
         Value = value;
     }
 
+    public static ApString Template() => new("");
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApString;
     }
-    
+
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

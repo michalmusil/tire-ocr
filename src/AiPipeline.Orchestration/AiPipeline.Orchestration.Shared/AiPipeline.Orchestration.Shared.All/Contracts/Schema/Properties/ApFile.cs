@@ -16,6 +16,9 @@ public record ApFile : IApElement
         SupportedContentTypes = supportedContentTypes;
     }
 
+    public static ApFile Template(string[] supportedContentTypes) =>
+        new(Guid.Empty, "", supportedContentTypes);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         if (other is not ApFile otherAsFile)

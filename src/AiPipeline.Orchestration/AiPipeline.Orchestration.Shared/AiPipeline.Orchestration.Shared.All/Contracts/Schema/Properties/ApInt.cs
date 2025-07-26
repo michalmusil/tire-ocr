@@ -12,10 +12,12 @@ public record ApInt : IApElement
         Value = value;
     }
 
+    public static ApInt Template() => new(0);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         return other is ApInt;
     }
-    
+
     public List<T> GetAllDescendantsOfType<T>() where T : IApElement => [];
 }

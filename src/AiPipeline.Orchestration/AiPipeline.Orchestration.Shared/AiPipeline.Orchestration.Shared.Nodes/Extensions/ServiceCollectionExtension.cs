@@ -27,7 +27,7 @@ public static class ServiceCollectionExtension
         foreach (var procedureType in procedureTypes)
             services.AddTransient(procedureType);
 
-        services.AddSingleton<IProcedureRouter>(provider =>
+        services.AddScoped<IProcedureRouter>(provider =>
         {
             var wolverineRuntime = provider.GetRequiredService<IWolverineRuntime>();
             var messageBus = new MessageBus(wolverineRuntime);
