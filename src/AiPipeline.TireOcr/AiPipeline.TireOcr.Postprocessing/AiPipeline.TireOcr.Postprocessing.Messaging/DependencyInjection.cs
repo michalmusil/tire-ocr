@@ -2,7 +2,6 @@ using AiPipeline.Orchestration.Shared.All.Constants;
 using AiPipeline.Orchestration.Shared.All.Extensions;
 using AiPipeline.Orchestration.Shared.Nodes.Extensions;
 using AiPipeline.Orchestration.Shared.Nodes.Producers;
-using AiPipeline.TireOcr.Postprocessing.Messaging.Constants;
 using Wolverine;
 using Wolverine.RabbitMQ;
 
@@ -28,10 +27,15 @@ public static class DependencyInjection
             opt.ConfigureMessagePublishing();
             opt.ApplyCustomConfiguration();
 
-            opt.ListenToRabbitQueue(MessagingConstants.TireOcrPostprocessingQueueName);
+            opt.ListenToRabbitQueue(MessagingConstants.TireOcrPostprocessingId);
 
             opt.Services.AddHostedService(provider =>
-                new NodeAdvertisementProducerService(provider, NodeMessagingConstants.NodeAdvertisement));
+                new NodeAdvertisementProducerService(
+                    serviceProvider: provider,
+                    nodeId: MessagingConstants.TireOcrPostprocessingId,
+                    assemblies: typeof(DependencyInjection).Assembly
+                )
+            );
         });
     }
 }

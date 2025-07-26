@@ -3,7 +3,6 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
-using AiPipeline.TireOcr.Ocr.Messaging.Constants;
 using JasperFx.Core;
 using MediatR;
 using TireOcr.Ocr.Application.Queries.PerformTireImageOcr;
@@ -14,9 +13,10 @@ namespace AiPipeline.TireOcr.Ocr.Messaging.Procedures;
 
 public class PerformSingleOcrProcedure : IProcedure
 {
-    private const int _schemaVersion = 1;
+    public string Id => "PerformSingleOcr";
+    public int SchemaVersion => 1;
 
-    private static readonly IApElement _inputSchema = new ApObject(
+    public IApElement InputSchema => new ApObject(
         properties: new()
         {
             {
@@ -32,12 +32,8 @@ public class PerformSingleOcrProcedure : IProcedure
             }
         }
     );
+    public IApElement OutputSchema => new ApString("");
 
-    private static readonly IApElement _outputSchema = new ApString("");
-    public string Id => NodeMessagingConstants.PerformSingleOcrProcedureId;
-    public int SchemaVersion => _schemaVersion;
-    public IApElement InputSchema => _inputSchema;
-    public IApElement OutputSchema => _outputSchema;
     private readonly IFileReferenceDownloaderService _fileReferenceDownloaderService;
     private readonly IMediator _mediator;
 
@@ -49,7 +45,7 @@ public class PerformSingleOcrProcedure : IProcedure
 
     public async Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
     {
-        var schemaIsCompatible = _inputSchema.HasCompatibleSchemaWith(input);
+        var schemaIsCompatible = InputSchema.HasCompatibleSchemaWith(input);
         if (!schemaIsCompatible)
             return DataResult<IApElement>.Invalid(
                 $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: input schema is not compatible");

@@ -42,14 +42,14 @@ public static class WolverineExtension
                 exc.ExchangeType = ExchangeType.Topic;
 
                 exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPreprocessingQueueName}")
-                    .ToQueue(MessagingConstants.TireOcrPreprocessingQueueName);
+                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPreprocessingId}")
+                    .ToQueue(MessagingConstants.TireOcrPreprocessingId);
                 exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrOcrQueueName}")
-                    .ToQueue(MessagingConstants.TireOcrOcrQueueName);
+                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrOcrId}")
+                    .ToQueue(MessagingConstants.TireOcrOcrId);
                 exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPostprocessingQueueName}")
-                    .ToQueue(MessagingConstants.TireOcrPostprocessingQueueName);
+                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPostprocessingId}")
+                    .ToQueue(MessagingConstants.TireOcrPostprocessingId);
             });
     }
 
