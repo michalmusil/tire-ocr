@@ -1,6 +1,6 @@
+using AiPipeline.TireOcr.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using TireOcr.Ocr.Application.Services;
-using TireOcr.Ocr.Domain;
 using TireOcr.Ocr.Infrastructure.Services.ImageUtils;
 using TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 using TireOcr.Shared.Result;

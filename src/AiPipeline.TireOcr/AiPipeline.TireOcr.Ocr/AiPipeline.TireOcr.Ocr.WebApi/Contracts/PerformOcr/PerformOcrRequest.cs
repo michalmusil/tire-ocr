@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using TireOcr.Ocr.Domain;
+using AiPipeline.TireOcr.Shared.Models;
 
 namespace TireOcr.Ocr.WebApi.Contracts.PerformOcr;
 

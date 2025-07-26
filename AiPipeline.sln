@@ -65,6 +65,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Sh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared.Tests", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Tests\AiPipeline.Orchestration.Shared.Tests.csproj", "{685421B2-261C-49AC-BAD4-9C92238B806F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Messaging\AiPipeline.TireOcr.Preprocessing.Messaging.csproj", "{A67E6C0D-1C4F-450B-B73C-7782F1940151}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Shared", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj", "{BB81313F-1161-43A3-A8D4-E39627BC9E90}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -98,6 +102,8 @@ Global
 		{DE381DB7-0572-4295-ABB7-1433BC4BEEF2} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
 		{AD6DECA6-8C30-41A9-A100-2F3CCCDAC3B5} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
 		{685421B2-261C-49AC-BAD4-9C92238B806F} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
+		{A67E6C0D-1C4F-450B-B73C-7782F1940151} = {EBDF096A-73D6-4FD1-B646-BF021E2CF320}
+		{BB81313F-1161-43A3-A8D4-E39627BC9E90} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -200,5 +206,13 @@ Global
 		{685421B2-261C-49AC-BAD4-9C92238B806F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{685421B2-261C-49AC-BAD4-9C92238B806F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{685421B2-261C-49AC-BAD4-9C92238B806F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A67E6C0D-1C4F-450B-B73C-7782F1940151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A67E6C0D-1C4F-450B-B73C-7782F1940151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A67E6C0D-1C4F-450B-B73C-7782F1940151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A67E6C0D-1C4F-450B-B73C-7782F1940151}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB81313F-1161-43A3-A8D4-E39627BC9E90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB81313F-1161-43A3-A8D4-E39627BC9E90}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB81313F-1161-43A3-A8D4-E39627BC9E90}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB81313F-1161-43A3-A8D4-E39627BC9E90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

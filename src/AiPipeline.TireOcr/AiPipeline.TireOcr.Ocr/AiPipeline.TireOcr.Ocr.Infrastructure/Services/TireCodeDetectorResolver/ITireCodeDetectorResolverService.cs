@@ -1,5 +1,5 @@
+using AiPipeline.TireOcr.Shared.Models;
 using TireOcr.Ocr.Application.Services;
-using TireOcr.Ocr.Domain;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetectorResolver;

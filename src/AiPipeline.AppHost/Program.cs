@@ -16,6 +16,15 @@ var rabbitMq = builder
 // var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
 //     .WithHttpsHealthCheck("/health");
 
+var preprocessingMessagingService = builder
+    .AddProject<AiPipeline_TireOcr_Preprocessing_Messaging>("PreprocessingMessagingService")
+    .WithHttpsHealthCheck("/health")
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq)
+    .WithReference(minio)
+    .WithMinioCredentials(minio)
+    .WaitFor(minio);
+
 var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("OcrMessagingService")
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)

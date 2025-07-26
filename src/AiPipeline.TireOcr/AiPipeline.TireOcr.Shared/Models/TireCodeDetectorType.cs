@@ -1,4 +1,4 @@
-namespace TireOcr.Ocr.Domain;
+namespace AiPipeline.TireOcr.Shared.Models;
 
 public enum TireCodeDetectorType
 {

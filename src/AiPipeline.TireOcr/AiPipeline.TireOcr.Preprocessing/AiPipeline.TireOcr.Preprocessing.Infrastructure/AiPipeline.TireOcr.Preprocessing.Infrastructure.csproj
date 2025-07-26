@@ -19,8 +19,8 @@
 
     <ItemGroup>
         <PackageReference Include="Fastenshtein" Version="1.0.10"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.2"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.2"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
         <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.21.0"/>
         <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108"/>
         <PackageReference Include="OpenCvSharp4.official.runtime.linux-x64" Version="4.10.0.20241108" Condition="'$(IsLinux)' == 'true'"/>

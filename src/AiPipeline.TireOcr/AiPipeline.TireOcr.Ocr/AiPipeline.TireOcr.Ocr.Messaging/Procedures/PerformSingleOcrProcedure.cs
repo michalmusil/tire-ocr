@@ -3,10 +3,10 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
+using AiPipeline.TireOcr.Shared.Models;
 using JasperFx.Core;
 using MediatR;
 using TireOcr.Ocr.Application.Queries.PerformTireImageOcr;
-using TireOcr.Ocr.Domain;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Ocr.Messaging.Procedures;

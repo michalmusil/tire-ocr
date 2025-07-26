@@ -1,5 +1,5 @@
+using AiPipeline.TireOcr.Shared.Models;
 using TireOcr.Ocr.Application.Dtos;
-using TireOcr.Ocr.Domain;
 using TireOcr.Ocr.Domain.ImageEntity;
 using TireOcr.Shared.Result;
 

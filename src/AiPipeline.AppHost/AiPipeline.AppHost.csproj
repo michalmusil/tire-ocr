@@ -23,6 +23,7 @@
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Messaging\AiPipeline.TireOcr.Postprocessing.Messaging.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Messaging\AiPipeline.TireOcr.Preprocessing.Messaging.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.RunnerPrototype\AiPipeline.TireOcr.RunnerPrototype.csproj" />
   </ItemGroup>
