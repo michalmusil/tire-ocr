@@ -24,16 +24,22 @@ public record ApFile : IApElement
         if (other is not ApFile otherAsFile)
             return false;
 
-        var othersContentTypeMismatch = SupportedContentTypes?.Length > 0 && !SupportedContentTypes
-            .Contains(otherAsFile.ContentType, StringComparer.OrdinalIgnoreCase);
-        if (othersContentTypeMismatch)
-            return false;
+        if (otherAsFile.ContentType != "")
+        {
+            var othersContentTypeMismatch = SupportedContentTypes?.Length > 0 && !SupportedContentTypes
+                .Contains(otherAsFile.ContentType, StringComparer.OrdinalIgnoreCase);
+            if (othersContentTypeMismatch)
+                return false;
+        }
 
-        var thisContentTypeMismatch = otherAsFile.SupportedContentTypes?.Length > 0 &&
-                                      !otherAsFile.SupportedContentTypes
-                                          .Contains(ContentType, StringComparer.OrdinalIgnoreCase);
-        if (thisContentTypeMismatch)
-            return false;
+        if (ContentType != "")
+        {
+            var thisContentTypeMismatch = otherAsFile.SupportedContentTypes?.Length > 0 &&
+                                          !otherAsFile.SupportedContentTypes
+                                              .Contains(ContentType, StringComparer.OrdinalIgnoreCase);
+            if (thisContentTypeMismatch)
+                return false;
+        }
 
         return true;
     }

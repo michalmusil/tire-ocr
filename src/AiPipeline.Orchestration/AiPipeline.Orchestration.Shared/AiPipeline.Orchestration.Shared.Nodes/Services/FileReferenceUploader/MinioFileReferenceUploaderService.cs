@@ -23,7 +23,7 @@ public class MinioFileReferenceUploaderService : IFileReferenceUploaderService
     public async Task<DataResult<FileReference>> UploadFileDataAsync(Guid fileId, Stream fileStream, string contentType,
         string fileName, bool storePermanently)
     {
-        var bucketName = storePermanently ? "temp-files" : "long-term-files";
+        var bucketName = storePermanently ? "long-term-files" : "temp-files";
         var filePath = $"{bucketName}/{fileName}";
         try
         {

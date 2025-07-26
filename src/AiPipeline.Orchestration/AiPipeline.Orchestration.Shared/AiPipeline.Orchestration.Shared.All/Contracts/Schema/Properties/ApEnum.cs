@@ -21,16 +21,22 @@ public record ApEnum : IApElement
         if (other is not ApEnum otherAsEnum)
             return false;
 
-        var othersCaseMismatch = SupportedCases?.Length > 0 && !SupportedCases
-            .Contains(otherAsEnum.Value, StringComparer.OrdinalIgnoreCase);
-        if (othersCaseMismatch)
-            return false;
+        if (otherAsEnum.Value != "")
+        {
+            var othersCaseMismatch = SupportedCases?.Length > 0 && !SupportedCases
+                .Contains(otherAsEnum.Value, StringComparer.OrdinalIgnoreCase);
+            if (othersCaseMismatch)
+                return false;
+        }
 
-        var thisCaseMissmatch = otherAsEnum.SupportedCases?.Length > 0 &&
-                                !otherAsEnum.SupportedCases
-                                    .Contains(Value, StringComparer.OrdinalIgnoreCase);
-        if (thisCaseMissmatch)
-            return false;
+        if (Value != "")
+        {
+            var thisCaseMissmatch = otherAsEnum.SupportedCases?.Length > 0 &&
+                                    !otherAsEnum.SupportedCases
+                                        .Contains(Value, StringComparer.OrdinalIgnoreCase);
+            if (thisCaseMissmatch)
+                return false;
+        }
 
         return true;
     }
