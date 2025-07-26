@@ -184,6 +184,22 @@ public class ApElementSerializationDeserializationTests
         Assert.Equal(number, result.Value);
     }
 
+    [Fact]
+    public void ApEnum_ValidApEnum_SerializesCorrectly()
+    {
+        // Arrange
+        var valueIndex = 0;
+        string[] supportedCases = ["Sunday", "Monday"];
+        IApElement original = new ApEnum(supportedCases[0], supportedCases);
+
+        // Act
+        var json = JsonSerializer.Serialize(original, TestUtils.ApElementSerializerOptions);
+        var result = JsonSerializer.Deserialize<ApEnum>(json, TestUtils.ApElementSerializerOptions)!;
+
+        // Assert
+        Assert.Equal(supportedCases[valueIndex], result.Value);
+    }
+
     //
     // [Fact]
     // public void ApList_ValidApList_SerializesCorrectly()

@@ -19,18 +19,25 @@ public class PerformSingleOcrProcedure : IProcedure
     private static readonly IApElement _inputSchema = new ApObject(
         properties: new()
         {
-            { "detectorType", ApString.Template() },
-            { "image", ApFile.Template(["image/jpeg", "image/png", "image/webp"]) }
+            {
+                "detectorType", ApEnum.Template(
+                    Enum.GetValues(typeof(TireCodeDetectorType))
+                        .Cast<TireCodeDetectorType>()
+                        .Select(t => t.ToString())
+                        .ToArray()
+                )
+            },
+            {
+                "image", ApFile.Template(["image/jpeg", "image/png", "image/webp"])
+            }
         }
     );
 
     private static readonly IApElement _outputSchema = new ApString("");
-
     public string Id => NodeMessagingConstants.PerformSingleOcrProcedureId;
     public int SchemaVersion => _schemaVersion;
     public IApElement InputSchema => _inputSchema;
     public IApElement OutputSchema => _outputSchema;
-
     private readonly IFileReferenceDownloaderService _fileReferenceDownloaderService;
     private readonly IMediator _mediator;
 
@@ -86,7 +93,7 @@ public class PerformSingleOcrProcedure : IProcedure
             var inputObject = (ApObject)input;
             inputObject.TryGetValueCaseInsensitive("Image", out var inputFile);
             inputObject.TryGetValueCaseInsensitive("DetectorType", out var inputDetectorTypeValue);
-            var detectorType = GetTireCodeDetectorTypeFromString(((ApString)inputDetectorTypeValue!).Value);
+            var detectorType = GetTireCodeDetectorTypeFromString(((ApEnum)inputDetectorTypeValue!).Value);
             if (detectorType is null)
                 return DataResult<(TireCodeDetectorType, ApFile)>.Invalid(
                     $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: unsupported detector type '{inputDetectorTypeValue}'");
