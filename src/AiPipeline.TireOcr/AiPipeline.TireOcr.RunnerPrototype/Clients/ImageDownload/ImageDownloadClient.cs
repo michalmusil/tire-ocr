@@ -53,7 +53,7 @@ public class ImageDownloadClient : IImageDownloadClient
                 DataResult<Image>.Success(new Image(imageData, fileName, contentType))
             );
         }
-        catch (Exception ex)
+        catch
         {
             return new ImageDownloadResultDto(
                 imageUrl,

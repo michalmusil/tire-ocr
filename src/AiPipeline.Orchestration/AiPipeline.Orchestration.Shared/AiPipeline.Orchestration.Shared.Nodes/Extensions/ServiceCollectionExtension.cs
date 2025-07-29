@@ -41,9 +41,27 @@ public static class ServiceCollectionExtension
 
     public static void AddFileManipulation(this IServiceCollection services, IConfiguration configuration)
     {
+        AddFileManipulationViaHttpClient(services);
+    }
+
+    private static void AddFileManipulationViaHttpClient(IServiceCollection services)
+    {
+        var baseAddressUri = new Uri("https+http://OrchestrationRunnerService");
+        services.AddHttpClient<IFileReferenceDownloaderService, HttpFileReferenceDownloaderService>(client =>
+        {
+            client.BaseAddress = baseAddressUri;
+        });
+        services.AddHttpClient<IFileReferenceUploaderService, HttpFileReferenceUploaderService>(client =>
+        {
+            client.BaseAddress = baseAddressUri;
+        });
+    }
+
+    private static void AddDirectMinioFileManipulation(IServiceCollection services, IConfiguration configuration)
+    {
         services.AddScoped<IFileReferenceDownloaderService, MinioFileReferenceDownloaderService>();
         services.AddScoped<IFileReferenceUploaderService, MinioFileReferenceUploaderService>();
-        
+
         // Minio client doesn't support base addresses starting with protocol
         var uri = configuration
             .GetValue<string>("services:minio:api:0")
