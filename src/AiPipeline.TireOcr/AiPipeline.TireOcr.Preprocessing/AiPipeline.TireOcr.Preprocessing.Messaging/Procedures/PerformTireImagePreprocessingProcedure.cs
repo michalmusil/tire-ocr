@@ -83,7 +83,7 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
             return DataResult<IApElement>.Failure(result.Failures);
 
         var preprocessedImage = result.Data!;
-        var preprocessedImageStream = new MemoryStream(imageData);
+        var preprocessedImageStream = new MemoryStream(preprocessedImage.ImageData);
         preprocessedImageStream.Position = 0;
         var preprocessedImageId = Guid.NewGuid();
 
