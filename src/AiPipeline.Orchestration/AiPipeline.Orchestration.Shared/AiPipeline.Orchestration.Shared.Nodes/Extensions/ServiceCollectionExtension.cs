@@ -5,9 +5,7 @@ using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Minio;
-using Wolverine.Runtime;
 
 namespace AiPipeline.Orchestration.Shared.Nodes.Extensions;
 
@@ -27,16 +25,7 @@ public static class ServiceCollectionExtension
         foreach (var procedureType in procedureTypes)
             services.AddTransient(procedureType);
 
-        services.AddScoped<IProcedureRouter>(provider =>
-        {
-            var wolverineRuntime = provider.GetRequiredService<IWolverineRuntime>();
-            var messageBus = new MessageBus(wolverineRuntime);
-            var logger = provider.GetRequiredService<ILogger<ProcedureRouter>>();
-            var procedureRouter = new ProcedureRouter(messageBus, provider, logger);
-
-            procedureRouter.RegisterProceduresFromAssemblies(assemblies);
-            return procedureRouter;
-        });
+        services.AddScoped<IProcedureRouter, ProcedureRouter>();
     }
 
     public static void AddFileManipulation(this IServiceCollection services, IConfiguration configuration)

@@ -1,6 +1,7 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
+using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using Wolverine;
 
@@ -9,13 +10,15 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 public class PipelineRabbitMqPublisherService : IPipelinePublisherService
 {
     private readonly IMessageBus _messageBus;
+    private readonly ILogger<PipelineRabbitMqPublisherService> _logger;
 
-    public PipelineRabbitMqPublisherService(IMessageBus messageBus)
+    public PipelineRabbitMqPublisherService(IMessageBus messageBus, ILogger<PipelineRabbitMqPublisherService> logger)
     {
         _messageBus = messageBus;
+        _logger = logger;
     }
 
-    public async Task<Result> PublishPipeline(Domain.PipelineAggregate.Pipeline pipeline, IApElement input)
+    public async Task<Result> PublishAsync(Domain.PipelineAggregate.Pipeline pipeline, IApElement input)
     {
         var firstStep = pipeline.Steps.FirstOrDefault();
 
@@ -47,7 +50,9 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
         }
         catch (Exception ex)
         {
-            return Result.Failure(new Failure(500, ex.Message));
+            var customMessage = $"Unexpected error while publishing pipeline '{pipeline.Id}'";
+            _logger.LogError(ex, $"{customMessage}: {ex.Message}");
+            return Result.Failure(new Failure(500, customMessage));
         }
     }
 }

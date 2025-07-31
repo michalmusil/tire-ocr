@@ -34,6 +34,7 @@ public class ProcedureRouter : IProcedureRouter
 
         DefaultCompletionStrategy = new DefaultProcedureCompletionStrategy();
         DefaultFailureStrategy = new DefaultPipelineFailureStrategy();
+        RegisterProceduresFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
     }
 
     /// <summary>

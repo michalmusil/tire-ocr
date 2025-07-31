@@ -5,5 +5,5 @@ namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 
 public interface IPipelinePublisherService
 {
-    public Task<Result> PublishPipeline(Domain.PipelineAggregate.Pipeline pipeline, IApElement input);
+    public Task<Result> PublishAsync(Domain.PipelineAggregate.Pipeline pipeline, IApElement input);
 }

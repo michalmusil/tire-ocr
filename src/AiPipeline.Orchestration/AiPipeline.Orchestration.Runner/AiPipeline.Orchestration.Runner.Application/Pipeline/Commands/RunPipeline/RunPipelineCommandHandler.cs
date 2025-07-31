@@ -41,7 +41,7 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
             return DataResult<PipelineDto>.Failure(pipelineBuildResult.Failures);
         var pipeline = pipelineBuildResult.Data!;
 
-        var pipelinePublishResult = await _pipelinePublisher.PublishPipeline(pipeline, request.Dto.Input);
+        var pipelinePublishResult = await _pipelinePublisher.PublishAsync(pipeline, request.Dto.Input);
 
         return await pipelinePublishResult.MapAsync(
             onSuccess: async () =>
