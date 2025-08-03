@@ -29,11 +29,17 @@ public class Result
     public static Result NotFound(string message, params Failure[] failures) =>
         Failure(new[] { new Failure(404, message) }.Concat(failures).ToArray());
 
+    public static Result Timeout(string message, params Failure[] failures) =>
+        Failure(new[] { new Failure(408, message) }.Concat(failures).ToArray());
+
     public static Result Conflict(string message, params Failure[] failures) =>
         Failure(new[] { new Failure(409, message) }.Concat(failures).ToArray());
 
     public static Result Invalid(string message, params Failure[] failures) =>
         Failure(new[] { new Failure(422, message) }.Concat(failures).ToArray());
+
+    public static Result Cancelled(string message, params Failure[] failures) =>
+        Failure(new[] { new Failure(499, message) }.Concat(failures).ToArray());
 
     public FailureMessages GetMessages()
     {

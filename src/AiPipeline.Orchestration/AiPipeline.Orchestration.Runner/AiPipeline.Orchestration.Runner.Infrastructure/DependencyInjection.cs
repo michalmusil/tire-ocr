@@ -50,6 +50,7 @@ public static class DependencyInjection
 
     private static void AddServices(IServiceCollection services)
     {
+        services.AddSingleton<IPipelineResultSubscriberService, PipelineResultSubscriberService>();
         services.AddScoped<IPipelinePublisherService, PipelineRabbitMqPublisherService>();
     }
 
