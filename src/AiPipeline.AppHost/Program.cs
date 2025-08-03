@@ -19,6 +19,13 @@ var orchestrationRunnerService = builder
     .WithMinioCredentials(minio)
     .WaitFor(minio);
 
+var fileService = builder
+    .AddProject<AiPipeline_Orchestration_FileService_GrpcServer>("FileService")
+    .WithHttpsHealthCheck("/health")
+    .WithReference(minio)
+    .WithMinioCredentials(minio)
+    .WaitFor(minio);
+
 // var preprocessingService = builder.AddProject<AiPipeline_TireOcr_Preprocessing_WebApi>("PreprocessingService")
 //     .WithHttpsHealthCheck("/health");
 //
