@@ -1,8 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
-using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
-using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
-using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.InitPipelineResult;
-using MediatR;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Facades;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -11,17 +8,13 @@ namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipel
 
 public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, PipelineDto>
 {
-    private readonly IMediator _mediator;
-    private readonly IPipelineBuilderProvider _pipelineBuilderProvider;
-    private readonly IPipelinePublisherService _pipelinePublisher;
+    private readonly IPipelineRunnerFacade _pipelineRunnerFacade;
     private readonly ILogger<RunPipelineCommandHandler> _logger;
 
-    public RunPipelineCommandHandler(IMediator mediator, IPipelineBuilderProvider pipelineBuilderProvider,
-        IPipelinePublisherService pipelinePublisher, ILogger<RunPipelineCommandHandler> logger)
+    public RunPipelineCommandHandler(IPipelineRunnerFacade pipelineRunnerFacade,
+        ILogger<RunPipelineCommandHandler> logger)
     {
-        _mediator = mediator;
-        _pipelineBuilderProvider = pipelineBuilderProvider;
-        _pipelinePublisher = pipelinePublisher;
+        _pipelineRunnerFacade = pipelineRunnerFacade;
         _logger = logger;
     }
 
@@ -30,26 +23,11 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
         CancellationToken cancellationToken
     )
     {
-        var pipelineBuilder = _pipelineBuilderProvider.GetPipelineBuilder();
+        var runPipelineResult = await _pipelineRunnerFacade.RunPipelineAsync(request.Dto);
 
-        pipelineBuilder.SetPipelineInput(request.Dto.Input);
-        pipelineBuilder.AddSteps(request.Dto.Steps);
-
-        var pipelineBuildResult = await pipelineBuilder.BuildAsync();
-
-        if (pipelineBuildResult.IsFailure)
-            return DataResult<PipelineDto>.Failure(pipelineBuildResult.Failures);
-        var pipeline = pipelineBuildResult.Data!;
-
-        var pipelinePublishResult = await _pipelinePublisher.PublishAsync(pipeline, request.Dto.Input);
-
-        return await pipelinePublishResult.MapAsync(
-            onSuccess: async () =>
-            {
-                await _mediator.Send(new InitPipelineResultCommand(pipeline.Id), cancellationToken);
-                return DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline));
-            },
-            onFailure: failures => Task.FromResult(DataResult<PipelineDto>.Failure(failures))
+        return runPipelineResult.Map(
+            onSuccess: pipeline => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),
+            onFailure: DataResult<PipelineDto>.Failure
         );
     }
 }

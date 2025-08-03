@@ -1,12 +1,14 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Infrastructure.File.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
@@ -25,6 +27,7 @@ public static class DependencyInjection
         AddUnitOfWork(services);
         AddProviders(services);
         AddServices(services);
+        AddFacades(services);
         AddS3Storage(services, configuration);
         AddDbContext(services, configuration);
         return services;
@@ -52,6 +55,11 @@ public static class DependencyInjection
     {
         services.AddSingleton<IPipelineResultSubscriberService, PipelineResultSubscriberService>();
         services.AddScoped<IPipelinePublisherService, PipelineRabbitMqPublisherService>();
+    }
+
+    private static void AddFacades(IServiceCollection services)
+    {
+        services.AddScoped<IPipelineRunnerFacade, PipelineRunnerFacade>();
     }
 
     private static void AddS3Storage(IServiceCollection services, IConfiguration configuration)
