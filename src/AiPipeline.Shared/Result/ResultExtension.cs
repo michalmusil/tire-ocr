@@ -59,8 +59,10 @@ public static class ResultExtension
             401 => CreateActionResult(401, "Unauthorized", failure, otherFailures),
             403 => CreateActionResult(403, "Forbidden", failure, otherFailures),
             404 => CreateActionResult(404, "Not Found", failure, otherFailures),
+            408 => CreateActionResult(408, "Timeout", failure, otherFailures),
             409 => CreateActionResult(409, "Conflict", failure, otherFailures),
             422 => CreateActionResult(422, "Invalid request data", failure, otherFailures),
+            499 => CreateActionResult(499, "Cancelled by client", failure, otherFailures),
             >= 400 and < 500 => CreateActionResult(400, "Bad request", failure, otherFailures),
             _ => CreateActionResult(500, "Unexpected result output", failure, otherFailures)
         };

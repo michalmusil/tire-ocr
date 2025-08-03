@@ -1,7 +1,10 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipeline;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipelineAwaited;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
+using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAsync;
+using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAwaitedAsync;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +43,30 @@ public class PipelinesController : ControllerBase
 
         return result.ToActionResult<PipelineDto, RunPipelineAsyncResponse>(
             onSuccess: dto => new RunPipelineAsyncResponse(dto)
+        );
+    }
+
+    [HttpPost("Awaited")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status408RequestTimeout)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+    public async Task<ActionResult<RunPipelineAwaitedAsyncResponse>> RunAwaitedAsync(
+        [FromBody] RunPipelineAwaitedAsyncRequest request, CancellationToken cancellationToken)
+    {
+        var command = new RunPipelineAwaitedCommand(
+            Dto: new RunPipelineDto(
+                Input: request.Input,
+                Steps: request.Steps
+            ),
+            Timeout: TimeSpan.FromSeconds(request.TimeoutSeconds)
+        );
+        var result = await _mediator.Send(command, cancellationToken);
+
+        return result.ToActionResult<GetPipelineResultDto, RunPipelineAwaitedAsyncResponse>(
+            onSuccess: dto => new RunPipelineAwaitedAsyncResponse(dto)
         );
     }
 }

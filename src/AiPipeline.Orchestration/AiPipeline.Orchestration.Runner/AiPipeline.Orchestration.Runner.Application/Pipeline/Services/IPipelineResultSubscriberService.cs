@@ -9,8 +9,6 @@ public interface IPipelineResultSubscriberService
         CancellationToken? cancellationToken = null
     );
 
-    public Task<Result> CompleteWithSuccessfulPipelineResultAsync(
+    public Task<Result> CompleteWithPipelineResultAsync(
         Domain.PipelineResultAggregate.PipelineResult pipelineResult);
-
-    public Task<Result> CompleteWithPipelineFailuresAsync(Guid pipelineId, params Failure[] failures);
 }

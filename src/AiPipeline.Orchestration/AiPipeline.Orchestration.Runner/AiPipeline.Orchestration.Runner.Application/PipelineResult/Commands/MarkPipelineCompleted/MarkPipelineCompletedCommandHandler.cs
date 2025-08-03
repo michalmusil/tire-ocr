@@ -41,27 +41,9 @@ public class MarkPipelineCompletedCommandHandler : ICommandHandler<MarkPipelineC
 
         await _unitOfWork.SaveChangesAsync();
 
-        await PublishPipelineResultToSubscribers(existingResult);
+        await _pipelineResultSubscriberService.CompleteWithPipelineResultAsync(existingResult);
 
         var dto = GetPipelineResultDto.FromDomain(existingResult);
         return DataResult<GetPipelineResultDto>.Success(dto);
-    }
-
-    private async Task PublishPipelineResultToSubscribers(Domain.PipelineResultAggregate.PipelineResult pipelineResult)
-    {
-        var pipelineFailureReason = pipelineResult.StepResults
-            .FirstOrDefault(fr => fr.FailureReason != null)
-            ?.FailureReason;
-
-        if (pipelineFailureReason is null)
-        {
-            await _pipelineResultSubscriberService.CompleteWithSuccessfulPipelineResultAsync(pipelineResult);
-        }
-        else
-        {
-            var failure = new Failure(pipelineFailureReason.Code, pipelineFailureReason.Reason);
-            await _pipelineResultSubscriberService.CompleteWithPipelineFailuresAsync(pipelineResult.PipelineId,
-                failure);
-        }
     }
 }

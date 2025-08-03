@@ -58,6 +58,17 @@ public class Result
         onFailure(Failures);
     }
 
+    public async Task FoldAsync(Func<Task> onSuccess, Func<Failure[], Task> onFailure)
+    {
+        if (IsSuccess)
+        {
+            await onSuccess();
+            return;
+        }
+
+        await onFailure(Failures);
+    }
+
     public TResult Map<TResult>(Func<TResult> onSuccess, Func<Failure[], TResult> onFailure)
     {
         if (IsSuccess)

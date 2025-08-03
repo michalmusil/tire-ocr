@@ -38,7 +38,7 @@ public class PipelineResultSubscriberService : IPipelineResultSubscriberService
         );
     }
 
-    public Task<Result> CompleteWithSuccessfulPipelineResultAsync(
+    public Task<Result> CompleteWithPipelineResultAsync(
         Domain.PipelineResultAggregate.PipelineResult pipelineResult)
     {
         var pipelineId = pipelineResult.PipelineId;
