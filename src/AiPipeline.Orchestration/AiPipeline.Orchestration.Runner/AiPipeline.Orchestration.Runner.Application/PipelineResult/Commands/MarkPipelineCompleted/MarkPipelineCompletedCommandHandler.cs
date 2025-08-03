@@ -1,4 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
@@ -9,12 +10,15 @@ namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.Ma
 public class MarkPipelineCompletedCommandHandler : ICommandHandler<MarkPipelineCompletedCommand, GetPipelineResultDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IPipelineResultSubscriberService _pipelineResultSubscriberService;
     private readonly ILogger<MarkPipelineCompletedCommandHandler> _logger;
 
     public MarkPipelineCompletedCommandHandler(IUnitOfWork unitOfWork,
+        IPipelineResultSubscriberService pipelineResultSubscriberService,
         ILogger<MarkPipelineCompletedCommandHandler> logger)
     {
         _unitOfWork = unitOfWork;
+        _pipelineResultSubscriberService = pipelineResultSubscriberService;
         _logger = logger;
     }
 
@@ -37,7 +41,27 @@ public class MarkPipelineCompletedCommandHandler : ICommandHandler<MarkPipelineC
 
         await _unitOfWork.SaveChangesAsync();
 
+        await PublishPipelineResultToSubscribers(existingResult);
+
         var dto = GetPipelineResultDto.FromDomain(existingResult);
         return DataResult<GetPipelineResultDto>.Success(dto);
+    }
+
+    private async Task PublishPipelineResultToSubscribers(Domain.PipelineResultAggregate.PipelineResult pipelineResult)
+    {
+        var pipelineFailureReason = pipelineResult.StepResults
+            .FirstOrDefault(fr => fr.FailureReason != null)
+            ?.FailureReason;
+
+        if (pipelineFailureReason is null)
+        {
+            await _pipelineResultSubscriberService.CompleteWithSuccessfulPipelineResultAsync(pipelineResult);
+        }
+        else
+        {
+            var failure = new Failure(pipelineFailureReason.Code, pipelineFailureReason.Reason);
+            await _pipelineResultSubscriberService.CompleteWithPipelineFailuresAsync(pipelineResult.PipelineId,
+                failure);
+        }
     }
 }
