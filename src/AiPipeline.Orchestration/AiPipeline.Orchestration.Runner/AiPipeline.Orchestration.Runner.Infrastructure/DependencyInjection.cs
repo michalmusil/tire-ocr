@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.FileService.GrpcSdk;
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
@@ -28,6 +29,7 @@ public static class DependencyInjection
         AddProviders(services);
         AddServices(services);
         AddFacades(services);
+        AddFileServiceSdk(services);
         AddS3Storage(services, configuration);
         AddDbContext(services, configuration);
         return services;
@@ -37,7 +39,7 @@ public static class DependencyInjection
     {
         services.AddScoped<INodeTypeRepository, NodeTypeRepository>();
         services.AddScoped<IPipelineResultRepository, PipelineResultRepository>();
-        services.AddScoped<IFileRepository, FileRepository>();
+        services.AddScoped<IFileRepository, FileRepositoryGrpc>();
         services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
 
@@ -60,6 +62,11 @@ public static class DependencyInjection
     private static void AddFacades(IServiceCollection services)
     {
         services.AddScoped<IPipelineRunnerFacade, PipelineRunnerFacade>();
+    }
+
+    private static void AddFileServiceSdk(IServiceCollection services)
+    {
+        services.AddFileServiceSdk(new Uri("http://FileService"));
     }
 
     private static void AddS3Storage(IServiceCollection services, IConfiguration configuration)

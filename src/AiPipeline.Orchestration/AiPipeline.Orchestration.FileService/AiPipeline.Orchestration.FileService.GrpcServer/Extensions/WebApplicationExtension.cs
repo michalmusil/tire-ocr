@@ -6,7 +6,7 @@ public static class WebApplicationExtension
 {
     public static WebApplication AddGrpcServices(this WebApplication app)
     {
-        app.MapGrpcService<GreeterService>();
+        app.MapGrpcService<Services.FileService>();
         return app;
     }
 }

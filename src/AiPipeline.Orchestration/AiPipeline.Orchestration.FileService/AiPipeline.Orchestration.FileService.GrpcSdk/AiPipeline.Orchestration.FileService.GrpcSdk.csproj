@@ -20,4 +20,8 @@
       </PackageReference>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
+    </ItemGroup>
+
 </Project>

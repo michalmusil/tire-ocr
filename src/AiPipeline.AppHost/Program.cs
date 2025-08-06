@@ -10,18 +10,19 @@ var rabbitMq = builder
     .WithDataVolume()
     .WithManagementPlugin(port: 15672);
 
-var orchestrationRunnerService = builder
-    .AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
+var fileService = builder
+    .AddProject<AiPipeline_Orchestration_FileService_GrpcServer>("FileService")
     .WithHttpsHealthCheck("/health")
-    .WithReference(rabbitMq)
-    .WaitFor(rabbitMq)
     .WithReference(minio)
     .WithMinioCredentials(minio)
     .WaitFor(minio);
 
-var fileService = builder
-    .AddProject<AiPipeline_Orchestration_FileService_GrpcServer>("FileService")
+var orchestrationRunnerService = builder
+    .AddProject<AiPipeline_Orchestration_Runner_WebApi>("OrchestrationRunnerService")
     .WithHttpsHealthCheck("/health")
+    .WithReference(fileService)
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq)
     .WithReference(minio)
     .WithMinioCredentials(minio)
     .WaitFor(minio);
