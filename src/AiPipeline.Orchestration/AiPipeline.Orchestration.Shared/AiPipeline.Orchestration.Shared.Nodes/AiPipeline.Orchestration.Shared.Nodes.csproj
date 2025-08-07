@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.GrpcSdk\AiPipeline.Orchestration.FileService.GrpcSdk.csproj" />
       <ProjectReference Include="..\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
     </ItemGroup>
 

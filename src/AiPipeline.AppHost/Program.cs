@@ -38,15 +38,13 @@ var preprocessingMessagingService = builder
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq)
-    .WithReference(orchestrationRunnerService)
-    .WaitFor(orchestrationRunnerService);
+    .WithReference(fileService);
 
 var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("OcrMessagingService")
     .WithHttpsHealthCheck("/health")
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq)
-    .WithReference(orchestrationRunnerService)
-    .WaitFor(orchestrationRunnerService);
+    .WithReference(fileService);
 
 // var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
 //     .WithHttpsHealthCheck("/health");

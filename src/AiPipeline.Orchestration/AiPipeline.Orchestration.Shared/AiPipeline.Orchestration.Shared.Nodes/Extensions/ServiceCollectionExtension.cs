@@ -1,4 +1,5 @@
 using System.Reflection;
+using AiPipeline.Orchestration.FileService.GrpcSdk;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures.Routing;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
@@ -30,7 +31,7 @@ public static class ServiceCollectionExtension
 
     public static void AddFileManipulation(this IServiceCollection services, IConfiguration configuration)
     {
-        AddFileManipulationViaHttpClient(services);
+        AddFileManipulationViaGrpcService(services);
     }
 
     private static void AddFileManipulationViaHttpClient(IServiceCollection services)
@@ -46,24 +47,12 @@ public static class ServiceCollectionExtension
         });
     }
 
-    private static void AddDirectMinioFileManipulation(IServiceCollection services, IConfiguration configuration)
+    private static void AddFileManipulationViaGrpcService(IServiceCollection services)
     {
-        services.AddScoped<IFileReferenceDownloaderService, MinioFileReferenceDownloaderService>();
-        services.AddScoped<IFileReferenceUploaderService, MinioFileReferenceUploaderService>();
+        var grpcServerUri = new Uri("http://FileService");
+        services.AddFileServiceSdk(grpcServerUri);
 
-        // Minio client doesn't support base addresses starting with protocol
-        var uri = configuration
-            .GetValue<string>("services:minio:api:0")
-            ?.Replace("http://", "")
-            .Replace("https://", "");
-        var username = configuration.GetValue<string>("MINIO_USERNAME");
-        var password = configuration.GetValue<string>("MINIO_PASSWORD");
-
-        services.AddMinio(configureClient => configureClient
-            .WithEndpoint(uri)
-            .WithCredentials(username, password)
-            .WithSSL(false)
-            .Build()
-        );
+        services.AddScoped<IFileReferenceDownloaderService, GrpcFileReferenceDownloaderService>();
+        services.AddScoped<IFileReferenceUploaderService, GrpcFileReferenceUploaderService>();
     }
 }
