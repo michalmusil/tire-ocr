@@ -19,6 +19,7 @@ using GetFilesByIdsRequest =
     AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFilesByIds.GetFilesByIdsRequest;
 using GetFilesByIdsResponse =
     AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFilesByIds.GetFilesByIdsResponse;
+using RemoveFileRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.RemoveFile.RemoveFileRequest;
 using UploadFileRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.UploadFile.UploadFileRequest;
 using UploadFileResponse = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.UploadFile.UploadFileResponse;
 
@@ -139,6 +140,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
             ContentType = request.ContentType,
             FileName = request.FileName,
             FileData = serverFileData,
+            StorageScope = GetStorageScope(request.FileStorageScope)
         };
         try
         {
@@ -176,7 +178,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
                 ContentType: response.ContentType,
                 FileData: dataStream
             );
-            
+
             return DataResult<DownloadFileResponse>.Success(result);
         }
         catch (RpcException ex)
@@ -186,6 +188,35 @@ public class GrpcFileServiceClient : IFileSerivceClient
         catch
         {
             return DataResult<DownloadFileResponse>.Failure(_defaultRpcFailure);
+        }
+    }
+
+    public async Task<Result> RemoveFileAsync(RemoveFileRequest request, CancellationToken? ct = null)
+    {
+        var serverRequest = new GrpcServer.RemoveFileRequest
+        {
+            FileGuid = request.Id.ToString(),
+        };
+        try
+        {
+            var response =
+                await _client.RemoveFileAsync(serverRequest, cancellationToken: ct ?? CancellationToken.None);
+
+            if (!response.WasFound)
+                return Result.NotFound($"File with id '{request.Id}' was not found");
+
+            if (!response.Success)
+                return Result.Failure(new Failure(500, $"Failed to remove file '{request.Id}'"));
+
+            return Result.Success();
+        }
+        catch (RpcException ex)
+        {
+            return ex.ToResult();
+        }
+        catch
+        {
+            return Result.Failure(_defaultRpcFailure);
         }
     }
 

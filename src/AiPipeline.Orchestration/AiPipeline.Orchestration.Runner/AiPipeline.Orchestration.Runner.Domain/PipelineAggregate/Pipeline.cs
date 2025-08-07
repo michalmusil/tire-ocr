@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
@@ -8,16 +9,15 @@ public class Pipeline
 
     public Guid Id { get; }
     private readonly List<PipelineStep> _steps;
-    private readonly List<Domain.FileAggregate.File> _pipelineFiles;
+    private readonly List<FileValueObject> _pipelineFiles;
     public IReadOnlyCollection<PipelineStep> Steps => _steps.AsReadOnly();
-    public IReadOnlyCollection<Domain.FileAggregate.File> Files => _pipelineFiles.AsReadOnly();
+    public IReadOnlyCollection<FileValueObject> Files => _pipelineFiles.AsReadOnly();
 
-    public Pipeline(Guid? id = null, List<PipelineStep>? steps = null,
-        List<Domain.FileAggregate.File>? pipelineFiles = null)
+    public Pipeline(Guid? id = null, List<PipelineStep>? steps = null, List<FileValueObject>? pipelineFiles = null)
     {
         Id = id ?? Guid.NewGuid();
         _steps = steps ?? new List<PipelineStep>();
-        _pipelineFiles = pipelineFiles ?? new List<Domain.FileAggregate.File>();
+        _pipelineFiles = pipelineFiles ?? new List<FileValueObject>();
     }
 
     public Result Validate()
@@ -48,7 +48,7 @@ public class Pipeline
         return _steps.Remove(step);
     }
 
-    public Result AddFile(Domain.FileAggregate.File file)
+    public Result AddFile(FileValueObject file)
     {
         var alreadyContained = _pipelineFiles.Any(s => s.Id == file.Id);
         if (alreadyContained)
@@ -57,7 +57,7 @@ public class Pipeline
         return Result.Success();
     }
 
-    public bool RemoveFile(Domain.FileAggregate.File file)
+    public bool RemoveFile(FileValueObject file)
     {
         return _pipelineFiles.Remove(file);
     }

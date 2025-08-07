@@ -7,11 +7,11 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.FileService.Infrastructure.File.Repositories;
 
-public class FileRepository : IFileRepository
+public class FileEntityRepository : IFileEntityRepository
 {
     private readonly FileServiceDbContext _dbContext;
 
-    public FileRepository(FileServiceDbContext dbContext)
+    public FileEntityRepository(FileServiceDbContext dbContext)
     {
         _dbContext = dbContext;
     }

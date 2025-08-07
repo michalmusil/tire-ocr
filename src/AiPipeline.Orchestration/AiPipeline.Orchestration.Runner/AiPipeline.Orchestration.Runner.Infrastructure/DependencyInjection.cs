@@ -29,18 +29,16 @@ public static class DependencyInjection
         AddProviders(services);
         AddServices(services);
         AddFacades(services);
-        AddFileServiceSdk(services);
-        AddS3Storage(services, configuration);
+        AddGrpcFileService(services);
         AddDbContext(services, configuration);
         return services;
     }
 
     private static void AddRepositories(IServiceCollection services)
     {
-        services.AddScoped<INodeTypeRepository, NodeTypeRepository>();
-        services.AddScoped<IPipelineResultRepository, PipelineResultRepository>();
+        services.AddScoped<INodeTypeEntityRepository, NodeTypeEntityRepository>();
+        services.AddScoped<IPipelineResultEntityRepository, PipelineResultEntityRepository>();
         services.AddScoped<IFileRepository, FileRepositoryGrpc>();
-        services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
 
     public static void AddUnitOfWork(this IServiceCollection serviceCollection)
@@ -64,27 +62,9 @@ public static class DependencyInjection
         services.AddScoped<IPipelineRunnerFacade, PipelineRunnerFacade>();
     }
 
-    private static void AddFileServiceSdk(IServiceCollection services)
+    private static void AddGrpcFileService(IServiceCollection services)
     {
         services.AddFileServiceSdk(new Uri("http://FileService"));
-    }
-
-    private static void AddS3Storage(IServiceCollection services, IConfiguration configuration)
-    {
-        // Minio client doesn't support base addresses starting with protocol
-        var uri = configuration
-            .GetValue<string>("services:minio:api:0")
-            ?.Replace("http://", "")
-            .Replace("https://", "");
-        var username = configuration.GetValue<string>("MINIO_USERNAME");
-        var password = configuration.GetValue<string>("MINIO_PASSWORD");
-
-        services.AddMinio(configureClient => configureClient
-            .WithEndpoint(uri)
-            .WithCredentials(username, password)
-            .WithSSL(false)
-            .Build()
-        );
     }
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)

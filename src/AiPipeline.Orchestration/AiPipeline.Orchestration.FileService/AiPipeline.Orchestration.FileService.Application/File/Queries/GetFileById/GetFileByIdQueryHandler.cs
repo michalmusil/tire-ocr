@@ -8,10 +8,10 @@ namespace AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileB
 
 public class GetFileByIdQueryHandler : IQueryHandler<GetFileByIdQuery, GetFileDto>
 {
-    private readonly IFileRepository _fileEntityRepository;
+    private readonly IFileEntityRepository _fileEntityRepository;
     private readonly ILogger<GetFileByIdQueryHandler> _logger;
 
-    public GetFileByIdQueryHandler(IFileRepository fileEntityRepository,
+    public GetFileByIdQueryHandler(IFileEntityRepository fileEntityRepository,
         ILogger<GetFileByIdQueryHandler> logger)
     {
         _fileEntityRepository = fileEntityRepository;

@@ -6,4 +6,4 @@ using TireOcr.Shared.UseCase;
 namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetFilesPaginated;
 
 public record GetFilesPaginatedQuery(PaginationParams Pagination, FileStorageScope? ScopeFilter = null)
-    : IQuery<PaginatedCollection<GetFileDto>>;
+    : IQuery<PaginatedCollection<FileDto>>;

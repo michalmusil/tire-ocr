@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.FileService.Application.File.Commands.RemoveFile;
 using AiPipeline.Orchestration.FileService.Application.File.Commands.SaveFile;
 using AiPipeline.Orchestration.FileService.Application.File.Dtos;
 using AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileById;
@@ -107,7 +108,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
 
         var command = new SaveFileCommand(
             FileStream: fileStream,
-            FileStorageScope: FileStorageScope.ShortTerm,
+            FileStorageScope: request.StorageScope.ToFileStorageScope() ?? FileStorageScope.ShortTerm,
             ContentType: request.ContentType,
             OriginalFileName: request.FileName,
             Id: fileGuid
@@ -139,6 +140,26 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         {
             ContentType = contentType,
             FileData = fileData
+        };
+    }
+
+    public override async Task<RemoveFileResponse> RemoveFile(RemoveFileRequest request, ServerCallContext context)
+    {
+        var fileGuid = new Guid(request.FileGuid);
+        var command = new RemoveFileCommand(fileGuid);
+        var result = await _mediator.Send(command);
+
+        if (result.IsFailure)
+            return new RemoveFileResponse
+            {
+                Success = false,
+                WasFound = result.PrimaryFailure?.Code != 404
+            };
+
+        return new RemoveFileResponse
+        {
+            Success = true,
+            WasFound = true
         };
     }
 

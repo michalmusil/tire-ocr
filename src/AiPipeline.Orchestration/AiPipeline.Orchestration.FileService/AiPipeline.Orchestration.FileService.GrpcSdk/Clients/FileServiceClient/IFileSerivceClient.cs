@@ -2,6 +2,7 @@ using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.DownloadFile;
 using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetAllFiles;
 using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFileById;
 using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFilesByIds;
+using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.RemoveFile;
 using AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.UploadFile;
 using TireOcr.Shared.Result;
 
@@ -23,4 +24,6 @@ public interface IFileSerivceClient
 
     public Task<DataResult<DownloadFileResponse>> DownloadFileAsync(DownloadFileRequest request,
         CancellationToken? ct = null);
+
+    public Task<Result> RemoveFileAsync(RemoveFileRequest request, CancellationToken? ct = null);
 }

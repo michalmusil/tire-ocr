@@ -7,22 +7,19 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
 
 public class UnitOfWork : IUnitOfWork
 {
-    public INodeTypeRepository NodeTypeRepository { get; }
-    public IPipelineResultRepository PipelineResultRepository { get; }
-    public IFileRepository FileRepository { get; }
+    public INodeTypeEntityRepository NodeTypeEntityRepository { get; }
+    public IPipelineResultEntityRepository PipelineResultEntityRepository { get; }
 
-    public UnitOfWork(INodeTypeRepository nodeTypeRepository, IPipelineResultRepository pipelineResultRepository,
-        IFileRepository fileRepository)
+    public UnitOfWork(INodeTypeEntityRepository nodeTypeEntityRepository,
+        IPipelineResultEntityRepository pipelineResultEntityRepository)
     {
-        NodeTypeRepository = nodeTypeRepository;
-        PipelineResultRepository = pipelineResultRepository;
-        FileRepository = fileRepository;
+        NodeTypeEntityRepository = nodeTypeEntityRepository;
+        PipelineResultEntityRepository = pipelineResultEntityRepository;
     }
 
     public async Task SaveChangesAsync()
     {
-        await NodeTypeRepository.SaveChangesAsync();
-        await PipelineResultRepository.SaveChangesAsync();
-        await FileRepository.SaveChangesAsync();
+        await NodeTypeEntityRepository.SaveChangesAsync();
+        await PipelineResultEntityRepository.SaveChangesAsync();
     }
 }

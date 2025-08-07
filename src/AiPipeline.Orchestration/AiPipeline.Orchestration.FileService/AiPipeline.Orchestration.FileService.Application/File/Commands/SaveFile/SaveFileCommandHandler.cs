@@ -8,11 +8,11 @@ namespace AiPipeline.Orchestration.FileService.Application.File.Commands.SaveFil
 
 public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDto>
 {
-    private readonly IFileRepository _fileEntityRepository;
+    private readonly IFileEntityRepository _fileEntityRepository;
     private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
     private readonly ILogger<SaveFileCommandHandler> _logger;
 
-    public SaveFileCommandHandler(IFileRepository fileEntityRepository,
+    public SaveFileCommandHandler(IFileEntityRepository fileEntityRepository,
         IFileStorageProviderRepository fileStorageProviderRepository,
         ILogger<SaveFileCommandHandler> logger)
     {

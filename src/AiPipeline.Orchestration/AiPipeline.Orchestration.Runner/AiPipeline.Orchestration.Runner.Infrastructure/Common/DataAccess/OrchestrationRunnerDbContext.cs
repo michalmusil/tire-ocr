@@ -12,7 +12,6 @@ public class OrchestrationRunnerDbContext : DbContext
 
     public DbSet<Domain.NodeTypeAggregate.NodeType> NodeTypes => Set<Domain.NodeTypeAggregate.NodeType>();
     public DbSet<Domain.PipelineResultAggregate.PipelineResult> PipelineResults => Set<Domain.PipelineResultAggregate.PipelineResult>();
-    public DbSet<Domain.FileAggregate.File> Files => Set<Domain.FileAggregate.File>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,6 +1,8 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Builders;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
+using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
 using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
@@ -12,10 +14,11 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;
 public class PipelineBuilder : IPipelineBuilder
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileRepository _fileRepository;
 
     private IApElement? _pipelineInput;
     private readonly List<RunPipelineStepDto> _steps;
-    private readonly List<Domain.FileAggregate.File> _files;
+    private readonly List<FileValueObject> _files;
 
     public IApElement? PipelineInput => _pipelineInput;
     public IReadOnlyCollection<RunPipelineStepDto> Steps => _steps.AsReadOnly();
@@ -23,12 +26,13 @@ public class PipelineBuilder : IPipelineBuilder
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
 
-    public PipelineBuilder(IUnitOfWork unitOfWork)
+    public PipelineBuilder(IUnitOfWork unitOfWork, IFileRepository fileRepository)
     {
         _unitOfWork = unitOfWork;
+        _fileRepository = fileRepository;
         _pipelineInput = null;
         _steps = new List<RunPipelineStepDto>();
-        _files = new List<Domain.FileAggregate.File>();
+        _files = new List<FileValueObject>();
     }
 
 
@@ -112,7 +116,7 @@ public class PipelineBuilder : IPipelineBuilder
     private async Task<List<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesForAllStepsAsync()
     {
         var nodeIds = _steps.Select(s => s.NodeId).ToArray();
-        return (await _unitOfWork.NodeTypeRepository.GetNodeTypesByIdsAsync(nodeIds))
+        return (await _unitOfWork.NodeTypeEntityRepository.GetNodeTypesByIdsAsync(nodeIds))
             .ToList();
     }
 
@@ -141,7 +145,7 @@ public class PipelineBuilder : IPipelineBuilder
                     .Distinct()
                     .ToArray();
 
-                var foundFiles = (await _unitOfWork.FileRepository.GetFilesByIdsAsync(fileIds))
+                var foundFiles = (await _fileRepository.GetFilesByIdsAsync(fileIds))
                     .ToList();
                 _files.Clear();
                 _files.AddRange(foundFiles);

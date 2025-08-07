@@ -3,4 +3,4 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Contracts.Files.GetAllFiles;
 
-public record GetAllFilesResponse(IEnumerable<GetFileDto> Items, Pagination Pagination);
+public record GetAllFilesResponse(IEnumerable<FileDto> Items, Pagination Pagination);

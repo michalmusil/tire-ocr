@@ -7,11 +7,11 @@ namespace AiPipeline.Orchestration.FileService.Application.File.Commands.RemoveF
 
 public class RemoveFileCommandHandler : ICommandHandler<RemoveFileCommand>
 {
-    private readonly IFileRepository _fileEntityRepository;
+    private readonly IFileEntityRepository _fileEntityRepository;
     private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
     private readonly ILogger<RemoveFileCommandHandler> _logger;
 
-    public RemoveFileCommandHandler(IFileRepository fileEntityRepository,
+    public RemoveFileCommandHandler(IFileEntityRepository fileEntityRepository,
         IFileStorageProviderRepository fileStorageProviderRepository, ILogger<RemoveFileCommandHandler> logger)
     {
         _fileEntityRepository = fileEntityRepository;

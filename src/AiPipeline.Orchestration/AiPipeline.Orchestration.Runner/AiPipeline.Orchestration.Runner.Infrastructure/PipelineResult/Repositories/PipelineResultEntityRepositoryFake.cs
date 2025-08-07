@@ -3,7 +3,7 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
 
-public class PipelineResultRepositoryFake : IPipelineResultRepository
+public class PipelineResultEntityRepositoryFake : IPipelineResultEntityRepository
 {
     private static List<Domain.PipelineResultAggregate.PipelineResult> _pipelineResults = [];
 

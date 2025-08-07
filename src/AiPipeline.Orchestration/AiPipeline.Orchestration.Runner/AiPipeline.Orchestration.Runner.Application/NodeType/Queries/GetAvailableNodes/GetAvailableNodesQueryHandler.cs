@@ -24,7 +24,7 @@ public class GetAvailableNodesQueryHandler : IQueryHandler<GetAvailableNodesQuer
         CancellationToken cancellationToken
     )
     {
-        var foundNodes = await _unitOfWork.NodeTypeRepository.GetNodeTypesPaginatedAsync(request.Pagination);
+        var foundNodes = await _unitOfWork.NodeTypeEntityRepository.GetNodeTypesPaginatedAsync(request.Pagination);
         var nodeDtos = foundNodes.Items
             .Select(GetNodeDto.FromDomain)
             .ToList();

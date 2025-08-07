@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Dtos;
 
-public record GetFileDto(
+public record FileDto(
     Guid Id,
     FileStorageScope FileStorageScope,
     string ContentType,
@@ -10,9 +10,9 @@ public record GetFileDto(
     string Path
 )
 {
-    public static GetFileDto FromDomain(Domain.FileAggregate.File domain)
+    public static FileDto FromDomain(FileValueObject domain)
     {
-        return new GetFileDto(
+        return new FileDto(
             Id: domain.Id,
             FileStorageScope: domain.FileStorageScope,
             ContentType: domain.ContentType,

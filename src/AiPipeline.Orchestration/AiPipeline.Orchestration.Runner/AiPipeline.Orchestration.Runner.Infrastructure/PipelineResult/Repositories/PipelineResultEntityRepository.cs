@@ -6,11 +6,11 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
 
-public class PipelineResultRepository : IPipelineResultRepository
+public class PipelineResultEntityRepository : IPipelineResultEntityRepository
 {
     private readonly OrchestrationRunnerDbContext _dbContext;
 
-    public PipelineResultRepository(OrchestrationRunnerDbContext dbContext)
+    public PipelineResultEntityRepository(OrchestrationRunnerDbContext dbContext)
     {
         _dbContext = dbContext;
     }

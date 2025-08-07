@@ -43,7 +43,7 @@ public class FilesController : ControllerBase
         );
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<PaginatedCollection<GetFileDto>, GetAllFilesResponse>(
+        return result.ToActionResult<PaginatedCollection<FileDto>, GetAllFilesResponse>(
             onSuccess: dto => new GetAllFilesResponse(dto.Items, dto.Pagination)
         );
     }
@@ -58,7 +58,7 @@ public class FilesController : ControllerBase
         var query = new GetFileByIdQuery(fileId);
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<GetFileDto, GetFileByIdResponse>(
+        return result.ToActionResult<FileDto, GetFileByIdResponse>(
             onSuccess: dto => new GetFileByIdResponse(dto)
         );
     }
@@ -83,7 +83,7 @@ public class FilesController : ControllerBase
         );
 
         var result = await _mediator.Send(command);
-        return result.ToActionResult<GetFileDto, UploadFileResponse>(
+        return result.ToActionResult<FileDto, UploadFileResponse>(
             onSuccess: dto =>
             {
                 var createdAt = Url.Action("GetFileById", new { fileId = dto.Id });

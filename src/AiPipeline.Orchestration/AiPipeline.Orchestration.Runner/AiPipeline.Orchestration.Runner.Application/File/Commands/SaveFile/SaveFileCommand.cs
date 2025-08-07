@@ -10,4 +10,4 @@ public record SaveFileCommand(
     string ContentType,
     string OriginalFileName,
     Guid? Id = null
-) : ICommand<GetFileDto>;
+) : ICommand<FileDto>;

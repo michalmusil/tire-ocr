@@ -3,7 +3,7 @@ using TireOcr.Shared.Pagination;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
 
-public class NodeTypeRepositoryFake : INodeTypeRepository
+public class NodeTypeEntityRepositoryFake : INodeTypeEntityRepository
 {
     private static readonly List<Domain.NodeTypeAggregate.NodeType> NodeTypes = [];
 

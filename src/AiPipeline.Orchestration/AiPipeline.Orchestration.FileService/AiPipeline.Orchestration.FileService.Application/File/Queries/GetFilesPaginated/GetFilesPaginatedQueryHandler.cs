@@ -9,10 +9,10 @@ namespace AiPipeline.Orchestration.FileService.Application.File.Queries.GetFiles
 
 public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuery, PaginatedCollection<GetFileDto>>
 {
-    private readonly IFileRepository _fileEntityRepository;
+    private readonly IFileEntityRepository _fileEntityRepository;
     private readonly ILogger<GetFilesPaginatedQueryHandler> _logger;
 
-    public GetFilesPaginatedQueryHandler(IFileRepository fileEntityRepository,
+    public GetFilesPaginatedQueryHandler(IFileEntityRepository fileEntityRepository,
         ILogger<GetFilesPaginatedQueryHandler> logger)
     {
         _fileEntityRepository = fileEntityRepository;

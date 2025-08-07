@@ -20,7 +20,7 @@ public static class DependencyInjection
 
     private static void AddRepositories(IServiceCollection services)
     {
-        services.AddScoped<IFileRepository, FileRepository>();
+        services.AddScoped<IFileEntityRepository, FileEntityRepository>();
         services.AddScoped<IFileStorageProviderRepository, FileStorageMinioRepository>();
     }
 

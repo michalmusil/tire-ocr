@@ -1,5 +1,6 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -7,40 +8,39 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetFilesPaginated;
 
-public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuery, PaginatedCollection<GetFileDto>>
+public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuery, PaginatedCollection<FileDto>>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileRepository _fileRepository;
     private readonly ILogger<GetFilesPaginatedQueryHandler> _logger;
 
-    public GetFilesPaginatedQueryHandler(IUnitOfWork unitOfWork,
+    public GetFilesPaginatedQueryHandler(IFileRepository fileRepository,
         ILogger<GetFilesPaginatedQueryHandler> logger)
     {
-        _unitOfWork = unitOfWork;
+        _fileRepository = fileRepository;
         _logger = logger;
     }
 
-    public async Task<DataResult<PaginatedCollection<GetFileDto>>> Handle(
+    public async Task<DataResult<PaginatedCollection<FileDto>>> Handle(
         GetFilesPaginatedQuery request,
         CancellationToken cancellationToken
     )
     {
         var foundFiles =
-            await _unitOfWork
-                .FileRepository
+            await _fileRepository
                 .GetFilesPaginatedAsync(request.Pagination,
                     storageScope: request.ScopeFilter
                 );
 
         var fileDtos = foundFiles.Items
-            .Select(GetFileDto.FromDomain)
+            .Select(FileDto.FromDomain)
             .ToList();
-        var dtosCollection = new PaginatedCollection<GetFileDto>(
+        var dtosCollection = new PaginatedCollection<FileDto>(
             fileDtos,
             totalCount: foundFiles.Pagination.TotalCount,
             pageNumber: foundFiles.Pagination.PageNumber,
             pageSize: foundFiles.Pagination.PageSize
         );
 
-        return DataResult<PaginatedCollection<GetFileDto>>.Success(dtosCollection);
+        return DataResult<PaginatedCollection<FileDto>>.Success(dtosCollection);
     }
 }

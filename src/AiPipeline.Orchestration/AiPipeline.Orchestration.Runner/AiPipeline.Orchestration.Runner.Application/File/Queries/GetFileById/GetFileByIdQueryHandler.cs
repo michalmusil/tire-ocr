@@ -1,35 +1,35 @@
 using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
+using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Queries.GetFileById;
 
-public class GetFileByIdQueryHandler : IQueryHandler<GetFileByIdQuery, GetFileDto>
+public class GetFileByIdQueryHandler : IQueryHandler<GetFileByIdQuery, FileDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IFileRepository _fileRepository;
     private readonly ILogger<GetFileByIdQueryHandler> _logger;
 
-    public GetFileByIdQueryHandler(IUnitOfWork unitOfWork,
+    public GetFileByIdQueryHandler(IFileRepository fileRepository,
         ILogger<GetFileByIdQueryHandler> logger)
     {
-        _unitOfWork = unitOfWork;
+        _fileRepository = fileRepository;
         _logger = logger;
     }
 
-    public async Task<DataResult<GetFileDto>> Handle(
+    public async Task<DataResult<FileDto>> Handle(
         GetFileByIdQuery request,
         CancellationToken cancellationToken
     )
     {
-        var foundFile = await _unitOfWork
-            .FileRepository
+        var foundFile = await _fileRepository
             .GetFileByIdAsync(request.Id);
         if (foundFile is null)
-            return DataResult<GetFileDto>.NotFound($"File with id {request.Id} not found");
+            return DataResult<FileDto>.NotFound($"File with id {request.Id} not found");
 
-        var dto = GetFileDto.FromDomain(foundFile);
-        return DataResult<GetFileDto>.Success(dto);
+        var dto = FileDto.FromDomain(foundFile);
+        return DataResult<FileDto>.Success(dto);
     }
 }

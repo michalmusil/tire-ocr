@@ -24,7 +24,7 @@ public class AddStepToResultCommandHandler : ICommandHandler<AddStepToResultComm
     )
     {
         var existingResult = await _unitOfWork
-            .PipelineResultRepository
+            .PipelineResultEntityRepository
             .GetPipelineResultByPipelineIdAsync(request.PipelineId);
         if (existingResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} not found");

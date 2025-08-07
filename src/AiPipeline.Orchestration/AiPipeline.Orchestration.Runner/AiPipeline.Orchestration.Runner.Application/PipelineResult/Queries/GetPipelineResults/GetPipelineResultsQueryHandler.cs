@@ -26,7 +26,7 @@ public class
     )
     {
         var foundResults = await _unitOfWork
-            .PipelineResultRepository
+            .PipelineResultEntityRepository
             .GetPipelineResultsPaginatedAsync(request.Pagination);
         var resultDtos = foundResults.Items
             .Select(GetPipelineResultDto.FromDomain)

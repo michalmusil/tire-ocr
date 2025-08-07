@@ -3,7 +3,7 @@ using TireOcr.Shared.Persistence;
 
 namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
 
-public interface IPipelineResultRepository: IRepository
+public interface IPipelineResultEntityRepository: IEntityRepository
 {
     public Task<PaginatedCollection<Domain.PipelineResultAggregate.PipelineResult>> GetPipelineResultsPaginatedAsync(
         PaginationParams pagination

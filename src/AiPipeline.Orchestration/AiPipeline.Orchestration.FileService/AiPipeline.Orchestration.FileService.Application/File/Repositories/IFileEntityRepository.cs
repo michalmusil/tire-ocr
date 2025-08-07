@@ -4,7 +4,7 @@ using TireOcr.Shared.Persistence;
 
 namespace AiPipeline.Orchestration.FileService.Application.File.Repositories;
 
-public interface IFileRepository : IRepository
+public interface IFileEntityRepository : IEntityRepository
 {
     public Task<PaginatedCollection<Domain.FileAggregate.File>> GetFilesPaginatedAsync(
         PaginationParams pagination, FileStorageScope? storageScope = null

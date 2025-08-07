@@ -10,6 +10,7 @@ service FileServiceInterface {
   rpc GetFilesByIds (GetFilesByIdsRequest) returns (GetFilesByIdsResponse);
   rpc UploadFile (UploadFileRequest) returns (UploadFileResponse);
   rpc DownloadFile (DownloadFileRequest) returns (DownloadFileResponse);
+  rpc RemoveFile (RemoveFileRequest) returns (RemoveFileResponse);
 }
 
 
@@ -73,7 +74,8 @@ message UploadFileRequest {
   string file_name = 1;
   string content_type = 2;
   bytes file_data = 3;
-  optional string file_guid = 4;
+  StorageScope storage_scope = 4;
+  optional string file_guid = 5;
 }
 
 message UploadFileResponse {
@@ -88,4 +90,14 @@ message DownloadFileRequest {
 message DownloadFileResponse {
   bytes file_data = 1;
   string content_type = 2;
+}
+
+// REMOVE FILE
+message RemoveFileRequest {
+  string file_guid = 1;
+}
+
+message RemoveFileResponse {
+  bool success = 1;
+  bool wasFound = 2;
 }

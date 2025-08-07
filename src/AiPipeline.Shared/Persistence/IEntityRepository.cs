@@ -1,6 +1,6 @@
 namespace TireOcr.Shared.Persistence;
 
-public interface IRepository
+public interface IEntityRepository
 {
     public Task<int> SaveChangesAsync();
 }

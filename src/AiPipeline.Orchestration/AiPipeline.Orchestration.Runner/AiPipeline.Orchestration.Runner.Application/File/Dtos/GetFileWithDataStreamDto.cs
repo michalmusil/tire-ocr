@@ -1,3 +1,3 @@
 namespace AiPipeline.Orchestration.Runner.Application.File.Dtos;
 
-public record GetFileWithDataStreamDto(GetFileDto File, Stream DataStream);
+public record GetFileWithDataStreamDto(FileDto File, Stream DataStream);

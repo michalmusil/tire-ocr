@@ -7,22 +7,19 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.File.Commands.SaveFile;
 
-public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDto>
+public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, FileDto>
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
+    private readonly IFileRepository _fileRepository;
     private readonly ILogger<SaveFileCommandHandler> _logger;
 
-    public SaveFileCommandHandler(IUnitOfWork unitOfWork, IFileStorageProviderRepository fileStorageProviderRepository,
-        ILogger<SaveFileCommandHandler> logger)
+    public SaveFileCommandHandler(IFileRepository fileRepository, ILogger<SaveFileCommandHandler> logger)
     {
-        _unitOfWork = unitOfWork;
-        _fileStorageProviderRepository = fileStorageProviderRepository;
+        _fileRepository = fileRepository;
         _logger = logger;
     }
 
 
-    public async Task<DataResult<GetFileDto>> Handle(
+    public async Task<DataResult<FileDto>> Handle(
         SaveFileCommand request,
         CancellationToken cancellationToken
     )
@@ -31,35 +28,20 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
         var fileId = request.Id ?? Guid.NewGuid();
         var fileExtension = Path.GetExtension(request.OriginalFileName);
         if (string.IsNullOrEmpty(fileExtension))
-            return DataResult<GetFileDto>.Invalid($"File name {request.OriginalFileName} is invalid.");
+            return DataResult<FileDto>.Invalid($"File name {request.OriginalFileName} is invalid.");
 
         var fileName = $"{fileId}{fileExtension}";
-        var saved = await _fileStorageProviderRepository.UploadFileAsync(
+        var saveFileResult = await _fileRepository.Add(
             fileStream: stream,
             contentType: request.ContentType,
-            scope: request.FileStorageScope,
-            fileName: fileName
+            fileName: fileName,
+            guid: fileId
         );
 
-        if (!saved)
-            return DataResult<GetFileDto>.Failure(new Failure(500, "Failed to store file data"));
+        if (saveFileResult.IsFailure)
+            return DataResult<FileDto>.Failure(saveFileResult.Failures);
 
-        var storageProviderName = _fileStorageProviderRepository.GetProviderName();
-        var filePath = _fileStorageProviderRepository.GetFullFilePathFor(request.FileStorageScope, fileName);
-        var file = new Domain.FileAggregate.File(
-            id: fileId,
-            fileStorageScope: request.FileStorageScope,
-            storageProvider: storageProviderName,
-            path: filePath,
-            contentType: request.ContentType
-        );
-
-        await _unitOfWork
-            .FileRepository
-            .Add(file);
-        await _unitOfWork.SaveChangesAsync();
-
-        var dto = GetFileDto.FromDomain(file);
-        return DataResult<GetFileDto>.Success(dto);
+        var dto = FileDto.FromDomain(saveFileResult.Data!);
+        return DataResult<FileDto>.Success(dto);
     }
 }

@@ -6,9 +6,8 @@ namespace AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 
 public interface IUnitOfWork
 {
-    INodeTypeRepository NodeTypeRepository { get; }
-    IPipelineResultRepository PipelineResultRepository { get; }
-    IFileRepository FileRepository { get; }
+    INodeTypeEntityRepository NodeTypeEntityRepository { get; }
+    IPipelineResultEntityRepository PipelineResultEntityRepository { get; }
 
     Task SaveChangesAsync();
 }
