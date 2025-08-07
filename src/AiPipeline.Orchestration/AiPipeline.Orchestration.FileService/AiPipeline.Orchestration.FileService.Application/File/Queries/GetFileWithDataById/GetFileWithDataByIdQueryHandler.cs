@@ -6,14 +6,14 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileWithDataById;
 
-public class GetFileByIdQueryHandler : IQueryHandler<GetFileWithDataByIdQuery, GetFileWithDataStreamDto>
+public class GetFileWithDataByIdQueryHandler : IQueryHandler<GetFileWithDataByIdQuery, GetFileWithDataStreamDto>
 {
     private readonly IFileRepository _fileEntityRepository;
     private readonly IFileStorageProviderRepository _fileStorageProviderRepository;
-    private readonly ILogger<GetFileByIdQueryHandler> _logger;
+    private readonly ILogger<GetFileWithDataByIdQueryHandler> _logger;
 
-    public GetFileByIdQueryHandler(IFileRepository fileEntityRepository,
-        IFileStorageProviderRepository fileStorageProviderRepository, ILogger<GetFileByIdQueryHandler> logger)
+    public GetFileWithDataByIdQueryHandler(IFileRepository fileEntityRepository,
+        IFileStorageProviderRepository fileStorageProviderRepository, ILogger<GetFileWithDataByIdQueryHandler> logger)
     {
         _fileEntityRepository = fileEntityRepository;
         _logger = logger;

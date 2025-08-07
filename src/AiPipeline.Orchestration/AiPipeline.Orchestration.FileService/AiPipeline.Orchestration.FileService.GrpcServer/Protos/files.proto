@@ -6,6 +6,10 @@ package files;
 
 service FileServiceInterface {
   rpc GetAllFilesPaginated (GetAllFilesRequest) returns (GetAllFilesResponse);
+  rpc GetFileById (GetFileByIdRequest) returns (GetFileByIdResponse);
+  rpc GetFilesByIds (GetFilesByIdsRequest) returns (GetFilesByIdsResponse);
+  rpc UploadFile (UploadFileRequest) returns (UploadFileResponse);
+  rpc DownloadFile (DownloadFileRequest) returns (DownloadFileResponse);
 }
 
 
@@ -27,7 +31,7 @@ message Pagination {
 }
 
 message FileDto {
-  string id = 1;
+  string file_guid = 1;
   StorageScope file_storage_scope = 2;
   string content_type = 3;
   string storage_provider = 4;
@@ -43,4 +47,45 @@ message GetAllFilesRequest {
 message GetAllFilesResponse {
   repeated FileDto items = 1;
   Pagination pagination = 2;
+}
+
+// GET FILE BY ID
+message GetFileByIdRequest {
+  string file_guid = 1;
+}
+
+message GetFileByIdResponse {
+  FileDto file = 1;
+}
+
+// GET FILES BY IDS
+message GetFilesByIdsRequest {
+  repeated string file_guids = 1;
+  bool fail_if_not_all_found = 2;
+}
+
+message GetFilesByIdsResponse {
+  repeated FileDto items = 1;
+}
+
+// UPLOAD FILE
+message UploadFileRequest {
+  string file_name = 1;
+  string content_type = 2;
+  bytes file_data = 3;
+  optional string file_guid = 4;
+}
+
+message UploadFileResponse {
+  FileDto file = 1;
+}
+
+// DOWNLOAD FILE
+message DownloadFileRequest {
+  string file_guid = 1;
+}
+
+message DownloadFileResponse {
+  bytes file_data = 1;
+  string content_type = 2;
 }

@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.FileService.Application.File.Dtos;
 using AiPipeline.Orchestration.FileService.Application.File.Repositories;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
@@ -5,7 +6,7 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.FileService.Application.File.Queries.GetFilesByIds;
 
-public class GetFilesByIdsQueryHandler : IQueryHandler<GetFilesByIdsQuery, IEnumerable<Domain.FileAggregate.File>>
+public class GetFilesByIdsQueryHandler : IQueryHandler<GetFilesByIdsQuery, IEnumerable<GetFileDto>>
 {
     private readonly IFileRepository _fileEntityRepository;
     private readonly ILogger<GetFilesByIdsQueryHandler> _logger;
@@ -17,7 +18,7 @@ public class GetFilesByIdsQueryHandler : IQueryHandler<GetFilesByIdsQuery, IEnum
         _logger = logger;
     }
 
-    public async Task<DataResult<IEnumerable<Domain.FileAggregate.File>>> Handle(
+    public async Task<DataResult<IEnumerable<GetFileDto>>> Handle(
         GetFilesByIdsQuery request,
         CancellationToken cancellationToken
     )
@@ -32,10 +33,13 @@ public class GetFilesByIdsQueryHandler : IQueryHandler<GetFilesByIdsQuery, IEnum
                 .Except(foundFiles.Select(x => x.Id))
                 .ToArray();
             if (notFoundFileIds.Any())
-                return DataResult<IEnumerable<Domain.FileAggregate.File>>.NotFound(
+                return DataResult<IEnumerable<GetFileDto>>.NotFound(
                     $"Some files were not found. Not found file ids: {string.Join(", ", notFoundFileIds)}");
         }
 
-        return DataResult<IEnumerable<Domain.FileAggregate.File>>.Success(foundFiles);
+        var fileDtos = foundFiles
+            .Select(GetFileDto.FromDomain)
+            .ToList();
+        return DataResult<IEnumerable<GetFileDto>>.Success(fileDtos);
     }
 }

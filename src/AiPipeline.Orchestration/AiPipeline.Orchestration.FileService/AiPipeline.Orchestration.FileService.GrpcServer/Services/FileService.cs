@@ -1,6 +1,13 @@
+using AiPipeline.Orchestration.FileService.Application.File.Commands.SaveFile;
+using AiPipeline.Orchestration.FileService.Application.File.Dtos;
+using AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileById;
+using AiPipeline.Orchestration.FileService.Application.File.Queries.GetFilesByIds;
 using AiPipeline.Orchestration.FileService.Application.File.Queries.GetFilesPaginated;
+using AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileWithDataById;
+using AiPipeline.Orchestration.FileService.Domain.FileAggregate;
 using Grpc.Core;
 using AiPipeline.Orchestration.FileService.GrpcServer.Extensions;
+using Google.Protobuf;
 using MediatR;
 using TireOcr.Shared.Pagination;
 
@@ -33,14 +40,8 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var data = result.Data!;
         var dataPagination = data.Pagination;
         var dataItems = data.Items
-            .Select(dto => new FileDto
-            {
-                Id = dto.Id.ToString(),
-                ContentType = dto.ContentType,
-                FileStorageScope = dto.FileStorageScope.ToStorageScope(),
-                Path = dto.Path,
-                StorageProvider = dto.StorageProvider
-            }).ToList();
+            .Select(MapToFileDto)
+            .ToList();
 
 
         var response = new GetAllFilesResponse
@@ -57,5 +58,99 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         response.Items.AddRange(dataItems);
 
         return response;
+    }
+
+    public override async Task<GetFileByIdResponse> GetFileById(GetFileByIdRequest request, ServerCallContext context)
+    {
+        var fileGuid = new Guid(request.FileGuid);
+        var query = new GetFileByIdQuery(fileGuid);
+        var result = await _mediator.Send(query);
+
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var fileDtoLocal = result.Data!;
+        var fileDtoResponse = MapToFileDto(fileDtoLocal);
+
+        return new GetFileByIdResponse
+        {
+            File = fileDtoResponse
+        };
+    }
+
+    public override async Task<GetFilesByIdsResponse> GetFilesByIds(GetFilesByIdsRequest request,
+        ServerCallContext context)
+    {
+        var guids = request.FileGuids
+            .Select(fg => new Guid(fg))
+            .Where(g => g != Guid.Empty)
+            .ToList();
+        var query = new GetFilesByIdsQuery(guids, request.FailIfNotAllFound);
+        var result = await _mediator.Send(query);
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var fileDtos = result.Data!
+            .Select(MapToFileDto)
+            .ToList();
+
+        var response = new GetFilesByIdsResponse();
+        response.Items.AddRange(fileDtos);
+        return response;
+    }
+
+    public override async Task<UploadFileResponse> UploadFile(UploadFileRequest request, ServerCallContext context)
+    {
+        Guid? fileGuid = request.FileGuid is null ? null : new Guid(request.FileGuid);
+        using var fileStream = new MemoryStream(request.FileData.ToByteArray());
+        fileStream.Position = 0;
+
+        var command = new SaveFileCommand(
+            FileStream: fileStream,
+            FileStorageScope: FileStorageScope.ShortTerm,
+            ContentType: request.ContentType,
+            OriginalFileName: request.FileName,
+            Id: fileGuid
+        );
+        var result = await _mediator.Send(command);
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var fileDtoLocal = result.Data!;
+        var fileDtoResponse = MapToFileDto(fileDtoLocal);
+
+        return new UploadFileResponse { File = fileDtoResponse };
+    }
+
+    public override async Task<DownloadFileResponse> DownloadFile(DownloadFileRequest request,
+        ServerCallContext context)
+    {
+        var fileGuid = new Guid(request.FileGuid);
+        var query = new GetFileWithDataByIdQuery(fileGuid);
+        var result = await _mediator.Send(query);
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var resultDtoLocal = result.Data!;
+        var contentType = resultDtoLocal.File.ContentType;
+
+        var fileData = await ByteString.FromStreamAsync(resultDtoLocal.DataStream);
+        return new DownloadFileResponse
+        {
+            ContentType = contentType,
+            FileData = fileData
+        };
+    }
+
+    private FileDto MapToFileDto(GetFileDto localDto)
+    {
+        return new FileDto
+        {
+            FileGuid = localDto.Id.ToString(),
+            ContentType = localDto.ContentType,
+            FileStorageScope = localDto.FileStorageScope.ToStorageScope(),
+            Path = localDto.Path,
+            StorageProvider = localDto.StorageProvider
+        };
     }
 }

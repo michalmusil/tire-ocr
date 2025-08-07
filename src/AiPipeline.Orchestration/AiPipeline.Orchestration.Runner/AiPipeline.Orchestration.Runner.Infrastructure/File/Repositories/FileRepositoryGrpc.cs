@@ -39,7 +39,7 @@ public class FileRepositoryGrpc : IFileRepository
 
         var localItems = remoteData.Items
             .Select(rf => new Domain.FileAggregate.File(
-                    new Guid(rf.Id),
+                    new Guid(rf.FileGuid),
                     GetFileStorageScope(rf.FileStorageScope) ?? FileStorageScope.Temporary,
                     rf.StorageProvider,
                     rf.Path,
