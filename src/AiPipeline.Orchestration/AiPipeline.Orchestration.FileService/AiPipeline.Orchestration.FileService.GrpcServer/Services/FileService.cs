@@ -36,7 +36,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            throw result.ToRpcException();
 
         var data = result.Data!;
         var dataPagination = data.Pagination;
@@ -68,7 +68,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            throw result.ToRpcException();
 
         var fileDtoLocal = result.Data!;
         var fileDtoResponse = MapToFileDto(fileDtoLocal);
@@ -89,7 +89,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var query = new GetFilesByIdsQuery(guids, request.FailIfNotAllFound);
         var result = await _mediator.Send(query);
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            throw result.ToRpcException();
 
         var fileDtos = result.Data!
             .Select(MapToFileDto)
@@ -115,7 +115,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         );
         var result = await _mediator.Send(command);
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            throw result.ToRpcException();
 
         var fileDtoLocal = result.Data!;
         var fileDtoResponse = MapToFileDto(fileDtoLocal);
@@ -130,7 +130,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var query = new GetFileWithDataByIdQuery(fileGuid);
         var result = await _mediator.Send(query);
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            throw result.ToRpcException();
 
         var resultDtoLocal = result.Data!;
         var contentType = resultDtoLocal.File.ContentType;

@@ -26,7 +26,9 @@ public static class RpcExceptionExtension
             StatusCode.AlreadyExists => new Failure(409, "Grpc failure: Already exists"),
             StatusCode.PermissionDenied => new Failure(403, "Grpc failure: Permission denied"),
             StatusCode.Unauthenticated => new Failure(401, "Grpc failure: Unauthenticated"),
-            _ => new Failure(500, "Grpc failure: Unexpected"),
+            StatusCode.ResourceExhausted => new Failure(408, "Grpc failure: Resource exhausted"),
+            StatusCode.Cancelled => new Failure(499, "Grpc failure: Cancelled"),
+            _ => new Failure(500, "Grpc failure: Internal error"),
         };
     }
 }

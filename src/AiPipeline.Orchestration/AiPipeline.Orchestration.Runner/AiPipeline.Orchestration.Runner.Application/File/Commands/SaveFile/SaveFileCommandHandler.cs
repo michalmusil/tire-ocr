@@ -1,6 +1,6 @@
-using AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
+using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -35,6 +35,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, FileDto>
             fileStream: stream,
             contentType: request.ContentType,
             fileName: fileName,
+            storageScope: request.FileStorageScope,
             guid: fileId
         );
 

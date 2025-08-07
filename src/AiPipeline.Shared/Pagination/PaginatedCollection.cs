@@ -12,7 +12,6 @@ public record PaginatedCollection<T>
     public PaginatedCollection(IReadOnlyCollection<T> items, int totalCount, int pageNumber, int pageSize)
     {
         Items = items;
-
         var totalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
         Pagination = new Pagination
         (
@@ -22,6 +21,16 @@ public record PaginatedCollection<T>
             TotalCount: totalCount,
             HasPreviousPage: pageNumber > 1,
             HasNextPage: pageNumber < totalPages
+        );
+    }
+
+    public static PaginatedCollection<T> Empty<T>(int pageNumber, int pageSize)
+    {
+        return new PaginatedCollection<T>(
+            items: new List<T>(),
+            totalCount: 0,
+            pageNumber: pageNumber,
+            pageSize: pageSize
         );
     }
 }

@@ -13,6 +13,9 @@ public interface IFileRepository
     public Task<IEnumerable<FileValueObject>> GetFilesByIdsAsync(params Guid[] fileIds);
     public Task<FileValueObject?> GetFileByIdAsync(Guid fileId);
     public Task<Stream?> GetFileDataByIdAsync(Guid fileId);
-    public Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream, Guid? guid);
-    public Task<Result> Remove(Guid file);
+
+    public Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream,
+        FileStorageScope? storageScope, Guid? guid);
+
+    public Task<Result> Remove(Guid fileId);
 }

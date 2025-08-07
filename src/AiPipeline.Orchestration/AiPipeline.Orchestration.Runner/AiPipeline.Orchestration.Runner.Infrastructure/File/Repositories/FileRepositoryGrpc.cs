@@ -1,9 +1,17 @@
 using AiPipeline.Orchestration.FileService.GrpcSdk.Clients.FileServiceClient;
-using AiPipeline.Orchestration.FileService.GrpcServer;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
+using AiPipeline.Orchestration.Runner.Infrastructure.File.Extensions;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
+using DownloadFileRequest =
+    AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.DownloadFile.DownloadFileRequest;
+using GetAllFilesRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetAllFiles.GetAllFilesRequest;
+using GetFileByIdRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFileById.GetFileByIdRequest;
+using GetFilesByIdsRequest =
+    AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetFilesByIds.GetFilesByIdsRequest;
+using RemoveFileRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.RemoveFile.RemoveFileRequest;
+using UploadFileRequest = AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.UploadFile.UploadFileRequest;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.File.Repositories;
 
@@ -16,33 +24,120 @@ public class FileRepositoryGrpc : IFileRepository
         _grpcClient = grpcClient;
     }
 
-    public Task<PaginatedCollection<FileValueObject>> GetFilesPaginatedAsync(PaginationParams pagination, FileStorageScope? storageScope = null)
+    public async Task<PaginatedCollection<FileValueObject>> GetFilesPaginatedAsync(PaginationParams pagination,
+        FileStorageScope? storageScope = null)
     {
-        throw new NotImplementedException();
+        var serverStorageScope = storageScope.ToGrpcServerStorageScope();
+        var request = new GetAllFilesRequest(
+            serverStorageScope,
+            PageNumber: pagination.PageNumber,
+            PageSize: pagination.PageSize
+        );
+        var result = await _grpcClient.GetAllFilesPaginatedAsync(request);
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var data = result.Data!;
+        var valueObjects = data.Items
+            .Select(MapGrpcFileToLocalValueObject)
+            .ToList();
+        var collection = new PaginatedCollection<FileValueObject>(
+            items: valueObjects,
+            pageNumber: data.Pagination.PageNumber,
+            pageSize: data.Pagination.PageSize,
+            totalCount: data.Pagination.TotalCount
+        );
+        return collection;
     }
 
-    public Task<IEnumerable<FileValueObject>> GetFilesByIdsAsync(params Guid[] fileIds)
+    public async Task<IEnumerable<FileValueObject>> GetFilesByIdsAsync(params Guid[] fileIds)
     {
-        throw new NotImplementedException();
+        var request = new GetFilesByIdsRequest(fileIds, true);
+        var result = await _grpcClient.GetFilesByIdsAsync(request);
+        if (result.IsFailure)
+            result.PrimaryFailure!.ThrowAsException();
+
+        var valueObjects = result.Data!.Items.Select(MapGrpcFileToLocalValueObject);
+        return valueObjects;
     }
 
-    public Task<FileValueObject?> GetFileByIdAsync(Guid fileId)
+    public async Task<FileValueObject?> GetFileByIdAsync(Guid fileId)
     {
-        throw new NotImplementedException();
+        var request = new GetFileByIdRequest(fileId);
+        var result = await _grpcClient.GetFileByIdAsync(request);
+        if (result.IsFailure)
+        {
+            if (result.PrimaryFailure!.Code == 404)
+                return null;
+
+            result.PrimaryFailure!.ThrowAsException();
+        }
+
+        var valueObject = MapGrpcFileToLocalValueObject(result.Data!.File);
+        return valueObject;
     }
 
-    public Task<Stream?> GetFileDataByIdAsync(Guid fileId)
+    public async Task<Stream?> GetFileDataByIdAsync(Guid fileId)
     {
-        throw new NotImplementedException();
+        var request = new DownloadFileRequest(fileId);
+        var result = await _grpcClient.DownloadFileAsync(request);
+        if (result.IsFailure)
+        {
+            if (result.PrimaryFailure!.Code == 404)
+                return null;
+
+            result.PrimaryFailure!.ThrowAsException();
+        }
+
+        return result.Data!.FileData;
     }
 
-    public Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream, Guid? guid)
+    public async Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream,
+        FileStorageScope? storageScope, Guid? guid)
     {
-        throw new NotImplementedException();
+        var request = new UploadFileRequest(
+            FileName: fileName,
+            ContentType: contentType,
+            FileData: fileStream,
+            Id: guid,
+            FileStorageScope: storageScope.ToGrpcServerStorageScope() ??
+                              FileService.Domain.FileAggregate.FileStorageScope.ShortTerm
+        );
+        var result = await _grpcClient.UploadFileAsync(request);
+        if (result.IsFailure)
+            return DataResult<FileValueObject>.Failure(result.Failures);
+
+        var valueObject = MapGrpcFileToLocalValueObject(result.Data!.File);
+        return DataResult<FileValueObject>.Success(valueObject);
     }
 
-    public Task<Result> Remove(Guid file)
+    public async Task<Result> Remove(Guid fileId)
     {
-        throw new NotImplementedException();
+        var request = new RemoveFileRequest(fileId);
+        return await _grpcClient.RemoveFileAsync(request);
+    }
+
+    private FileStorageScope MapGrpcFileStorageScope(
+        FileService.Domain.FileAggregate.FileStorageScope grpcStorageScope)
+    {
+        return grpcStorageScope switch
+        {
+            FileService.Domain.FileAggregate.FileStorageScope.LongTerm => FileStorageScope.LongTerm,
+            FileService.Domain.FileAggregate.FileStorageScope.ShortTerm => FileStorageScope.ShortTerm,
+            FileService.Domain.FileAggregate.FileStorageScope.Temporary => FileStorageScope.Temporary,
+            _ => throw new ArgumentOutOfRangeException(nameof(grpcStorageScope), grpcStorageScope, null)
+        };
+    }
+
+    private FileValueObject MapGrpcFileToLocalValueObject(FileService.Application.File.Dtos.GetFileDto grpcDto)
+    {
+        return new FileValueObject
+        {
+            Id = grpcDto.Id,
+            Path = grpcDto.Path,
+            ContentType = grpcDto.ContentType,
+            StorageProvider = grpcDto.StorageProvider,
+            FileStorageScope = MapGrpcFileStorageScope(grpcDto.FileStorageScope)
+        };
     }
 }
