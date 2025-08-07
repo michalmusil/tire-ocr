@@ -22,10 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Contracts\" />
+      <ProjectReference Include="..\AiPipeline.Orchestration.FileService.Application\AiPipeline.Orchestration.FileService.Application.csproj" />
     </ItemGroup>
 
 </Project>

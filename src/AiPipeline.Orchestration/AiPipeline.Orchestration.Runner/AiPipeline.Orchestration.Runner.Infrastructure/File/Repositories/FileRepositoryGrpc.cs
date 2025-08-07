@@ -86,26 +86,4 @@ public class FileRepositoryGrpc : IFileRepository
     {
         throw new NotImplementedException();
     }
-
-    private StorageScope GetStorageScope(FileStorageScope? storageScope)
-    {
-        return storageScope switch
-        {
-            FileStorageScope.LongTerm => StorageScope.LongTerm,
-            FileStorageScope.ShortTerm => StorageScope.ShortTerm,
-            FileStorageScope.Temporary => StorageScope.Temporary,
-            _ => StorageScope.FileStorageScopeUnspecified
-        };
-    }
-
-    private FileStorageScope? GetFileStorageScope(StorageScope storageScope)
-    {
-        return storageScope switch
-        {
-            StorageScope.LongTerm => FileStorageScope.LongTerm,
-            StorageScope.ShortTerm => FileStorageScope.ShortTerm,
-            StorageScope.Temporary => FileStorageScope.Temporary,
-            _ => null
-        };
-    }
 }
