@@ -8,5 +8,6 @@ public record PipelineFailed(
     DateTime FailedAt,
     int FailureCode,
     string FailureReason,
-    string? ExceptionMessage
+    string? ExceptionMessage,
+    List<ProcedureIdentifier> RemainingNotCompletedSteps
 );

@@ -16,6 +16,7 @@ public class DefaultPipelineFailureStrategy : IPipelineFailureStrategy
             FailedAt: DateTime.UtcNow,
             FailureCode: failure.Code,
             FailureReason: failure.Message,
+            RemainingNotCompletedSteps: failedStep.NextSteps,
             ExceptionMessage: exception is null
                 ? null
                 : $"{exception.Message} | Stack trace: {exception.StackTrace ?? "N/A"}"

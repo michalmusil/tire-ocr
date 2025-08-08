@@ -63,7 +63,6 @@ public static class DependencyInjection
 
             opt.ListenToRabbitQueue(MessagingConstants.AdvertisementsQueueName);
             opt.ListenToRabbitQueue(MessagingConstants.CompletedPipelineStepsQueueName);
-            opt.ListenToRabbitQueue(MessagingConstants.CompletedPipelinesQueueName);
             opt.ListenToRabbitQueue(MessagingConstants.FailedPipelinesQueueName);
         });
     }

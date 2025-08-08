@@ -1,7 +1,6 @@
 using AiPipeline.Orchestration.Shared.All.Constants;
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Events.NodeAdvertisement;
-using AiPipeline.Orchestration.Shared.All.Contracts.Events.PipelineCompletion;
 using AiPipeline.Orchestration.Shared.All.Contracts.Events.PipelineFailure;
 using AiPipeline.Orchestration.Shared.All.Contracts.Events.StepCompletion;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Converters;
@@ -26,11 +25,6 @@ public static class WolverineExtension
             {
                 exc.ExchangeType = ExchangeType.Fanout;
                 exc.BindQueue(MessagingConstants.CompletedPipelineStepsQueueName);
-            })
-            .DeclareExchange(MessagingConstants.CompletedPipelinesExchangeName, exc =>
-            {
-                exc.ExchangeType = ExchangeType.Fanout;
-                exc.BindQueue(MessagingConstants.CompletedPipelinesQueueName);
             })
             .DeclareExchange(MessagingConstants.FailedPipelinesExchangeName, exc =>
             {
@@ -63,9 +57,6 @@ public static class WolverineExtension
 
         options.PublishMessage<StepCompleted>()
             .ToRabbitExchange(MessagingConstants.CompletedPipelineStepsExchangeName);
-
-        options.PublishMessage<PipelineCompleted>()
-            .ToRabbitExchange(MessagingConstants.CompletedPipelinesExchangeName);
 
         options.PublishMessage<PipelineFailed>()
             .ToRabbitExchange(MessagingConstants.FailedPipelinesExchangeName);

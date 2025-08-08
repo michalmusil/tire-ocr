@@ -1,4 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.AddStepToResult;
+using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.MarkPipelineCompleted;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Shared.All.Contracts.Events.StepCompletion;
 using MediatR;
@@ -36,6 +37,23 @@ public class PipelineStepCompletedHandler
             );
             var failure = result.PrimaryFailure ?? new Failure(500, "Failed to persist completed pipeline step");
             failure.ThrowAsException();
+        }
+
+        var entirePipelineIsCompleted = !message.NextSteps.Any();
+        if (entirePipelineIsCompleted)
+        {
+            _logger.LogInformation($"Pipeline {message.PipelineId} completed");
+            var pipelineCompletionResult =
+                await _mediator.Send(new MarkPipelineCompletedCommand(message.PipelineId, message.CompletedAt));
+            if (pipelineCompletionResult.IsFailure)
+            {
+                _logger.LogCritical(
+                    $"Failed to persist marking pipeline {message.PipelineId} as completed: {pipelineCompletionResult.PrimaryFailure!.Code} - {pipelineCompletionResult.PrimaryFailure.Message}"
+                );
+                var failure = pipelineCompletionResult.PrimaryFailure ??
+                              new Failure(500, "Failed to mark pipeline as completed");
+                failure.ThrowAsException();
+            }
         }
     }
 }

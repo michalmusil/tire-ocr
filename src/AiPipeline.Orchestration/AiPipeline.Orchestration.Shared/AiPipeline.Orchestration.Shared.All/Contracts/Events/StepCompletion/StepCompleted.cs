@@ -7,5 +7,6 @@ public record StepCompleted(
     Guid PipelineId,
     ProcedureIdentifier ProcedureIdentifier,
     DateTime CompletedAt,
-    IApElement? Result
+    IApElement? Result,
+    List<ProcedureIdentifier> NextSteps
 );
