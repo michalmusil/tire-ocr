@@ -116,7 +116,7 @@ public class PipelineBuilder : IPipelineBuilder
     private async Task<List<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesForAllStepsAsync()
     {
         var nodeIds = _steps.Select(s => s.NodeId).ToArray();
-        return (await _unitOfWork.NodeTypeEntityRepository.GetNodeTypesByIdsAsync(nodeIds))
+        return (await _unitOfWork.NodeTypeRepository.GetNodeTypesByIdsAsync(nodeIds))
             .ToList();
     }
 

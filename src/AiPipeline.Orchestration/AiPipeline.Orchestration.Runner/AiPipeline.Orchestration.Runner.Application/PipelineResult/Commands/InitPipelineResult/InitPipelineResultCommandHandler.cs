@@ -28,7 +28,7 @@ public class InitPipelineResultCommandHandler : ICommandHandler<InitPipelineResu
         if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);
 
-        await _unitOfWork.PipelineResultEntityRepository.Add(newResult);
+        await _unitOfWork.PipelineResultRepository.Add(newResult);
         await _unitOfWork.SaveChangesAsync();
 
         var dto = GetPipelineResultDto.FromDomain(newResult);

@@ -23,7 +23,7 @@ public class SaveNodeTypeCommandHandler : ICommandHandler<SaveNodeTypeCommand, G
         CancellationToken cancellationToken
     )
     {
-        var nodeTypeRepository = _unitOfWork.NodeTypeEntityRepository;
+        var nodeTypeRepository = _unitOfWork.NodeTypeRepository;
         var nodeTypeToPut = request.Dto.ToDomain();
         await nodeTypeRepository.Put(nodeTypeToPut);
         await _unitOfWork.SaveChangesAsync();
