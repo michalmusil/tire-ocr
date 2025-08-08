@@ -12,6 +12,9 @@ public class PipelineResultValidator : AbstractValidator<PipelineResult>
         RuleFor(x => x.PipelineId.ToString())
             .NotEmpty();
 
+        RuleFor(x => x.UserId.ToString())
+            .NotEmpty();
+
         RuleForEach(x => x.StepResults)
             .Must(x => x.Id.ToString().Trim().Length != 0)
             .WithMessage(x => "Pipeline step result id must not be empty")

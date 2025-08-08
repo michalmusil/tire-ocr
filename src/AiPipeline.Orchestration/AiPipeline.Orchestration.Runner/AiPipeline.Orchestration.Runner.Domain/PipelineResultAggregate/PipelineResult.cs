@@ -8,6 +8,7 @@ public class PipelineResult : TimestampedEntity
     private static readonly PipelineResultValidator Validator = new PipelineResultValidator();
     public Guid Id { get; }
     public Guid PipelineId { get; }
+    public Guid UserId { get; }
     public DateTime? FinishedAt { get; private set; }
     public readonly List<PipelineStepResult> _stepResults;
     public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
@@ -16,10 +17,11 @@ public class PipelineResult : TimestampedEntity
     {
     }
 
-    public PipelineResult(Guid pipelineId, Guid? id = null)
+    public PipelineResult(Guid pipelineId, Guid userId, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         PipelineId = pipelineId;
+        UserId = userId;
         FinishedAt = null;
         _stepResults = new List<PipelineStepResult>();
     }
