@@ -35,13 +35,15 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(pipelineBuildResult.Failures);
         var pipeline = pipelineBuildResult.Data!;
 
-        var pipelinePublishResult = await _pipelinePublisher.PublishAsync(pipeline, runDto.Input);
-
-        return await pipelinePublishResult.MapAsync(
+        var initResult = await _mediator.Send(new InitPipelineResultCommand(pipeline.Id, runDto.UserId));
+        return await initResult.MapAsync(
             onSuccess: async () =>
             {
-                await _mediator.Send(new InitPipelineResultCommand(pipeline.Id));
-                return DataResult<Domain.PipelineAggregate.Pipeline>.Success(pipeline);
+                var pipelinePublishResult = await _pipelinePublisher.PublishAsync(pipeline, runDto.Input);
+                return pipelinePublishResult.Map(
+                    onSuccess: () => DataResult<Domain.PipelineAggregate.Pipeline>.Success(pipeline),
+                    onFailure: DataResult<Domain.PipelineAggregate.Pipeline>.Failure
+                );
             },
             onFailure: failures => Task.FromResult(DataResult<Domain.PipelineAggregate.Pipeline>.Failure(failures))
         );

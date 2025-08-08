@@ -23,7 +23,7 @@ public class InitPipelineResultCommandHandler : ICommandHandler<InitPipelineResu
         CancellationToken cancellationToken
     )
     {
-        var newResult = new Domain.PipelineResultAggregate.PipelineResult(request.PipelineId);
+        var newResult = new Domain.PipelineResultAggregate.PipelineResult(request.PipelineId, request.UserId);
         var validationResult = newResult.Validate();
         if (validationResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(validationResult.Failures);

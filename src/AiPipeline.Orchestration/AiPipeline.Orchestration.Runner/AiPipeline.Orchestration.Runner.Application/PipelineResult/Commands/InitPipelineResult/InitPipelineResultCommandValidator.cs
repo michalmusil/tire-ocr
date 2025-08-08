@@ -9,5 +9,8 @@ public class InitPipelineResultCommandValidator : AbstractValidator<InitPipeline
     {
         RuleFor(x => x.PipelineId.ToString())
             .IsGuid();
+
+        RuleFor(x => x.UserId.ToString())
+            .IsGuid();
     }
 }

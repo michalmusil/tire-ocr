@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Runner.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -14,6 +15,9 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
 
         builder.Property(pr => pr.PipelineId)
             .IsRequired();
+        
+        builder.Property(pr => pr.UserId)
+            .IsRequired();
 
         builder.Property(pr => pr.FinishedAt)
             .IsRequired(false);
@@ -29,6 +33,11 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
         builder.HasMany(pr => pr._stepResults)
             .WithOne()
             .HasForeignKey(psr => psr.ResultId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.HasOne<User>()
+            .WithMany()
+            .HasForeignKey(pr => pr.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

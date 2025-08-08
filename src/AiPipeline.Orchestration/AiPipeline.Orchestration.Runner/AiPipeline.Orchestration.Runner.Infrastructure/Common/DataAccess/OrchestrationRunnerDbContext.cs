@@ -1,4 +1,5 @@
 using System.Reflection;
+using AiPipeline.Orchestration.Runner.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
@@ -10,8 +11,12 @@ public class OrchestrationRunnerDbContext : DbContext
     {
     }
 
+    public DbSet<User> Users => Set<User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Domain.NodeTypeAggregate.NodeType> NodeTypes => Set<Domain.NodeTypeAggregate.NodeType>();
-    public DbSet<Domain.PipelineResultAggregate.PipelineResult> PipelineResults => Set<Domain.PipelineResultAggregate.PipelineResult>();
+
+    public DbSet<Domain.PipelineResultAggregate.PipelineResult> PipelineResults =>
+        Set<Domain.PipelineResultAggregate.PipelineResult>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
