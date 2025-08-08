@@ -36,7 +36,8 @@ public class PipelinesController : ControllerBase
         var command = new RunPipelineCommand(
             new RunPipelineDto(
                 Input: request.Input,
-                Steps: request.Steps
+                Steps: request.Steps,
+                UserId: Guid.NewGuid()
             )
         );
         var result = await _mediator.Send(command);
@@ -59,7 +60,8 @@ public class PipelinesController : ControllerBase
         var command = new RunPipelineAwaitedCommand(
             Dto: new RunPipelineDto(
                 Input: request.Input,
-                Steps: request.Steps
+                Steps: request.Steps,
+                UserId: Guid.NewGuid()
             ),
             Timeout: TimeSpan.FromSeconds(request.TimeoutSeconds)
         );
