@@ -35,7 +35,7 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
             .HasForeignKey(psr => psr.ResultId)
             .OnDelete(DeleteBehavior.Cascade);
         
-        builder.HasOne<User>()
+        builder.HasOne<Domain.UserAggregate.User>()
             .WithMany()
             .HasForeignKey(pr => pr.UserId)
             .OnDelete(DeleteBehavior.Cascade);

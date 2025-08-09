@@ -6,6 +6,8 @@ using AiPipeline.Orchestration.Runner.Application.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Application.User.Repositories;
+using AiPipeline.Orchestration.Runner.Application.User.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
 using AiPipeline.Orchestration.Runner.Infrastructure.File.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.NodeType.Repositories;
@@ -13,6 +15,8 @@ using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.User.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.User.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +43,8 @@ public static class DependencyInjection
         services.AddScoped<INodeTypeEntityRepository, NodeTypeEntityRepository>();
         services.AddScoped<IPipelineResultEntityRepository, PipelineResultEntityRepository>();
         services.AddScoped<IFileRepository, FileRepositoryGrpc>();
+        services.AddScoped<IUserEntityRepository, UserEntityRepository>();
+        services.AddScoped<IRefreshTokenEntityRepository, RefreshTokenEntityRepository>();
     }
 
     public static void AddUnitOfWork(this IServiceCollection serviceCollection)
@@ -54,7 +60,10 @@ public static class DependencyInjection
     private static void AddServices(IServiceCollection services)
     {
         services.AddSingleton<IPipelineResultSubscriberService, PipelineResultSubscriberService>();
+
         services.AddScoped<IPipelinePublisherService, PipelineRabbitMqPublisherService>();
+        services.AddScoped<IHashService, HashService>();
+        services.AddScoped<IAuthService, AuthService>();
     }
 
     private static void AddFacades(IServiceCollection services)

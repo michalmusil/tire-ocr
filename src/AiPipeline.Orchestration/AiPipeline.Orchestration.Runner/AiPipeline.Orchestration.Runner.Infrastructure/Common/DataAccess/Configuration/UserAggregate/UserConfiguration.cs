@@ -1,12 +1,11 @@
-using AiPipeline.Orchestration.Runner.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.UserAggregate;
 
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UserConfiguration : IEntityTypeConfiguration<Domain.UserAggregate.User>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<Domain.UserAggregate.User> builder)
     {
         builder.HasKey(u => u.Id);
         

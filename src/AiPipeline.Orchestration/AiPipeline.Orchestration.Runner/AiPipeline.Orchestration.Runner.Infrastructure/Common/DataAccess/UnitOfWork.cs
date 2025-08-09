@@ -11,14 +11,16 @@ public class UnitOfWork : IUnitOfWork
     public INodeTypeEntityRepository NodeTypeRepository { get; }
     public IPipelineResultEntityRepository PipelineResultRepository { get; }
     public IUserEntityRepository UserRepository { get; }
+    public IRefreshTokenEntityRepository RefreshTokenRepository { get; }
 
     public UnitOfWork(INodeTypeEntityRepository nodeTypeRepository,
         IPipelineResultEntityRepository pipelineResultRepository,
-        IUserEntityRepository userRepository)
+        IUserEntityRepository userRepository, IRefreshTokenEntityRepository refreshTokenRepository)
     {
         NodeTypeRepository = nodeTypeRepository;
         PipelineResultRepository = pipelineResultRepository;
         UserRepository = userRepository;
+        RefreshTokenRepository = refreshTokenRepository;
     }
 
     public async Task SaveChangesAsync()
@@ -26,5 +28,6 @@ public class UnitOfWork : IUnitOfWork
         await NodeTypeRepository.SaveChangesAsync();
         await PipelineResultRepository.SaveChangesAsync();
         await UserRepository.SaveChangesAsync();
+        await RefreshTokenRepository.SaveChangesAsync();
     }
 }

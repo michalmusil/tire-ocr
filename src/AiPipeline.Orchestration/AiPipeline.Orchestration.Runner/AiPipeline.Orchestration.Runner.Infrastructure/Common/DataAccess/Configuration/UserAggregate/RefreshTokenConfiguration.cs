@@ -26,7 +26,7 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
         builder.Property(rt => rt.Invalidated)
             .IsRequired();
 
-        builder.HasOne<User>()
+        builder.HasOne<Domain.UserAggregate.User>()
             .WithMany(u => u._refreshTokens)
             .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);

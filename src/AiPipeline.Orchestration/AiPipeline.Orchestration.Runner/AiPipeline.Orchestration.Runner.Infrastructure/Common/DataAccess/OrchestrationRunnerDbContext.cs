@@ -11,7 +11,7 @@ public class OrchestrationRunnerDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users => Set<User>();
+    public DbSet<Domain.UserAggregate.User> Users => Set<Domain.UserAggregate.User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<Domain.NodeTypeAggregate.NodeType> NodeTypes => Set<Domain.NodeTypeAggregate.NodeType>();
 
