@@ -7,6 +7,7 @@ using AiPipeline.Orchestration.Runner.WebApi.Contracts.Auth.RefreshToken;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Auth.Register;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Shared.Result;
 
@@ -68,6 +69,7 @@ public class AuthController : ControllerBase
             });
     }
 
+    [Authorize]
     [HttpPost("Refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

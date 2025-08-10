@@ -1,12 +1,9 @@
-using System.Text;
 using System.Text.Json.Serialization;
-using AiPipeline.Orchestration.Runner.Infrastructure.User.Dtos;
+using AiPipeline.Orchestration.Runner.WebApi.AuthenticationSchemas.UserOrApiKey;
 using AiPipeline.Orchestration.Shared.All.Constants;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Converters;
 using AiPipeline.Orchestration.Shared.All.Extensions;
 using Asp.Versioning;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Wolverine;
 using Wolverine.RabbitMQ;
@@ -15,7 +12,8 @@ namespace AiPipeline.Orchestration.Runner.WebApi;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration, IHostBuilder hostBuilder)
+    public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration,
+        IHostBuilder hostBuilder)
     {
         AddControllersConfig(services);
         AddRoutesConfig(services);
@@ -49,35 +47,19 @@ public static class DependencyInjection
             options.SubstituteApiVersionInUrl = true;
         });
     }
-    
+
     public static void AddJwt(this IServiceCollection serviceCollection, IConfiguration configuration)
     {
-        serviceCollection.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            var jwtOptions = new JwtOptions();
-            configuration.GetSection(JwtOptions.Key).Bind(jwtOptions);
-            if (!jwtOptions.IsValid)
-                throw new InvalidOperationException("Failed to bind JwtOptions");
-
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters
+        serviceCollection
+            .AddAuthentication(options =>
             {
-                ValidIssuer = jwtOptions.Issuer,
-                ValidAudience = jwtOptions.Audience,
-                IssuerSigningKey =
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Secret)),
-                ClockSkew = TimeSpan.Zero,
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true
-            };
-        });
+                options.DefaultAuthenticateScheme = UserOrApiKeyAuthenticationOptions.SchemeName;
+                options.DefaultChallengeScheme = UserOrApiKeyAuthenticationOptions.SchemeName;
+                options.DefaultScheme = UserOrApiKeyAuthenticationOptions.SchemeName;
+            })
+            .AddScheme<UserOrApiKeyAuthenticationOptions, UserOrApiKeyAuthenticationHandler>(
+                UserOrApiKeyAuthenticationOptions.SchemeName, options => { }
+            );
         serviceCollection.AddAuthorization();
     }
 

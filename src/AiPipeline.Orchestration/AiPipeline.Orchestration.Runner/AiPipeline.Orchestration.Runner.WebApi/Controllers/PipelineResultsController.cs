@@ -5,6 +5,7 @@ using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetAllRes
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetResultOfPipeline;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -12,6 +13,7 @@ using TireOcr.Shared.Result;
 namespace AiPipeline.Orchestration.Runner.WebApi.Controllers;
 
 [ApiController]
+[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{v:apiVersion}/[controller]")]
 public class PipelineResultsController : ControllerBase

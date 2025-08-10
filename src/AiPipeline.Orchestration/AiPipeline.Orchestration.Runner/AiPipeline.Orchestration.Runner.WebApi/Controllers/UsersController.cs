@@ -7,12 +7,14 @@ using AiPipeline.Orchestration.Runner.WebApi.Contracts.Users.Update;
 using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.WebApi.Controllers;
 
 [ApiController]
+[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{v:apiVersion}/[controller]")]
 public class UsersController : ControllerBase
