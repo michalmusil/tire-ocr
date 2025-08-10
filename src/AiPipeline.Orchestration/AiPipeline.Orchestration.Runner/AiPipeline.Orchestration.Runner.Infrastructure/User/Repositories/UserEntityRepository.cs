@@ -21,6 +21,12 @@ public class UserEntityRepository : IUserEntityRepository
             .FirstOrDefaultAsync(u => u.Id == userId);
     }
 
+    public async Task<Domain.UserAggregate.User?> GetByUsernameAsync(string username)
+    {
+        return await GetBaseQuery()
+            .FirstOrDefaultAsync(u => u.Username == username);
+    }
+
     public async Task AddAsync(Domain.UserAggregate.User user)
     {
         await _dbContext.Users

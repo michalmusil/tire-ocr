@@ -16,6 +16,8 @@ public class UserConfiguration : IEntityTypeConfiguration<Domain.UserAggregate.U
         builder.Property(u => u.Username)
             .IsRequired()
             .HasMaxLength(200);
+        builder.HasIndex(u => u.Username)
+            .IsUnique();
 
         builder.Property(u => u.PasswordHash)
             .IsRequired();
