@@ -15,6 +15,15 @@ public class DeleteUserCommandHandler : ICommandHandler<DeleteUserCommand>
 
     public async Task<Result> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        if (request.UserToDeleteId != request.DeletingUserId)
+            return Result.Forbidden("Users may only delete their own account");
+
+        var userToDelete = await _unitOfWork.UserRepository.GetByIdAsync(request.UserToDeleteId);
+        if (userToDelete is null)
+            return Result.NotFound($"User with id {request.UserToDeleteId} not found");
+
+        await _unitOfWork.UserRepository.RemoveAsync(userToDelete);
+        await _unitOfWork.SaveChangesAsync();
+        return Result.Success();
     }
 }

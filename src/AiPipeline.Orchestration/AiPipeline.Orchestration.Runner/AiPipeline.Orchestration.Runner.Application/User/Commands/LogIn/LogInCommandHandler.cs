@@ -24,6 +24,25 @@ public class LogInCommandHandler : ICommandHandler<LogInCommand, AuthenticatedUs
     public async Task<DataResult<AuthenticatedUserDto>> Handle(LogInCommand request,
         CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var existingUser = await _unitOfWork.UserRepository.GetByUsernameAsync(request.Username);
+        if (existingUser == null)
+            return DataResult<AuthenticatedUserDto>.Unauthorized(UnauthorizedMessage);
+
+        var passwordValid = _hashService.Verify(request.Password, existingUser.PasswordHash).IsSuccess;
+        if (!passwordValid)
+            return DataResult<AuthenticatedUserDto>.Unauthorized(UnauthorizedMessage);
+
+        var tokensResult = await _authService.GetTokensForUserAsync(existingUser);
+        if (tokensResult.IsFailure)
+            return DataResult<AuthenticatedUserDto>.Unauthorized(UnauthorizedMessage);
+
+        var tokens = tokensResult.Data!;
+        var refreshTokenResult = existingUser.AddRefreshToken(tokens.RefreshToken, tokens.RefreshExpiration);
+        if (refreshTokenResult.IsFailure)
+            return DataResult<AuthenticatedUserDto>.Failure(new Failure(500, "Failed to log user in"));
+
+        await _unitOfWork.SaveChangesAsync();
+        var dto = AuthenticatedUserDto.FromDomain(existingUser, tokens);
+        return DataResult<AuthenticatedUserDto>.Success(dto);
     }
 }

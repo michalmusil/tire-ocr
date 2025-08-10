@@ -16,6 +16,11 @@ public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserDto>
 
     public async Task<DataResult<UserDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var user = await _repository.GetByIdAsync(request.Id);
+        if (user is null)
+            return DataResult<UserDto>.NotFound($"User with id {request.Id} not found.");
+
+        var dto = UserDto.FromDomain(user);
+        return DataResult<UserDto>.Success(dto);
     }
 }

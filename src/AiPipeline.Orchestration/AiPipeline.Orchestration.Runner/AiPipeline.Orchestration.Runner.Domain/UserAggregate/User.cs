@@ -61,7 +61,6 @@ public class User : TimestampedEntity
             return Result.NotFound($"Refresh token not found: {token}");
 
         _refreshTokens.Remove(existingRefreshToken);
-        SetUpdated();
         return Result.Success();
     }
 
@@ -72,7 +71,6 @@ public class User : TimestampedEntity
             return Result.NotFound($"Refresh token not found: {token}");
 
         existingRefreshToken.Invalidate();
-        SetUpdated();
         return Result.Success();
     }
 
