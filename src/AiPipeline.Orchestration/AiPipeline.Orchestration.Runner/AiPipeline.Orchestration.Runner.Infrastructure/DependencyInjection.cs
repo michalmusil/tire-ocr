@@ -60,9 +60,10 @@ public static class DependencyInjection
     private static void AddServices(IServiceCollection services)
     {
         services.AddSingleton<IPipelineResultSubscriberService, PipelineResultSubscriberService>();
+        services.AddSingleton<IHashService, HashService>();
+        services.AddSingleton<ICryptographyService, CryptographyService>();
 
         services.AddScoped<IPipelinePublisherService, PipelineRabbitMqPublisherService>();
-        services.AddScoped<IHashService, HashService>();
         services.AddScoped<IAuthService, AuthService>();
     }
 

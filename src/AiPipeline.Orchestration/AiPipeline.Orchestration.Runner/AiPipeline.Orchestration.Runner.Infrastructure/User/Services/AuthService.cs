@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 using AiPipeline.Orchestration.Runner.Application.User.Dtos;
 using AiPipeline.Orchestration.Runner.Application.User.Repositories;
@@ -14,13 +13,18 @@ namespace AiPipeline.Orchestration.Runner.Infrastructure.User.Services;
 
 public class AuthService : IAuthService
 {
+    private const int RefreshTokenByteLength = 256;
+
     private readonly IConfiguration _configuration;
     private readonly IUserEntityRepository _userRepository;
+    private readonly ICryptographyService _cryptographyService;
 
-    public AuthService(IConfiguration configuration, IUserEntityRepository userRepository)
+    public AuthService(IConfiguration configuration, IUserEntityRepository userRepository,
+        ICryptographyService cryptographyService)
     {
         _configuration = configuration;
         _userRepository = userRepository;
+        _cryptographyService = cryptographyService;
     }
 
     public async Task<DataResult<AccessRefreshTokenPair>> GetTokensForUserAsync(Domain.UserAggregate.User user)
@@ -30,7 +34,7 @@ public class AuthService : IAuthService
         if (accessToken is null)
             return DataResult<AccessRefreshTokenPair>.Failure(new Failure(500, "Access token generation failed"));
 
-        var refreshToken = GetNewRefreshToken();
+        var refreshToken = _cryptographyService.GenerateCryptographicallyRandomString(RefreshTokenByteLength);
         var refreshTokenExpiration = DateTime.UtcNow.AddMonths(jwtOptions.RefreshTokenExpirationMonths);
 
         return DataResult<AccessRefreshTokenPair>.Success(
@@ -130,15 +134,4 @@ public class AuthService : IAuthService
 
     private SymmetricSecurityKey GetAccessTokenSigningKey(JwtOptions jwtOptions) =>
         new(Encoding.UTF8.GetBytes(jwtOptions.Secret));
-
-    private string GetNewRefreshToken()
-    {
-        var randNum = new byte[256];
-        using (var numberGenerator = RandomNumberGenerator.Create())
-        {
-            numberGenerator.GetBytes(randNum);
-        }
-
-        return Convert.ToBase64String(randNum);
-    }
 }
