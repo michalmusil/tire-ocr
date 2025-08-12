@@ -45,6 +45,7 @@ public static class DependencyInjection
         services.AddScoped<IFileRepository, FileRepositoryGrpc>();
         services.AddScoped<IUserEntityRepository, UserEntityRepository>();
         services.AddScoped<IRefreshTokenEntityRepository, RefreshTokenEntityRepository>();
+        services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
     }
 
     public static void AddUnitOfWork(this IServiceCollection serviceCollection)

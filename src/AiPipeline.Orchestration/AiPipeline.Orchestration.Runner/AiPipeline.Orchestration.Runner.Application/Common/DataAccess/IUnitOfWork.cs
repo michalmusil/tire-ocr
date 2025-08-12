@@ -11,6 +11,7 @@ public interface IUnitOfWork
     public IPipelineResultEntityRepository PipelineResultRepository { get; }
     public IUserEntityRepository UserRepository { get; }
     public IRefreshTokenEntityRepository RefreshTokenRepository { get; }
+    public IApiKeyRepository ApiKeyRepository { get; }
 
     public Task SaveChangesAsync();
 }

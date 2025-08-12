@@ -8,7 +8,7 @@ public class UserConfiguration : IEntityTypeConfiguration<Domain.UserAggregate.U
     public void Configure(EntityTypeBuilder<Domain.UserAggregate.User> builder)
     {
         builder.HasKey(u => u.Id);
-        
+
         builder.Property(u => u.Id)
             .IsRequired()
             .ValueGeneratedNever();
@@ -24,6 +24,10 @@ public class UserConfiguration : IEntityTypeConfiguration<Domain.UserAggregate.U
 
         builder.Ignore(u => u.RefreshTokens);
         builder.HasMany(u => u._refreshTokens)
+            .WithOne();
+        
+        builder.Ignore(u => u.ApiKeys);
+        builder.HasMany(u => u._apiKeys)
             .WithOne();
     }
 }

@@ -13,6 +13,7 @@ public class OrchestrationRunnerDbContext : DbContext
 
     public DbSet<Domain.UserAggregate.User> Users => Set<Domain.UserAggregate.User>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<Domain.NodeTypeAggregate.NodeType> NodeTypes => Set<Domain.NodeTypeAggregate.NodeType>();
 
     public DbSet<Domain.PipelineResultAggregate.PipelineResult> PipelineResults =>
