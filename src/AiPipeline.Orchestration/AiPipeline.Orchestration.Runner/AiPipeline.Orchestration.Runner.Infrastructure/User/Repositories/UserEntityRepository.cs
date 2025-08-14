@@ -43,6 +43,7 @@ public class UserEntityRepository : IUserEntityRepository
     private IQueryable<Domain.UserAggregate.User> GetBaseQuery()
     {
         return _dbContext.Users
-            .Include(u => u._refreshTokens);
+            .Include(u => u._refreshTokens)
+            .Include(u => u._apiKeys);
     }
 }

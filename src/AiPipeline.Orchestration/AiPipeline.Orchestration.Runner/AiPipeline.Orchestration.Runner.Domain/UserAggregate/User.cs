@@ -80,9 +80,13 @@ public class User : TimestampedEntity
     {
         if (apiKey.UserId != Id)
             return Result.Forbidden($"Api key user id {apiKey.UserId} doesn't match user id: {Id}");
-        var existingApiKey = GetExistingApiKey(apiKey.Key);
-        if (existingApiKey is not null)
-            return Result.Conflict("User already owns the same api key.");
+        var apiKeyWithSameKey = GetExistingApiKeyByKey(apiKey.Key);
+        if (apiKeyWithSameKey is not null)
+            return Result.Conflict("User already owns an api key with provided key");
+
+        var apiKeyWithSameName = GetExistingApiKeyByName(apiKey.Name);
+        if (apiKeyWithSameName is not null)
+            return Result.Conflict($"User already owns an api key named {apiKey.Name}");
 
         _apiKeys.Add(apiKey);
         return Result.Success();
@@ -90,7 +94,7 @@ public class User : TimestampedEntity
 
     public Result RemoveApiKey(string key)
     {
-        var existingApiKey = GetExistingApiKey(key);
+        var existingApiKey = GetExistingApiKeyByKey(key);
         if (existingApiKey is null)
             return Result.NotFound("User has no such api key.");
 
@@ -101,6 +105,9 @@ public class User : TimestampedEntity
     private RefreshToken? GetExistingRefreshToken(string token) =>
         _refreshTokens.FirstOrDefault(rt => rt.Token == token);
 
-    private ApiKey? GetExistingApiKey(string key) =>
+    private ApiKey? GetExistingApiKeyByKey(string key) =>
         _apiKeys.FirstOrDefault(ak => ak.Key == key);
+
+    private ApiKey? GetExistingApiKeyByName(string name) =>
+        _apiKeys.FirstOrDefault(ak => ak.Name == name);
 }
