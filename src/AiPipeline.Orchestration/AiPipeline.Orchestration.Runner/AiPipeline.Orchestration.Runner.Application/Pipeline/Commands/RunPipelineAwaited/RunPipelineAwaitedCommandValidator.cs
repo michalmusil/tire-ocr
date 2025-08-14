@@ -1,4 +1,5 @@
 using FluentValidation;
+using TireOcr.Shared.Extensions;
 
 namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipelineAwaited;
 
@@ -8,6 +9,9 @@ public class RunPipelineAwaitedCommandValidator : AbstractValidator<RunPipelineA
     {
         RuleFor(x => x.Dto.Steps)
             .NotEmpty();
+
+        RuleFor(x => x.Dto.UserId.ToString())
+            .IsGuid();
 
         RuleForEach(x => x.Dto.Steps)
             .Must(x => x.NodeId.Trim().Length != 0)

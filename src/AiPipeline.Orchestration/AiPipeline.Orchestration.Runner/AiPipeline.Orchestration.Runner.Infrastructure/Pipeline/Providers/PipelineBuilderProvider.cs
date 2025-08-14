@@ -17,5 +17,6 @@ public class PipelineBuilderProvider : IPipelineBuilderProvider
         _fileRepository = fileRepository;
     }
 
-    public IPipelineBuilder GetPipelineBuilder() => new PipelineBuilder(_unitOfWork, _fileRepository);
+    public IPipelineBuilder GetPipelineBuilder(Guid pipelineOwnerId) =>
+        new PipelineBuilder(pipelineOwnerId, _unitOfWork, _fileRepository);
 }

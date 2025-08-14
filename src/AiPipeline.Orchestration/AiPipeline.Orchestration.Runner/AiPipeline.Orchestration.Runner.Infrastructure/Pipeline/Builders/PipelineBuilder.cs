@@ -20,16 +20,19 @@ public class PipelineBuilder : IPipelineBuilder
     private readonly List<RunPipelineStepDto> _steps;
     private readonly List<FileValueObject> _files;
 
+    private readonly Guid _userId;
     public IApElement? PipelineInput => _pipelineInput;
     public IReadOnlyCollection<RunPipelineStepDto> Steps => _steps.AsReadOnly();
 
     private static Failure NoInputProvidedFailure =>
         new Failure(422, "Pipeline input must be provided before pipeline can be built.");
 
-    public PipelineBuilder(IUnitOfWork unitOfWork, IFileRepository fileRepository)
+    public PipelineBuilder(Guid userId, IUnitOfWork unitOfWork, IFileRepository fileRepository)
     {
+        _userId = userId;
         _unitOfWork = unitOfWork;
         _fileRepository = fileRepository;
+        _userId = userId;
         _pipelineInput = null;
         _steps = new List<RunPipelineStepDto>();
         _files = new List<FileValueObject>();
@@ -56,10 +59,14 @@ public class PipelineBuilder : IPipelineBuilder
         return _steps.Remove(step);
     }
 
-    public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> BuildAsync()
+    public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> ValidateAndBuildAsync()
     {
         if (_pipelineInput is null)
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(NoInputProvidedFailure);
+
+        var ownerValidationResult = await ValidatePipelineOwnerAsync();
+        if (ownerValidationResult.IsFailure)
+            return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(ownerValidationResult.Failures);
 
         var loadFilesResult = await LoadInputFilesAsync();
         if (loadFilesResult.IsFailure)
@@ -103,6 +110,7 @@ public class PipelineBuilder : IPipelineBuilder
         }
 
         var pipeline = new Domain.PipelineAggregate.Pipeline(
+            userId: _userId,
             steps: pipelineSteps,
             pipelineFiles: _files
         );
@@ -111,6 +119,14 @@ public class PipelineBuilder : IPipelineBuilder
             onSuccess: () => DataResult<Domain.PipelineAggregate.Pipeline>.Success(pipeline),
             onFailure: DataResult<Domain.PipelineAggregate.Pipeline>.Failure
         );
+    }
+
+    private async Task<Result> ValidatePipelineOwnerAsync()
+    {
+        var existingOwner = await _unitOfWork.UserRepository.GetByIdAsync(_userId);
+        if (existingOwner is null)
+            return Result.NotFound($"Pipeline owner with id '{_userId}' does not exist");
+        return Result.Success();
     }
 
     private async Task<List<Domain.NodeTypeAggregate.NodeType>> GetNodeTypesForAllStepsAsync()

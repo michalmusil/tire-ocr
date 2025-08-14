@@ -9,5 +9,8 @@ public class GetResultOfPipelineQueryValidator : AbstractValidator<GetResultOfPi
     {
         RuleFor(q => q.PipelineId.ToString())
             .IsGuid();
+
+        RuleFor(q => q.UserId.ToString())
+            .IsGuid();
     }
 }

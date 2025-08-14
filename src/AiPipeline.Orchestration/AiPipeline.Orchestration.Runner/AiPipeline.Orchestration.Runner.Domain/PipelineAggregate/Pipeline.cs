@@ -8,13 +8,16 @@ public class Pipeline
     private static readonly PipelineValidator Validator = new PipelineValidator();
 
     public Guid Id { get; }
+    public Guid UserId { get; }
     private readonly List<PipelineStep> _steps;
     private readonly List<FileValueObject> _pipelineFiles;
     public IReadOnlyCollection<PipelineStep> Steps => _steps.AsReadOnly();
     public IReadOnlyCollection<FileValueObject> Files => _pipelineFiles.AsReadOnly();
 
-    public Pipeline(Guid? id = null, List<PipelineStep>? steps = null, List<FileValueObject>? pipelineFiles = null)
+    public Pipeline(Guid userId, Guid? id = null, List<PipelineStep>? steps = null,
+        List<FileValueObject>? pipelineFiles = null)
     {
+        UserId = userId;
         Id = id ?? Guid.NewGuid();
         _steps = steps ?? new List<PipelineStep>();
         _pipelineFiles = pipelineFiles ?? new List<FileValueObject>();

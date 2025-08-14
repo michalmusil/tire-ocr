@@ -5,6 +5,7 @@ using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAsync;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAwaitedAsync;
+using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -35,11 +36,12 @@ public class PipelinesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<RunPipelineAsyncResponse>> RunAsync([FromBody] RunPipelineAsyncRequest request)
     {
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
         var command = new RunPipelineCommand(
             new RunPipelineDto(
                 Input: request.Input,
                 Steps: request.Steps,
-                UserId: Guid.NewGuid()
+                UserId: loggedInUser.Id
             )
         );
         var result = await _mediator.Send(command);
@@ -59,11 +61,12 @@ public class PipelinesController : ControllerBase
     public async Task<ActionResult<RunPipelineAwaitedAsyncResponse>> RunAwaitedAsync(
         [FromBody] RunPipelineAwaitedAsyncRequest request, CancellationToken cancellationToken)
     {
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
         var command = new RunPipelineAwaitedCommand(
             Dto: new RunPipelineDto(
                 Input: request.Input,
                 Steps: request.Steps,
-                UserId: Guid.NewGuid()
+                UserId: loggedInUser.Id
             ),
             Timeout: TimeSpan.FromSeconds(request.TimeoutSeconds)
         );

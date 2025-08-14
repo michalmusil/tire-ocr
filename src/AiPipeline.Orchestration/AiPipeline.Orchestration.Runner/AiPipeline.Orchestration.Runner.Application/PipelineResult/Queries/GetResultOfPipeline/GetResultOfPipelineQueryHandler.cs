@@ -29,6 +29,11 @@ public class GetResultOfPipelineQueryHandler : IQueryHandler<GetResultOfPipeline
         if (foundResult is null)
             return DataResult<GetPipelineResultDto>.NotFound($"Result for pipeline {request.PipelineId} doesn't exist");
 
+        if (foundResult.UserId != request.UserId)
+            return DataResult<GetPipelineResultDto>.Forbidden(
+                $"User '{request.UserId}' does not have access to results of pipeline '{request.PipelineId}'"
+            );
+
         var resultDto = GetPipelineResultDto.FromDomain(foundResult);
 
         return DataResult<GetPipelineResultDto>.Success(resultDto);

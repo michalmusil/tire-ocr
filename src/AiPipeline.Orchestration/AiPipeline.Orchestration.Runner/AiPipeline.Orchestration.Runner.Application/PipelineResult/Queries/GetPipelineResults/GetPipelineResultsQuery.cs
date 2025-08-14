@@ -4,4 +4,4 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.GetPipelineResults;
 
-public record GetPipelineResultsQuery(PaginationParams Pagination) : IQuery<PaginatedCollection<GetPipelineResultDto>>;
+public record GetPipelineResultsQuery(PaginationParams Pagination, Guid UserId) : IQuery<PaginatedCollection<GetPipelineResultDto>>;

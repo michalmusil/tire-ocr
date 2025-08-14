@@ -30,4 +30,13 @@ public static class HttpContextExtension
             AuthenticationMethod: authenticationMethod
         );
     }
+
+    public static LoggedInUser GetLoggedInUserOrThrow(this HttpContext httpContext)
+    {
+        var user = GetLoggedInUser(httpContext);
+        if (user is null)
+            throw new InvalidOperationException("Failed to extract logged in user");
+
+        return user;
+    }
 }

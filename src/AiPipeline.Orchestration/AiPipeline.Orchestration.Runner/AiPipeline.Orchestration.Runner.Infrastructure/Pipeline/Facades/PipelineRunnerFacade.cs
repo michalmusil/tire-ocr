@@ -24,12 +24,12 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
 
     public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> RunPipelineAsync(RunPipelineDto runDto)
     {
-        var pipelineBuilder = _pipelineBuilderProvider.GetPipelineBuilder();
+        var pipelineBuilder = _pipelineBuilderProvider.GetPipelineBuilder(pipelineOwnerId: runDto.UserId);
 
         pipelineBuilder.SetPipelineInput(runDto.Input);
         pipelineBuilder.AddSteps(runDto.Steps);
 
-        var pipelineBuildResult = await pipelineBuilder.BuildAsync();
+        var pipelineBuildResult = await pipelineBuilder.ValidateAndBuildAsync();
 
         if (pipelineBuildResult.IsFailure)
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(pipelineBuildResult.Failures);

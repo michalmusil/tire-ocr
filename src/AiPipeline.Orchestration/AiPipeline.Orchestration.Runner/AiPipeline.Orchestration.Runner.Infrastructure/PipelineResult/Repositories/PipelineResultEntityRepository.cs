@@ -22,9 +22,10 @@ public class PipelineResultEntityRepository : IPipelineResultEntityRepository
 
     public async Task<PaginatedCollection<Domain.PipelineResultAggregate.PipelineResult>>
         GetPipelineResultsPaginatedAsync(
-            PaginationParams pagination)
+            PaginationParams pagination, Guid userId)
     {
         var query = GetBasicQuery()
+            .Where(pr => pr.UserId == userId)
             .OrderByDescending(pr => pr.UpdatedAt);
 
         return await query.ToPaginatedList(pagination);

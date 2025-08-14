@@ -1,4 +1,5 @@
 using FluentValidation;
+using TireOcr.Shared.Extensions;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 
@@ -7,7 +8,10 @@ public class PipelineValidator : AbstractValidator<Pipeline>
     public PipelineValidator()
     {
         RuleFor(x => x.Id.ToString())
-            .NotEmpty();
+            .IsGuid();
+        
+        RuleFor(x => x.UserId.ToString())
+            .IsGuid();
 
         RuleForEach(x => x.Steps)
             .Must(x => x.Id.ToString().Trim().Length != 0)

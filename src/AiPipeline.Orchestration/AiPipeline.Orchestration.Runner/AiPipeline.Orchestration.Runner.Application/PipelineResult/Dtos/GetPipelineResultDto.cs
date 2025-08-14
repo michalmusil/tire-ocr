@@ -2,6 +2,7 @@ namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 
 public record GetPipelineResultDto(
     Guid Id,
+    Guid UserId,
     Guid PipelineId,
     DateTime CreatedAt,
     DateTime UpdatedAt,
@@ -13,6 +14,7 @@ public record GetPipelineResultDto(
     {
         return new GetPipelineResultDto(
             Id: domain.Id,
+            UserId: domain.UserId,
             PipelineId: domain.PipelineId,
             CreatedAt: domain.CreatedAt,
             UpdatedAt: domain.UpdatedAt,

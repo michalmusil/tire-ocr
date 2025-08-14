@@ -3,6 +3,7 @@ using AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.GetPipe
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.GetResultOfPipeline;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetAllResults;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetResultOfPipeline;
+using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -33,7 +34,11 @@ public class PipelineResultsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<GetAllResultsResponse>> GetAllResults([FromQuery] GetAllResultsRequest request)
     {
-        var query = new GetPipelineResultsQuery(new PaginationParams(request.PageNumber, request.PageSize));
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
+        var query = new GetPipelineResultsQuery(
+            new PaginationParams(request.PageNumber, request.PageSize),
+            loggedInUser.Id
+        );
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<PaginatedCollection<GetPipelineResultDto>, GetAllResultsResponse>(
@@ -48,7 +53,11 @@ public class PipelineResultsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<GetResultOfPipelineResponse>> GetResultOfPipeline([FromRoute] Guid pipelineId)
     {
-        var query = new GetResultOfPipelineQuery(pipelineId);
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
+        var query = new GetResultOfPipelineQuery(
+            pipelineId,
+            loggedInUser.Id
+        );
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<GetPipelineResultDto, GetResultOfPipelineResponse>(

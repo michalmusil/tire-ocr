@@ -15,5 +15,5 @@ public interface IPipelineBuilder
 
     public bool RemoveStep(RunPipelineStepDto step);
 
-    public Task<DataResult<Domain.PipelineAggregate.Pipeline>> BuildAsync();
+    public Task<DataResult<Domain.PipelineAggregate.Pipeline>> ValidateAndBuildAsync();
 }
