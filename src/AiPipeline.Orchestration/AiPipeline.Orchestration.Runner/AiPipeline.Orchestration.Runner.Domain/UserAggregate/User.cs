@@ -86,7 +86,7 @@ public class User : TimestampedEntity
 
         var apiKeyWithSameName = GetExistingApiKeyByName(apiKey.Name);
         if (apiKeyWithSameName is not null)
-            return Result.Conflict($"User already owns an api key named {apiKey.Name}");
+            return Result.Conflict($"User already owns an api key named '{apiKey.Name}'");
 
         _apiKeys.Add(apiKey);
         return Result.Success();
@@ -109,5 +109,5 @@ public class User : TimestampedEntity
         _apiKeys.FirstOrDefault(ak => ak.Key == key);
 
     private ApiKey? GetExistingApiKeyByName(string name) =>
-        _apiKeys.FirstOrDefault(ak => ak.Name == name);
+        _apiKeys.FirstOrDefault(ak => ak.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
 }
