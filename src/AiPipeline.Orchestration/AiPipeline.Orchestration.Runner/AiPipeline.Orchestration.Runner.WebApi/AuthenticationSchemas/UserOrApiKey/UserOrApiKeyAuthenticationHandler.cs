@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using AiPipeline.Orchestration.Runner.Application.User.Repositories;
@@ -50,6 +51,11 @@ public class UserOrApiKeyAuthenticationHandler : AuthenticationHandler<UserOrApi
             if (claimsPrincipal is null || securityToken is null)
                 return AuthenticateResult.Fail("Failed to decode provided access token");
 
+            var authTypeIdentity = new ClaimsIdentity([
+                new Claim(ClaimTypes.AuthenticationMethod, AuthenticationMethodType.Jwt.ToString())
+            ], AuthenticationMethodType.Jwt.ToString());
+            claimsPrincipal.AddIdentity(authTypeIdentity);
+
             var ticket = new AuthenticationTicket(claimsPrincipal, UserOrApiKeyAuthenticationOptions.SchemeName);
             return AuthenticateResult.Success(ticket);
         }
@@ -65,7 +71,28 @@ public class UserOrApiKeyAuthenticationHandler : AuthenticationHandler<UserOrApi
 
     private async Task<AuthenticateResult> PerformApiKeyAuthentication(string authorizationHeaderValue)
     {
-        throw new NotImplementedException();
+        var apiKeyString = authorizationHeaderValue;
+        var apiKeyOwner = await _userRepository.GetByApiKeyStringAsync(apiKeyString);
+        if (apiKeyOwner is null)
+            return AuthenticateResult.Fail("Invalid api key");
+        var apiKey = apiKeyOwner.ApiKeys.FirstOrDefault(a => a.Key == apiKeyString);
+        if (apiKey is null)
+            return AuthenticateResult.Fail("Invalid api key");
+
+        if (apiKey.ValidUntil < DateTime.UtcNow)
+            return AuthenticateResult.Fail("Api Key expired");
+
+        var userIdentity = new ClaimsIdentity([
+            new Claim(ClaimTypes.NameIdentifier, apiKeyOwner.Id.ToString()),
+            new Claim(ClaimTypes.Name, apiKeyOwner.Username),
+        ], AuthenticationMethodType.ApiKey.ToString());
+        var authTypeIdentity = new ClaimsIdentity([
+            new Claim(ClaimTypes.AuthenticationMethod, AuthenticationMethodType.ApiKey.ToString())
+        ], AuthenticationMethodType.ApiKey.ToString());
+        var claimsPrincipal = new ClaimsPrincipal([userIdentity, authTypeIdentity]);
+
+        var ticket = new AuthenticationTicket(claimsPrincipal, UserOrApiKeyAuthenticationOptions.SchemeName);
+        return AuthenticateResult.Success(ticket);
     }
 
     private JwtOptions GetJwtOptions()

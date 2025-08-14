@@ -73,7 +73,6 @@ public class AuthController : ControllerBase
             });
     }
 
-    [Authorize]
     [HttpPost("Refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -82,8 +81,8 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(
         [FromBody] RefreshTokenRequest contract)
     {
-        var requestingPartyIsUser = HttpContext.GetLoggedInUser() != null;
-        if (!requestingPartyIsUser)
+        var user = HttpContext.GetLoggedInUser();
+        if (user is null || user.IsAuthenticatedViaApiKey)
             return Unauthorized("Only logged in users can refresh token");
 
         var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
@@ -109,7 +108,7 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<CreateApiKeyResponse>> CreateApiKey([FromBody] CreateApiKeyRequest contract)
     {
         var requestingUser = HttpContext.GetLoggedInUser();
-        if (requestingUser is null)
+        if (requestingUser is null || requestingUser.IsAuthenticatedViaApiKey)
             return Unauthorized("Only logged in users can create api keys");
 
         var command = new AddApiKeyCommand(
@@ -135,7 +134,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> DeleteApiKey([FromRoute] string name)
     {
         var requestingUser = HttpContext.GetLoggedInUser();
-        if (requestingUser is null)
+        if (requestingUser?.IsAuthenticatedViaApiKey ?? true)
             return Unauthorized("Only logged in users can delete their api keys");
 
         var command = new DeleteApiKeyCommand(

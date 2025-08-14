@@ -27,6 +27,12 @@ public class UserEntityRepository : IUserEntityRepository
             .FirstOrDefaultAsync(u => u.Username == username);
     }
 
+    public async Task<Domain.UserAggregate.User?> GetByApiKeyStringAsync(string apiKeyString)
+    {
+        return await GetBaseQuery()
+            .FirstOrDefaultAsync(u => u._apiKeys.Any(a => a.Key == apiKeyString));
+    }
+
     public async Task AddAsync(Domain.UserAggregate.User user)
     {
         await _dbContext.Users

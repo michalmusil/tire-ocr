@@ -50,7 +50,7 @@ public class UsersController : ControllerBase
     )
     {
         var updatingUser = HttpContext.GetLoggedInUser();
-        if (updatingUser is null)
+        if (updatingUser is null || updatingUser.IsAuthenticatedViaApiKey)
             return Unauthorized("User must be logged in to update their account");
         var command = new UpdateUserCommand(
             UpdatingUserId: updatingUser.Id,
@@ -73,7 +73,7 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         var deletingUser = HttpContext.GetLoggedInUser();
-        if (deletingUser is null)
+        if (deletingUser is null || deletingUser.IsAuthenticatedViaApiKey)
             return Unauthorized("User must be logged in to delete their account");
         var command = new DeleteUserCommand(
             DeletingUserId: deletingUser.Id,
