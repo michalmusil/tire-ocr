@@ -10,6 +10,7 @@ public class PipelineResult : TimestampedEntity
     public Guid Id { get; }
     public Guid PipelineId { get; }
     public Guid UserId { get; }
+    public Guid? BatchId { get; }
     public IApElement? InitialInput { get; }
     public DateTime? FinishedAt { get; private set; }
     public readonly List<PipelineStepResult> _stepResults;
@@ -19,11 +20,12 @@ public class PipelineResult : TimestampedEntity
     {
     }
 
-    public PipelineResult(Guid pipelineId, Guid userId, IApElement? initialInput, Guid? id = null)
+    public PipelineResult(Guid pipelineId, Guid userId, Guid? batchId, IApElement? initialInput, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         PipelineId = pipelineId;
         UserId = userId;
+        BatchId = batchId;
         InitialInput = initialInput;
         FinishedAt = null;
         _stepResults = new List<PipelineStepResult>();

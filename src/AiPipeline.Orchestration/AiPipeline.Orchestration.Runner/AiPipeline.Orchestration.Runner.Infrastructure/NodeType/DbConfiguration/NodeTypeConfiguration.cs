@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.NodeTypeAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.DbConfiguration;
 
 public class NodeTypeConfiguration : IEntityTypeConfiguration<Domain.NodeTypeAggregate.NodeType>
 {

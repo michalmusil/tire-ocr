@@ -19,6 +19,9 @@ public class OrchestrationRunnerDbContext : DbContext
     public DbSet<Domain.PipelineResultAggregate.PipelineResult> PipelineResults =>
         Set<Domain.PipelineResultAggregate.PipelineResult>();
 
+    public DbSet<Domain.PipelineResultBatchAggregate.PipelineResultBatch> PipelineResultBatches =>
+        Set<Domain.PipelineResultBatchAggregate.PipelineResultBatch>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

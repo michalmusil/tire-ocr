@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Runner.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.UserAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.User.DbConfiguration;
 
 public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {

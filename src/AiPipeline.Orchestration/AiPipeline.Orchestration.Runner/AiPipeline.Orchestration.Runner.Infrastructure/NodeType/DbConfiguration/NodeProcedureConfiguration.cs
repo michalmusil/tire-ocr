@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Runner.Infrastructure.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.NodeTypeAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.NodeType.DbConfiguration;
 
 public class NodeProcedureConfiguration : IEntityTypeConfiguration<Domain.NodeTypeAggregate.NodeProcedure>
 {

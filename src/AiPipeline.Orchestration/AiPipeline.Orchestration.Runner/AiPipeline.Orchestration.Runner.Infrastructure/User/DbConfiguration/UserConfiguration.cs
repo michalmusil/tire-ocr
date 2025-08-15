@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.UserAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.User.DbConfiguration;
 
 public class UserConfiguration : IEntityTypeConfiguration<Domain.UserAggregate.User>
 {

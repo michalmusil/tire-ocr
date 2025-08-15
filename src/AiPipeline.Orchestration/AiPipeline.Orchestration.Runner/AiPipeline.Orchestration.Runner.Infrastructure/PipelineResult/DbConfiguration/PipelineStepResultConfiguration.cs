@@ -3,7 +3,7 @@ using AiPipeline.Orchestration.Runner.Infrastructure.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.PipelineResultAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.DbConfiguration;
 
 public class PipelineStepResultConfiguration : IEntityTypeConfiguration<PipelineStepResult>
 {

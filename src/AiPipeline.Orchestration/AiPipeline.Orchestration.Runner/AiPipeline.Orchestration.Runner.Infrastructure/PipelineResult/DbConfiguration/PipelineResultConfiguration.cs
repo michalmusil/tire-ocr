@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Runner.Infrastructure.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess.Configuration.PipelineResultAggregate;
+namespace AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.DbConfiguration;
 
 public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.PipelineResultAggregate.PipelineResult>
 {
@@ -18,6 +18,9 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
 
         builder.Property(pr => pr.UserId)
             .IsRequired();
+
+        builder.Property(pr => pr.BatchId)
+            .IsRequired(false);
 
         builder.Property(pr => pr.InitialInput)
             .IsRequired(false)
@@ -42,6 +45,11 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
         builder.HasOne<Domain.UserAggregate.User>()
             .WithMany()
             .HasForeignKey(pr => pr.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne<Domain.PipelineResultBatchAggregate.PipelineResultBatch>()
+            .WithMany()
+            .HasForeignKey(pr => pr.BatchId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
