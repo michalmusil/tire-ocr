@@ -1,6 +1,7 @@
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.Nodes.Dtos.FileReferenceUploader;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
 using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
@@ -48,8 +49,11 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
         _fileReferenceUploaderService = fileReferenceUploaderService;
     }
 
-    public async Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
+    public async Task<DataResult<IApElement>> ExecuteAsync(RunPipelineStep step)
     {
+        var input = step.CurrentStepInput;
+        var fileReferences = step.FileReferences;
+
         var schemaIsCompatible = InputSchema.HasCompatibleSchemaWith(input);
         if (!schemaIsCompatible)
             return DataResult<IApElement>.Invalid(
@@ -67,7 +71,10 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
             return DataResult<IApElement>.Invalid(
                 $"Procedure '{nameof(PerformTireImagePreprocessingProcedure)}' failed: missing file reference '{inputImage.Id}'");
 
-        var imageDataResult = await _fileReferenceDownloaderService.DownloadFileReferenceDataAsync(inputFileReference);
+        var imageDataResult = await _fileReferenceDownloaderService.DownloadFileReferenceDataAsync(
+            reference: inputFileReference,
+            userId: step.UserId
+        );
         if (imageDataResult.IsFailure)
             return DataResult<IApElement>.Failure(imageDataResult.Failures);
 
@@ -87,13 +94,16 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
         preprocessedImageStream.Position = 0;
         var preprocessedImageId = Guid.NewGuid();
 
-        var fileReferenceResult = await _fileReferenceUploaderService.UploadFileDataAsync(
-            fileId: preprocessedImageId,
-            fileStream: preprocessedImageStream,
-            contentType: preprocessedImage.ContentType,
-            fileName: preprocessedImage.Name,
-            storePermanently: false
+        var uploadParams = new UploadFileParams(
+            FileId: preprocessedImageId,
+            UserId: step.UserId,
+            FileStream: preprocessedImageStream,
+            ContentType: preprocessedImage.ContentType,
+            FileName: preprocessedImage.Name,
+            StorePermanently: false
         );
+        var fileReferenceResult = await _fileReferenceUploaderService
+            .UploadFileDataAsync(uploadParams);
         if (fileReferenceResult.IsFailure)
             return DataResult<IApElement>.Failure(fileReferenceResult.Failures);
 

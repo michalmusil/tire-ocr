@@ -14,9 +14,9 @@ public class GrpcFileReferenceDownloaderService : IFileReferenceDownloaderServic
         _grpcFileClient = grpcFileClient;
     }
 
-    public async Task<DataResult<Stream>> DownloadFileReferenceDataAsync(FileReference reference)
+    public async Task<DataResult<Stream>> DownloadFileReferenceDataAsync(FileReference reference, Guid userId)
     {
-        var request = new DownloadFileRequest(reference.Id);
+        var request = new DownloadFileRequest(reference.Id, userId);
         var response = await _grpcFileClient.DownloadFileAsync(request);
         if (response.IsFailure)
             return DataResult<Stream>.Failure(response.Failures);

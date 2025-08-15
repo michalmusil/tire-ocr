@@ -40,8 +40,10 @@ public class PerformTireCodePostprocessingProcedure : IProcedure
         _mediator = mediator;
     }
 
-    public async Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
+    public async Task<DataResult<IApElement>> ExecuteAsync(RunPipelineStep step)
     {
+        var input = step.CurrentStepInput;
+
         var schemaCompatible = InputSchema.HasCompatibleSchemaWith(input);
         if (!schemaCompatible)
             return DataResult<IApElement>.Invalid(

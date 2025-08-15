@@ -11,5 +11,5 @@ public interface IProcedure
     public IApElement InputSchema { get; }
     public IApElement OutputSchema { get; }
 
-    public Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences);
+    public Task<DataResult<IApElement>> ExecuteAsync(RunPipelineStep step);
 }

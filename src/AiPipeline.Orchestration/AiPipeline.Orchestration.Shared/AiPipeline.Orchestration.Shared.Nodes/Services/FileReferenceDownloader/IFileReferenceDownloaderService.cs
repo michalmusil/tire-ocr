@@ -5,5 +5,5 @@ namespace AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader
 
 public interface IFileReferenceDownloaderService
 {
-    public Task<DataResult<Stream>> DownloadFileReferenceDataAsync(FileReference reference);
+    public Task<DataResult<Stream>> DownloadFileReferenceDataAsync(FileReference reference, Guid userId);
 }

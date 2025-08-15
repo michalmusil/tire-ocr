@@ -47,8 +47,6 @@ public class ProcedureRouter : IProcedureRouter
     /// <returns>A data result containing either the output of current pipeline step or failure</returns>
     public async Task<DataResult<IApElement>> ProcessPipelineStep(RunPipelineStep stepDescription)
     {
-        var input = stepDescription.CurrentStepInput;
-        var fileReferences = stepDescription.FileReferences;
         var currentStep = stepDescription.CurrentStep;
 
         var currentStepProcedureFactory =
@@ -62,7 +60,7 @@ public class ProcedureRouter : IProcedureRouter
         {
             var currentProcedure = currentStepProcedureFactory();
             procedure = currentProcedure;
-            result = await currentProcedure.ExecuteAsync(input, fileReferences);
+            result = await currentProcedure.ExecuteAsync(stepDescription);
         }
         catch (InvalidOperationException ex)
         {
@@ -96,13 +94,12 @@ public class ProcedureRouter : IProcedureRouter
                 .Skip(1)
                 .ToList();
 
-            var nextStepMessage = new RunPipelineStep(
-                PipelineId: stepDescription.PipelineId,
-                CurrentStep: nextStepProcedureIdentifier!,
-                CurrentStepInput: result.Data!,
-                NextSteps: followingStepsProcedureIdentifiers,
-                FileReferences: fileReferences
-            );
+            var nextStepMessage = stepDescription with
+            {
+                CurrentStep = nextStepProcedureIdentifier!,
+                CurrentStepInput = result.Data!,
+                NextSteps = followingStepsProcedureIdentifiers,
+            };
             await _bus.PublishAsync(nextStepMessage);
         }
 

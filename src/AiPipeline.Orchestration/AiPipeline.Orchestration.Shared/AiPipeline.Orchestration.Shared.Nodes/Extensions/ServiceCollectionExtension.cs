@@ -34,19 +34,6 @@ public static class ServiceCollectionExtension
         AddFileManipulationViaGrpcService(services);
     }
 
-    private static void AddFileManipulationViaHttpClient(IServiceCollection services)
-    {
-        var baseAddressUri = new Uri("https+http://OrchestrationRunnerService");
-        services.AddHttpClient<IFileReferenceDownloaderService, HttpFileReferenceDownloaderService>(client =>
-        {
-            client.BaseAddress = baseAddressUri;
-        });
-        services.AddHttpClient<IFileReferenceUploaderService, HttpFileReferenceUploaderService>(client =>
-        {
-            client.BaseAddress = baseAddressUri;
-        });
-    }
-
     private static void AddFileManipulationViaGrpcService(IServiceCollection services)
     {
         var grpcServerUri = new Uri("http://FileService");

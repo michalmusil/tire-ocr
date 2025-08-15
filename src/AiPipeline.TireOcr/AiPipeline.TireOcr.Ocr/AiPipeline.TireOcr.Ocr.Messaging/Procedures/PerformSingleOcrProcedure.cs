@@ -32,6 +32,7 @@ public class PerformSingleOcrProcedure : IProcedure
             }
         }
     );
+
     public IApElement OutputSchema => new ApString("");
 
     private readonly IFileReferenceDownloaderService _fileReferenceDownloaderService;
@@ -43,8 +44,11 @@ public class PerformSingleOcrProcedure : IProcedure
         _mediator = mediator;
     }
 
-    public async Task<DataResult<IApElement>> ExecuteAsync(IApElement input, List<FileReference> fileReferences)
+    public async Task<DataResult<IApElement>> ExecuteAsync(RunPipelineStep step)
     {
+        var input = step.CurrentStepInput!;
+        var fileReferences = step.FileReferences;
+
         var schemaIsCompatible = InputSchema.HasCompatibleSchemaWith(input);
         if (!schemaIsCompatible)
             return DataResult<IApElement>.Invalid(
@@ -62,7 +66,10 @@ public class PerformSingleOcrProcedure : IProcedure
             return DataResult<IApElement>.Invalid(
                 $"Procedure '{nameof(PerformSingleOcrProcedure)}' failed: missing file reference '{inputFile.Id}'");
 
-        var imageDataResult = await _fileReferenceDownloaderService.DownloadFileReferenceDataAsync(inputFileReference);
+        var imageDataResult = await _fileReferenceDownloaderService.DownloadFileReferenceDataAsync(
+            reference: inputFileReference,
+            userId: step.UserId
+        );
         if (imageDataResult.IsFailure)
             return DataResult<IApElement>.Failure(imageDataResult.Failures);
 
