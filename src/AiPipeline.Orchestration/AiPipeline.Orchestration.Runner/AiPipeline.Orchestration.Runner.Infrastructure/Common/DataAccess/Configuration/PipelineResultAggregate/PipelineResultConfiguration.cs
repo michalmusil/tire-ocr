@@ -1,4 +1,4 @@
-using AiPipeline.Orchestration.Runner.Domain.UserAggregate;
+using AiPipeline.Orchestration.Runner.Infrastructure.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,16 +15,20 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
 
         builder.Property(pr => pr.PipelineId)
             .IsRequired();
-        
+
         builder.Property(pr => pr.UserId)
             .IsRequired();
 
+        builder.Property(pr => pr.InitialInput)
+            .IsRequired(false)
+            .HasConversion(JsonUtils.GetApElementJsonValueConverter()!);
+
         builder.Property(pr => pr.FinishedAt)
             .IsRequired(false);
-        
+
         builder.Property(nt => nt.CreatedAt)
             .IsRequired();
-        
+
         builder.Property(nt => nt.UpdatedAt)
             .IsRequired();
 
@@ -34,7 +38,7 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
             .WithOne()
             .HasForeignKey(psr => psr.ResultId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder.HasOne<Domain.UserAggregate.User>()
             .WithMany()
             .HasForeignKey(pr => pr.UserId)

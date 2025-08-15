@@ -35,7 +35,13 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
             return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(pipelineBuildResult.Failures);
         var pipeline = pipelineBuildResult.Data!;
 
-        var initResult = await _mediator.Send(new InitPipelineResultCommand(pipeline.Id, runDto.UserId));
+        var initResult = await _mediator.Send(
+            new InitPipelineResultCommand(
+                PipelineId: pipeline.Id,
+                Input: runDto.Input,
+                UserId: runDto.UserId
+            )
+        );
         return await initResult.MapAsync(
             onSuccess: async () =>
             {

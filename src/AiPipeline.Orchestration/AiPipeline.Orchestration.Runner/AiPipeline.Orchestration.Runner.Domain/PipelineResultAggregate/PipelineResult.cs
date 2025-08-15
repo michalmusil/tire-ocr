@@ -1,4 +1,5 @@
 using AiPipeline.Orchestration.Runner.Domain.Common;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
@@ -9,6 +10,7 @@ public class PipelineResult : TimestampedEntity
     public Guid Id { get; }
     public Guid PipelineId { get; }
     public Guid UserId { get; }
+    public IApElement? InitialInput { get; }
     public DateTime? FinishedAt { get; private set; }
     public readonly List<PipelineStepResult> _stepResults;
     public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
@@ -17,11 +19,12 @@ public class PipelineResult : TimestampedEntity
     {
     }
 
-    public PipelineResult(Guid pipelineId, Guid userId, Guid? id = null)
+    public PipelineResult(Guid pipelineId, Guid userId, IApElement? initialInput, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         PipelineId = pipelineId;
         UserId = userId;
+        InitialInput = initialInput;
         FinishedAt = null;
         _stepResults = new List<PipelineStepResult>();
     }
@@ -42,7 +45,7 @@ public class PipelineResult : TimestampedEntity
     {
         var existingStepResult = _stepResults.FirstOrDefault(s => s.Id == stepResult.Id);
         if (existingStepResult is not null)
-            return Result.Conflict($"Step result {stepResult.Id} is already stored in result {Id}");
+            return Result.Conflict($"Step result '{stepResult.Id}' is already stored in result '{Id}'");
         _stepResults.Add(stepResult);
         SetUpdated();
         return Result.Success();
@@ -51,7 +54,7 @@ public class PipelineResult : TimestampedEntity
     public void MarkAsFinished(DateTime? finishedAt = null)
     {
         SetUpdated();
-        var inUtc = finishedAt == null ? DateTime.UtcNow : finishedAt.Value.ToUniversalTime();
+        var inUtc = finishedAt?.ToUniversalTime() ?? DateTime.UtcNow;
         FinishedAt = inUtc;
     }
 }
