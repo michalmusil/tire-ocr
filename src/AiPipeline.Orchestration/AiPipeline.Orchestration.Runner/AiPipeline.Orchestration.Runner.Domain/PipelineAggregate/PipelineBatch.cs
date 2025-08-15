@@ -49,6 +49,18 @@ public class PipelineBatch
         return Result.Success();
     }
 
+    public Result AddPipelines(params Pipeline[] pipelines)
+    {
+        var uniquePipelines = pipelines
+            .DistinctBy(p => p.Id)
+            .ToList();
+        if (uniquePipelines.Count != pipelines.Length)
+            return Result.Conflict("Attempted to add duplicate pipelines to a pipeline batch");
+
+        _pipelines.AddRange(uniquePipelines);
+        return Result.Success();
+    }
+
     public bool RemovePipeline(Pipeline pipeline)
     {
         return _pipelines.Remove(pipeline);

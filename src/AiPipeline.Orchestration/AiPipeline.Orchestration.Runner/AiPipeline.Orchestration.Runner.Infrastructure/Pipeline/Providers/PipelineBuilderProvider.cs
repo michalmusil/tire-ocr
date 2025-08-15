@@ -19,4 +19,7 @@ public class PipelineBuilderProvider : IPipelineBuilderProvider
 
     public IPipelineBuilder GetPipelineBuilder(Guid pipelineOwnerId) =>
         new PipelineBuilder(pipelineOwnerId, _unitOfWork, _fileRepository);
+
+    public IPipelineBatchBuilder GetPipelineBatchBuilder(Guid pipelineOwnerId) =>
+        new PipelineBatchBuilder(pipelineOwnerId, _unitOfWork, _fileRepository);
 }
