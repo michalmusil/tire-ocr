@@ -24,12 +24,15 @@ public class GetFileByIdQueryHandler : IQueryHandler<GetFileByIdQuery, FileDto>
         CancellationToken cancellationToken
     )
     {
-        var foundFile = await _fileRepository
-            .GetFileByIdAsync(request.Id);
-        if (foundFile is null)
-            return DataResult<FileDto>.NotFound($"File with id {request.Id} not found");
+        var fileResult = await _fileRepository
+            .GetFileByIdAsync(
+                fileId: request.Id,
+                userId: request.UserId
+            );
+        if (fileResult.IsFailure)
+            return DataResult<FileDto>.Failure(fileResult.Failures);
 
-        var dto = FileDto.FromDomain(foundFile);
+        var dto = FileDto.FromDomain(fileResult.Data!);
         return DataResult<FileDto>.Success(dto);
     }
 }

@@ -9,5 +9,8 @@ public class RemoveFileCommandValidator : AbstractValidator<RemoveFileCommand>
     {
         RuleFor(x => x.Id.ToString())
             .IsGuid();
+
+        RuleFor(x => x.UserId.ToString())
+            .IsGuid();
     }
 }

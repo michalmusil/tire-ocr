@@ -6,6 +6,7 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Commands.SaveFile;
 
 public record SaveFileCommand(
     Stream FileStream,
+    Guid UserId,
     FileStorageScope FileStorageScope,
     string ContentType,
     string OriginalFileName,

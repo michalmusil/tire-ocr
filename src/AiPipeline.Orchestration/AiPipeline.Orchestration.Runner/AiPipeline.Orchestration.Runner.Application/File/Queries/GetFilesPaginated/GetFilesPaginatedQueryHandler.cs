@@ -27,7 +27,9 @@ public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuer
     {
         var foundFiles =
             await _fileRepository
-                .GetFilesPaginatedAsync(request.Pagination,
+                .GetFilesPaginatedAsync(
+                    pagination: request.Pagination,
+                    userId: request.UserId,
                     storageScope: request.ScopeFilter
                 );
 

@@ -12,7 +12,7 @@ public static class ResultExtension
         return new RpcException(new Status(statusCode, primaryFailure.Message));
     }
 
-    public static RpcException ToRpcException<T>(this Result result)
+    public static RpcException ToRpcException(this Result result)
     {
         var primaryFailure = result.PrimaryFailure!;
         var statusCode = GetStatusCode(primaryFailure.Code);

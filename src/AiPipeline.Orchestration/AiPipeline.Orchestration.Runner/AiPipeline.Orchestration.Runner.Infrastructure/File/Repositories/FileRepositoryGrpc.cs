@@ -24,12 +24,15 @@ public class FileRepositoryGrpc : IFileRepository
         _grpcClient = grpcClient;
     }
 
-    public async Task<PaginatedCollection<FileValueObject>> GetFilesPaginatedAsync(PaginationParams pagination,
+    public async Task<PaginatedCollection<FileValueObject>> GetFilesPaginatedAsync(
+        PaginationParams pagination,
+        Guid userId,
         FileStorageScope? storageScope = null)
     {
         var serverStorageScope = storageScope.ToGrpcServerStorageScope();
         var request = new GetAllFilesRequest(
             serverStorageScope,
+            userId,
             PageNumber: pagination.PageNumber,
             PageSize: pagination.PageSize
         );
@@ -50,53 +53,45 @@ public class FileRepositoryGrpc : IFileRepository
         return collection;
     }
 
-    public async Task<IEnumerable<FileValueObject>> GetFilesByIdsAsync(params Guid[] fileIds)
+    public async Task<DataResult<IEnumerable<FileValueObject>>> GetFilesByIdsAsync(Guid userId, params Guid[] fileIds)
     {
-        var request = new GetFilesByIdsRequest(fileIds, true);
+        var request = new GetFilesByIdsRequest(fileIds, userId, true);
         var result = await _grpcClient.GetFilesByIdsAsync(request);
         if (result.IsFailure)
-            result.PrimaryFailure!.ThrowAsException();
+            return DataResult<IEnumerable<FileValueObject>>.Failure(result.Failures);
 
         var valueObjects = result.Data!.Items.Select(MapGrpcFileToLocalValueObject);
-        return valueObjects;
+        return DataResult<IEnumerable<FileValueObject>>.Success(valueObjects);
     }
 
-    public async Task<FileValueObject?> GetFileByIdAsync(Guid fileId)
+    public async Task<DataResult<FileValueObject>> GetFileByIdAsync(Guid fileId, Guid userId)
     {
-        var request = new GetFileByIdRequest(fileId);
+        var request = new GetFileByIdRequest(fileId, userId);
         var result = await _grpcClient.GetFileByIdAsync(request);
         if (result.IsFailure)
-        {
-            if (result.PrimaryFailure!.Code == 404)
-                return null;
-
-            result.PrimaryFailure!.ThrowAsException();
-        }
+            return DataResult<FileValueObject>.Failure(result.Failures);
 
         var valueObject = MapGrpcFileToLocalValueObject(result.Data!.File);
-        return valueObject;
+        return DataResult<FileValueObject>.Success(valueObject);
     }
 
-    public async Task<Stream?> GetFileDataByIdAsync(Guid fileId)
+    public async Task<DataResult<Stream>> GetFileDataByIdAsync(Guid fileId, Guid userId)
     {
-        var request = new DownloadFileRequest(fileId);
+        var request = new DownloadFileRequest(fileId, userId);
         var result = await _grpcClient.DownloadFileAsync(request);
         if (result.IsFailure)
-        {
-            if (result.PrimaryFailure!.Code == 404)
-                return null;
+            return DataResult<Stream>.Failure(result.Failures);
 
-            result.PrimaryFailure!.ThrowAsException();
-        }
-
-        return result.Data!.FileData;
+        return DataResult<Stream>.Success(result.Data!.FileData);
     }
 
-    public async Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream,
+    public async Task<DataResult<FileValueObject>> Add(Guid userId, string fileName, string contentType,
+        Stream fileStream,
         FileStorageScope? storageScope, Guid? guid)
     {
         var request = new UploadFileRequest(
             FileName: fileName,
+            UserId: userId,
             ContentType: contentType,
             FileData: fileStream,
             Id: guid,
@@ -111,9 +106,9 @@ public class FileRepositoryGrpc : IFileRepository
         return DataResult<FileValueObject>.Success(valueObject);
     }
 
-    public async Task<Result> Remove(Guid fileId)
+    public async Task<Result> Remove(Guid fileId, Guid userId)
     {
-        var request = new RemoveFileRequest(fileId);
+        var request = new RemoveFileRequest(fileId, userId);
         return await _grpcClient.RemoveFileAsync(request);
     }
 
@@ -134,6 +129,7 @@ public class FileRepositoryGrpc : IFileRepository
         return new FileValueObject
         {
             Id = grpcDto.Id,
+            UserId = grpcDto.UserId,
             Path = grpcDto.Path,
             ContentType = grpcDto.ContentType,
             StorageProvider = grpcDto.StorageProvider,

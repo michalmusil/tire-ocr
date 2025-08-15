@@ -162,16 +162,11 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
-            return new RemoveFileResponse
-            {
-                Success = false,
-                WasFound = result.PrimaryFailure?.Code != 404
-            };
+            throw result.ToRpcException();
 
         return new RemoveFileResponse
         {
             Success = true,
-            WasFound = true
         };
     }
 

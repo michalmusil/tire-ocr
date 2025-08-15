@@ -107,5 +107,4 @@ message RemoveFileRequest {
 
 message RemoveFileResponse {
   bool success = 1;
-  bool wasFound = 2;
 }

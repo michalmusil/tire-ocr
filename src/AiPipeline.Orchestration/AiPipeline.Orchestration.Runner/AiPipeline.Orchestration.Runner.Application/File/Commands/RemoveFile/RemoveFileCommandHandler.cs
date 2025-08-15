@@ -15,5 +15,5 @@ public class RemoveFileCommandHandler : ICommandHandler<RemoveFileCommand>
 
 
     public Task<Result> Handle(RemoveFileCommand request, CancellationToken cancellationToken) =>
-        _fileRepository.Remove(request.Id);
+        _fileRepository.Remove(fileId: request.Id, userId: request.UserId);
 }

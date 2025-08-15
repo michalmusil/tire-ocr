@@ -161,10 +161,11 @@ public class PipelineBuilder : IPipelineBuilder
                     .Distinct()
                     .ToArray();
 
-                var foundFiles = (await _fileRepository.GetFilesByIdsAsync(fileIds))
-                    .ToList();
+                var filesResult = await _fileRepository.GetFilesByIdsAsync(userId: _userId, fileIds: fileIds);
+                if (filesResult.IsFailure)
+                    return Result.Failure(filesResult.Failures);
                 _files.Clear();
-                _files.AddRange(foundFiles);
+                _files.AddRange(filesResult.Data!);
                 return Result.Success();
             }
         );

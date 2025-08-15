@@ -1,6 +1,5 @@
 using AiPipeline.Orchestration.Runner.Application.File.Dtos;
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
-using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -33,6 +32,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, FileDto>
         var fileName = $"{fileId}{fileExtension}";
         var saveFileResult = await _fileRepository.Add(
             fileStream: stream,
+            userId: request.UserId,
             contentType: request.ContentType,
             fileName: fileName,
             storageScope: request.FileStorageScope,

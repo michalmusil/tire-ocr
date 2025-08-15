@@ -41,6 +41,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var serverRequest = new GrpcServer.GetAllFilesRequest
         {
             PageNumber = request.PageNumber,
+            UserGuid = request.UserId.ToString(),
             PageSize = request.PageSize,
             StorageScopeFilter = GetStorageScope(request.StorageScopeFilter),
         };
@@ -80,6 +81,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var serverRequest = new GrpcServer.GetFileByIdRequest
         {
             FileGuid = request.Id.ToString(),
+            UserGuid = request.UserId.ToString(),
         };
         try
         {
@@ -105,6 +107,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var guidsAsString = request.Ids.Select(id => id.ToString());
         var serverRequest = new GrpcServer.GetFilesByIdsRequest
         {
+            UserGuid = request.UserId.ToString(),
             FailIfNotAllFound = request.FailIfNotAllFound,
         };
         serverRequest.FileGuids.AddRange(guidsAsString);
@@ -137,6 +140,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var serverRequest = new GrpcServer.UploadFileRequest
         {
             FileGuid = request.Id?.ToString(),
+            UserGuid = request.UserId.ToString(),
             ContentType = request.ContentType,
             FileName = request.FileName,
             FileData = serverFileData,
@@ -166,6 +170,7 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var serverRequest = new GrpcServer.DownloadFileRequest
         {
             FileGuid = request.Id.ToString(),
+            UserGuid = request.UserId.ToString(),
         };
         try
         {
@@ -196,14 +201,12 @@ public class GrpcFileServiceClient : IFileSerivceClient
         var serverRequest = new GrpcServer.RemoveFileRequest
         {
             FileGuid = request.Id.ToString(),
+            UserGuid = request.UserId.ToString(),
         };
         try
         {
             var response =
                 await _client.RemoveFileAsync(serverRequest, cancellationToken: ct ?? CancellationToken.None);
-
-            if (!response.WasFound)
-                return Result.NotFound($"File with id '{request.Id}' was not found");
 
             if (!response.Success)
                 return Result.Failure(new Failure(500, $"Failed to remove file '{request.Id}'"));

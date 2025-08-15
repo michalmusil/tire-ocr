@@ -7,15 +7,15 @@ namespace AiPipeline.Orchestration.Runner.Application.File.Repositories;
 public interface IFileRepository
 {
     public Task<PaginatedCollection<FileValueObject>> GetFilesPaginatedAsync(
-        PaginationParams pagination, FileStorageScope? storageScope = null
+        PaginationParams pagination, Guid userId, FileStorageScope? storageScope = null
     );
 
-    public Task<IEnumerable<FileValueObject>> GetFilesByIdsAsync(params Guid[] fileIds);
-    public Task<FileValueObject?> GetFileByIdAsync(Guid fileId);
-    public Task<Stream?> GetFileDataByIdAsync(Guid fileId);
+    public Task<DataResult<IEnumerable<FileValueObject>>> GetFilesByIdsAsync(Guid userId, params Guid[] fileIds);
+    public Task<DataResult<FileValueObject>> GetFileByIdAsync(Guid fileId, Guid userId);
+    public Task<DataResult<Stream>> GetFileDataByIdAsync(Guid fileId, Guid userId);
 
-    public Task<DataResult<FileValueObject>> Add(string fileName, string contentType, Stream fileStream,
+    public Task<DataResult<FileValueObject>> Add(Guid userId, string fileName, string contentType, Stream fileStream,
         FileStorageScope? storageScope, Guid? guid);
 
-    public Task<Result> Remove(Guid fileId);
+    public Task<Result> Remove(Guid fileId, Guid userId);
 }
