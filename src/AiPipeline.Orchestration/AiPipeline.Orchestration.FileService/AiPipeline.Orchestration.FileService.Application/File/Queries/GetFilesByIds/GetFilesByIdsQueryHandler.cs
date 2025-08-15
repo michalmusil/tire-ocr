@@ -24,7 +24,7 @@ public class GetFilesByIdsQueryHandler : IQueryHandler<GetFilesByIdsQuery, IEnum
     )
     {
         var fileIds = request.FileIds.ToArray();
-        var foundFiles = (await _fileEntityRepository.GetFilesByIdsAsync(fileIds))
+        var foundFiles = (await _fileEntityRepository.GetFilesByIdsAsync(userId: request.UserId, fileIds))
             .ToList();
 
         if (request.FailIfNotAllFound)

@@ -28,9 +28,11 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
     public override async Task<GetAllFilesResponse> GetAllFilesPaginated(GetAllFilesRequest request,
         ServerCallContext context)
     {
+        var userId = new Guid(request.UserGuid);
         var pagination = new PaginationParams(request.PageNumber, request.PageSize);
         var query = new GetFilesPaginatedQuery(
             Pagination: pagination,
+            UserId: userId,
             ScopeFilter: request.StorageScopeFilter.ToFileStorageScope()
         );
         var result = await _mediator.Send(query);
@@ -63,8 +65,9 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
 
     public override async Task<GetFileByIdResponse> GetFileById(GetFileByIdRequest request, ServerCallContext context)
     {
+        var userGuid = new Guid(request.UserGuid);
         var fileGuid = new Guid(request.FileGuid);
-        var query = new GetFileByIdQuery(fileGuid);
+        var query = new GetFileByIdQuery(fileGuid, userGuid);
         var result = await _mediator.Send(query);
 
         if (result.IsFailure)
@@ -82,11 +85,16 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
     public override async Task<GetFilesByIdsResponse> GetFilesByIds(GetFilesByIdsRequest request,
         ServerCallContext context)
     {
+        var userGuid = new Guid(request.UserGuid);
         var guids = request.FileGuids
             .Select(fg => new Guid(fg))
             .Where(g => g != Guid.Empty)
             .ToList();
-        var query = new GetFilesByIdsQuery(guids, request.FailIfNotAllFound);
+        var query = new GetFilesByIdsQuery(
+            FileIds: guids,
+            UserId: userGuid,
+            FailIfNotAllFound: request.FailIfNotAllFound
+        );
         var result = await _mediator.Send(query);
         if (result.IsFailure)
             throw result.ToRpcException();
@@ -102,12 +110,14 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
 
     public override async Task<UploadFileResponse> UploadFile(UploadFileRequest request, ServerCallContext context)
     {
+        var userGuid = new Guid(request.UserGuid);
         Guid? fileGuid = request.FileGuid is null ? null : new Guid(request.FileGuid);
         using var fileStream = new MemoryStream(request.FileData.ToByteArray());
         fileStream.Position = 0;
 
         var command = new SaveFileCommand(
             FileStream: fileStream,
+            UserId: userGuid,
             FileStorageScope: request.StorageScope.ToFileStorageScope() ?? FileStorageScope.ShortTerm,
             ContentType: request.ContentType,
             OriginalFileName: request.FileName,
@@ -126,8 +136,9 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
     public override async Task<DownloadFileResponse> DownloadFile(DownloadFileRequest request,
         ServerCallContext context)
     {
+        var userGuid = new Guid(request.UserGuid);
         var fileGuid = new Guid(request.FileGuid);
-        var query = new GetFileWithDataByIdQuery(fileGuid);
+        var query = new GetFileWithDataByIdQuery(Id: fileGuid, UserId: userGuid);
         var result = await _mediator.Send(query);
         if (result.IsFailure)
             throw result.ToRpcException();
@@ -145,8 +156,9 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
 
     public override async Task<RemoveFileResponse> RemoveFile(RemoveFileRequest request, ServerCallContext context)
     {
+        var userGuid = new Guid(request.UserGuid);
         var fileGuid = new Guid(request.FileGuid);
-        var command = new RemoveFileCommand(fileGuid);
+        var command = new RemoveFileCommand(Id: fileGuid, UserId: userGuid);
         var result = await _mediator.Send(command);
 
         if (result.IsFailure)
@@ -168,6 +180,7 @@ public class FileService : FileServiceInterface.FileServiceInterfaceBase
         return new FileDto
         {
             FileGuid = localDto.Id.ToString(),
+            UserGuid = localDto.UserId.ToString(),
             ContentType = localDto.ContentType,
             FileStorageScope = localDto.FileStorageScope.ToStorageScope(),
             Path = localDto.Path,

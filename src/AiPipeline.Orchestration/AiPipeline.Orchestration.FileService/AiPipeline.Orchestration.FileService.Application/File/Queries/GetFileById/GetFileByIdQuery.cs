@@ -3,4 +3,4 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.FileService.Application.File.Queries.GetFileById;
 
-public record GetFileByIdQuery(Guid Id) : IQuery<GetFileDto>;
+public record GetFileByIdQuery(Guid Id, Guid UserId) : IQuery<GetFileDto>;

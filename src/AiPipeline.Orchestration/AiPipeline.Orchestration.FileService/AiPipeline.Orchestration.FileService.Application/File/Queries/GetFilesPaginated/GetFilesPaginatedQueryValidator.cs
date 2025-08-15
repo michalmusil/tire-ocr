@@ -9,5 +9,8 @@ public class GetFilesPaginatedQueryValidator : AbstractValidator<GetFilesPaginat
     {
         RuleFor(q => q.Pagination)
             .IsValidPagination();
+
+        RuleFor(q => q.UserId.ToString())
+            .IsGuid();
     }
 }

@@ -1,3 +1,3 @@
 namespace AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.RemoveFile;
 
-public record RemoveFileRequest(Guid Id);
+public record RemoveFileRequest(Guid Id, Guid UserId);

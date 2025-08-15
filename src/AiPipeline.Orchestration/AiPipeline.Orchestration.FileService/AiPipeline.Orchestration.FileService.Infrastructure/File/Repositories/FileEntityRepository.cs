@@ -22,11 +22,11 @@ public class FileEntityRepository : IFileEntityRepository
     }
 
     public async Task<PaginatedCollection<Domain.FileAggregate.File>> GetFilesPaginatedAsync(
-        PaginationParams pagination,
+        PaginationParams pagination, Guid userId,
         FileStorageScope? storageScope = null)
     {
         var query = GetBasicQuery()
-            .Where(f => storageScope == null || f.FileStorageScope == storageScope)
+            .Where(f => f.UserId == userId && (storageScope == null || f.FileStorageScope == storageScope))
             .OrderByDescending(f => f.UpdatedAt);
 
         return await query.ToPaginatedList(pagination);
@@ -38,10 +38,10 @@ public class FileEntityRepository : IFileEntityRepository
             .FirstOrDefaultAsync(f => f.Id == fileId);
     }
 
-    public async Task<IEnumerable<Domain.FileAggregate.File>> GetFilesByIdsAsync(params Guid[] fileIds)
+    public async Task<IEnumerable<Domain.FileAggregate.File>> GetFilesByIdsAsync(Guid? userId, params Guid[] fileIds)
     {
         return await GetBasicQuery()
-            .Where(f => fileIds.Contains(f.Id))
+            .Where(f => fileIds.Contains(f.Id) && (userId == null || f.UserId == userId))
             .ToListAsync();
     }
 

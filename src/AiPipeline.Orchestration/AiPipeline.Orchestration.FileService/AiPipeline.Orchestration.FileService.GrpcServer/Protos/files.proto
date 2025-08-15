@@ -37,6 +37,7 @@ message FileDto {
   string content_type = 3;
   string storage_provider = 4;
   string path = 5;
+  string user_guid = 6;
 }
 
 // GET ALL FILES PAGINATED
@@ -44,15 +45,18 @@ message GetAllFilesRequest {
   optional StorageScope storage_scope_filter = 1;
   int32 page_number = 2;
   int32 page_size = 3;
+  string user_guid = 4;
 }
 message GetAllFilesResponse {
   repeated FileDto items = 1;
   Pagination pagination = 2;
+  string user_guid = 3;
 }
 
 // GET FILE BY ID
 message GetFileByIdRequest {
   string file_guid = 1;
+  string user_guid = 2;
 }
 
 message GetFileByIdResponse {
@@ -63,6 +67,7 @@ message GetFileByIdResponse {
 message GetFilesByIdsRequest {
   repeated string file_guids = 1;
   bool fail_if_not_all_found = 2;
+  string user_guid = 3;
 }
 
 message GetFilesByIdsResponse {
@@ -76,6 +81,7 @@ message UploadFileRequest {
   bytes file_data = 3;
   StorageScope storage_scope = 4;
   optional string file_guid = 5;
+  string user_guid = 6;
 }
 
 message UploadFileResponse {
@@ -85,6 +91,7 @@ message UploadFileResponse {
 // DOWNLOAD FILE
 message DownloadFileRequest {
   string file_guid = 1;
+  string user_guid = 2;
 }
 
 message DownloadFileResponse {
@@ -95,6 +102,7 @@ message DownloadFileResponse {
 // REMOVE FILE
 message RemoveFileRequest {
   string file_guid = 1;
+  string user_guid = 2;
 }
 
 message RemoveFileResponse {

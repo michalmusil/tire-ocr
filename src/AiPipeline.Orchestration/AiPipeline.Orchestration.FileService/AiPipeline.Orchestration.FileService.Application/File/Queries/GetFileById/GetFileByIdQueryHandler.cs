@@ -23,10 +23,13 @@ public class GetFileByIdQueryHandler : IQueryHandler<GetFileByIdQuery, GetFileDt
         CancellationToken cancellationToken
     )
     {
-        var foundFile = await _fileEntityRepository
-            .GetFileByIdAsync(request.Id);
+        var foundFile = await _fileEntityRepository.GetFileByIdAsync(request.Id);
         if (foundFile is null)
             return DataResult<GetFileDto>.NotFound($"File with id {request.Id} not found");
+
+        if (foundFile.UserId != request.UserId)
+            return DataResult<GetFileDto>.Forbidden(
+                $"User '{request.UserId}' is not authorized to access file '{request.Id}'");
 
         var dto = GetFileDto.FromDomain(foundFile);
         return DataResult<GetFileDto>.Success(dto);

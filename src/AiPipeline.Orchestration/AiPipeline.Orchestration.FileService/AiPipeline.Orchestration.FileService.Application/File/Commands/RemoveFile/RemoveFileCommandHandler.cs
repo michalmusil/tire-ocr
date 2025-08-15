@@ -27,6 +27,9 @@ public class RemoveFileCommandHandler : ICommandHandler<RemoveFileCommand>
         if (foundFile is null)
             return Result.NotFound($"File with id {request.Id} was not found");
 
+        if (foundFile.UserId != request.UserId)
+            return Result.Forbidden($"User '{request.UserId}' is not authorized to delete file '{foundFile.Id}'");
+
         var fileName = Path.GetFileName(foundFile.Path);
         var removed = await _fileStorageProviderRepository
             .RemoveFileAsync(

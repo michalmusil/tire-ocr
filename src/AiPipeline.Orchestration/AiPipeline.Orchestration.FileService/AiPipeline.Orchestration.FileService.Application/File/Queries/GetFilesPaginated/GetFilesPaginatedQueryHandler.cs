@@ -25,10 +25,11 @@ public class GetFilesPaginatedQueryHandler : IQueryHandler<GetFilesPaginatedQuer
     )
     {
         var foundFiles =
-            await _fileEntityRepository
-                .GetFilesPaginatedAsync(request.Pagination,
-                    storageScope: request.ScopeFilter
-                );
+            await _fileEntityRepository.GetFilesPaginatedAsync(
+                request.Pagination,
+                request.UserId,
+                storageScope: request.ScopeFilter
+            );
 
         var fileDtos = foundFiles.Items
             .Select(GetFileDto.FromDomain)

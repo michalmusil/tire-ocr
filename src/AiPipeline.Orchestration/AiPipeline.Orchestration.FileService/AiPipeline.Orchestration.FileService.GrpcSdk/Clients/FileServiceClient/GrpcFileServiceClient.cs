@@ -245,11 +245,12 @@ public class GrpcFileServiceClient : IFileSerivceClient
     private GetFileDto MapToFileDto(FileDto remoteFileDto)
     {
         return new GetFileDto(
-            new Guid(remoteFileDto.FileGuid),
-            GetFileStorageScope(remoteFileDto.FileStorageScope) ?? FileStorageScope.Temporary,
-            remoteFileDto.ContentType,
-            remoteFileDto.StorageProvider,
-            remoteFileDto.Path
+            Id: new Guid(remoteFileDto.FileGuid),
+            UserId: new Guid(remoteFileDto.UserGuid),
+            FileStorageScope: GetFileStorageScope(remoteFileDto.FileStorageScope) ?? FileStorageScope.Temporary,
+            ContentType: remoteFileDto.ContentType,
+            StorageProvider: remoteFileDto.StorageProvider,
+            Path: remoteFileDto.Path
         );
     }
 }

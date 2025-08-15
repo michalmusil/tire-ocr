@@ -9,5 +9,6 @@ public record SaveFileCommand(
     FileStorageScope FileStorageScope,
     string ContentType,
     string OriginalFileName,
+    Guid UserId,
     Guid? Id = null
 ) : ICommand<GetFileDto>;

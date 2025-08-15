@@ -4,6 +4,7 @@ namespace AiPipeline.Orchestration.FileService.Application.File.Dtos;
 
 public record GetFileDto(
     Guid Id,
+    Guid UserId,
     FileStorageScope FileStorageScope,
     string ContentType,
     string StorageProvider,
@@ -14,6 +15,7 @@ public record GetFileDto(
     {
         return new GetFileDto(
             Id: domain.Id,
+            UserId: domain.UserId,
             FileStorageScope: domain.FileStorageScope,
             ContentType: domain.ContentType,
             StorageProvider: domain.StorageProvider,

@@ -4,6 +4,7 @@ namespace AiPipeline.Orchestration.FileService.GrpcSdk.Contracts.Files.GetAllFil
 
 public record GetAllFilesRequest(
     FileStorageScope? StorageScopeFilter,
+    Guid UserId,
     int PageNumber,
     int PageSize
 );

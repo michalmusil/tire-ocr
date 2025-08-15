@@ -48,6 +48,7 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
         var filePath = _fileStorageProviderRepository.GetFullFilePathFor(request.FileStorageScope, fileName);
         var file = new FileService.Domain.FileAggregate.File(
             id: fileId,
+            userId: request.UserId,
             fileStorageScope: request.FileStorageScope,
             storageProvider: storageProviderName,
             path: filePath,

@@ -9,5 +9,8 @@ public class GetFileWithDataByIdQueryValidator : AbstractValidator<GetFileWithDa
     {
         RuleFor(q => q.Id.ToString())
             .IsGuid();
+
+        RuleFor(q => q.UserId.ToString())
+            .IsGuid();
     }
 }

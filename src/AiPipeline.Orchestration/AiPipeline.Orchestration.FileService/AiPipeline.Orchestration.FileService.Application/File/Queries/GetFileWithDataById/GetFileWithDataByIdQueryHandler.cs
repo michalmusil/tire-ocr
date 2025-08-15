@@ -30,6 +30,10 @@ public class GetFileWithDataByIdQueryHandler : IQueryHandler<GetFileWithDataById
         if (foundFile is null)
             return DataResult<GetFileWithDataStreamDto>.NotFound($"File with id {request.Id} not found");
 
+        if (foundFile.UserId != request.UserId)
+            return DataResult<GetFileWithDataStreamDto>.Forbidden(
+                $"User '{request.UserId}' is not authorized to access file '{request.Id}'");
+
         var fileName = Path.GetFileName(foundFile.Path);
         var dataStream = await _fileStorageProviderRepository.DownloadFileAsync(
             scope: foundFile.FileStorageScope,
