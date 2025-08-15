@@ -4,5 +4,5 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.InitPipelineResult;
 
-public record InitPipelineResultCommand(Guid PipelineId, Guid UserId, IApElement Input)
+public record InitPipelineResultCommand(Guid PipelineId, Guid UserId, IApElement Input, Guid? BatchId)
     : ICommand<GetPipelineResultDto>;

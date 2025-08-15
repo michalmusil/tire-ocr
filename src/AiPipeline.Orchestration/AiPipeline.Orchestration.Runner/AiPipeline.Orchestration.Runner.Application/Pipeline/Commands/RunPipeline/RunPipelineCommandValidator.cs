@@ -12,6 +12,9 @@ public class RunPipelineCommandValidator : AbstractValidator<RunPipelineCommand>
 
         RuleFor(x => x.Dto.UserId.ToString())
             .IsGuid();
+        
+        RuleFor(x => x.Dto.Steps.Count)
+            .GreaterThan(0);
 
         RuleForEach(x => x.Dto.Steps)
             .Must(x => x.NodeId.Trim().Length != 0)

@@ -21,7 +21,7 @@ public class RunPipelineAwaitedCommandHandler : ICommandHandler<RunPipelineAwait
     public async Task<DataResult<GetPipelineResultDto>> Handle(RunPipelineAwaitedCommand request,
         CancellationToken cancellationToken)
     {
-        var runPipelineResult = await _pipelineRunnerFacade.RunPipelineAsync(request.Dto);
+        var runPipelineResult = await _pipelineRunnerFacade.RunSinglePipelineAsync(request.Dto);
         if (runPipelineResult.IsFailure)
             return DataResult<GetPipelineResultDto>.Failure(runPipelineResult.Failures);
 

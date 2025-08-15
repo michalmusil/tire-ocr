@@ -23,7 +23,7 @@ public class RunPipelineCommandHandler : ICommandHandler<RunPipelineCommand, Pip
         CancellationToken cancellationToken
     )
     {
-        var runPipelineResult = await _pipelineRunnerFacade.RunPipelineAsync(request.Dto);
+        var runPipelineResult = await _pipelineRunnerFacade.RunSinglePipelineAsync(request.Dto);
 
         return runPipelineResult.Map(
             onSuccess: pipeline => DataResult<PipelineDto>.Success(PipelineDto.FromDomain(pipeline)),

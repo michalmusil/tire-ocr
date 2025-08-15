@@ -13,7 +13,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="PipelineResultBatch\" />
+      <Folder Include="PipelineResultBatch\Commands\" />
+      <Folder Include="PipelineResultBatch\Dtos\" />
     </ItemGroup>
 
 </Project>

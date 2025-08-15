@@ -25,6 +25,7 @@ public class InitPipelineResultCommandHandler : ICommandHandler<InitPipelineResu
     {
         var newResult = new Domain.PipelineResultAggregate.PipelineResult(
             pipelineId: request.PipelineId,
+            batchId: request.BatchId,
             initialInput: request.Input,
             userId: request.UserId
         );

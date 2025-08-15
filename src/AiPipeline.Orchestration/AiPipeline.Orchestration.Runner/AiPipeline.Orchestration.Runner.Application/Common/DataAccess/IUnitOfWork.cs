@@ -1,6 +1,7 @@
 using AiPipeline.Orchestration.Runner.Application.File.Repositories;
 using AiPipeline.Orchestration.Runner.Application.NodeType.Repositories;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Repositories;
 using AiPipeline.Orchestration.Runner.Application.User.Repositories;
 
 namespace AiPipeline.Orchestration.Runner.Application.Common.DataAccess;
@@ -12,6 +13,7 @@ public interface IUnitOfWork
     public IUserEntityRepository UserRepository { get; }
     public IRefreshTokenEntityRepository RefreshTokenRepository { get; }
     public IApiKeyRepository ApiKeyRepository { get; }
+    public IPipelineResultBatchEntityRepository PipelineResultBatchRepository { get; }
 
     public Task SaveChangesAsync();
 }

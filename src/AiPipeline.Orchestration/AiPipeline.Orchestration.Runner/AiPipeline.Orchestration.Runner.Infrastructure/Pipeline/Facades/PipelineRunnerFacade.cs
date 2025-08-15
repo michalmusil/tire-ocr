@@ -22,7 +22,7 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
         _pipelinePublisher = pipelinePublisher;
     }
 
-    public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> RunPipelineAsync(RunPipelineDto runDto)
+    public async Task<DataResult<Domain.PipelineAggregate.Pipeline>> RunSinglePipelineAsync(RunPipelineDto runDto)
     {
         var pipelineBuilder = _pipelineBuilderProvider.GetPipelineBuilder(pipelineOwnerId: runDto.UserId);
 
@@ -38,6 +38,7 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
         var initResult = await _mediator.Send(
             new InitPipelineResultCommand(
                 PipelineId: pipeline.Id,
+                BatchId: null,
                 Input: runDto.Input,
                 UserId: runDto.UserId
             )

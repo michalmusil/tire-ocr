@@ -6,6 +6,7 @@ using AiPipeline.Orchestration.Runner.Application.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Repositories;
 using AiPipeline.Orchestration.Runner.Application.User.Repositories;
 using AiPipeline.Orchestration.Runner.Application.User.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
@@ -15,6 +16,7 @@ using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Infrastructure.PipelineResult.Repositories;
+using AiPipeline.Orchestration.Runner.Infrastructure.PipelineResultBatch.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.User.Repositories;
 using AiPipeline.Orchestration.Runner.Infrastructure.User.Services;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +48,7 @@ public static class DependencyInjection
         services.AddScoped<IUserEntityRepository, UserEntityRepository>();
         services.AddScoped<IRefreshTokenEntityRepository, RefreshTokenEntityRepository>();
         services.AddScoped<IApiKeyRepository, ApiKeyRepository>();
+        services.AddScoped<IPipelineResultBatchEntityRepository, PipelineResultBatchEntityRepository>();
     }
 
     public static void AddUnitOfWork(this IServiceCollection serviceCollection)
