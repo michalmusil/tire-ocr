@@ -38,6 +38,12 @@ public class PipelineResultEntityRepositoryFake : IPipelineResultEntityRepositor
         return Task.CompletedTask;
     }
 
+    public Task AddRange(IEnumerable<Domain.PipelineResultAggregate.PipelineResult> pipelineResults)
+    {
+        _pipelineResults.AddRange(pipelineResults);
+        return Task.CompletedTask;
+    }
+
     public Task Remove(Domain.PipelineResultAggregate.PipelineResult pipelineResult)
     {
         _pipelineResults.Remove(pipelineResult);

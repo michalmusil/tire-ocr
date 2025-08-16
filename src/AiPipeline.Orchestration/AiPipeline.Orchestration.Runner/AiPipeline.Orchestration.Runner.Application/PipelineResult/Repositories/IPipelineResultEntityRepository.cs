@@ -13,5 +13,6 @@ public interface IPipelineResultEntityRepository : IEntityRepository
     public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(Guid pipelineId);
 
     public Task Add(Domain.PipelineResultAggregate.PipelineResult pipelineResult);
+    public Task AddRange(IEnumerable<Domain.PipelineResultAggregate.PipelineResult> pipelineResults);
     public Task Remove(Domain.PipelineResultAggregate.PipelineResult pipelineResult);
 }

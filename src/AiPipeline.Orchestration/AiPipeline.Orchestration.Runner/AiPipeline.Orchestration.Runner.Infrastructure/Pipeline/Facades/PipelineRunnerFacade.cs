@@ -3,7 +3,7 @@ using AiPipeline.Orchestration.Runner.Application.Pipeline.Facades;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Providers;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Commands.InitPipelineResult;
-using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Commands.InitPipelineBatchResults;
+using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Commands.InitPipelineResultBatch;
 using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 using MediatR;
 using TireOcr.Shared.Result;
@@ -71,7 +71,7 @@ public class PipelineRunnerFacade : IPipelineRunnerFacade
             return DataResult<PipelineBatch>.Failure(pipelineBatchBuildResult.Failures);
         var batch = pipelineBatchBuildResult.Data!;
 
-        var initResult = await _mediator.Send(new InitPipelineBatchResultsCommand(batch));
+        var initResult = await _mediator.Send(new InitPipelineResultBatchCommand(batch));
         return await initResult.MapAsync(
             onSuccess: async () =>
             {

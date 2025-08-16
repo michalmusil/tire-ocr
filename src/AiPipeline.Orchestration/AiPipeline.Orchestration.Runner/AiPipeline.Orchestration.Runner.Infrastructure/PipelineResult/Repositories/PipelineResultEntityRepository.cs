@@ -50,6 +50,11 @@ public class PipelineResultEntityRepository : IPipelineResultEntityRepository
             .AddAsync(pipelineResult);
     }
 
+    public Task AddRange(IEnumerable<Domain.PipelineResultAggregate.PipelineResult> pipelineResults)
+    {
+        return _dbContext.AddRangeAsync(pipelineResults);
+    }
+
     public Task Remove(Domain.PipelineResultAggregate.PipelineResult pipelineResult)
     {
         _dbContext.PipelineResults
