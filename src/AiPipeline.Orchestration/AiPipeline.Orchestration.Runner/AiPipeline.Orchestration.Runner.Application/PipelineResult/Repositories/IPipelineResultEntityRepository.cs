@@ -9,6 +9,9 @@ public interface IPipelineResultEntityRepository : IEntityRepository
         PaginationParams pagination, Guid userId
     );
 
+    public Task<IEnumerable<Domain.PipelineResultAggregate.PipelineResult>>
+        GetPipelineResultsByBatchIdAsync(Guid batchId);
+
     public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(Guid id);
     public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByPipelineIdAsync(Guid pipelineId);
 

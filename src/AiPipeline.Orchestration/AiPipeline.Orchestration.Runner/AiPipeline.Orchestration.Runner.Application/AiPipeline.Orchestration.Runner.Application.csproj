@@ -12,9 +12,4 @@
       <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Domain\AiPipeline.Orchestration.Runner.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="PipelineResultBatch\Commands\" />
-      <Folder Include="PipelineResultBatch\Dtos\" />
-    </ItemGroup>
-
 </Project>

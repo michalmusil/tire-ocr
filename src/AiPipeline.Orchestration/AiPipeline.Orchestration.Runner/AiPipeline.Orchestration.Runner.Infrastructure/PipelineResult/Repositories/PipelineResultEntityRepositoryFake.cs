@@ -22,6 +22,17 @@ public class PipelineResultEntityRepositoryFake : IPipelineResultEntityRepositor
         );
     }
 
+    public Task<IEnumerable<Domain.PipelineResultAggregate.PipelineResult>>
+        GetPipelineResultsByBatchIdAsync(Guid batchId)
+    {
+        var results = _pipelineResults
+            .Where(pr => pr.BatchId == batchId)
+            .OrderByDescending(pr => pr.UpdatedAt)
+            .AsEnumerable();
+
+        return Task.FromResult(results);
+    }
+
     public Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(Guid id)
     {
         return Task.FromResult(_pipelineResults.FirstOrDefault(pr => pr.Id == id));

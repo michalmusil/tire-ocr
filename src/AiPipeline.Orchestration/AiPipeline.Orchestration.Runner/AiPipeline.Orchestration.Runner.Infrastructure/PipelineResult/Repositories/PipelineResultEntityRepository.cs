@@ -31,6 +31,15 @@ public class PipelineResultEntityRepository : IPipelineResultEntityRepository
         return await query.ToPaginatedList(pagination);
     }
 
+    public async Task<IEnumerable<Domain.PipelineResultAggregate.PipelineResult>>
+        GetPipelineResultsByBatchIdAsync(Guid batchId)
+    {
+        return await GetBasicQuery()
+            .Where(pr => pr.BatchId == batchId)
+            .OrderByDescending(pr => pr.UpdatedAt)
+            .ToListAsync();
+    }
+
     public async Task<Domain.PipelineResultAggregate.PipelineResult?> GetPipelineResultByIdAsync(Guid id)
     {
         return await GetBasicQuery()

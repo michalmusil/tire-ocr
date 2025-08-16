@@ -16,6 +16,9 @@ public class PipelineResult : TimestampedEntity
     public readonly List<PipelineStepResult> _stepResults;
     public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
 
+    public bool Succeeded => FinishedAt is not null && StepResults.All(psr => psr.WasSuccessful);
+    public bool Failed => FinishedAt is not null && StepResults.Any(psr => psr.FailureReason is not null);
+
     private PipelineResult()
     {
     }

@@ -36,6 +36,8 @@ public class PipelineResultConfiguration : IEntityTypeConfiguration<Domain.Pipel
             .IsRequired();
 
         builder.Ignore(pr => pr.StepResults);
+        builder.Ignore(pr => pr.Succeeded);
+        builder.Ignore(pr => pr.Failed);
 
         builder.HasMany(pr => pr._stepResults)
             .WithOne()
