@@ -27,6 +27,13 @@ public class SaveFileCommandHandler : ICommandHandler<SaveFileCommand, GetFileDt
         CancellationToken cancellationToken
     )
     {
+        if (request.Id is not null)
+        {
+            var existingFile = await _fileEntityRepository.GetFileByIdAsync(request.Id.Value);
+            if (existingFile is not null)
+                return DataResult<GetFileDto>.Conflict($"File with id '{request.Id}' already exists");
+        }
+
         await using var stream = request.FileStream;
         var fileId = request.Id ?? Guid.NewGuid();
         var fileExtension = Path.GetExtension(request.OriginalFileName);

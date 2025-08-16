@@ -1,10 +1,12 @@
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipeline;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipelineAwaited;
+using AiPipeline.Orchestration.Runner.Application.Pipeline.Commands.RunPipelineBatch;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos;
 using AiPipeline.Orchestration.Runner.Application.Pipeline.Dtos.Run;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
-using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAsync;
-using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAwaitedAsync;
+using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.Run;
+using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunAwaited;
+using AiPipeline.Orchestration.Runner.WebApi.Contracts.Pipelines.RunBatch;
 using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using Asp.Versioning;
 using MediatR;
@@ -74,6 +76,30 @@ public class PipelinesController : ControllerBase
 
         return result.ToActionResult<GetPipelineResultDto, RunPipelineAwaitedAsyncResponse>(
             onSuccess: dto => new RunPipelineAwaitedAsyncResponse(dto)
+        );
+    }
+
+    [HttpPost("Batch")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<RunBatchAsyncResponse>> RunBatchAsync(
+        [FromBody] RunBatchAsyncRequest request,
+        CancellationToken cancellationToken)
+    {
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
+        var command = new RunPipelineBatchCommand(
+            RunPipelineBatchDto: new RunPipelineBatchDto(
+                UserId: loggedInUser.Id,
+                Inputs: request.Inputs,
+                Steps: request.Steps
+            )
+        );
+        var result = await _mediator.Send(command, cancellationToken);
+
+        return result.ToActionResult<GetPipelineBatchDto, RunBatchAsyncResponse>(
+            onSuccess: dto => new RunBatchAsyncResponse(dto)
         );
     }
 }

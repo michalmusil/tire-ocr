@@ -32,7 +32,7 @@ public class PipelineBatch
             .SelectMany(r => r.Failures)
             .ToArray();
 
-        if (!pipelineValidationFailures.Any())
+        if (pipelineValidationFailures.Any())
             return Result.Failure(pipelineValidationFailures);
 
         return Result.Success();
