@@ -121,6 +121,7 @@ public abstract class PipelineBuilderBase
 
         var pipeline = new Domain.PipelineAggregate.Pipeline(
             userId: OwnerId,
+            input: input,
             steps: pipelineSteps,
             pipelineFiles: Files
         );
@@ -130,7 +131,7 @@ public abstract class PipelineBuilderBase
             onFailure: DataResult<Domain.PipelineAggregate.Pipeline>.Failure
         );
     }
-    
+
     protected Result ValidateInputAgainstProcedure(NodeProcedure procedure, IApElement input)
     {
         var schemaIsValid = input.HasCompatibleSchemaWith(procedure.InputSchema);

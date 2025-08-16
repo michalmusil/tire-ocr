@@ -1,4 +1,5 @@
 using AiPipeline.Orchestration.Runner.Domain.FileAggregate;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
@@ -9,15 +10,17 @@ public class Pipeline
 
     public Guid Id { get; }
     public Guid UserId { get; }
+    public IApElement Input { get; }
     private readonly List<PipelineStep> _steps;
     private readonly List<FileValueObject> _pipelineFiles;
     public IReadOnlyCollection<PipelineStep> Steps => _steps.AsReadOnly();
     public IReadOnlyCollection<FileValueObject> Files => _pipelineFiles.AsReadOnly();
 
-    public Pipeline(Guid userId, Guid? id = null, List<PipelineStep>? steps = null,
+    public Pipeline(Guid userId, IApElement input, Guid? id = null, List<PipelineStep>? steps = null,
         List<FileValueObject>? pipelineFiles = null)
     {
         UserId = userId;
+        Input = input;
         Id = id ?? Guid.NewGuid();
         _steps = steps ?? new List<PipelineStep>();
         _pipelineFiles = pipelineFiles ?? new List<FileValueObject>();

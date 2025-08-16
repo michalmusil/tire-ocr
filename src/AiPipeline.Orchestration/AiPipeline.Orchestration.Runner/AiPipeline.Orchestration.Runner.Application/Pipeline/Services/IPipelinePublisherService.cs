@@ -1,10 +1,10 @@
-using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
+using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Application.Pipeline.Services;
 
 public interface IPipelinePublisherService
 {
-    public Task<Result> PublishAsync(Domain.PipelineAggregate.Pipeline pipeline, IApElement input);
-    public Task<Result> PublishManyAsync(Dictionary<Domain.PipelineAggregate.Pipeline, IApElement> pipelines);
+    public Task<Result> PublishAsync(Domain.PipelineAggregate.Pipeline pipeline);
+    public Task<Result> PublishBatchAsync(PipelineBatch batch);
 }

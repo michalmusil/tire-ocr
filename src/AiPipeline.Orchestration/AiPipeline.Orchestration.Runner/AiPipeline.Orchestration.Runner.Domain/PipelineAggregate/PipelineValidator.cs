@@ -9,9 +9,12 @@ public class PipelineValidator : AbstractValidator<Pipeline>
     {
         RuleFor(x => x.Id.ToString())
             .IsGuid();
-        
+
         RuleFor(x => x.UserId.ToString())
             .IsGuid();
+
+        RuleFor(x => x.Input)
+            .NotNull();
 
         RuleForEach(x => x.Steps)
             .Must(x => x.Id.ToString().Trim().Length != 0)
