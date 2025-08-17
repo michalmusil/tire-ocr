@@ -53,7 +53,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                 new OcrRequestBillingDto(
                     responseDto.UsageMetadata.PromptTokenCount,
                     responseDto.UsageMetadata.CandidatesTokenCount,
-                    BillingUnitDto.Token
+                    BillingUnitType.Token
                 )
             );
             return DataResult<OcrResultDto>.Success(result);

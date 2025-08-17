@@ -43,7 +43,7 @@ public class AzureAiVisionTireCodeDetectorService : ITireCodeDetectorService
 
             var result = new OcrResultDto(
                 foundTireCode,
-                new OcrRequestBillingDto(0, 1, BillingUnitDto.Transaction)
+                new OcrRequestBillingDto(0, 1, BillingUnitType.Transaction)
             );
             return DataResult<OcrResultDto>.Success(result);
         }

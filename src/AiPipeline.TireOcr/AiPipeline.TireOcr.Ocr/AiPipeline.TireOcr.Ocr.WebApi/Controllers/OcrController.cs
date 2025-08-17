@@ -34,13 +34,14 @@ public class OcrController : ControllerBase
             request.DetectorType,
             imageData,
             request.Image.FileName,
-            request.Image.ContentType
+            request.Image.ContentType,
+            true
         );
 
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<OcrResultDto, PerformOcrResponse>(
-            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.Billing)
+        return result.ToActionResult<OcrWithBillingDto, PerformOcrResponse>(
+            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.EstimatedCosts)
         );
     }
 }

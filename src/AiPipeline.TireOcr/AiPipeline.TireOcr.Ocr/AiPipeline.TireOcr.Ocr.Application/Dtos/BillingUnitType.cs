@@ -1,6 +1,6 @@
 namespace TireOcr.Ocr.Application.Dtos;
 
-public enum BillingUnitDto
+public enum BillingUnitType
 {
     Token,
     Transaction

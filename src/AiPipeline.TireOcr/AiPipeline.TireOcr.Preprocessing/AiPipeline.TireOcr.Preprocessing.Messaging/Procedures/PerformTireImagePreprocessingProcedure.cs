@@ -32,8 +32,9 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
                         .ToArray()
                 )
             },
-            { "image", ApFile.Template(["image/jpeg", "image/png", "image/webp"]) }
-        }
+            { "image", ApFile.Template(["image/jpeg", "image/png", "image/webp"]) },
+        },
+        nonRequiredProperties: ["detectorType"]
     );
 
     private readonly IMediator _mediator;

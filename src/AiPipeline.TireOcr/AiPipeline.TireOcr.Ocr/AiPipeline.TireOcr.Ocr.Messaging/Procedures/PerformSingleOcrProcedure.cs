@@ -75,10 +75,11 @@ public class PerformSingleOcrProcedure : IProcedure
 
         var imageData = await imageDataResult.Data!.ReadAllBytesAsync();
         var query = new PerformTireImageOcrQuery(
-            detectorType,
-            imageData,
-            Path.GetFileName(inputFileReference.Path),
-            inputFile.ContentType
+            DetectorType: detectorType,
+            ImageData: imageData,
+            ImageName: Path.GetFileName(inputFileReference.Path),
+            ImageContentType: inputFile.ContentType,
+            IncludeCostEstimation: true
         );
 
         var result = await _mediator.Send(query);

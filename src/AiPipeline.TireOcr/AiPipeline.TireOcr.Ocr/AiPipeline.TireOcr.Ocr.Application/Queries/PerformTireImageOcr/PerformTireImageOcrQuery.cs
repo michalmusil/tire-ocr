@@ -8,4 +8,6 @@ public record PerformTireImageOcrQuery(
     TireCodeDetectorType DetectorType,
     byte[] ImageData,
     string ImageName,
-    string ImageContentType) : IQuery<OcrResultDto>;
+    string ImageContentType,
+    bool IncludeCostEstimation
+) : IQuery<OcrWithBillingDto>;
