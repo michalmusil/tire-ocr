@@ -81,13 +81,8 @@ public class AuthController : ControllerBase
     public async Task<ActionResult<RefreshTokenResponse>> RefreshToken(
         [FromBody] RefreshTokenRequest contract)
     {
-        var user = HttpContext.GetLoggedInUser();
-        if (user is null || user.IsAuthenticatedViaApiKey)
-            return Unauthorized("Only logged in users can refresh token");
-
-        var accessToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
         var command = new RefreshTokenCommand(
-            AccessToken: accessToken,
+            AccessToken: contract.AccessToken,
             RefreshToken: contract.RefreshToken
         );
         var result = await _mediator.Send(command);

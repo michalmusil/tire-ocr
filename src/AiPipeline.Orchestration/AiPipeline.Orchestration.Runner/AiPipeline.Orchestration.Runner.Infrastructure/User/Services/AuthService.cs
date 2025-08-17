@@ -48,7 +48,7 @@ public class AuthService : IAuthService
 
     public async Task<DataResult<Domain.UserAggregate.User>> GetUserFromAccessTokenAsync(string accessToken)
     {
-        var userIdResult = await ValidateAndParseUserIdFromAccessTokenAsync(accessToken);
+        var userIdResult = await ValidateAndParseUserIdFromAccessTokenAsync(accessToken, validateExpiration: false);
         if (userIdResult.IsFailure)
             return DataResult<Domain.UserAggregate.User>.Failure(userIdResult.Failures);
 
@@ -70,13 +70,16 @@ public class AuthService : IAuthService
         return jwtOptions;
     }
 
-    private async Task<DataResult<Guid>> ValidateAndParseUserIdFromAccessTokenAsync(string accessToken)
+    private async Task<DataResult<Guid>> ValidateAndParseUserIdFromAccessTokenAsync(
+        string accessToken,
+        bool validateExpiration
+    )
     {
         var jwtOptions = GetJwtOptions();
         var handler = new JwtSecurityTokenHandler();
         try
         {
-            var validationParameters = GetAccessTokenValidationParams(jwtOptions);
+            var validationParameters = GetAccessTokenValidationParams(jwtOptions, validateExpiration);
             var claimsPrincipal = handler.ValidateToken(accessToken, validationParameters, out var securityToken);
             if (claimsPrincipal is null || securityToken is null)
                 return DataResult<Guid>.Invalid("Failed to decode provided access token");
@@ -120,7 +123,7 @@ public class AuthService : IAuthService
         return tokenString;
     }
 
-    private TokenValidationParameters GetAccessTokenValidationParams(JwtOptions jwtOptions) =>
+    private TokenValidationParameters GetAccessTokenValidationParams(JwtOptions jwtOptions, bool validateExpiration) =>
         new()
         {
             ValidateIssuerSigningKey = true,
@@ -129,7 +132,7 @@ public class AuthService : IAuthService
             ValidIssuer = jwtOptions.Issuer,
             ValidateAudience = true,
             ValidAudience = jwtOptions.Audience,
-            ValidateLifetime = false
+            ValidateLifetime = validateExpiration
         };
 
     private SymmetricSecurityKey GetAccessTokenSigningKey(JwtOptions jwtOptions) =>

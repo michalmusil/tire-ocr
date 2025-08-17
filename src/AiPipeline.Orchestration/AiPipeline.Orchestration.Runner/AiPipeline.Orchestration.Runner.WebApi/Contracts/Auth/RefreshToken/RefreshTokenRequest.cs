@@ -1,3 +1,6 @@
 namespace AiPipeline.Orchestration.Runner.WebApi.Contracts.Auth.RefreshToken;
 
-public record RefreshTokenRequest(string RefreshToken);
+public record RefreshTokenRequest(
+    string RefreshToken,
+    string AccessToken
+);
