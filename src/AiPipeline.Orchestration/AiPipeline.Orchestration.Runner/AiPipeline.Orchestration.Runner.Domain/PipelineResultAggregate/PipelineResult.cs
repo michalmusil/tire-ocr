@@ -14,7 +14,11 @@ public class PipelineResult : TimestampedEntity
     public IApElement? InitialInput { get; }
     public DateTime? FinishedAt { get; private set; }
     public readonly List<PipelineStepResult> _stepResults;
-    public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults.AsReadOnly();
+
+    public IReadOnlyCollection<PipelineStepResult> StepResults => _stepResults
+        .OrderBy(s => s.Order)
+        .ToList()
+        .AsReadOnly();
 
     public bool Succeeded => FinishedAt is not null && StepResults.All(psr => psr.WasSuccessful);
     public bool Failed => FinishedAt is not null && StepResults.Any(psr => psr.FailureReason is not null);

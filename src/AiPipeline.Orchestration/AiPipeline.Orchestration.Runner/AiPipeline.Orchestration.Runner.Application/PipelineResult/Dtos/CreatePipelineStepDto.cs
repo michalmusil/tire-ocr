@@ -12,9 +12,10 @@ public class CreatePipelineStepDto
     public bool WasSuccessful { get; }
     public PipelineFailureReason? FailureReason { get; }
     public IApElement? Result { get; }
+    public int Order { get; }
 
     private CreatePipelineStepDto(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        bool wasSuccessful, PipelineFailureReason? failureReason, IApElement? result, Guid? id = null)
+        bool wasSuccessful, PipelineFailureReason? failureReason, IApElement? result, int order, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         NodeId = nodeId;
@@ -23,15 +24,16 @@ public class CreatePipelineStepDto
         WasSuccessful = wasSuccessful;
         FailureReason = failureReason;
         Result = result;
+        Order = order;
     }
 
     public static CreatePipelineStepDto SuccessfulStep(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        IApElement? result, Guid? id = null)
-        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, true, null, result, id);
+        IApElement? result, int order, Guid? id = null)
+        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, true, null, result, order, id);
 
     public static CreatePipelineStepDto FailedStep(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        PipelineFailureReason failureReason, Guid? id = null)
-        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, false, failureReason, null, id);
+        PipelineFailureReason failureReason, int order, Guid? id = null)
+        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, false, failureReason, null, order, id);
 
     public PipelineStepResult ToDomain(Guid resultId)
     {
@@ -43,7 +45,8 @@ public class CreatePipelineStepDto
             nodeProcedureId: NodeProcedureId,
             finishedAt: FinishedAt,
             failureReason: WasSuccessful ? null : FailureReason,
-            result: WasSuccessful ? Result : null
+            result: WasSuccessful ? Result : null,
+            order: Order
         );
     }
 }

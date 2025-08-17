@@ -3,7 +3,7 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 
 namespace AiPipeline.Orchestration.Runner.Domain.PipelineResultAggregate;
 
-public class PipelineStepResult: TimestampedEntity
+public class PipelineStepResult : TimestampedEntity
 {
     public Guid Id { get; }
     public Guid ResultId { get; }
@@ -13,14 +13,14 @@ public class PipelineStepResult: TimestampedEntity
     public bool WasSuccessful { get; }
     public PipelineFailureReason? FailureReason { get; }
     public IApElement? Result { get; }
+    public int Order { get; }
 
     private PipelineStepResult()
     {
     }
 
     public PipelineStepResult(bool wasSuccessful, Guid resultId, string nodeId, string nodeProcedureId,
-        DateTime finishedAt,
-        PipelineFailureReason? failureReason, IApElement? result, Guid? id = null)
+        DateTime finishedAt, PipelineFailureReason? failureReason, IApElement? result, int order, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         WasSuccessful = wasSuccessful;
@@ -30,5 +30,6 @@ public class PipelineStepResult: TimestampedEntity
         FinishedAt = finishedAt;
         FailureReason = failureReason;
         Result = result;
+        Order = order;
     }
 }

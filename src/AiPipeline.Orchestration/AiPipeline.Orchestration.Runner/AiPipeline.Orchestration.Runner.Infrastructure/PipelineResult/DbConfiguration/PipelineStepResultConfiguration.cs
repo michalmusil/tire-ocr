@@ -28,13 +28,16 @@ public class PipelineStepResultConfiguration : IEntityTypeConfiguration<Pipeline
 
         builder.Property(pr => pr.WasSuccessful)
             .IsRequired();
-        
+
+        builder.Property(pr => pr.Order)
+            .IsRequired();
+
         builder.Property(nt => nt.CreatedAt)
             .IsRequired();
-        
+
         builder.Property(nt => nt.UpdatedAt)
             .IsRequired();
-        
+
         builder.Property(pr => pr.FailureReason)
             .IsRequired(false)
             .HasConversion(JsonUtils.GetDefaultJsonValueConverter<PipelineFailureReason?>());

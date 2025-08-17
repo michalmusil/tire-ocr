@@ -94,11 +94,19 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
 
         if (firstStep is null)
             return DataResult<RunPipelineStep>.Invalid("Pipeline must contain at least one step to be published.");
-        var currentProcedureIdentifier = new ProcedureIdentifier(firstStep.NodeId, firstStep.NodeProcedureId);
+        var currentProcedureIdentifier = new ProcedureIdentifier(
+            NodeId: firstStep.NodeId,
+            ProcedureId: firstStep.NodeProcedureId,
+            OrderInPipeline: 1
+        );
 
         var nextSteps = pipeline.Steps.Skip(1).ToList();
         var nextProcedureIdentifiers = nextSteps
-            .Select(s => new ProcedureIdentifier(s.NodeId, s.NodeProcedureId))
+            .Select((step, index) => new ProcedureIdentifier(
+                NodeId: step.NodeId,
+                ProcedureId: step.NodeProcedureId,
+                OrderInPipeline: index + 2
+            ))
             .ToList();
 
         var fileReferences = pipeline.Files

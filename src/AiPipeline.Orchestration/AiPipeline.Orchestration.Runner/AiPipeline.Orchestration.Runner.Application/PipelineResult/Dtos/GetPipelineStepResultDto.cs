@@ -4,6 +4,7 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 namespace AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 
 public record GetPipelineStepResultDto(
+    int Order,
     Guid Id,
     string NodeId,
     string NodeProcedureId,
@@ -16,6 +17,7 @@ public record GetPipelineStepResultDto(
     public static GetPipelineStepResultDto FromDomain(PipelineStepResult domain)
     {
         return new GetPipelineStepResultDto(
+            Order: domain.Order,
             Id: domain.Id,
             NodeId: domain.NodeId,
             NodeProcedureId: domain.NodeProcedureId,

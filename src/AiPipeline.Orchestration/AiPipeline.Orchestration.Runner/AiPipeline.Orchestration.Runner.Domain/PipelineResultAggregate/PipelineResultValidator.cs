@@ -25,6 +25,8 @@ public class PipelineResultValidator : AbstractValidator<PipelineResult>
             .Must(x => x.NodeProcedureId.Trim().Length != 0)
             .WithMessage(x => "Pipeline node procedure id must not be empty")
             .Must(x => x.WasSuccessful || x.FailureReason is not null)
-            .WithMessage(x => "Non-successful pipeline step results must have a failure reason");
+            .WithMessage(x => "Non-successful pipeline step results must have a failure reason")
+            .Must(x => x.Order > 0)
+            .WithMessage(x => "Pipeline step result must have an order > 0");
     }
 }

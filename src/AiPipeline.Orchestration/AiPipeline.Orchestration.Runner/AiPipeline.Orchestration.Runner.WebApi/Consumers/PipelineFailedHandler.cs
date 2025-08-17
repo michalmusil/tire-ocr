@@ -28,6 +28,7 @@ public class PipelineFailedHandler
             nodeId: message.ProcedureIdentifier.NodeId,
             nodeProcedureId: message.ProcedureIdentifier.ProcedureId,
             finishedAt: message.FailedAt,
+            order: message.ProcedureIdentifier.OrderInPipeline,
             failureReason: new PipelineFailureReason(message.FailureCode, message.FailureReason,
                 message.ExceptionMessage)
         );
