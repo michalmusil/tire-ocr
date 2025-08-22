@@ -33,7 +33,25 @@ public class PerformSingleOcrProcedure : IProcedure
         }
     );
 
-    public IApElement OutputSchema => new ApString("");
+    public IApElement OutputSchema => new ApObject(
+        properties: new()
+        {
+            { "detectedCode", ApString.Template() },
+            {
+                "estimatedCosts", new ApObject(
+                    properties: new()
+                    {
+                        { "inputUnitCount", ApDecimal.Template() },
+                        { "outputUnitCount", ApDecimal.Template() },
+                        { "billingUnit", ApString.Template() },
+                        { "estimatedCost", ApDecimal.Template() },
+                        { "estimatedCostCurrency", ApString.Template() },
+                    }
+                )
+            }
+        },
+        nonRequiredProperties: ["estimatedCosts"]
+    );
 
     private readonly IFileReferenceDownloaderService _fileReferenceDownloaderService;
     private readonly IMediator _mediator;
@@ -85,7 +103,28 @@ public class PerformSingleOcrProcedure : IProcedure
         var result = await _mediator.Send(query);
 
         return result.Map(
-            onSuccess: ocrResult => DataResult<IApElement>.Success(new ApString(ocrResult.DetectedCode)),
+            onSuccess: ocrResult =>
+            {
+                var resultObject = new ApObject(
+                    properties: new()
+                    {
+                        { "detectedCode", new ApString(ocrResult.DetectedCode) },
+                    }
+                );
+                if (ocrResult.EstimatedCosts is not null)
+                    resultObject.Properties.Add("estimatedCosts", new ApObject(
+                        properties: new()
+                        {
+                            { "estimatedCost", new ApDecimal(ocrResult.EstimatedCosts.EstimatedCost) },
+                            { "estimatedCostCurrency", new ApString(ocrResult.EstimatedCosts.EstimatedCostCurrency) },
+                            { "inputUnitCount", new ApDecimal(ocrResult.EstimatedCosts.InputUnitCount) },
+                            { "outputUnitCount", new ApDecimal(ocrResult.EstimatedCosts.OutputUnitCount) },
+                            { "billingUnit", new ApString(ocrResult.EstimatedCosts.BillingUnit) }
+                        }
+                    ));
+
+                return DataResult<IApElement>.Success(resultObject);
+            },
             onFailure: DataResult<IApElement>.Failure
         );
     }
