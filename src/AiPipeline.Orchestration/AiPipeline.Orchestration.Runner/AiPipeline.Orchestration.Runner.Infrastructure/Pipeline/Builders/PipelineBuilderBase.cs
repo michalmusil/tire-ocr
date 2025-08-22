@@ -105,7 +105,7 @@ public abstract class PipelineBuilderBase
             var isFirstStep = i == 0;
             var schemaValidationResult = ValidateStepSchemas(
                 forProcedure: procedure,
-                runDto: requestedStep,
+                currentStep: requestedStep,
                 pipelineInput: input,
                 previousStep: isFirstStep ? null : pipelineSteps[i - 1]
             );
@@ -135,8 +135,8 @@ public abstract class PipelineBuilderBase
         );
     }
 
-    private Result ValidateStepSchemas(NodeProcedure forProcedure, RunPipelineStepDto runDto, IApElement pipelineInput,
-        PipelineStep? previousStep)
+    private Result ValidateStepSchemas(NodeProcedure forProcedure, IApElement pipelineInput,
+        RunPipelineStepDto currentStep, PipelineStep? previousStep)
     {
         var isFirstStep = previousStep is null;
         if (isFirstStep)
@@ -144,7 +144,7 @@ public abstract class PipelineBuilderBase
             var inputValidationResult = ValidateInputAgainstProcedure(
                 procedure: forProcedure,
                 input: pipelineInput,
-                valueSelector: null,
+                outputValueSelector: null,
                 previousProcedureId: null
             );
             if (inputValidationResult.IsFailure)
@@ -155,7 +155,7 @@ public abstract class PipelineBuilderBase
             var schemaValidationResult = ValidateInputAgainstProcedure(
                 procedure: forProcedure,
                 input: previousStep!.OutputSchema,
-                valueSelector: runDto.OutputValueSelector,
+                outputValueSelector: previousStep.OutputValueSelector,
                 previousProcedureId: previousStep.NodeProcedureId
             );
             if (schemaValidationResult.IsFailure)
@@ -165,13 +165,13 @@ public abstract class PipelineBuilderBase
         return Result.Success();
     }
 
-    private Result ValidateInputAgainstProcedure(NodeProcedure procedure, IApElement input, string? valueSelector,
+    private Result ValidateInputAgainstProcedure(NodeProcedure procedure, IApElement input, string? outputValueSelector,
         string? previousProcedureId)
     {
         var incomingSchema = input;
-        if (valueSelector is not null)
+        if (outputValueSelector is not null)
         {
-            var selectorResult = ChildElementSelector.FromString(valueSelector);
+            var selectorResult = ChildElementSelector.FromString(outputValueSelector);
             if (selectorResult.IsFailure)
                 return selectorResult;
             var selector = selectorResult.Data!;
@@ -190,7 +190,7 @@ public abstract class PipelineBuilderBase
             var incomingIdentifier = previousProcedureId is null
                 ? "Pipeline input"
                 : $"Procedure '{previousProcedureId}' output schema";
-            var incomingIdentifierAppendix = valueSelector is null ? "" : $" with value selector: '{valueSelector}'";
+            var incomingIdentifierAppendix = outputValueSelector is null ? "" : $" with value selector: '{outputValueSelector}'";
             return Result.Invalid(
                 $"{incomingIdentifier}{incomingIdentifierAppendix} doesn't match the '{procedure.Id}' procedure input schema."
             );
