@@ -8,6 +8,7 @@ public record PipelineStepDto(
     string NodeId,
     string NodeProcedureId,
     int SchemaVersion,
+    int Order,
     string? OutputValueSelector,
     IApElement InputSchema,
     IApElement OutputSchema
@@ -20,6 +21,7 @@ public record PipelineStepDto(
             NodeId: domain.NodeId,
             NodeProcedureId: domain.NodeProcedureId,
             SchemaVersion: domain.SchemaVersion,
+            Order: domain.Order,
             OutputValueSelector: domain.OutputValueSelector,
             InputSchema: domain.InputSchema,
             OutputSchema: domain.OutputSchema

@@ -116,6 +116,7 @@ public abstract class PipelineBuilderBase
                 nodeId: node.Id,
                 nodeProcedureId: procedure.Id,
                 schemaVersion: procedure.SchemaVersion,
+                order: i + 1,
                 outputValueSelector: requestedStep.OutputValueSelector,
                 inputSchema: procedure.InputSchema,
                 outputSchema: procedure.OutputSchema
@@ -190,7 +191,8 @@ public abstract class PipelineBuilderBase
             var incomingIdentifier = previousProcedureId is null
                 ? "Pipeline input"
                 : $"Procedure '{previousProcedureId}' output schema";
-            var incomingIdentifierAppendix = outputValueSelector is null ? "" : $" with value selector: '{outputValueSelector}'";
+            var incomingIdentifierAppendix =
+                outputValueSelector is null ? "" : $" with value selector: '{outputValueSelector}'";
             return Result.Invalid(
                 $"{incomingIdentifier}{incomingIdentifierAppendix} doesn't match the '{procedure.Id}' procedure input schema."
             );
