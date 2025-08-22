@@ -28,7 +28,8 @@ public class PipelineStepCompletedHandler
             nodeProcedureId: message.ProcedureIdentifier.ProcedureId,
             finishedAt: message.CompletedAt,
             result: message.Result,
-            order: message.ProcedureIdentifier.OrderInPipeline
+            order: message.ProcedureIdentifier.OrderInPipeline,
+            outputValueSelector: message.ProcedureIdentifier.OutputValueSelector
         );
         var result = await _mediator.Send(new AddStepToResultCommand(message.PipelineId, dto));
         if (result.IsFailure)

@@ -3,6 +3,7 @@ using System;
 using AiPipeline.Orchestration.Runner.Infrastructure.Common.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Migrations
 {
     [DbContext(typeof(OrchestrationRunnerDbContext))]
-    partial class OrchestrationRunnerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250822145908_AddPipelineResultValueSelector")]
+    partial class AddPipelineResultValueSelector
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

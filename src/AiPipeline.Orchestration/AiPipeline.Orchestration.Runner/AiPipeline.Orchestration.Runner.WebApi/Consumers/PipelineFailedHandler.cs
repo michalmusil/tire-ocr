@@ -30,7 +30,8 @@ public class PipelineFailedHandler
             finishedAt: message.FailedAt,
             order: message.ProcedureIdentifier.OrderInPipeline,
             failureReason: new PipelineFailureReason(message.FailureCode, message.FailureReason,
-                message.ExceptionMessage)
+                message.ExceptionMessage),
+            outputValueSelector: message.ProcedureIdentifier.OutputValueSelector
         );
         var saveStepResult = await _mediator.Send(new AddStepToResultCommand(message.PipelineId, dto));
         if (saveStepResult.IsFailure)

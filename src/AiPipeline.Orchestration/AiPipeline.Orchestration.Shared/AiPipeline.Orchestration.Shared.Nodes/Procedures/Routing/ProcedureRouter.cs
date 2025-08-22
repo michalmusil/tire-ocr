@@ -1,6 +1,7 @@
 using System.Reflection;
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Selectors;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures.PipelineFailure;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures.ProcedureCompletion;
 using Microsoft.Extensions.Logging;
@@ -40,8 +41,9 @@ public class ProcedureRouter : IProcedureRouter
     /// <summary>
     /// Manages routing and execution of a pipeline step.
     /// Finds a registered procedure matched based on the procedureId of current pipeline step and executes it
-    /// with the current step input. Then it sends an asynchronous message to the next pipeline step (with output of
-    /// the current step as input) if there are any next steps left and invokes a procedure completion strategy. 
+    /// with the current step input. Then it sends an asynchronous message to the next pipeline step with output of
+    /// the current step as input (narrowed down by output selector if supplied), if there are any next steps left
+    /// and invokes a procedure completion strategy. 
     /// </summary>
     /// <param name="stepDescription">A pipeline step to process</param>
     /// <returns>A data result containing either the output of current pipeline step or failure</returns>
@@ -79,10 +81,11 @@ public class ProcedureRouter : IProcedureRouter
             return DataResult<IApElement>.Failure(failure);
         }
 
+        var procedureFailureStrategy = GetProcedureFailureStrategy(procedure);
+
         if (result.IsFailure)
         {
-            var failureStrategy = GetProcedureFailureStrategy(procedure);
-            await failureStrategy.Execute(_bus, stepDescription, result.PrimaryFailure!);
+            await procedureFailureStrategy.Execute(_bus, stepDescription, result.PrimaryFailure!);
             return result;
         }
 
@@ -90,6 +93,16 @@ public class ProcedureRouter : IProcedureRouter
         var pipelineIsCompleted = nextStepProcedureIdentifier is null;
         if (!pipelineIsCompleted)
         {
+            var nextStepInputResult = GetInputForNextProcedure(
+                currentProcedureOutput: result.Data!,
+                currentStep: currentStep
+            );
+            if (nextStepInputResult.IsFailure)
+            {
+                await procedureFailureStrategy.Execute(_bus, stepDescription, nextStepInputResult.PrimaryFailure!);
+                return nextStepInputResult;
+            }
+
             var followingStepsProcedureIdentifiers = stepDescription.NextSteps
                 .Skip(1)
                 .ToList();
@@ -97,7 +110,7 @@ public class ProcedureRouter : IProcedureRouter
             var nextStepMessage = stepDescription with
             {
                 CurrentStep = nextStepProcedureIdentifier!,
-                CurrentStepInput = result.Data!,
+                CurrentStepInput = nextStepInputResult.Data!,
                 NextSteps = followingStepsProcedureIdentifiers,
             };
             await _bus.PublishAsync(nextStepMessage);
@@ -200,6 +213,31 @@ public class ProcedureRouter : IProcedureRouter
                     $"Error during registration of procedure type '{procedureType.FullName}' (Id: {procedureId ?? "N/A"}): {ex.Message}");
             }
         }
+    }
+
+    /// <summary>
+    /// Evaluates output value of current procedure which should be passed down to the next procedure.
+    /// This method takes into account user-defined OutputValueSelector, by which the user may
+    /// select a more specific part of current procedure's output to be passed down to the next procedure.  
+    /// </summary>
+    /// <param name="currentProcedureOutput">A successfully returned output of current procedure</param>
+    /// <param name="currentStep">Identifier of current procedure</param>
+    /// <returns>A data result containing either correct result to pass to the next procedure or failure</returns>
+    private DataResult<IApElement> GetInputForNextProcedure(IApElement currentProcedureOutput,
+        ProcedureIdentifier currentStep)
+    {
+        if (currentStep.OutputValueSelector is null)
+            return DataResult<IApElement>.Success(currentProcedureOutput);
+
+        var selectorResult = ChildElementSelector.FromString(currentStep.OutputValueSelector);
+        if (selectorResult.IsFailure)
+            return DataResult<IApElement>.Failure(selectorResult.Failures);
+        var selector = selectorResult.Data!;
+        var selectedSchemaResult = selector.Select(currentProcedureOutput);
+        if (selectedSchemaResult.IsFailure)
+            return selectedSchemaResult;
+
+        return DataResult<IApElement>.Success(selectedSchemaResult.Data!);
     }
 
     private IProcedureCompletionStrategy GetProcedureCompletionStrategy(IProcedure procedure) =>

@@ -97,7 +97,8 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
         var currentProcedureIdentifier = new ProcedureIdentifier(
             NodeId: firstStep.NodeId,
             ProcedureId: firstStep.NodeProcedureId,
-            OrderInPipeline: 1
+            OrderInPipeline: 1,
+            OutputValueSelector: firstStep.OutputValueSelector
         );
 
         var nextSteps = pipeline.Steps.Skip(1).ToList();
@@ -105,7 +106,8 @@ public class PipelineRabbitMqPublisherService : IPipelinePublisherService
             .Select((step, index) => new ProcedureIdentifier(
                 NodeId: step.NodeId,
                 ProcedureId: step.NodeProcedureId,
-                OrderInPipeline: index + 2
+                OrderInPipeline: index + 2,
+                OutputValueSelector: step.OutputValueSelector
             ))
             .ToList();
 

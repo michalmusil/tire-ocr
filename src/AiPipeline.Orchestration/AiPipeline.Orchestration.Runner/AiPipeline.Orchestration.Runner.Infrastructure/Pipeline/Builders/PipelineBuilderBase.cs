@@ -6,6 +6,7 @@ using AiPipeline.Orchestration.Runner.Domain.NodeTypeAggregate;
 using AiPipeline.Orchestration.Runner.Domain.PipelineAggregate;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Selectors;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.Orchestration.Runner.Infrastructure.Pipeline.Builders;
@@ -102,18 +103,20 @@ public abstract class PipelineBuilderBase
                     $"Procedure '{requestedStep.ProcedureId}' not found on node {node.Id}");
 
             var isFirstStep = i == 0;
-            if (isFirstStep)
-            {
-                var inputValidationResult = ValidateInputAgainstProcedure(procedure, input);
-                if (inputValidationResult.IsFailure)
-                    return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(inputValidationResult.Failures);
-            }
-
+            var schemaValidationResult = ValidateStepSchemas(
+                forProcedure: procedure,
+                runDto: requestedStep,
+                pipelineInput: input,
+                previousStep: isFirstStep ? null : pipelineSteps[i - 1]
+            );
+            if (schemaValidationResult.IsFailure)
+                return DataResult<Domain.PipelineAggregate.Pipeline>.Failure(schemaValidationResult.Failures);
 
             pipelineSteps.Add(new PipelineStep(
                 nodeId: node.Id,
                 nodeProcedureId: procedure.Id,
                 schemaVersion: procedure.SchemaVersion,
+                outputValueSelector: requestedStep.OutputValueSelector,
                 inputSchema: procedure.InputSchema,
                 outputSchema: procedure.OutputSchema
             ));
@@ -132,11 +135,66 @@ public abstract class PipelineBuilderBase
         );
     }
 
-    protected Result ValidateInputAgainstProcedure(NodeProcedure procedure, IApElement input)
+    private Result ValidateStepSchemas(NodeProcedure forProcedure, RunPipelineStepDto runDto, IApElement pipelineInput,
+        PipelineStep? previousStep)
     {
-        var schemaIsValid = input.HasCompatibleSchemaWith(procedure.InputSchema);
+        var isFirstStep = previousStep is null;
+        if (isFirstStep)
+        {
+            var inputValidationResult = ValidateInputAgainstProcedure(
+                procedure: forProcedure,
+                input: pipelineInput,
+                valueSelector: null,
+                previousProcedureId: null
+            );
+            if (inputValidationResult.IsFailure)
+                return inputValidationResult;
+        }
+        else
+        {
+            var schemaValidationResult = ValidateInputAgainstProcedure(
+                procedure: forProcedure,
+                input: previousStep!.OutputSchema,
+                valueSelector: runDto.OutputValueSelector,
+                previousProcedureId: previousStep.NodeProcedureId
+            );
+            if (schemaValidationResult.IsFailure)
+                return schemaValidationResult;
+        }
+
+        return Result.Success();
+    }
+
+    private Result ValidateInputAgainstProcedure(NodeProcedure procedure, IApElement input, string? valueSelector,
+        string? previousProcedureId)
+    {
+        var incomingSchema = input;
+        if (valueSelector is not null)
+        {
+            var selectorResult = ChildElementSelector.FromString(valueSelector);
+            if (selectorResult.IsFailure)
+                return selectorResult;
+            var selector = selectorResult.Data!;
+            var selectedSchemaResult = selector.Select(input);
+            if (selectedSchemaResult.IsFailure)
+                return selectedSchemaResult;
+
+            incomingSchema = selectedSchemaResult.Data!;
+        }
+
+        var acceptingSchema = procedure.InputSchema;
+
+        var schemaIsValid = incomingSchema.HasCompatibleSchemaWith(acceptingSchema);
         if (!schemaIsValid)
-            return Result.Invalid($"Pipeline input doesn't match the '{procedure.Id}' procedure input schema.");
+        {
+            var incomingIdentifier = previousProcedureId is null
+                ? "Pipeline input"
+                : $"Procedure '{previousProcedureId}' output schema";
+            var incomingIdentifierAppendix = valueSelector is null ? "" : $" with value selector: '{valueSelector}'";
+            return Result.Invalid(
+                $"{incomingIdentifier}{incomingIdentifierAppendix} doesn't match the '{procedure.Id}' procedure input schema."
+            );
+        }
 
         return Result.Success();
     }

@@ -10,6 +10,7 @@ public record GetPipelineStepResultDto(
     string NodeProcedureId,
     DateTime FinishedAt,
     bool WasSuccessful,
+    string? OutputValueSelector,
     IApElement? Result,
     GetPipelineFailureReasonDto? FailureReason
 )
@@ -23,6 +24,7 @@ public record GetPipelineStepResultDto(
             NodeProcedureId: domain.NodeProcedureId,
             FinishedAt: domain.FinishedAt,
             WasSuccessful: domain.WasSuccessful,
+            OutputValueSelector: domain.OutputValueSelector,
             Result: domain.Result,
             FailureReason: domain.FailureReason == null
                 ? null

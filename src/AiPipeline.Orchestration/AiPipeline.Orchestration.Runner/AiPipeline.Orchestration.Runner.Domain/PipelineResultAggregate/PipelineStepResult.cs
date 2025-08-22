@@ -13,6 +13,7 @@ public class PipelineStepResult : TimestampedEntity
     public bool WasSuccessful { get; }
     public PipelineFailureReason? FailureReason { get; }
     public IApElement? Result { get; }
+    public string? OutputValueSelector { get; }
     public int Order { get; }
 
     private PipelineStepResult()
@@ -20,7 +21,8 @@ public class PipelineStepResult : TimestampedEntity
     }
 
     public PipelineStepResult(bool wasSuccessful, Guid resultId, string nodeId, string nodeProcedureId,
-        DateTime finishedAt, PipelineFailureReason? failureReason, IApElement? result, int order, Guid? id = null)
+        DateTime finishedAt, string? outputValueSelector, PipelineFailureReason? failureReason, IApElement? result, int order,
+        Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         WasSuccessful = wasSuccessful;
@@ -28,6 +30,7 @@ public class PipelineStepResult : TimestampedEntity
         NodeId = nodeId;
         NodeProcedureId = nodeProcedureId;
         FinishedAt = finishedAt;
+        OutputValueSelector = outputValueSelector;
         FailureReason = failureReason;
         Result = result;
         Order = order;

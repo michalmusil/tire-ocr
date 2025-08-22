@@ -1,3 +1,4 @@
+using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Selectors;
 using FluentValidation;
 using TireOcr.Shared.Extensions;
 
@@ -32,7 +33,23 @@ public class PipelineValidator : AbstractValidator<Pipeline>
                     var stepA = x.ElementAt(i);
                     var stepB = x.ElementAt(i + 1);
 
-                    var schemasCompatible = stepA.OutputSchema.HasCompatibleSchemaWith(stepB.InputSchema);
+                    var output = stepA.OutputSchema;
+                    if (stepA.OutputValueSelector is not null)
+                    {
+                        var selectorResult = ChildElementSelector.FromString(stepA.OutputValueSelector);
+                        if (selectorResult.IsFailure)
+                            return false;
+                        var selector = selectorResult.Data!;
+                        var selectedValue = selector.Select(output);
+                        if (selectedValue.IsFailure)
+                            return false;
+
+                        output = selectedValue.Data!;
+                    }
+
+                    var input = stepB.InputSchema;
+
+                    var schemasCompatible = output.HasCompatibleSchemaWith(input);
                     if (!schemasCompatible)
                         return false;
                 }

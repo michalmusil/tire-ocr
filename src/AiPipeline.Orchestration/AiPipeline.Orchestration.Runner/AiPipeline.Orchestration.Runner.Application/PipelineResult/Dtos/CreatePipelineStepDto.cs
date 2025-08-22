@@ -13,27 +13,31 @@ public class CreatePipelineStepDto
     public PipelineFailureReason? FailureReason { get; }
     public IApElement? Result { get; }
     public int Order { get; }
+    public string? OutputValueSelector { get; }
 
-    private CreatePipelineStepDto(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        bool wasSuccessful, PipelineFailureReason? failureReason, IApElement? result, int order, Guid? id = null)
+    private CreatePipelineStepDto(string nodeId, string nodeProcedureId, DateTime finishedAt, bool wasSuccessful,
+        string? outputValueSelector, PipelineFailureReason? failureReason, IApElement? result, int order, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         NodeId = nodeId;
         NodeProcedureId = nodeProcedureId;
         FinishedAt = finishedAt;
         WasSuccessful = wasSuccessful;
+        OutputValueSelector = outputValueSelector;
         FailureReason = failureReason;
         Result = result;
         Order = order;
     }
 
     public static CreatePipelineStepDto SuccessfulStep(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        IApElement? result, int order, Guid? id = null)
-        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, true, null, result, order, id);
+        IApElement? result, string? outputValueSelector, int order, Guid? id = null)
+        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, true, outputValueSelector,
+            null, result, order, id);
 
     public static CreatePipelineStepDto FailedStep(string nodeId, string nodeProcedureId, DateTime finishedAt,
-        PipelineFailureReason failureReason, int order, Guid? id = null)
-        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, false, failureReason, null, order, id);
+        PipelineFailureReason failureReason, string? outputValueSelector, int order, Guid? id = null)
+        => new CreatePipelineStepDto(nodeId, nodeProcedureId, finishedAt, false, outputValueSelector,
+            failureReason, null, order, id);
 
     public PipelineStepResult ToDomain(Guid resultId)
     {
@@ -46,6 +50,7 @@ public class CreatePipelineStepDto
             finishedAt: FinishedAt,
             failureReason: WasSuccessful ? null : FailureReason,
             result: WasSuccessful ? Result : null,
+            outputValueSelector: OutputValueSelector,
             order: Order
         );
     }

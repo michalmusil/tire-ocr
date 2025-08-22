@@ -32,6 +32,9 @@ public class PipelineStepResultConfiguration : IEntityTypeConfiguration<Pipeline
         builder.Property(pr => pr.Order)
             .IsRequired();
 
+        builder.Property(pr => pr.OutputValueSelector)
+            .IsRequired(false);
+
         builder.Property(nt => nt.CreatedAt)
             .IsRequired();
 
