@@ -13,8 +13,10 @@ builder.AddServiceDefaults();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
-app.AddSwagger();
+app.MapDefaultEndpoints()
+    .AddSwagger()
+    .AddMkDocs();
+
 app.UseHttpsRedirection();
 app.MapControllers();
 

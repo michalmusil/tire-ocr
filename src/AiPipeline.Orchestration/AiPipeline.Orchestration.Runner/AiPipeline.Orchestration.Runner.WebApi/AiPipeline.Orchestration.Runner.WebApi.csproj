@@ -4,24 +4,24 @@
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-      <UserSecretsId>8de9e1d7-51f8-4416-955f-990604ba2b3d</UserSecretsId>
-  </PropertyGroup>
+        <UserSecretsId>8de9e1d7-51f8-4416-955f-990604ba2b3d</UserSecretsId>
+    </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
-        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
+        <PackageReference Include="Asp.Versioning.Http" Version="8.1.0"/>
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
-      <ProjectReference Include="..\..\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
-      <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj" />
+        <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\..\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj"/>
+        <ProjectReference Include="..\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj"/>
     </ItemGroup>
-
+    
 </Project>

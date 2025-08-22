@@ -10,6 +10,9 @@
 .env
 *credentials.json
 
+# project documentation
+/docs/site
+
 # User-specific files
 *.rsuser
 *.suo

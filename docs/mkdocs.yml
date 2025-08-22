@@ -1,0 +1,9 @@
+site_name: AiPipeline
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Orchestration Runner: orchestration-runner.md
+  - Running Pipelines: running-pipelines.md
+  - Create your own node: node-creation.md
+  - License: license.md
+theme: readthedocs
