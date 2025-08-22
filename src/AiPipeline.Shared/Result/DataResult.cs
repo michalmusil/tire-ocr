@@ -4,16 +4,16 @@ public class DataResult<T> : Result
 {
     public T? Data { get; }
 
-    private DataResult(T? data, Failure[] failures) : base(data != null, failures)
+    private DataResult(bool success, T? data, Failure[] failures) : base(success, failures)
     {
         Data = data;
     }
 
-    public static DataResult<T> Success(T value) => new(value, []);
+    public static DataResult<T> Success(T value) => new(true, value, []);
 
-    public new static DataResult<T> Failure(Failure failure) => new(default, [failure]);
+    public new static DataResult<T> Failure(Failure failure) => new(false, default, [failure]);
 
-    public new static DataResult<T> Failure(params Failure[] failures) => new(default, failures);
+    public new static DataResult<T> Failure(params Failure[] failures) => new(false, default, failures);
 
     public void Fold(Action<T> onSuccess, Action<Failure[]> onFailure)
     {

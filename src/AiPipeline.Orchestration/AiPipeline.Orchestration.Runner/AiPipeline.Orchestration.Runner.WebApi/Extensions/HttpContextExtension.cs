@@ -21,7 +21,7 @@ public static class HttpContextExtension
 
         var validAuthMethodType =
             Enum.TryParse<AuthenticationMethodType>(authenticationType, out var authenticationMethod);
-        if (!validGuid)
+        if (!validAuthMethodType)
             return null;
 
         return new LoggedInUser(
