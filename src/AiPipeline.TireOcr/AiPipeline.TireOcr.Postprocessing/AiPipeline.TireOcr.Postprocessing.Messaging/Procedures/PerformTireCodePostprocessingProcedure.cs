@@ -17,19 +17,19 @@ public class PerformTireCodePostprocessingProcedure : IProcedure
     public IApElement OutputSchema => new ApObject(
         properties: new()
         {
-            { "RawCode", ApString.Template() },
-            { "PostprocessedTireCode", ApString.Template() },
-            { "VehicleClass", ApString.Template() },
-            { "Width", ApDecimal.Template() },
-            { "AspectRatio", ApDecimal.Template() },
-            { "Construction", ApString.Template() },
-            { "Diameter", ApDecimal.Template() },
-            { "LoadIndex", ApString.Template() },
-            { "SpeedRating", ApString.Template() }
+            { "rawCode", ApString.Template() },
+            { "postprocessedTireCode", ApString.Template() },
+            { "vehicleClass", ApString.Template() },
+            { "width", ApDecimal.Template() },
+            { "aspectRatio", ApDecimal.Template() },
+            { "construction", ApString.Template() },
+            { "diameter", ApDecimal.Template() },
+            { "loadIndex", ApString.Template() },
+            { "speedRating", ApString.Template() }
         },
         nonRequiredProperties:
         [
-            "VehicleClass", "Width", "AspectRatio", "Construction", "Diameter", "LoadIndex", "SpeedRating"
+            "vehicleClass", "width", "aspectRatio", "construction", "diameter", "loadIndex", "speedRating"
         ]
     );
 
@@ -56,27 +56,35 @@ public class PerformTireCodePostprocessingProcedure : IProcedure
         var result = await _mediator.Send(query);
 
         return result.Map(
-            onSuccess: data => DataResult<IApElement>.Success(
-                new ApObject(
+            onSuccess: data =>
+            {
+                var returnedObject = new ApObject(
                     properties: new()
                     {
-                        { "RawCode", new ApString(data.RawCode) },
-                        { "PostprocessedTireCode", new ApString(data.PostprocessedTireCode) },
-                        { "VehicleClass", new ApString(data.VehicleClass ?? "") },
-                        { "Width", new ApDecimal(data.Width ?? default) },
-                        { "AspectRatio", new ApDecimal(data.AspectRatio ?? default) },
-                        { "Construction", new ApString(data.Construction ?? "") },
-                        { "Diameter", new ApDecimal(data.Diameter ?? default) },
-                        { "LoadIndex", new ApString(data.LoadIndex ?? "") },
-                        { "SpeedRating", new ApString(data.SpeedRating ?? "") }
-                    },
-                    nonRequiredProperties:
-                    [
-                        "VehicleClass", "Width", "AspectRatio", "Construction", "Diameter", "LoadIndex", "SpeedRating"
-                    ]
-                )
-            ),
+                        { "rawCode", new ApString(data.RawCode) },
+                        { "postprocessedTireCode", new ApString(data.PostprocessedTireCode) }
+                    }
+                );
+                AddPropIfNotNull(returnedObject, data.VehicleClass, "vehicleClass", vc => new ApString(vc));
+                AddPropIfNotNull(returnedObject, data.Width, "width", w => new ApDecimal(w!.Value));
+                AddPropIfNotNull(returnedObject, data.AspectRatio, "aspectRatio", ar => new ApDecimal(ar!.Value));
+                AddPropIfNotNull(returnedObject, data.Construction, "construction", c => new ApString(c));
+                AddPropIfNotNull(returnedObject, data.Diameter, "diameter", d => new ApDecimal(d!.Value));
+                AddPropIfNotNull(returnedObject, data.LoadIndex, "loadIndex", li => new ApString(li));
+                AddPropIfNotNull(returnedObject, data.SpeedRating, "speedRating", sr => new ApString(sr));
+
+                return DataResult<IApElement>.Success(returnedObject);
+            },
             onFailure: DataResult<IApElement>.Failure
         );
+    }
+
+    private void AddPropIfNotNull<T>(ApObject apObject, T? property, string key, Func<T, IApElement> creteOnNotNull)
+    {
+        if (property is null)
+            return;
+        var apElement = creteOnNotNull(property);
+        apObject.Properties.Add(key, apElement);
+        apObject.NonRequiredProperties.Add(key);
     }
 }

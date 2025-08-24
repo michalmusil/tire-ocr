@@ -1,7 +1,10 @@
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Dtos;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.GetPipelineResults;
 using AiPipeline.Orchestration.Runner.Application.PipelineResult.Queries.GetResultOfPipeline;
+using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Dtos;
+using AiPipeline.Orchestration.Runner.Application.PipelineResultBatch.Queries.GetResultBatchById;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetAllResults;
+using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetBatchResultsById;
 using AiPipeline.Orchestration.Runner.WebApi.Contracts.PipelineResults.GetResultOfPipeline;
 using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using Asp.Versioning;
@@ -62,6 +65,26 @@ public class PipelineResultsController : ControllerBase
 
         return result.ToActionResult<GetPipelineResultDto, GetResultOfPipelineResponse>(
             onSuccess: dto => new GetResultOfPipelineResponse(dto)
+        );
+    }
+    
+    [HttpGet("Batch/{batchId:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<GetBatchResultsByIdResponse>> GetBatchResultsByIdAsync([FromRoute] Guid batchId)
+    {
+        var loggedInUser = HttpContext.GetLoggedInUserOrThrow();
+        var query = new GetResultBatchByIdQuery(
+            batchId,
+            loggedInUser.Id
+        );
+        var result = await _mediator.Send(query);
+
+        return result.ToActionResult<GetPipelineResultBatchDto, GetBatchResultsByIdResponse>(
+            onSuccess: dto => new GetBatchResultsByIdResponse(dto)
         );
     }
 }
