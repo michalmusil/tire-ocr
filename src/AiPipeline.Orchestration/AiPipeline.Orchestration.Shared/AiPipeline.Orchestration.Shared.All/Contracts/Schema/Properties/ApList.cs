@@ -20,6 +20,9 @@ public record ApList : IApElement
         Items = items;
     }
 
+    public static ApList Template(IApElement itemType) =>
+        new([itemType]);
+
     public bool HasCompatibleSchemaWith(IApElement other)
     {
         if (other is not ApList)

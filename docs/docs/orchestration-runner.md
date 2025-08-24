@@ -19,7 +19,7 @@ Access to the AiPipeline platform is restricted to authenticated users and servi
 
 ### Authorization Rules
 
-Authenticated users have full access to all endpoints. However, authorization is scoped to the user, meaning they can only view and manage content they have created, including files, pipeline results, and personal data. This restriction does not apply to the Node Discovery endpoints, which are public for all authenticated users.
+Authenticated users have full access to all endpoints. However, authorization is scoped to the user, meaning they can only view and manage content they have created, including files, pipeline results, and personal data. This restriction does not apply to the Node Discovery endpoints, which are public for all authenticated users. It should also be noted that authenticated services (via ApiKeys) create all content under their owner user's id and also have restricted access to some endpoints. Namely, a service authenticated via ApiKey may not update or delete user accounts or create/delete ApiKeys.
 
 ## 2. File Management (Files)
 
