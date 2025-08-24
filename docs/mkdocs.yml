@@ -7,4 +7,6 @@ nav:
   - Running pipelines: running-pipelines.md
   - Create your own node: node-creation.md
   - License: license.md
-theme: readthedocs
+theme:
+  name: readthedocs
+  custom_dir: docs/_overrides
