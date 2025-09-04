@@ -5,7 +5,7 @@ nav:
   - Orchestration runner: orchestration-runner.md
   - Ap scheme: ap-scheme.md
   - Running pipelines: running-pipelines.md
-  - Create your own node: node-creation.md
+  - Create your own node: node-creation-2.md
   - License: license.md
 theme:
   name: readthedocs

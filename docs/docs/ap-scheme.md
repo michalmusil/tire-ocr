@@ -267,7 +267,3 @@ _**Note:** due to mention of `detectorType` in `nonRequiredProperties`, this wou
   }
 }
 ```
-
-```
-
-```
