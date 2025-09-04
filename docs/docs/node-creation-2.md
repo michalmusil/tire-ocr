@@ -1,33 +1,34 @@
-# Create Your Own Node
+# Creating a Custom Node
 
-The AiPipeline platform is designed to be highly extensible, allowing developers to create and integrate custom nodes. While the platform is primarily built on .NET, making it easier to leverage the provided shared codebase, a node can theoretically be implemented in any programming language or framework.
+The AiPipeline platform is designed to be highly extensible. You can add new functionalities by creating and integrating your own custom nodes. While the platform is primarily built in .NET, a node can be implemented in any language that can communicate with RabbitMQ and gRPC.
 
-This guide will focus on creating a .NET node named `word-processor`. This node will contain a single procedure called `repeat-string`, which accepts a string and an integer `N`, then outputs the string repeated `N` times. If `N` is not provided, the default repetition count is 2.
+This guide uses a simple `word-processor` node as an example. Its single procedure, `repeat-string`, takes a string and a repetition count N as input, then outputs the string repeated N times. N is optional and it's default is 2.
 
-### 1. RabbitMQ Communication
+---
 
-RabbitMQ is the primary communication method for nodes within the AiPipeline platform. A node uses RabbitMQ for the following tasks:
+### 1. Node Communication Essentials
 
-1. Publishing Node Advertisements: Periodically advertising its availability and procedures to the Orchestration Runner.
-2. Receiving Pipeline Commands: Listening on its dedicated queue for requests to process a pipeline step.
-3. Sending Back Results: Notifying the Orchestration Runner of a step's successful completion or failure.
-4. Forwarding Pipeline Commands: Sending the pipeline to the next node if the process continues.
+Nodes communicate with the Orchestration Runner and other nodes via **RabbitMQ**, a message broker. Your node needs to handle four key messaging tasks:
 
-#### Connecting to RabbitMQ
+1. **Advertising**: Periodically announce your node's capabilities to the Orchestration Runner.
+2. **Listening**: Receive pipeline commands from the Orchestration Runner (or other nodes).
+3. **Reporting**: Send the results (success or failure) of a procedure back to the runner.
+4. **Forwarding**: Pass the pipeline command to the next node in the sequence.
 
-Your node must receive a connection string for the RabbitMQ broker. This is typically configured at the deployment level using an environment variable. For .NET nodes, the connection string is read from the configuration key `ConnectionStrings__rabbitmq`. The node must establish a connection to this broker on startup.
+#### RabbitMQ Setup
 
-#### Setting Up Node Advertisements
+Your node needs a connection string to the RabbitMQ broker, typically provided via a `ConnectionStrings__rabbitmq` environment variable. On startup, it must establish a connection.
 
-Each node must periodically send an advertisement message to the Orchestration Runner to announce its availability and available procedures. For this purpose, a predefined exchange named `node-advertisements` is used.
-To be compatible, your node should send an advertisement message to this exchange, for example, once every minute. The message must be a JSON object with the following structure:
+#### Node Advertisements
+
+Your node must periodically send an advertisement message to the `node-advertisements` exchange. This message informs the Orchestration Runner about your node's availability and its procedures.
 
 ```json
 {
   "nodeId": "word-processor",
   "procedures": [
     {
-      "id": "my-node-procedure-1",
+      "id": "repeat-string",
       "schemaVersion": 1,
       "input": {
         "type": "ApObject",
@@ -58,20 +59,19 @@ To be compatible, your node should send an advertisement message to this exchang
 }
 ```
 
-The `nodeId` at the root of the message is a unique identifier for your node. You can choose any arbitrary string, but it must be unique among all other nodes on the platform. The procedures array lists all procedures offered by your node, each with a unique `id`, a `schemaVersion` (set to `1` for now), and `input` and `output` schemas in the ApScheme format.
+The `nodeId` must be a globally unique string. The procedures array lists all the functionalities your node provides, including their node-unique IDs and ApScheme input/output contracts.
 
-#### Creating a Custom Queue and Binding to a Topic
+#### Dedicated Queue
 
-To receive pipeline commands, your node must declare a dedicated queue on the RabbitMQ broker. This queue **must be named the same as your node's ID**.
-The Orchestration Runner uses a topic exchange named `run-pipeline` to send messages to individual nodes. To ensure your node's queue receives these messages, you must bind it to the topic `run-pipeline.<your-node-id>`. For our example, the topic would be `run-pipeline.word-processor`.
+To receive work, your node needs its own queue. This queue **must have the same name as your `nodeId`**. You then need to bind this queue to the `run-pipeline` topic exchange using a topic pattern that matches your queue name: `run-pipeline.<your-node-id>`. This setup ensures that your node only receives messages intended for it.
 
-### 2. Implementing Your Procedures
+### 2. Implementing the Procedure Logic
 
-After the initial RabbitMQ configuration, you can implement the actual logic for your node's procedures. Each procedure must have a unique ID within the node and defined ApScheme interfaces for its input and output. These parameters must be included in the periodic node advertisement.
+Once the messaging setup is complete, you can focus on the core logic of your procedures.
 
-#### Consuming and Routing Messages
+#### Handling Incoming Messages
 
-Your node should be actively listening for messages on its dedicated queue. Upon receiving a message, it will have the following format:
+When a message arrives on your queue, it will contain all the information needed to execute a step in a pipeline.
 
 ```json
 {
@@ -120,30 +120,108 @@ Your node should be actively listening for messages on its dedicated queue. Upon
 }
 ```
 
-When a message arrives, your node must:
+Your node must:
 
-1. Identify the procedure to execute using the `procedureId` from the `currentStep` object.
-2. Route the message to the corresponding procedure.
-3. Provide the `currentStepInput` as the procedure's input data.
+1. **Extract** the `procedureId` from the `currentStep` object.
+2. **Route** the message to the corresponding procedure's execution logic.
+3. **Provide** the `currentStepInput` as the procedure's input data.
 
-#### Executing the Procedure
+#### Success: Completing a Step
 
-During execution, your procedure should first parse the ApScheme input into usable data, then perform its core logic. Upon successful completion, you must:
+If your procedure runs successfully, you must do two things:
 
-1.  Construct an ApScheme result that matches your procedure's output schema.
-2.  Publish a message to the `completed-pipeline-steps` exchange to inform the Orchestration Runner of the successful completion. The message should contain:
-    - `pipelineId`, `nextSteps`, and `procedureIdentifier` from the original message.
-    - `completedAt`, the exact time of completion in ISO 8601 format.
-    - `result`, which is your procedure's ApScheme output. If an `outputValueSelector` was used in the original `currentStep`, apply the selector to your full result and return only the specified portion.
-3.  If there are any `nextSteps` in the original message, you must publish a new message for the next node. This message is sent to the `run-pipeline` exchange with the topic `run-pipeline.<next-node-identifier>`. The new message must be a modified version of the original:
-    - The `currentStep` is replaced with the first step from `nextSteps`.
-    - `currentStepInput` is replaced with your procedure's ApScheme `output`.
-    - The first step is removed from the `nextSteps` list.
-    - Any new files produced by your procedure are added to the `fileReferences` list.
+1. **Report Success**: Publish a message to the `completed-pipeline-steps` exchange. This message should contain the `pipelineId`, the procedure's identifier, a timestamp, and your procedure's ApScheme output as the `result`. If the original message had an `outputValueSelector`, you must apply it to your output before sending.
 
-#### Handling Pipeline Failures
+```json
+{
+  "pipelineId": "da44763b-cb66-4e0b-a2c9-13c94541a4e8",
+  "procedureIdentifier": {
+    "nodeId": "word-processor",
+    "procedureId": "repeat-string",
+    "orderInPipeline": 3
+  },
+  "completedAt": "2024-01-24T06:09:19.384957Z",
+  "result": {
+    "type": "ApObject",
+    "properties": {
+      "repeatedString": {
+        "type": "ApString",
+        "value": "This is the input of the procedureThis is the input of the procedureThis is the input of the procedure"
+      }
+    }
+  },
+  "nextSteps": [
+    {
+      "nodeId": "next-node-id-1",
+      "procedureId": "next-node-requested-procedure-id",
+      "orderInPipeline": 4,
+      "outputValueSelector": "0.innerParamXyz"
+    },
+    {
+      "nodeId": "next-node-id-2",
+      "procedureId": "next-node-requested-procedure-id-2",
+      "orderInPipeline": 5
+    }
+  ]
+}
+```
 
-If your procedure fails, it should terminate the pipeline and notify the Orchestration Runner. Publish a message to the `failed-pipelines` exchange with the following format:
+2.**Forward Pipeline**: If the nextSteps array is not empty, create a new message for the next node. This message is identical to the one you received, but with the following changes:
+
+- The `currentStep` is now the first step from the original `nextSteps`.
+- The `currentStepInput` is now your procedure's output (or value selected by optional `outputValueSelector`).
+- The first step is removed from the `nextSteps` array.
+- Any new file references are added to the `fileReferences` list.
+
+```json
+{
+  "pipelineId": "da44763b-cb66-4e0b-a2c9-13c94541a4e8",
+  "userId": "9b8ee2bc-9ecb-4556-89e0-4642f0a0cab4",
+  "currentStep": {
+    "nodeId": "next-node-id-1",
+    "procedureId": "next-node-requested-procedure-id",
+    "orderInPipeline": 4,
+    "outputValueSelector": "0.innerParamXyz"
+  },
+  "currentStepInput": {
+    "type": "ApObject",
+    "properties": {
+      "repeatedString": {
+        "type": "ApString",
+        "value": "This is the input of the procedureThis is the input of the procedureThis is the input of the procedure"
+      }
+    }
+  },
+  "nextSteps": [
+    {
+      "nodeId": "next-node-id-2",
+      "procedureId": "next-node-requested-procedure-id-2",
+      "orderInPipeline": 5
+    }
+  ],
+  "fileReferences": [
+    {
+      "id": "92d95e90-5c3f-45aa-ab04-e1533e5153ee",
+      "storageProvider": "minio",
+      "path": "short-term-files/92d95e90-5c3f-45aa-ab04-e1533e5153ee.png",
+      "contentType": "image/png"
+    }
+  ]
+}
+```
+
+Publish this new message to the `run-pipeline` exchange with the topic `run-pipeline.<next-node-id>`.
+
+#### Failure: Handling Errors
+
+If your procedure fails, it must stop the pipeline and report the error. Publish a single message to the `failed-pipelines` exchange. This message should include:
+
+- `pipelineId` and `procedureIdentifier` to identify the failure.
+- `failedAt` timestamp.
+- A `failureCode` (a numeric code semantically consistent with HTTP status codes, e.g., 422 for bad input).
+- A descriptive `failureReason`.
+- An optional `exceptionMessage` for technical details.
+- The `remainingNotCompletedSteps` to show which parts of the pipeline were skipped.
 
 ```json
 {
@@ -173,33 +251,27 @@ If your procedure fails, it should terminate the pipeline and notify the Orchest
 }
 ```
 
-The `failureCode` should be a numeric value, semantically consistent with HTTP status codes. The `failureReason` provides a human-readable description of the error, and `exceptionMessage` is an optional field for technical details.
-
 #### Handling Files
 
-The platform includes a gRPC file service for managing files. The protocol buffer (.proto) file with the interface definition is located in the `AiPipeline.Orchestration.FileService.GrpcServer/Protos` folder.
+The platform includes a dedicated **gRPC file service** for managing file data.
 
-- Downloading Files: If a procedure receives an ApFile in its input, it must find the corresponding file reference in the `fileReferences` list and use the gRPC file service to download the data.
-- Uploading Files: If a procedure generates a new file, it should upload it to the gRPC file service. You must provide the file's name, data, content type, a new GUID for the file, the user's GUID (from the incoming message), and a `storageScope`. The storage scope determines how long the file will be kept and can be one of three values: `long-term-files`, `short-term-files`, or `temp-files`. After uploading, the new file reference must be added to the `fileReferences` list if the pipeline continues to a subsequent step.
+- **Download**: If an `ApFile` is in your input, find its ID in the `fileReferences` list. Use the gRPC service to download the file data for processing.
+- **Upload**: If your procedure generates a new file, upload it to the gRPC service. You must provide the file's data, its `contentType`, a new GUID, the `userId` from the incoming message, and a `storageScope`. The storage scope determines how long the file will be kept and can be one of three values: `long-term-files`, `short-term-files`, or `temp-files`. The service will return a reference that must be added to the `fileReferences` list if the pipeline continues.
 
-## Example Node in .NET
+---
 
-Most of the logic described above is already prepared in the shared codebase for .NET. The following is a step-by-step guide on how to create the `word-processor` node using .NET.
+### Example Node in .NET
 
-### 1. Initialize Your Node Project
+The shared .NET codebase handles most of the complex messaging and routing logic for you. Here’s a streamlined guide for implementing the `word-processor` example.
 
-Create a new ASP.NET Core Web API project in the AiPipeline solution. Name it `AiPipeline.<optional-node-group-name>.WordProcessor`.
+#### Project Setup
 
-Add project references to the following shared projects:
+1. Create a new Web API project in the solution: `AiPipeline.<optional-node-group-name>.WordProcessor`.
+2. Add references to the following shared projects: `AiPipeline.Orchestration.Shared.All`, `AiPipeline.Orchestration.Shared.Nodes`, `AiPipeline.ServiceDefaults` (only for local deployment), and `AiPipeline.Shared`.
 
-- `AiPipeline.Orchestration.Shared.All`: Provides messaging constants, contracts, and ApScheme definitions.
-- `AiPipeline.Orchestration.Shared.Nodes`: Contains utilities for nodes, such as message routing, the procedure interface, and file services.
-- `AiPipeline.ServiceDefaults`: For debugging purposes with .NET Aspire.
-- `AiPipeline.Shared`: Includes general utilities used throughout the codebase.
+#### Declare Messaging Constants
 
-### 2. Declare Messaging Constants
-
-To define your node's unique ID, add a new constant to the `MessagingConstants` static class located in `AiPipeline.Orchestration.Shared.All`.
+In the `MessagingConstants.cs` file (in `AiPipeline.Orchestration.Shared.All`), add your node's unique ID.
 
 ```csharp
 public static class MessagingConstants
@@ -209,7 +281,7 @@ public static class MessagingConstants
 }
 ```
 
-Next, ensure the `run-pipeline` exchange is configured for your new node's queue. In `WolverineExtensions.cs` within `AiPipeline.Orchestration.Shared.All`, add the following lines to the `DeclareExchanges` extension method:
+Next, in `WolverineExtensions.cs`, bind your node's queue to the `run-pipeline` exchange.
 
 ```csharp
 public static RabbitMqTransportExpression DeclareExchanges(this RabbitMqTransportExpression expression)
@@ -224,9 +296,9 @@ public static RabbitMqTransportExpression DeclareExchanges(this RabbitMqTranspor
 }
 ```
 
-### 3. Set Up Program.cs
+#### Program.cs Configuration
 
-Configure the `Program.cs` file in your new node project to handle RabbitMQ communication and service registration:
+Configure `Program.cs` to set up Wolverine, register your procedures, and enable file services. The shared utilities handle all the background work.
 
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
@@ -262,9 +334,9 @@ var app = builder.Build();
 app.Run();
 ```
 
-### 4. Implement Your Procedure
+#### Implement Your Procedure
 
-Create a new class named `RepeatStringProcedure` that implements the `IProcedure` interface.
+Create a `RepeatStringProcedure` class that implements the `IProcedure` interface. You only need to define its ID, schemas, and the `ExecuteAsync` method.
 
 ```csharp
 public class RepeatStringProcedure : IProcedure
@@ -333,17 +405,31 @@ public class RepeatStringProcedure : IProcedure
 }
 ```
 
-The `ExecuteAsync` method handles only the core logic. All messaging, failure/success handling, and routing to subsequent steps are managed automatically by the `ProcedureRouter`, which was registered in `Program.cs`.
+The `ProcedureRouter` takes care of all the message-passing and error-handling boilerplate. Your `ExecuteAsync` method only needs to focus on the business logic and returning a `DataResult`.
 
-### 5. Run Your Node
+#### Running Your Node
 
-To run your node in a local debug environment with .NET Aspire, you must add a project reference to your node from the Aspire runner project (`AiPipeline.AppHost`). In the `Program.cs` file of `AiPipeline.Apphost`, add the following:
+To run your node in a local Aspire debug environment, add a project reference to it in the `AiPipeline.Apphost` project.
 
 ```csharp
+// ... other projects
 var wordProcessorNode = builder.AddProject<AiPipeline_WordProcessor>("WordProcessorNode")
-    .WithReference(rabbitMq)
+    .WithReference(rabbitMq) // rabbitMq already prepared in Program.cs
     .WaitFor(rabbitMq)
-    .WithReference(fileService);
+    .WithReference(fileService) // fileService already prepared in Program.cs;
 ```
 
-For production, add a Dockerfile to the root of your project and configure your deployment solution (e.g., Kubernetes, Docker Compose) to include your new service. Be sure to provide all necessary connection strings and secrets.
+For production, containerize your project with a Dockerfile and add it to your deployment configuration (e.g., Kubernetes, Docker Compose), ensuring you provide all necessary secrets and connection strings.
+
+#### A Note on DataResult and Result
+
+The `DataResult<T>` and `Result` classes are not a mandatory part of building an AiPipeline node, but they are an integral utility within the shared codebase. They are a C# implementation of a union type, designed to explicitly handle success and failure states in a clean, composable way.
+
+Instead of throwing exceptions or returning `null` to indicate a failure, these classes allow you to return a single object that clearly contains either the expected data on success or a collection of `Failure` objects on failure.
+
+This pattern is essential when implementing the `IProcedure` interface, as the `ExecuteAsync` method requires a return type of `Task<DataResult<IApElement>>`. The `ProcedureRouter` relies on this explicit result to automatically handle the next steps in the pipeline:
+
+- If `IsSuccess` is `true`, the `ProcedureRouter` takes the `Data` property and passes it to the next node.
+- If `IsSuccess` is `false`, the router uses the `Failures` property to construct the failure message and publish it to the `failed-pipelines` queue.
+
+The static factory methods on the `Result` and `DataResult<T>` classes provide a simple way to create these objects for common scenarios. They align with standard HTTP status codes, such as `Invalid(422)` for bad input or `NotFound(404)` for missing resources, making the failure reasons clear and consistent across the platform.

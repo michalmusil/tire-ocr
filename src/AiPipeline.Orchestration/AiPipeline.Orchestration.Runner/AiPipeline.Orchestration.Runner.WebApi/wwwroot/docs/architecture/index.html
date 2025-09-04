@@ -76,7 +76,7 @@
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../node-creation/">Create your own node</a>
+                <li class="toctree-l1"><a class="reference internal" href="../node-creation-2/">Create your own node</a>
                 </li>
               </ul>
               <ul>
@@ -126,7 +126,7 @@
 </ul>
 <p>Its primary responsibilities include pipeline creation, validation, and mapping the correct sequence of nodes for a given process. All other platform components, including the nodes and the File Service, are hosted privately and are not publicly exposed.</p>
 <h3 id="2-nodes-aipipelineyournodename">2. Nodes (AiPipeline.YourNodeName)</h3>
-<p>A node is an independent service integrated into the AiPipeline platform by implementing a specific set of interfaces (described in <a href="../node-creation/">Create your own node</a>). Each node can have multiple procedures, each with a defined input and output scheme. Users can chain these procedures together using the Orchestration Runner to create complex, long-running pipelines.</p>
+<p>A node is an independent service integrated into the AiPipeline platform by implementing a specific set of interfaces (described in <a href="node-creation.md">Create your own node</a>). Each node can have multiple procedures, each with a defined input and output scheme. Users can chain these procedures together using the Orchestration Runner to create complex, long-running pipelines.</p>
 <p>For scalability, the same type of node (same identifier, procedures and interface) can be deployed as multiple duplicates. The Orchestration Runner automatically distributes the workload of running pipelines evenly among these duplicates, which is crucial for handling parallel processing or computationally intensive tasks.</p>
 <h3 id="3-file-service-aipipelineorchestrationfileservice">3. File Service (AiPipeline.Orchestration.FileService)</h3>
 <p>The File Service provides a unified API for nodes to manage files (e.g., images, documents, videos) used within pipelines. It is a private service, accessible only by other components within the platform deployment. This ensures secure handling of sensitive data.</p>
