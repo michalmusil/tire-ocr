@@ -8,7 +8,7 @@ public class NodeProcedureConfiguration : IEntityTypeConfiguration<Domain.NodeTy
 {
     public void Configure(EntityTypeBuilder<Domain.NodeTypeAggregate.NodeProcedure> builder)
     {
-        builder.HasKey(np => np.Id);
+        builder.HasKey(np => new { np.Id, np.NodeTypeId });
 
         builder.Property(np => np.Id)
             .IsRequired()
@@ -27,10 +27,10 @@ public class NodeProcedureConfiguration : IEntityTypeConfiguration<Domain.NodeTy
         builder.Property(np => np.OutputSchema)
             .IsRequired()
             .HasConversion(JsonUtils.GetApElementJsonValueConverter());
-        
+
         builder.Property(nt => nt.CreatedAt)
             .IsRequired();
-        
+
         builder.Property(nt => nt.UpdatedAt)
             .IsRequired();
 
