@@ -1,4 +1,4 @@
-using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Preprocessing;
 
 namespace TireOcr.RunnerPrototype.Clients.ImageDownload;
 

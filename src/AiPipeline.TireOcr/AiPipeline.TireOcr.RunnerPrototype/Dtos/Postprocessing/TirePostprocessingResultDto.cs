@@ -1,4 +1,4 @@
-namespace TireOcr.RunnerPrototype.Dtos;
+namespace TireOcr.RunnerPrototype.Dtos.Postprocessing;
 
 public record TirePostprocessingResultDto(
     string RawCode,

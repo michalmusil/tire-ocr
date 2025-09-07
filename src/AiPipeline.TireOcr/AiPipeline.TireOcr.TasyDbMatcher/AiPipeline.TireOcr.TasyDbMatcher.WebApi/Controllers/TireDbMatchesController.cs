@@ -30,7 +30,7 @@ public class TireDbMatchesController : ControllerBase
     public async Task<ActionResult<GetMatchesInTireDbResponse>> GetMatchesInTireDb(
         [FromBody] GetMatchesInTireDbRequest request)
     {
-        var query = new GetTasyDbEntriesForTireCodeQuery(request.TireCode, MaxEntries: 0);
+        var query = new GetTasyDbEntriesForTireCodeQuery(request.TireCode, MaxEntries: null);
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<List<TireDbMatchDto>, GetMatchesInTireDbResponse>(

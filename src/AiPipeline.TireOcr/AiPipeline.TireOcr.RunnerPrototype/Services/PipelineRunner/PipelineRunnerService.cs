@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using TireOcr.RunnerPrototype.Clients.DbMatching;
 using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
@@ -18,18 +19,20 @@ public class PipelineRunnerService : IPipelineRunnerService
     private readonly IPreprocessingClient _preprocessingClient;
     private readonly IOcrClient _ocrClient;
     private readonly IPostprocessingClient _postprocessingClient;
+    private readonly IDbMatchingClient _dbMatchingClient;
     private readonly IImageDownloadClient _imageDownloadClient;
     private readonly ILogger<PipelineRunnerService> _logger;
 
     public PipelineRunnerService(IPreprocessingClient preprocessingClient, IOcrClient ocrClient,
         ILogger<PipelineRunnerService> logger, IPostprocessingClient postprocessingClient,
-        IImageDownloadClient imageDownloadClient)
+        IImageDownloadClient imageDownloadClient, IDbMatchingClient dbMatchingClient)
     {
         _preprocessingClient = preprocessingClient;
         _ocrClient = ocrClient;
         _logger = logger;
         _postprocessingClient = postprocessingClient;
         _imageDownloadClient = imageDownloadClient;
+        _dbMatchingClient = dbMatchingClient;
     }
 
     public async Task<DataResult<TireOcrResultDto>> RunSingleOcrPipelineAsync(
@@ -58,15 +61,23 @@ public class PipelineRunnerService : IPipelineRunnerService
         var postprocessingResult = await PerformTimeMeasuredTask("Postprocessing",
             () => _postprocessingClient.PostprocessTireCode(ocrResultData.DetectedCode));
         if (postprocessingResult.Item2.IsFailure)
-            return DataResult<TireOcrResultDto>.Failure(ocrResult.Item2.Failures);
+            return DataResult<TireOcrResultDto>.Failure(postprocessingResult.Item2.Failures);
 
         var postprocessedTireCode = postprocessingResult.Item2.Data!;
+
+        var dbMatchingResult = await PerformTimeMeasuredTask("DbMatching",
+            () => _dbMatchingClient.GetDbMatchesForTireCode(postprocessedTireCode));
+        if (dbMatchingResult.Item2.IsFailure)
+            return DataResult<TireOcrResultDto>.Failure(dbMatchingResult.Item2.Failures);
+
+        var dbMatches = dbMatchingResult.Item2.Data!;
 
         List<RunStatDto> runTrace =
         [
             preprocessingResult.Item1,
             ocrResult.Item1,
-            postprocessingResult.Item1
+            postprocessingResult.Item1,
+            dbMatchingResult.Item1
         ];
 
         totalStopwatch.Stop();
@@ -76,6 +87,7 @@ public class PipelineRunnerService : IPipelineRunnerService
             DetectorType: detectorType,
             OcrResult: ocrResultData,
             PostprocessingResult: postprocessedTireCode,
+            MatchedDbVariations: dbMatches.OrderedMatches,
             TotalDurationMs: totalStopwatch.Elapsed.TotalMilliseconds,
             RunTrace: runTrace
         );

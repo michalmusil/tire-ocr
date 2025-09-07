@@ -1,4 +1,4 @@
-using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Postprocessing;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Clients.Postprocessing;

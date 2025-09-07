@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json.Serialization;
+using TireOcr.RunnerPrototype.Clients.DbMatching;
 using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
@@ -60,6 +61,10 @@ public static class DependencyInjection
         serviceCollection.AddHttpClient<IPostprocessingClient, PostprocessingClient>(client =>
         {
             client.BaseAddress = new("https+http://PostprocessingService");
+        });
+        serviceCollection.AddHttpClient<IDbMatchingClient, DbMatchingClient>(client =>
+        {
+            client.BaseAddress = new("https+http://TasyDbMatherService");
         });
         serviceCollection.AddHttpClient<IImageDownloadClient, ImageDownloadClient>();
     }

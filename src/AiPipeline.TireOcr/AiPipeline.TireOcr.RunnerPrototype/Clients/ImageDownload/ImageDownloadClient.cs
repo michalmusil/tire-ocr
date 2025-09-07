@@ -1,5 +1,5 @@
 using System.Net;
-using TireOcr.RunnerPrototype.Dtos;
+using TireOcr.RunnerPrototype.Dtos.Preprocessing;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Result;
 

@@ -1,4 +1,4 @@
-namespace TireOcr.RunnerPrototype.Dtos;
+namespace TireOcr.RunnerPrototype.Dtos.Ocr;
 
 public record EstimatedCostsDto(
     decimal InputUnitCount,
