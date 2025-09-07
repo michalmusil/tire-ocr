@@ -4,4 +4,4 @@ using TireOcr.Shared.UseCase;
 namespace AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetTasyDbEntriesForTireCode;
 
 public record GetTasyDbEntriesForTireCodeQuery(DetectedTireCodeDto DetectedCode, int? MaxEntries)
-    : IQuery<List<TireDbMatch>>;
+    : IQuery<List<TireDbMatchDto>>;

@@ -27,11 +27,11 @@ var orchestrationRunnerService = builder
     .WithMinioCredentials(minio)
     .WaitFor(minio);
 
-// var preprocessingService = builder.AddProject<AiPipeline_TireOcr_Preprocessing_WebApi>("PreprocessingService")
-//     .WithHttpsHealthCheck("/health");
-//
-// var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
-//     .WithHttpsHealthCheck("/health");
+var preprocessingService = builder.AddProject<AiPipeline_TireOcr_Preprocessing_WebApi>("PreprocessingService")
+    .WithHttpsHealthCheck("/health");
+
+var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
+    .WithHttpsHealthCheck("/health");
 
 var preprocessingMessagingService = builder
     .AddProject<AiPipeline_TireOcr_Preprocessing_Messaging>("PreprocessingMessagingService")
@@ -46,8 +46,11 @@ var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("
     .WaitFor(rabbitMq)
     .WithReference(fileService);
 
-// var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
-//     .WithHttpsHealthCheck("/health");
+var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
+    .WithHttpsHealthCheck("/health");
+
+var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_WebApi>("TasyDbMatherService")
+    .WithHttpsHealthCheck("/health");
 
 var postprocessingMessagingService = builder
     .AddProject<AiPipeline_TireOcr_Postprocessing_Messaging>("PostprocessingMessagingService")
@@ -61,13 +64,15 @@ var dbMatcherMessagingService = builder
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq);
 
-// var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
-//     .WithHttpsHealthCheck("/health")
-//     .WithReference(preprocessingService)
-//     .WaitFor(preprocessingService)
-//     .WithReference(ocrService)
-//     .WaitFor(ocrService)
-//     .WithReference(postprocessingService)
-//     .WaitFor(postprocessingService);
+var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
+    .WithHttpsHealthCheck("/health")
+    .WithReference(preprocessingService)
+    .WaitFor(preprocessingService)
+    .WithReference(ocrService)
+    .WaitFor(ocrService)
+    .WithReference(postprocessingService)
+    .WaitFor(postprocessingService)
+    .WithReference(tireDbMatcherService)
+    .WaitFor(tireDbMatcherService);
 
 builder.Build().Run();

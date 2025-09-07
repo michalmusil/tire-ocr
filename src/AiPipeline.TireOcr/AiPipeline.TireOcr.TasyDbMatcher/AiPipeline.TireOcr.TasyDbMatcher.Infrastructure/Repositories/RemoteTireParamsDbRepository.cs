@@ -19,7 +19,7 @@ public class RemoteTireParamsDbRepository : ITireParamsDbRepository
     {
         try
         {
-            var res = await _httpClient.GetAsync("/productStructure/variations");
+            var res = await _httpClient.GetAsync("");
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();

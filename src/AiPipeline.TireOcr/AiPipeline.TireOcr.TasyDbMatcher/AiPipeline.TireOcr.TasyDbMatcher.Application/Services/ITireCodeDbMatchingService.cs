@@ -4,7 +4,7 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.Application.Services;
 
 public interface ITireCodeDbMatchingService
 {
-    public Task<List<TireDbMatch>> GetOrderedMatchingEntriesForCode(
+    public Task<List<TireDbMatchDto>> GetOrderedMatchingEntriesForCode(
         DetectedTireCodeDto tireCode,
         IEnumerable<ProcessedTireParamsDatabaseEntryDto> entriesToMatch,
         int? limit

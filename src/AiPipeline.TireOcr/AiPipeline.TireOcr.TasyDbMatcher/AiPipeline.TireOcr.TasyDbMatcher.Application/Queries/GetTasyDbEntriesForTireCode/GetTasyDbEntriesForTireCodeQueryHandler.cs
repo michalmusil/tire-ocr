@@ -7,7 +7,7 @@ using TireOcr.Shared.UseCase;
 namespace AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetTasyDbEntriesForTireCode;
 
 public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEntriesForTireCodeQuery,
-    List<TireDbMatch>>
+    List<TireDbMatchDto>>
 {
     private readonly ITireParamsDbRepository _tireParamsRepository;
     private readonly ITireCodeDbMatchingService _matchingService;
@@ -19,13 +19,13 @@ public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEn
         _matchingService = matchingService;
     }
 
-    public async Task<DataResult<List<TireDbMatch>>> Handle(
+    public async Task<DataResult<List<TireDbMatchDto>>> Handle(
         GetTasyDbEntriesForTireCodeQuery request,
         CancellationToken cancellationToken)
     {
         var existingTireEntriesResult = await _tireParamsRepository.GetAllTireParamEntries();
         if (existingTireEntriesResult.IsFailure)
-            return DataResult<List<TireDbMatch>>.Failure(existingTireEntriesResult.Failures);
+            return DataResult<List<TireDbMatchDto>>.Failure(existingTireEntriesResult.Failures);
 
         var matchingEntries = await _matchingService.GetOrderedMatchingEntriesForCode(
             tireCode: request.DetectedCode,
@@ -33,6 +33,10 @@ public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEn
             limit: request.MaxEntries ?? 30
         );
 
-        return DataResult<List<TireDbMatch>>.Success(matchingEntries);
+        if (!matchingEntries.Any())
+            return DataResult<List<TireDbMatchDto>>.NotFound(
+                $"No existing matches were found in the database for '{request.DetectedCode.PostprocessedTireCode}'");
+
+        return DataResult<List<TireDbMatchDto>>.Success(matchingEntries);
     }
 }

@@ -81,7 +81,7 @@ public class PerformTireDbMatchingProcedure : IProcedure
             onSuccess: entries =>
             {
                 var mappedEntries = entries
-                    .Select<TireDbMatch, IApElement>(e =>
+                    .Select<TireDbMatchDto, IApElement>(e =>
                     {
                         var entryObject = new ApObject(
                             properties: new()

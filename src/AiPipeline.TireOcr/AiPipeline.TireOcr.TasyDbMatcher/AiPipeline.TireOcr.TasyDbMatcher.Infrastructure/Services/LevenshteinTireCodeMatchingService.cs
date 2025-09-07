@@ -6,7 +6,7 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.Services;
 
 public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
 {
-    public Task<List<TireDbMatch>> GetOrderedMatchingEntriesForCode(
+    public Task<List<TireDbMatchDto>> GetOrderedMatchingEntriesForCode(
         DetectedTireCodeDto tireCode, IEnumerable<ProcessedTireParamsDatabaseEntryDto> entriesToMatch, int? limit)
     {
         var stringTireCode = tireCode.PostprocessedTireCode;
@@ -18,7 +18,7 @@ public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
                     .DistanceFrom(stringTireCode);
                 var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, entryAsString, stringTireCode);
 
-                return new TireDbMatch(entry, distance, estimatedAccuracy);
+                return new TireDbMatchDto(entry, distance, estimatedAccuracy);
             });
 
         var orderedMatches = ratedEntries
