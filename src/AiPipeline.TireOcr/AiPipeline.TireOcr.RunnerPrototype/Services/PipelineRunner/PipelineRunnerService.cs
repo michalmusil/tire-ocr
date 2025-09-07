@@ -7,7 +7,6 @@ using TireOcr.RunnerPrototype.Dtos;
 using TireOcr.RunnerPrototype.Dtos.Batch;
 using TireOcr.RunnerPrototype.Extensions;
 using TireOcr.RunnerPrototype.Models;
-using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Services.PipelineRunner;
@@ -19,19 +18,17 @@ public class PipelineRunnerService : IPipelineRunnerService
     private readonly IPreprocessingClient _preprocessingClient;
     private readonly IOcrClient _ocrClient;
     private readonly IPostprocessingClient _postprocessingClient;
-    private readonly ICostEstimationService _costEstimationService;
     private readonly IImageDownloadClient _imageDownloadClient;
     private readonly ILogger<PipelineRunnerService> _logger;
 
     public PipelineRunnerService(IPreprocessingClient preprocessingClient, IOcrClient ocrClient,
         ILogger<PipelineRunnerService> logger, IPostprocessingClient postprocessingClient,
-        ICostEstimationService costEstimationService, IImageDownloadClient imageDownloadClient)
+        IImageDownloadClient imageDownloadClient)
     {
         _preprocessingClient = preprocessingClient;
         _ocrClient = ocrClient;
         _logger = logger;
         _postprocessingClient = postprocessingClient;
-        _costEstimationService = costEstimationService;
         _imageDownloadClient = imageDownloadClient;
     }
 
@@ -65,11 +62,6 @@ public class PipelineRunnerService : IPipelineRunnerService
 
         var postprocessedTireCode = postprocessingResult.Item2.Data!;
 
-        var estimatedCostsResult = ocrResultData.Billing is null
-            ? null
-            : await _costEstimationService.GetEstimatedCostsAsync(detectorType, ocrResultData.Billing);
-
-
         List<RunStatDto> runTrace =
         [
             preprocessingResult.Item1,
@@ -80,12 +72,12 @@ public class PipelineRunnerService : IPipelineRunnerService
         totalStopwatch.Stop();
 
         var finalResult = new TireOcrResultDto(
-            image.FileName,
-            postprocessedTireCode,
-            detectorType,
-            estimatedCostsResult?.Data,
-            totalStopwatch.Elapsed.TotalMilliseconds,
-            runTrace
+            ImageFileName: image.FileName,
+            DetectorType: detectorType,
+            OcrResult: ocrResultData,
+            PostprocessingResult: postprocessedTireCode,
+            TotalDurationMs: totalStopwatch.Elapsed.TotalMilliseconds,
+            RunTrace: runTrace
         );
         return DataResult<TireOcrResultDto>.Success(finalResult);
     }
@@ -138,11 +130,11 @@ public class PipelineRunnerService : IPipelineRunnerService
         }
 
         var totalEstimatedCosts = successfullyProcessed
-            .Select(r => r.EstimatedCosts?.EstimatedCost ?? 0)
+            .Select(r => r.OcrResult.EstimatedCosts?.EstimatedCost ?? 0)
             .Sum();
         var estimatedCostsCurrency = successfullyProcessed
-            .FirstOrDefault(r => r.EstimatedCosts is not null)
-            ?.EstimatedCosts?.EstimatedCostCurrency;
+            .FirstOrDefault(r => r.OcrResult.EstimatedCosts is not null)
+            ?.OcrResult.EstimatedCosts?.EstimatedCostCurrency;
 
         totalStopwatch.Stop();
         var result = new TireOcrBatchResultDto(
@@ -152,8 +144,8 @@ public class PipelineRunnerService : IPipelineRunnerService
                 totalStopwatch.Elapsed.TotalMilliseconds,
                 new PipelineCompletionSuccessRateDto(
                     urls.Count,
-                    successfullyProcessed.Count(),
-                    failed.Count(),
+                    successfullyProcessed.Count,
+                    failed.Count,
                     double.Round((double)successfullyProcessed.Count / (double)urls.Count, 2)
                 )
             ),

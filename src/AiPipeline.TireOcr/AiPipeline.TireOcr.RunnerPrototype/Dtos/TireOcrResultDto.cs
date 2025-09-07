@@ -4,9 +4,9 @@ namespace TireOcr.RunnerPrototype.Dtos;
 
 public record TireOcrResultDto(
     string ImageFileName,
-    TirePostprocessingResultDto TireCode,
     TireCodeDetectorType DetectorType,
-    EstimatedCostsDto? EstimatedCosts,
+    OcrServiceResultDto OcrResult,
+    TirePostprocessingResultDto PostprocessingResult,
     double TotalDurationMs,
     List<RunStatDto> RunTrace
 );

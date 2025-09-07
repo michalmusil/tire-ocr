@@ -4,7 +4,6 @@ using TireOcr.RunnerPrototype.Clients.ImageDownload;
 using TireOcr.RunnerPrototype.Clients.Ocr;
 using TireOcr.RunnerPrototype.Clients.Postprocessing;
 using TireOcr.RunnerPrototype.Clients.Preprocessing;
-using TireOcr.RunnerPrototype.Services.CostEstimation;
 using TireOcr.RunnerPrototype.Services.PipelineRunner;
 using TireOcr.ServiceDefaults;
 
@@ -68,6 +67,5 @@ public static class DependencyInjection
     private static void AddServices(IServiceCollection services)
     {
         services.AddScoped<IPipelineRunnerService, PipelineRunnerService>();
-        services.AddScoped<ICostEstimationService, StaticCostEstimationService>();
     }
 }
