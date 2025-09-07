@@ -8,7 +8,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
-      <ProjectReference Include="..\AiPipeline.TireOcr.TasyDbMatcher.Domain\AiPipeline.TireOcr.TasyDbMatcher.Domain.csproj" />
+      <ProjectReference Include="..\..\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>
