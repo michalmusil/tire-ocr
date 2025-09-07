@@ -27,6 +27,7 @@
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Messaging\AiPipeline.TireOcr.Preprocessing.Messaging.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.RunnerPrototype\AiPipeline.TireOcr.RunnerPrototype.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Messaging\AiPipeline.TireOcr.TasyDbMatcher.Messaging.csproj" />
   </ItemGroup>
 
 </Project>

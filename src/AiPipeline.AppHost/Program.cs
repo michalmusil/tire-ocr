@@ -55,6 +55,12 @@ var postprocessingMessagingService = builder
     .WithReference(rabbitMq)
     .WaitFor(rabbitMq);
 
+var dbMatcherMessagingService = builder
+    .AddProject<AiPipeline_TireOcr_TasyDbMatcher_Messaging>("TasyDbMatcherMessagingService")
+    .WithHttpsHealthCheck("/health")
+    .WithReference(rabbitMq)
+    .WaitFor(rabbitMq);
+
 // var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
 //     .WithHttpsHealthCheck("/health")
 //     .WithReference(preprocessingService)
