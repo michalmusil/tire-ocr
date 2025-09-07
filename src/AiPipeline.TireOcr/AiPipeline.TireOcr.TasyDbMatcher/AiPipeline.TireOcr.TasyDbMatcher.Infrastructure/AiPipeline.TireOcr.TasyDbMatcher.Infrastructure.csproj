@@ -10,4 +10,8 @@
       <ProjectReference Include="..\AiPipeline.TireOcr.TasyDbMatcher.Application\AiPipeline.TireOcr.TasyDbMatcher.Application.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\" />
+    </ItemGroup>
+
 </Project>

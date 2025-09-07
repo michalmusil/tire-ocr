@@ -1,7 +1,7 @@
 using System.Net;
 using System.Text.Json;
 
-namespace TireOcr.RunnerPrototype.Exceptions;
+namespace TireOcr.Shared.Exceptions;
 
 public class HttpRequestExceptionWithContent : HttpRequestException
 {

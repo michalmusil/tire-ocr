@@ -1,13 +1,38 @@
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
+using AiPipeline.TireOcr.TasyDbMatcher.Application.Repositories;
+using AiPipeline.TireOcr.TasyDbMatcher.Application.Services;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetTasyDbEntriesForTireCode;
 
-public class GetTasyDbEntriesForTireCodeQueryHandler: IQueryHandler<GetTasyDbEntriesForTireCodeQuery, List<ProcessedTireParamsDatabaseEntryDto>>
+public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEntriesForTireCodeQuery,
+    List<ProcessedTireParamsDatabaseEntryDto>>
 {
-    public Task<DataResult<List<ProcessedTireParamsDatabaseEntryDto>>> Handle(GetTasyDbEntriesForTireCodeQuery request, CancellationToken cancellationToken)
+    private readonly ITireParamsDbRepository _tireParamsRepository;
+    private readonly ITireCodeDbMatchingService _matchingService;
+
+    public GetTasyDbEntriesForTireCodeQueryHandler(ITireParamsDbRepository tireParamsRepository,
+        ITireCodeDbMatchingService matchingService)
     {
-        throw new NotImplementedException();
+        _tireParamsRepository = tireParamsRepository;
+        _matchingService = matchingService;
+    }
+
+    public async Task<DataResult<List<ProcessedTireParamsDatabaseEntryDto>>> Handle(
+        GetTasyDbEntriesForTireCodeQuery request,
+        CancellationToken cancellationToken)
+    {
+        var existingTireEntriesResult = await _tireParamsRepository.GetAllTireParamEntries();
+        if (existingTireEntriesResult.IsFailure)
+            return DataResult<List<ProcessedTireParamsDatabaseEntryDto>>.Failure(existingTireEntriesResult.Failures);
+
+        var matchingEntries = await _matchingService.GetOrderedMatchingEntriesForCode(
+            tireCode: request.DetectedCode,
+            entriesToMatch: existingTireEntriesResult.Data!,
+            limit: request.MaxEntries ?? 30
+        );
+
+        return DataResult<List<ProcessedTireParamsDatabaseEntryDto>>.Success(matchingEntries);
     }
 }

@@ -1,7 +1,7 @@
 using System.Net.Http.Headers;
 using TireOcr.RunnerPrototype.Dtos;
-using TireOcr.RunnerPrototype.Exceptions;
 using TireOcr.RunnerPrototype.Models;
+using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Clients.Ocr;

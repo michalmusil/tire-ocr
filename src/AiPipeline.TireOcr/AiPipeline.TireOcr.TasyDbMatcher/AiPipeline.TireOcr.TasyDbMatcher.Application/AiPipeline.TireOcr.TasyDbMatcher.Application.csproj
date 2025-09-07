@@ -11,8 +11,4 @@
       <ProjectReference Include="..\..\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Services\" />
-    </ItemGroup>
-
 </Project>

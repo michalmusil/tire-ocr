@@ -1,5 +1,5 @@
 using TireOcr.RunnerPrototype.Dtos;
-using TireOcr.RunnerPrototype.Exceptions;
+using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.RunnerPrototype.Clients.Postprocessing;

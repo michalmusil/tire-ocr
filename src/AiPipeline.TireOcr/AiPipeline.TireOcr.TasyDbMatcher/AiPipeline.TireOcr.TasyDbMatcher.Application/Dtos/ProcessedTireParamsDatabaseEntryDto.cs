@@ -5,7 +5,7 @@ public class ProcessedTireParamsDatabaseEntryDto
     public int Width { get; init; }
     public double Diameter { get; init; }
     public int Profile { get; init; }
-    public required string Construction { get; init; }
+    public string Construction { get; init; }
     public int? LoadIndex { get; init; }
     public string? SpeedIndex { get; init; }
     public string? LoadIndexSpeedIndex { get; init; }
