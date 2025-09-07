@@ -3,7 +3,7 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
 public class ProcessedTireParamsDatabaseEntryDto
 {
     public int Width { get; init; }
-    public double Diameter { get; init; }
+    public decimal Diameter { get; init; }
     public int Profile { get; init; }
     public string Construction { get; init; }
     public int? LoadIndex { get; init; }
@@ -14,7 +14,7 @@ public class ProcessedTireParamsDatabaseEntryDto
     {
         var parsedWidth = int.TryParse(rawParams.ProductSizeWidth, out var width);
         Width = parsedWidth ? width : 0;
-        var parsedDiameter = double.TryParse(rawParams.ProductSizeDiameter, out var diameter);
+        var parsedDiameter = decimal.TryParse(rawParams.ProductSizeDiameter, out var diameter);
         Diameter = parsedDiameter ? diameter : 0;
         var parsedProfile = int.TryParse(rawParams.ProductSizeProfile, out var profile);
         Profile = parsedProfile ? profile : 0;
@@ -37,7 +37,7 @@ public class ProcessedTireParamsDatabaseEntryDto
 
     public string GetTireCodeString()
     {
-        var diameter = double.Round(Diameter, 1);
+        var diameter = decimal.Round(Diameter, 1);
 
         return $"{Width}/{Profile}{Construction}{diameter}{LoadIndexSpeedIndex}";
     }

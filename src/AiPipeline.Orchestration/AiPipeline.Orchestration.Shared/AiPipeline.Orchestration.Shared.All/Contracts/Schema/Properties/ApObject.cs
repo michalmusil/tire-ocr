@@ -50,6 +50,7 @@ public record ApObject : IApElement
             value = null;
             return false;
         }
+
         value = foundValues[0].Value;
         return true;
     }
@@ -77,6 +78,18 @@ public record ApObject : IApElement
         return childrenOfType
             .Concat(descendantsOfType)
             .ToList();
+    }
+
+    public T? GetPropertyOfTypeOrNull<T>(string key) where T : class, IApElement
+    {
+        if (Properties.TryGetValue(key, out var item))
+        {
+            if (item is T castedItem)
+                return castedItem;
+            return null;
+        }
+
+        return null;
     }
 
     private bool HasEquivalentRequiredPropertiesWith(ApObject other)

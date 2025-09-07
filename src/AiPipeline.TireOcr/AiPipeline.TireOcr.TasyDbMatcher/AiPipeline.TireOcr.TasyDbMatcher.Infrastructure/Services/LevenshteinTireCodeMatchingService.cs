@@ -9,33 +9,35 @@ public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
     public Task<List<TireDbMatch>> GetOrderedMatchingEntriesForCode(
         DetectedTireCodeDto tireCode, IEnumerable<ProcessedTireParamsDatabaseEntryDto> entriesToMatch, int? limit)
     {
-        var entryList = entriesToMatch.ToList();
         var stringTireCode = tireCode.PostprocessedTireCode;
-        var ratedEntries = new List<TireDbMatch>();
+        var ratedEntries = entriesToMatch
+            .Select(entry =>
+            {
+                var entryAsString = entry.GetTireCodeString();
+                var distance = new Levenshtein(entryAsString)
+                    .DistanceFrom(stringTireCode);
+                var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, entryAsString, stringTireCode);
 
-        var endIndex = limit ?? entryList.Count;
-        for (var i = 0; i < endIndex; i++)
-        {
-            var entry = entryList.ElementAt(i);
-            var entryAsString = entry.GetTireCodeString();
-            var distance = new Levenshtein(entryAsString)
-                .DistanceFrom(stringTireCode);
-            var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, entryAsString, stringTireCode);
-
-            var ratedEntry = new TireDbMatch(entry, distance, estimatedAccuracy);
-            ratedEntries.Add(ratedEntry);
-        }
+                return new TireDbMatch(entry, distance, estimatedAccuracy);
+            });
 
         var orderedMatches = ratedEntries
-            .OrderByDescending(m => m.RequiredCharEdits)
+            .OrderBy(m => m.RequiredCharEdits)
             .ToList();
+
+        if (limit.HasValue)
+            orderedMatches = orderedMatches
+                .Take(limit.Value)
+                .ToList();
 
         return Task.FromResult(orderedMatches);
     }
 
-    private double GetAccuracyForLevenshteinDistance(int distance, string string1, string string2)
+    private decimal GetAccuracyForLevenshteinDistance(int distance, string string1, string string2)
     {
-        var stringLength = Math.Max((double)string1.Length, (double)string2.Length);
+        var stringLength = Math.Max((decimal)string1.Length, (decimal)string2.Length);
+        if (stringLength == 0)
+            return 0;
         return 1 - distance / stringLength;
     }
 }
