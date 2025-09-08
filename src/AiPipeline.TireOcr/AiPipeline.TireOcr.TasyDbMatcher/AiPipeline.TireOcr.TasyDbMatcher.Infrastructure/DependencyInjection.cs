@@ -18,6 +18,7 @@ public static class DependencyInjection
 
     private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddMemoryCache();
         var remoteDbAddress = configuration.GetValue<string>("RemoteTireDbAddress") ?? "";
         services.AddHttpClient<ITireParamsDbRepository, RemoteTireParamsDbRepository>(client =>
         {

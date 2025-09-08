@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Repositories;
+using Microsoft.Extensions.Caching.Memory;
 using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
 
@@ -8,17 +9,24 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.Repositories;
 
 public class RemoteTireParamsDbRepository : ITireParamsDbRepository
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
     private readonly HttpClient _httpClient;
+    private readonly IMemoryCache _responseCache;
 
-    public RemoteTireParamsDbRepository(HttpClient httpClient)
+    public RemoteTireParamsDbRepository(HttpClient httpClient, IMemoryCache responseCache)
     {
         _httpClient = httpClient;
+        _responseCache = responseCache;
     }
 
     public async Task<DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>> GetAllTireParamEntries()
     {
         try
         {
+            var key = _httpClient.BaseAddress?.AbsoluteUri ?? "";
+            if (_responseCache.TryGetValue(key, out IEnumerable<ProcessedTireParamsDatabaseEntryDto>? result))
+                return DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>.Success(result!);
+
             var res = await _httpClient.GetAsync("");
             if (!res.IsSuccessStatusCode)
             {
@@ -28,7 +36,10 @@ public class RemoteTireParamsDbRepository : ITireParamsDbRepository
 
             var rawTireParams = (await res.Content.ReadFromJsonAsync<IEnumerable<RawTireParamsDatabaseEntryDto>>())!
                 .ToList();
-            var processedTireParams = rawTireParams.Select(raw => new ProcessedTireParamsDatabaseEntryDto(raw));
+            var processedTireParams = rawTireParams
+                .Select(raw => new ProcessedTireParamsDatabaseEntryDto(raw))
+                .ToList();
+            _responseCache.Set(key, processedTireParams, CacheDuration);
 
             return DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>.Success(processedTireParams);
         }
