@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>TireOcr.Postprocessing.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
+      <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj" />
+    </ItemGroup>
+
+</Project>

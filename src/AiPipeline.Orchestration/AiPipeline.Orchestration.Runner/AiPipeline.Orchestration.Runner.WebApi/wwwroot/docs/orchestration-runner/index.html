@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Orchestration runner - AiPipeline</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Orchestration runner";
+        var mkdocs_page_input_path = "orchestration-runner.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AiPipeline
+    </a>
+    <a href="/swagger/index.html">Swagger Documentation</a>
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Orchestration runner</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-authentication-and-authorization-auth">1. Authentication and Authorization (Auth)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#authentication-methods">Authentication Methods</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#authorization-rules">Authorization Rules</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-file-management-files">2. File Management (Files)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-node-discovery-nodes">3. Node Discovery (Nodes)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-running-pipelines-pipelines">4. Running pipelines (Pipelines)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-pipeline-result-analysis-pipelineresults">5. Pipeline Result Analysis (PipelineResults)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-user-management-users">6. User Management (Users)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../ap-scheme/">Ap scheme</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../running-pipelines/">Running pipelines</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../node-creation-2/">Create your own node</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AiPipeline</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Orchestration runner</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="orchestration-runner">Orchestration Runner</h1>
+<p>The Orchestration Runner serves as the central control for the AiPipeline platform. It manages several core functionalities and provides a public RESTful API with dedicated endpoint groups for user interaction.</p>
+<h2 id="1-authentication-and-authorization-auth">1. Authentication and Authorization (Auth)</h2>
+<p>Access to the AiPipeline platform is restricted to authenticated users and services. The Authentication API provides a secure way to manage access.</p>
+<ul>
+<li><code>POST /Register</code>: Creates a new user account with provided credentials.</li>
+<li><code>POST /Login</code>: Authenticates a user and returns a pair of access and refresh tokens.</li>
+<li><code>POST /Refresh</code>: Exchanges an existing token pair for a new one, extending the authenticated session.</li>
+<li><code>POST /ApiKey</code>: Generates a new, uniquely named API key for current user. This key can be used by other services to access the platform. The API key is only returned once and cannot be retrieved later.</li>
+<li><code>DELETE /ApiKey/{name}</code>: Deletes the specified API key.</li>
+</ul>
+<h3 id="authentication-methods">Authentication Methods</h3>
+<ul>
+<li><strong>For Users</strong>: Use the access token from the /Login endpoint. Include it in the Authorization HTTP header with the Bearer scheme =&gt; <code>Authorization: Bearer &lt;your_access_token&gt;</code>.</li>
+<li><strong>For Services</strong>: Use the API key from the /ApiKey endpoint. Include it directly in the Authorization HTTP header =&gt; <code>Authorization: &lt;your_api_key&gt;</code>.</li>
+</ul>
+<h3 id="authorization-rules">Authorization Rules</h3>
+<p>Authenticated users have full access to all endpoints. However, authorization is scoped to the user, meaning they can only view and manage content they have created, including files, pipeline results, and personal data. This restriction does not apply to the Node Discovery endpoints, which are public for all authenticated users. It should also be noted that authenticated services (via ApiKeys) create all content under their owner user's id and also have restricted access to some endpoints. Namely, a service authenticated via ApiKey may not update or delete user accounts or create/delete ApiKeys.</p>
+<h2 id="2-file-management-files">2. File Management (Files)</h2>
+<p>The Orchestration Runner provides an API for users to interact with the central File Service. Internally, the runner communicates with the File Service using its gRPC SDK.</p>
+<ul>
+<li><code>GET /Files</code>: Lists all files owned by the user.</li>
+<li><code>GET /Files/{id}</code>: Retrieves the structured metadata for a specific file.</li>
+<li><code>GET /Files/{id}/Download</code>: Downloads the raw data of a file.</li>
+<li><code>POST /Files/Upload</code>: Uploads a new file, creating a new file record and storing the data in the File Service.</li>
+<li><code>DELETE /Files/{id}</code>: Deletes a file record and its associated data.</li>
+</ul>
+<h2 id="3-node-discovery-nodes">3. Node Discovery (Nodes)</h2>
+<p>This functionality provides a simple way to discover and inspect all available nodes on the platform. The Orchestration Runner keeps up-to-date records of all available nodes in it's database. It gathers this data by listening on a RabbitMQ queue, which is used by the nodes to advertise themselves, their procedures and their i/o schemes.</p>
+<ul>
+<li><code>GET /Nodes</code>: Lists all available nodes the Orchestration Runner sees. These records contain the nodes' procedures and the procedures' i/o schemes</li>
+</ul>
+<h2 id="4-running-pipelines-pipelines">4. Running pipelines (Pipelines)</h2>
+<p>This is the core functionality of the Orchestration Runner. Endpoints in this group allow the user to construct an arbitrary pipeline from gathered information about available nodes. Generally user outlines the flow of the pipeline using node-procedure identifier list and provides the initial input (compatible with the first procedure in the sequence). More info on how to run pipelines available on <a href="../running-pipelines/">Running Pipelines</a>.</p>
+<ul>
+<li><code>POST /Pipelines</code>: Runs a pipeline on the background, not awaiting the result.</li>
+<li><code>POST /Pipelines/Awaited</code>: Runs a pipeline in the same manner as in the standard /Pipelines endpoint, but the Runner only responds after the pipeline has completed (or user-provided timeout runs out). Returns a pipeline result directly back to the user</li>
+<li><code>POST /Pipelines/Batch</code>: Runs the same pipeline on multiple inputs in parallel. Number of pipelines is derrived from the number of provided inputs. Completion of pipelines is not awaited.</li>
+</ul>
+<h2 id="5-pipeline-result-analysis-pipelineresults">5. Pipeline Result Analysis (PipelineResults)</h2>
+<p>This functionality is focused simply on listing and display of results of pipelines, where user can find step-by-step process of the finished pipeline, seeing each partial result or reason of failure in case pipeline doesn't finish successfully.</p>
+<ul>
+<li><code>GET /PipelineResults</code>: Lists results of all current user pipelines</li>
+<li><code>GET /PipelineResults/{id}</code>: Gets a result of current user pipeline with the specified pipeline id.</li>
+<li><code>GET /PipelineResults/Batch/{id}</code>: Gets a sequence of pipeline results for pipelines ran from a single batch (using the Pipelines/Batch endpoint).</li>
+</ul>
+<h2 id="6-user-management-users">6. User Management (Users)</h2>
+<p>Users can manage their accounts through this set of endpoints.</p>
+<ul>
+<li><code>GET /Users/{id}</code>: Retrieves public details of a user.</li>
+<li><code>PUT /Users/{id}</code>: Updates the authenticated user's account details.</li>
+<li><code>DELETE /Users/{id}</code>: Deletes the authenticated user's account and all associated data</li>
+</ul>
+<!-- # Orchestration runner
+
+As mentioned on previous pages, Orchestration Runner is the real brain of AiPipeline platform. It manages several key functionality components of the system while providing a public API with endpoint groups for each of these components, so that users may use them. These functionalities are:
+
+## 1. Authentication and Authorization (Auth)
+
+Only an authenticated user/service may use the AiPipeline platform. For this purpose, Orchestration Runner API provides a group with following endpoints:
+
+- **POST:Register** - User enter their new credentials to register to the platform.
+- **POST:Login** - User enters their credentials and receive an Access/Refresh token pair.
+- **POST:Refresh** - By providing an access/refresh token pair back to the server using this endpoint, user will get a fresh pair of these tokens back, thus prolonging their authenticated period.
+- **POST:ApiKey** - User creates and gets a new ApiKey with a unique non-empty name with optional expiration. This ApiKey may then be used by other services to access the AiPipeline platform. The ApiKey can't be accessed outside of response to this request.
+- **DELETE:ApiKey/{name}**: User deletes their api key with the respective name.
+
+### How to authenticate
+
+- **Users**: Insert the access token received from Login endoint into the Authorization HTTP Header preceded by 'Bearer '. Example: 'Bearer eyJhbGciO.....s'.
+- **Services**: Insert the ApiKey received from ApiKey endpoint directly into the Authorization HTTP header. Example: '=ImF1ZCI6ImFpLXBpcGVsaW5lLmNvbSJ..'.
+
+### How is authorization configured
+
+Every authenticated user may use all the provided endpoints. With exception of Nodes endpoints, users are only authorized to see and manage content generated by them. That includes uploaded files, pipeline results, user-data and more.
+
+## 2. File Management (Files)
+
+Orchestration Runner provides an API to communicate with the central file service. Through this endpoint group, users may upload new files, or display, download and delete files created by them or pipelines initiated by them. Internally Runner just uses FileService's gRPC sdk for communication. Available endpoints are:
+
+- **GET:Files** - User lists all files available to them
+- **GET:Files/{id}** - User accesses structured record of their file
+- **GET:Files/{id}/Download** - User downloads their file's data
+- **POST:Files/Upload** - User uploads a new file, creating a record and storing the file data
+- **DELETE:Files/{id}** - User deletes their file record together with the file data
+
+## 3. Node Discovery (Nodes)
+
+This functionality provides just a single endpoint for listing all available nodes on the platform. The Orchestration Runner keeps up-to-date records of all available nodes in it's database. It gathers this data by listening on a RabbitMQ queue, which is used by the nodes to advertise themselves, their procedures and their i/o shemes. Available endpoints:
+
+- **GET:Nodes** - User lists all available nodes the Orchestration Runner sees. These records contain the nodes' procedures and the procedure's i/o schemes
+
+## 4. Running pipelines (Pipelines)
+
+This is the core functionality of the Orchestration Runner. Endpoints in this group allow the user to construct an arbitrary pipeline from gathered information about available nodes. Generally user outlines the flow of the pipeline using node-procedure identifier list and provides the initial input (compatible with the first procedure in the sequence). More info on how to run pipelines available on [Running Pipelines](running-pipelines.md) Available endpoints:
+
+- **POST:Pipelines** - User runs a pipeline on the background, not awaiting the result.
+- **POST:Pipelines/Awaited** - User runs a pipeline in the same manner as in the standard /Pipelines endpoint, but the Runner only responds after the pipeline has completed (or user-provided timeout runs out). Returns a pipeline result directly back to the user
+- **POST:Pipelines/Batch** - User runs the same pipeline on multiple inputs in parallel. Number of pipelines is derrived from the number of provided inputs. Completion of pipelines is not awaited.
+
+## 5. Pipeline Result Analysis (PipelineResults)
+
+This functionality is focused simply on listing and display of results of pipelines, where user can find step-by-step process of the finished pipeline, seeing each partial result or reason of failure in case pipeline doesn't finish successfully. Available endpoints:
+
+- **GET:PipelineResults** - User lists results of all their pipelines
+- **GET:PipelineResults/{id}** - User gets a result of their pipeline with the specified pipeline id.
+- **GET:PipelineResults/Batch/{id}** - User gets a sequence of pipeline results from pipelines ran from a single batch (using the Pipelines/Batch endpoint).
+
+## 6. User management (Users)
+
+Orchestration Runner also provides a simple functionality where users may manage their accounts. Available endpoints:
+
+- **GET:Users/{id}** - User displays public details of user with given id.
+- **PUT:Users/{id}** - User updates their own account detail.
+- **DELETE:Users/{id}** - User deletes their own account and all data linked to it. -->
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../architecture/" class="btn btn-neutral float-left" title="Architecture"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ap-scheme/" class="btn btn-neutral float-right" title="Ap scheme">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../architecture/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ap-scheme/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

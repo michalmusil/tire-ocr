@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13"/>
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
+        <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Nodes\AiPipeline.Orchestration.Shared.Nodes.csproj"/>
+        <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Application\AiPipeline.TireOcr.Postprocessing.Application.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj"/>
+        <ProjectReference Include="..\AiPipeline.TireOcr.Postprocessing.Infrastructure\AiPipeline.TireOcr.Postprocessing.Infrastructure.csproj"/>
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+option csharp_namespace = "AiPipeline.Orchestration.FileService.GrpcServer";
+
+package files;
+
+service FileServiceInterface {
+  rpc GetAllFilesPaginated (GetAllFilesRequest) returns (GetAllFilesResponse);
+  rpc GetFileById (GetFileByIdRequest) returns (GetFileByIdResponse);
+  rpc GetFilesByIds (GetFilesByIdsRequest) returns (GetFilesByIdsResponse);
+  rpc UploadFile (UploadFileRequest) returns (UploadFileResponse);
+  rpc DownloadFile (DownloadFileRequest) returns (DownloadFileResponse);
+  rpc RemoveFile (RemoveFileRequest) returns (RemoveFileResponse);
+}
+
+
+// GENERAL MESSAGE TYPES
+enum StorageScope {
+  FILE_STORAGE_SCOPE_UNSPECIFIED = 0;
+  LONG_TERM = 1;
+  SHORT_TERM = 2;
+  TEMPORARY = 3;
+}
+
+message Pagination {
+  int32 page_number = 1;
+  int32 page_size = 2;
+  int32 total_pages = 3;
+  int32 total_count = 4;
+  bool has_previous_page = 5;
+  bool has_next_page = 6;
+}
+
+message FileDto {
+  string file_guid = 1;
+  StorageScope file_storage_scope = 2;
+  string content_type = 3;
+  string storage_provider = 4;
+  string path = 5;
+  string user_guid = 6;
+}
+
+// GET ALL FILES PAGINATED
+message GetAllFilesRequest {
+  optional StorageScope storage_scope_filter = 1;
+  int32 page_number = 2;
+  int32 page_size = 3;
+  string user_guid = 4;
+}
+message GetAllFilesResponse {
+  repeated FileDto items = 1;
+  Pagination pagination = 2;
+  string user_guid = 3;
+}
+
+// GET FILE BY ID
+message GetFileByIdRequest {
+  string file_guid = 1;
+  string user_guid = 2;
+}
+
+message GetFileByIdResponse {
+  FileDto file = 1;
+}
+
+// GET FILES BY IDS
+message GetFilesByIdsRequest {
+  repeated string file_guids = 1;
+  bool fail_if_not_all_found = 2;
+  string user_guid = 3;
+}
+
+message GetFilesByIdsResponse {
+  repeated FileDto items = 1;
+}
+
+// UPLOAD FILE
+message UploadFileRequest {
+  string file_name = 1;
+  string content_type = 2;
+  bytes file_data = 3;
+  StorageScope storage_scope = 4;
+  optional string file_guid = 5;
+  string user_guid = 6;
+}
+
+message UploadFileResponse {
+  FileDto file = 1;
+}
+
+// DOWNLOAD FILE
+message DownloadFileRequest {
+  string file_guid = 1;
+  string user_guid = 2;
+}
+
+message DownloadFileResponse {
+  bytes file_data = 1;
+  string content_type = 2;
+}
+
+// REMOVE FILE
+message RemoveFileRequest {
+  string file_guid = 1;
+  string user_guid = 2;
+}
+
+message RemoveFileResponse {
+  bool success = 1;
+}

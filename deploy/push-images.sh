@@ -5,6 +5,7 @@ set -e
 PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_preprocessing-service"
 OCR_IMAGE_NAME="michalmusil/tire-ocr_ocr-service"
 POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_postprocessing-service"
+TIRE_DB_MATCHER_IMAGE_NAME="michalmusil/tire-ocr_tire-db-matcher-service"
 RUNNER_PROTOTYPE_IMAGE_NAME="michalmusil/tire-ocr_runner-prototype"
 
 # PREPROCESSING
@@ -20,6 +21,11 @@ echo ""
 # POSTPROCESSING
 echo "Pushing image for postprocessing service"
 docker push "${POSTPROCESSING_IMAGE_NAME}:latest"
+echo ""
+
+# TIRE_DB_MATCHER
+echo "Pushing image for tire db matcher service"
+docker push "${TIRE_DB_MATCHER_IMAGE_NAME}:latest"
 echo ""
 
 # RUNNER_PROTOTYPE

@@ -1,0 +1,12 @@
+site_name: AiPipeline
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Orchestration runner: orchestration-runner.md
+  - Ap scheme: ap-scheme.md
+  - Running pipelines: running-pipelines.md
+  - Create your own node: node-creation-2.md
+  - License: license.md
+theme:
+  name: readthedocs
+  custom_dir: docs/_overrides

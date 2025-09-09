@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+      <UserSecretsId>3a28dac6-10fe-4660-bcfc-b9288c08e514</UserSecretsId>
+  </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
+        <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.13" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
+      <ProjectReference Include="..\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

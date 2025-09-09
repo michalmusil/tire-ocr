@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Sdk Name="Aspire.AppHost.Sdk" Version="9.1.0" />
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAspireHost>true</IsAspireHost>
+    <UserSecretsId>dc75423e-25be-4b02-8d61-829e2be03ec1</UserSecretsId>
+    <RootNamespace>TireOcr.AppHost</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" Version="9.1.0" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" Version="9.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.GrpcServer\AiPipeline.Orchestration.FileService.GrpcServer.csproj" />
+    <ProjectReference Include="..\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Messaging\AiPipeline.TireOcr.Ocr.Messaging.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Messaging\AiPipeline.TireOcr.Postprocessing.Messaging.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Messaging\AiPipeline.TireOcr.Preprocessing.Messaging.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.RunnerPrototype\AiPipeline.TireOcr.RunnerPrototype.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Messaging\AiPipeline.TireOcr.TasyDbMatcher.Messaging.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj" />
+  </ItemGroup>
+
+</Project>

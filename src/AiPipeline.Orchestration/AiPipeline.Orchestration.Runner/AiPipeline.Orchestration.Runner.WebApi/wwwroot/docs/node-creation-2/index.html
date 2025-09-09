@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Create your own node - AiPipeline</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Create your own node";
+        var mkdocs_page_input_path = "node-creation-2.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AiPipeline
+    </a>
+    <a href="/swagger/index.html">Swagger Documentation</a>
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orchestration-runner/">Orchestration runner</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../ap-scheme/">Ap scheme</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../running-pipelines/">Running pipelines</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Create your own node</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-node-communication-essentials">1. Node Communication Essentials</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#rabbitmq-setup">RabbitMQ Setup</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#node-advertisements">Node Advertisements</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dedicated-queue">Dedicated Queue</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-implementing-the-procedure-logic">2. Implementing the Procedure Logic</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#handling-incoming-messages">Handling Incoming Messages</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#success-completing-a-step">Success: Completing a Step</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#failure-handling-errors">Failure: Handling Errors</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#handling-files">Handling Files</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#example-node-in-net">Example Node in .NET</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#project-setup">Project Setup</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#declare-messaging-constants">Declare Messaging Constants</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#programcs-configuration">Program.cs Configuration</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#implement-your-procedure">Implement Your Procedure</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#running-your-node">Running Your Node</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#a-note-on-dataresult-and-result">A Note on DataResult and Result</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AiPipeline</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Create your own node</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="creating-a-custom-node">Creating a Custom Node</h1>
+<p>The AiPipeline platform is designed to be highly extensible. You can add new functionalities by creating and integrating your own custom nodes. While the platform is primarily built in .NET, a node can be implemented in any language that can communicate with RabbitMQ and gRPC.</p>
+<p>This guide uses a simple <code>word-processor</code> node as an example. Its single procedure, <code>repeat-string</code>, takes a string and a repetition count N as input, then outputs the string repeated N times. N is optional and it's default is 2.</p>
+<hr />
+<h3 id="1-node-communication-essentials">1. Node Communication Essentials</h3>
+<p>Nodes communicate with the Orchestration Runner and other nodes via <strong>RabbitMQ</strong>, a message broker. Your node needs to handle four key messaging tasks:</p>
+<ol>
+<li><strong>Advertising</strong>: Periodically announce your node's capabilities to the Orchestration Runner.</li>
+<li><strong>Listening</strong>: Receive pipeline commands from the Orchestration Runner (or other nodes).</li>
+<li><strong>Reporting</strong>: Send the results (success or failure) of a procedure back to the runner.</li>
+<li><strong>Forwarding</strong>: Pass the pipeline command to the next node in the sequence.</li>
+</ol>
+<h4 id="rabbitmq-setup">RabbitMQ Setup</h4>
+<p>Your node needs a connection string to the RabbitMQ broker, typically provided via a <code>ConnectionStrings__rabbitmq</code> environment variable. On startup, it must establish a connection.</p>
+<h4 id="node-advertisements">Node Advertisements</h4>
+<p>Your node must periodically send an advertisement message to the <code>node-advertisements</code> exchange. This message informs the Orchestration Runner about your node's availability and its procedures.</p>
+<pre><code class="language-json">{
+  &quot;nodeId&quot;: &quot;word-processor&quot;,
+  &quot;procedures&quot;: [
+    {
+      &quot;id&quot;: &quot;repeat-string&quot;,
+      &quot;schemaVersion&quot;: 1,
+      &quot;input&quot;: {
+        &quot;type&quot;: &quot;ApObject&quot;,
+        &quot;properties&quot;: {
+          &quot;inputString&quot;: {
+            &quot;type&quot;: &quot;ApString&quot;,
+            &quot;value&quot;: &quot;&quot;
+          },
+          &quot;repetitionCount&quot;: {
+            &quot;type&quot;: &quot;ApInt&quot;,
+            &quot;value&quot;: &quot;&quot;
+          }
+        },
+        &quot;nonRequiredProperties&quot;: [&quot;repetitionCount&quot;]
+      },
+      &quot;output&quot;: {
+        &quot;type&quot;: &quot;ApObject&quot;,
+        &quot;properties&quot;: {
+          &quot;repeatedString&quot;: {
+            &quot;type&quot;: &quot;ApString&quot;,
+            &quot;value&quot;: &quot;&quot;
+          }
+        },
+        &quot;nonRequiredProperties&quot;: []
+      }
+    }
+  ]
+}
+</code></pre>
+<p>The <code>nodeId</code> must be a globally unique string. The procedures array lists all the functionalities your node provides, including their node-unique IDs and ApScheme input/output contracts.</p>
+<h4 id="dedicated-queue">Dedicated Queue</h4>
+<p>To receive work, your node needs its own queue. This queue <strong>must have the same name as your <code>nodeId</code></strong>. You then need to bind this queue to the <code>run-pipeline</code> topic exchange using a topic pattern that matches your queue name: <code>run-pipeline.&lt;your-node-id&gt;</code>. This setup ensures that your node only receives messages intended for it.</p>
+<h3 id="2-implementing-the-procedure-logic">2. Implementing the Procedure Logic</h3>
+<p>Once the messaging setup is complete, you can focus on the core logic of your procedures.</p>
+<h4 id="handling-incoming-messages">Handling Incoming Messages</h4>
+<p>When a message arrives on your queue, it will contain all the information needed to execute a step in a pipeline.</p>
+<pre><code class="language-json">{
+  &quot;pipelineId&quot;: &quot;da44763b-cb66-4e0b-a2c9-13c94541a4e8&quot;,
+  &quot;userId&quot;: &quot;9b8ee2bc-9ecb-4556-89e0-4642f0a0cab4&quot;,
+  &quot;currentStep&quot;: {
+    &quot;nodeId&quot;: &quot;word-processor&quot;,
+    &quot;procedureId&quot;: &quot;repeat-string&quot;,
+    &quot;orderInPipeline&quot;: 3
+  },
+  &quot;currentStepInput&quot;: {
+    &quot;type&quot;: &quot;ApObject&quot;,
+    &quot;properties&quot;: {
+      &quot;inputString&quot;: {
+        &quot;type&quot;: &quot;ApString&quot;,
+        &quot;value&quot;: &quot;This is the input of the procedure&quot;
+      },
+      &quot;repetitionCount&quot;: {
+        &quot;type&quot;: &quot;ApInt&quot;,
+        &quot;value&quot;: &quot;3&quot;
+      }
+    },
+    &quot;nonRequiredProperties&quot;: [&quot;repetitionCount&quot;]
+  },
+  &quot;nextSteps&quot;: [
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-1&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id&quot;,
+      &quot;orderInPipeline&quot;: 4,
+      &quot;outputValueSelector&quot;: &quot;0.innerParamXyz&quot;
+    },
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-2&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id-2&quot;,
+      &quot;orderInPipeline&quot;: 5
+    }
+  ],
+  &quot;fileReferences&quot;: [
+    {
+      &quot;id&quot;: &quot;92d95e90-5c3f-45aa-ab04-e1533e5153ee&quot;,
+      &quot;storageProvider&quot;: &quot;minio&quot;,
+      &quot;path&quot;: &quot;short-term-files/92d95e90-5c3f-45aa-ab04-e1533e5153ee.png&quot;,
+      &quot;contentType&quot;: &quot;image/png&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Your node must:</p>
+<ol>
+<li><strong>Extract</strong> the <code>procedureId</code> from the <code>currentStep</code> object.</li>
+<li><strong>Route</strong> the message to the corresponding procedure's execution logic.</li>
+<li><strong>Provide</strong> the <code>currentStepInput</code> as the procedure's input data.</li>
+</ol>
+<h4 id="success-completing-a-step">Success: Completing a Step</h4>
+<p>If your procedure runs successfully, you must do two things:</p>
+<ol>
+<li><strong>Report Success</strong>: Publish a message to the <code>completed-pipeline-steps</code> exchange. This message should contain the <code>pipelineId</code>, the procedure's identifier, a timestamp, and your procedure's ApScheme output as the <code>result</code>. If the original message had an <code>outputValueSelector</code>, you must apply it to your output before sending.</li>
+</ol>
+<pre><code class="language-json">{
+  &quot;pipelineId&quot;: &quot;da44763b-cb66-4e0b-a2c9-13c94541a4e8&quot;,
+  &quot;procedureIdentifier&quot;: {
+    &quot;nodeId&quot;: &quot;word-processor&quot;,
+    &quot;procedureId&quot;: &quot;repeat-string&quot;,
+    &quot;orderInPipeline&quot;: 3
+  },
+  &quot;completedAt&quot;: &quot;2024-01-24T06:09:19.384957Z&quot;,
+  &quot;result&quot;: {
+    &quot;type&quot;: &quot;ApObject&quot;,
+    &quot;properties&quot;: {
+      &quot;repeatedString&quot;: {
+        &quot;type&quot;: &quot;ApString&quot;,
+        &quot;value&quot;: &quot;This is the input of the procedureThis is the input of the procedureThis is the input of the procedure&quot;
+      }
+    }
+  },
+  &quot;nextSteps&quot;: [
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-1&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id&quot;,
+      &quot;orderInPipeline&quot;: 4,
+      &quot;outputValueSelector&quot;: &quot;0.innerParamXyz&quot;
+    },
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-2&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id-2&quot;,
+      &quot;orderInPipeline&quot;: 5
+    }
+  ]
+}
+</code></pre>
+<p>2.<strong>Forward Pipeline</strong>: If the nextSteps array is not empty, create a new message for the next node. This message is identical to the one you received, but with the following changes:</p>
+<ul>
+<li>The <code>currentStep</code> is now the first step from the original <code>nextSteps</code>.</li>
+<li>The <code>currentStepInput</code> is now your procedure's output (or value selected by optional <code>outputValueSelector</code>).</li>
+<li>The first step is removed from the <code>nextSteps</code> array.</li>
+<li>Any new file references are added to the <code>fileReferences</code> list.</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;pipelineId&quot;: &quot;da44763b-cb66-4e0b-a2c9-13c94541a4e8&quot;,
+  &quot;userId&quot;: &quot;9b8ee2bc-9ecb-4556-89e0-4642f0a0cab4&quot;,
+  &quot;currentStep&quot;: {
+    &quot;nodeId&quot;: &quot;next-node-id-1&quot;,
+    &quot;procedureId&quot;: &quot;next-node-requested-procedure-id&quot;,
+    &quot;orderInPipeline&quot;: 4,
+    &quot;outputValueSelector&quot;: &quot;0.innerParamXyz&quot;
+  },
+  &quot;currentStepInput&quot;: {
+    &quot;type&quot;: &quot;ApObject&quot;,
+    &quot;properties&quot;: {
+      &quot;repeatedString&quot;: {
+        &quot;type&quot;: &quot;ApString&quot;,
+        &quot;value&quot;: &quot;This is the input of the procedureThis is the input of the procedureThis is the input of the procedure&quot;
+      }
+    }
+  },
+  &quot;nextSteps&quot;: [
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-2&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id-2&quot;,
+      &quot;orderInPipeline&quot;: 5
+    }
+  ],
+  &quot;fileReferences&quot;: [
+    {
+      &quot;id&quot;: &quot;92d95e90-5c3f-45aa-ab04-e1533e5153ee&quot;,
+      &quot;storageProvider&quot;: &quot;minio&quot;,
+      &quot;path&quot;: &quot;short-term-files/92d95e90-5c3f-45aa-ab04-e1533e5153ee.png&quot;,
+      &quot;contentType&quot;: &quot;image/png&quot;
+    }
+  ]
+}
+</code></pre>
+<p>Publish this new message to the <code>run-pipeline</code> exchange with the topic <code>run-pipeline.&lt;next-node-id&gt;</code>.</p>
+<h4 id="failure-handling-errors">Failure: Handling Errors</h4>
+<p>If your procedure fails, it must stop the pipeline and report the error. Publish a single message to the <code>failed-pipelines</code> exchange. This message should include:</p>
+<ul>
+<li><code>pipelineId</code> and <code>procedureIdentifier</code> to identify the failure.</li>
+<li><code>failedAt</code> timestamp.</li>
+<li>A <code>failureCode</code> (a numeric code semantically consistent with HTTP status codes, e.g., 422 for bad input).</li>
+<li>A descriptive <code>failureReason</code>.</li>
+<li>An optional <code>exceptionMessage</code> for technical details.</li>
+<li>The <code>remainingNotCompletedSteps</code> to show which parts of the pipeline were skipped.</li>
+</ul>
+<pre><code class="language-json">{
+  &quot;pipelineId&quot;: &quot;da44763b-cb66-4e0b-a2c9-13c94541a4e8&quot;,
+  &quot;procedureIdentifier&quot;: {
+    &quot;nodeId&quot;: &quot;word-processor&quot;,
+    &quot;procedureId&quot;: &quot;repeat-string&quot;,
+    &quot;orderInPipeline&quot;: 3
+  },
+  &quot;failedAt&quot;: &quot;2024-01-24T06:09:19.384957Z&quot;,
+  &quot;failureCode&quot;: 422,
+  &quot;failureReason&quot;: &quot;The provided repetition count wasn't a positive number ('-20'), which is not allowed.&quot;,
+  &quot;exceptionMessage&quot;: &quot;This is an optional string where you can provide exception details if your pipeline failed unexpectedly&quot;,
+  &quot;remainingNotCompletedSteps&quot;: [
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-1&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id&quot;,
+      &quot;orderInPipeline&quot;: 4,
+      &quot;outputValueSelector&quot;: &quot;0.innerParamXyz&quot;
+    },
+    {
+      &quot;nodeId&quot;: &quot;next-node-id-2&quot;,
+      &quot;procedureId&quot;: &quot;next-node-requested-procedure-id-2&quot;,
+      &quot;orderInPipeline&quot;: 5
+    }
+  ]
+}
+</code></pre>
+<h4 id="handling-files">Handling Files</h4>
+<p>The platform includes a dedicated <strong>gRPC file service</strong> for managing file data.</p>
+<ul>
+<li><strong>Download</strong>: If an <code>ApFile</code> is in your input, find its ID in the <code>fileReferences</code> list. Use the gRPC service to download the file data for processing.</li>
+<li><strong>Upload</strong>: If your procedure generates a new file, upload it to the gRPC service. You must provide the file's data, its <code>contentType</code>, a new GUID, the <code>userId</code> from the incoming message, and a <code>storageScope</code>. The storage scope determines how long the file will be kept and can be one of three values: <code>long-term-files</code>, <code>short-term-files</code>, or <code>temp-files</code>. The service will return a reference that must be added to the <code>fileReferences</code> list if the pipeline continues.</li>
+</ul>
+<hr />
+<h3 id="example-node-in-net">Example Node in .NET</h3>
+<p>The shared .NET codebase handles most of the complex messaging and routing logic for you. Here’s a streamlined guide for implementing the <code>word-processor</code> example.</p>
+<h4 id="project-setup">Project Setup</h4>
+<ol>
+<li>Create a new Web API project in the solution: <code>AiPipeline.&lt;optional-node-group-name&gt;.WordProcessor</code>.</li>
+<li>Add references to the following shared projects: <code>AiPipeline.Orchestration.Shared.All</code>, <code>AiPipeline.Orchestration.Shared.Nodes</code>, <code>AiPipeline.ServiceDefaults</code> (only for local deployment), and <code>AiPipeline.Shared</code>.</li>
+</ol>
+<h4 id="declare-messaging-constants">Declare Messaging Constants</h4>
+<p>In the <code>MessagingConstants.cs</code> file (in <code>AiPipeline.Orchestration.Shared.All</code>), add your node's unique ID.</p>
+<pre><code class="language-csharp">public static class MessagingConstants
+{
+    // ... other constants
+    public static string WordProcessorId =&gt; &quot;word-processor&quot;;
+}
+</code></pre>
+<p>Next, in <code>WolverineExtensions.cs</code>, bind your node's queue to the <code>run-pipeline</code> exchange.</p>
+<pre><code class="language-csharp">public static RabbitMqTransportExpression DeclareExchanges(this RabbitMqTransportExpression expression)
+{
+    return expression
+        .DeclareExchange(MessagingConstants.RunPipelineExchangeName, exc =&gt;
+        {
+          // ... other bindings
+          exc.BindTopic($&quot;{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.WordProcessorId}&quot;)
+            .ToQueue(MessagingConstants.WordProcessorId);
+        });
+}
+</code></pre>
+<h4 id="programcs-configuration">Program.cs Configuration</h4>
+<p>Configure <code>Program.cs</code> to set up Wolverine, register your procedures, and enable file services. The shared utilities handle all the background work.</p>
+<pre><code class="language-csharp">var builder = WebApplication.CreateBuilder(args);
+
+// Configures connection to RabbitMq message broker via WolverineFx
+builder.Host.UseWolverine(opt =&gt;
+        {
+            opt.UseRabbitMqUsingNamedConnection(&quot;rabbitmq&quot;) // This connects your node to the RabbitMq broker. The connectionString should added to configuration as 'ConnectionStrings__rabbitmq'
+                .DeclareExchanges() // Ensures all exchanges and queues are properly declared
+                .AutoProvision(); // Ensures RabbitMq configuration is persisted on the broker
+
+            opt.ConfigureMessagePublishing(); // Adds rules on how the messages should be published in the RabbitMq broker
+            opt.ApplyCustomConfiguration(); // Adds custom configuration on message parsing (ApElements)
+
+            opt.ListenToRabbitQueue(MessagingConstants.WordProcessorId); // Ensures your node receives messages for procedure execution
+
+            // Adds a separate hosted service which will publish your node and procedure advertisements to the OrchestrationRunner
+            opt.Services.AddHostedService(provider =&gt;
+                new NodeAdvertisementProducerService(
+                    serviceProvider: provider,
+                    nodeId: MessagingConstants.WordProcessorId,
+                    assemblies: typeof(DependencyInjection).Assembly
+                )
+            );
+        });
+
+// Injects 'IFileReferenceDownloaderService' and 'IFileReferenceUploaderService' to work with files via gRPC File Service
+builder.Services.AddFileManipulation(builder.Configuration);
+// Injects procedure routing and registers all procedures (implementations of IProcedure) from your assemblies
+builder.Services.AddProcedureRoutingFromAssemblies(typeof(Program).Assembly);
+
+var app = builder.Build();
+app.Run();
+</code></pre>
+<h4 id="implement-your-procedure">Implement Your Procedure</h4>
+<p>Create a <code>RepeatStringProcedure</code> class that implements the <code>IProcedure</code> interface. You only need to define its ID, schemas, and the <code>ExecuteAsync</code> method.</p>
+<pre><code class="language-csharp">public class RepeatStringProcedure : IProcedure
+{
+    public string Id =&gt; &quot;repeat-string&quot;;
+    public int SchemaVersion =&gt; 1;
+
+    public IApElement InputSchema =&gt; new ApObject(
+        properties: new Dictionary&lt;string, IApElement&gt;()
+        {
+            { &quot;inputString&quot;, ApString.Template() },
+            { &quot;repetitionCount&quot;, ApInt.Template() },
+        },
+        nonRequiredProperties: [&quot;repetitionCount&quot;]
+    );
+
+    public IApElement OutputSchema =&gt; new ApObject(
+        properties: new Dictionary&lt;string, IApElement&gt;()
+        {
+            { &quot;repeatedString&quot;, ApString.Template() }
+        }
+    );
+
+    public async Task&lt;DataResult&lt;IApElement&gt;&gt; ExecuteAsync(RunPipelineStep step)
+    {
+        var inputValuesResult = ExtractInputValues(step.CurrentStepInput);
+        if (inputValuesResult.IsFailure)
+            return DataResult&lt;IApElement&gt;.Failure(inputValuesResult.Failures);
+
+        var inputValues = inputValuesResult.Data!;
+        var result = string.Concat(Enumerable.Repeat(inputValues.Item1, inputValues.Item2));
+
+        return DataResult&lt;IApElement&gt;.Success(
+            new ApObject(
+                properties: new()
+                {
+                    { &quot;repeatedString&quot;, new ApString(result) }
+                }
+            )
+        );
+    }
+
+    private DataResult&lt;(string, int)&gt; ExtractInputValues(IApElement stepInput)
+    {
+        if (stepInput is ApObject input)
+        {
+            var hasInputString = input.TryGetValueCaseInsensitive(&quot;inputString&quot;, out var inputString);
+            if (!hasInputString || inputString is not ApString)
+                return DataResult&lt;(string, int)&gt;.Invalid(
+                    $&quot;Property 'inputString' is required and must be of type {nameof(ApString)}&quot;);
+
+            input.TryGetValueCaseInsensitive(&quot;repetitionCount&quot;, out var repCnt);
+            var repetitionCount = repCnt is ApInt repCntInt ? repCntInt.Value : 2;
+            if (repetitionCount &lt; 1)
+                return DataResult&lt;(string, int)&gt;.Invalid(
+                    $&quot;The provided repetition count wasn't a positive number ('{repetitionCount}'), which is not allowed.&quot;);
+
+            return DataResult&lt;(string, int)&gt;.Success((
+                ((ApString)inputString).Value,
+                repetitionCount
+            ));
+        }
+
+        return DataResult&lt;(string, int)&gt;.Invalid(&quot;Input has an invalid scheme.&quot;);
+    }
+}
+</code></pre>
+<p>The <code>ProcedureRouter</code> takes care of all the message-passing and error-handling boilerplate. Your <code>ExecuteAsync</code> method only needs to focus on the business logic and returning a <code>DataResult</code>.</p>
+<h4 id="running-your-node">Running Your Node</h4>
+<p>To run your node in a local Aspire debug environment, add a project reference to it in the <code>AiPipeline.Apphost</code> project.</p>
+<pre><code class="language-csharp">// ... other projects
+var wordProcessorNode = builder.AddProject&lt;AiPipeline_WordProcessor&gt;(&quot;WordProcessorNode&quot;)
+    .WithReference(rabbitMq) // rabbitMq already prepared in Program.cs
+    .WaitFor(rabbitMq)
+    .WithReference(fileService) // fileService already prepared in Program.cs;
+</code></pre>
+<p>For production, containerize your project with a Dockerfile and add it to your deployment configuration (e.g., Kubernetes, Docker Compose), ensuring you provide all necessary secrets and connection strings.</p>
+<h4 id="a-note-on-dataresult-and-result">A Note on DataResult and Result</h4>
+<p>The <code>DataResult&lt;T&gt;</code> and <code>Result</code> classes are not a mandatory part of building an AiPipeline node, but they are an integral utility within the shared codebase. They are a C# implementation of a union type, designed to explicitly handle success and failure states in a clean, composable way.</p>
+<p>Instead of throwing exceptions or returning <code>null</code> to indicate a failure, these classes allow you to return a single object that clearly contains either the expected data on success or a collection of <code>Failure</code> objects on failure.</p>
+<p>This pattern is essential when implementing the <code>IProcedure</code> interface, as the <code>ExecuteAsync</code> method requires a return type of <code>Task&lt;DataResult&lt;IApElement&gt;&gt;</code>. The <code>ProcedureRouter</code> relies on this explicit result to automatically handle the next steps in the pipeline:</p>
+<ul>
+<li>If <code>IsSuccess</code> is <code>true</code>, the <code>ProcedureRouter</code> takes the <code>Data</code> property and passes it to the next node.</li>
+<li>If <code>IsSuccess</code> is <code>false</code>, the router uses the <code>Failures</code> property to construct the failure message and publish it to the <code>failed-pipelines</code> queue.</li>
+</ul>
+<p>The static factory methods on the <code>Result</code> and <code>DataResult&lt;T&gt;</code> classes provide a simple way to create these objects for common scenarios. They align with standard HTTP status codes, such as <code>Invalid(422)</code> for bad input or <code>NotFound(404)</code> for missing resources, making the failure reasons clear and consistent across the platform.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../running-pipelines/" class="btn btn-neutral float-left" title="Running pipelines"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../license/" class="btn btn-neutral float-right" title="License">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../running-pipelines/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../license/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
