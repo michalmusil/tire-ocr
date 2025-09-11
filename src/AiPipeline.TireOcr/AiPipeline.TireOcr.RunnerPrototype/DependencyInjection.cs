@@ -64,7 +64,7 @@ public static class DependencyInjection
         });
         serviceCollection.AddHttpClient<IDbMatchingClient, DbMatchingClient>(client =>
         {
-            client.BaseAddress = new("https+http://TasyDbMatherService");
+            client.BaseAddress = new("https+http://TasyDbMatcherService");
         });
         serviceCollection.AddHttpClient<IImageDownloadClient, ImageDownloadClient>();
     }

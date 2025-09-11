@@ -28,7 +28,7 @@ echo ""
 
 # TIRE_DB_MATCHER
 echo "Building image for tire db matcher service"
-docker build --platform linux/amd64 -t "${TIRE_DB_MATCHER_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.Postprocessing/AiPipeline.TireOcr.Postprocessing.WebApi/Dockerfile .
+docker build --platform linux/amd64 -t "${TIRE_DB_MATCHER_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.TasyDbMatcher/AiPipeline.TireOcr.TasyDbMatcher.WebApi/Dockerfile .
 echo "Successfully built ${TIRE_DB_MATCHER_IMAGE_NAME}"
 echo ""
 

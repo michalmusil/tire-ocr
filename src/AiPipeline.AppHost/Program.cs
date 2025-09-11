@@ -49,7 +49,7 @@ var ocrMessagingService = builder.AddProject<AiPipeline_TireOcr_Ocr_Messaging>("
 // var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
 //     .WithHttpsHealthCheck("/health");
 //
-// var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_WebApi>("TasyDbMatherService")
+// var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_WebApi>("TasyDbMatcherService")
 //     .WithHttpsHealthCheck("/health");
 
 var postprocessingMessagingService = builder

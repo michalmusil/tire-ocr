@@ -36,8 +36,8 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
     restart: unless-stopped
-  TasyDbMatherService:
-    container_name: "TasyDbMatherService"
+  TasyDbMatcherService:
+    container_name: "TasyDbMatcherService"
     image: "michalmusil/tire-ocr_tire-db-matcher-service:latest"
     environment:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"

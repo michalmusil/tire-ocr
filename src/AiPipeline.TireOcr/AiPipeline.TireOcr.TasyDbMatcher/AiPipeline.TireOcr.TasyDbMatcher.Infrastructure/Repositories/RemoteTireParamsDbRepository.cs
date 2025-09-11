@@ -2,6 +2,7 @@ using System.Net.Http.Json;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Repositories;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
 
@@ -12,11 +13,14 @@ public class RemoteTireParamsDbRepository : ITireParamsDbRepository
     private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
     private readonly HttpClient _httpClient;
     private readonly IMemoryCache _responseCache;
+    private readonly ILogger<RemoteTireParamsDbRepository> _logger;
 
-    public RemoteTireParamsDbRepository(HttpClient httpClient, IMemoryCache responseCache)
+    public RemoteTireParamsDbRepository(HttpClient httpClient, IMemoryCache responseCache,
+        ILogger<RemoteTireParamsDbRepository> logger)
     {
         _httpClient = httpClient;
         _responseCache = responseCache;
+        _logger = logger;
     }
 
     public async Task<DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>> GetAllTireParamEntries()
@@ -47,13 +51,15 @@ public class RemoteTireParamsDbRepository : ITireParamsDbRepository
         {
             var statusCode = ex.StatusCode;
             ex.TryGetContentJsonProperty("detail", out var content);
-            var failureMessage = $"Ocr: {content ?? "No tire code was detected during Ocr"}";
+            var failureMessage = $"TireDbMatching: {content ?? "Failed to get DB matches for processed tire code."}";
+            _logger.LogError(ex, failureMessage);
 
             return DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>.Failure(new Failure((int)statusCode!,
                 failureMessage));
         }
         catch (Exception ex)
         {
+            _logger.LogError(ex, "Unexpected exception while getting Tire parameters from remote DB.");
             return DataResult<IEnumerable<ProcessedTireParamsDatabaseEntryDto>>.Failure(
                 new Failure(500, "Failed to retrieve existing Tire database entries")
             );
