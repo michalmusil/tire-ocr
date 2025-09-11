@@ -91,6 +91,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared.NodeSdk", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.NodeSdk\AiPipeline.Orchestration.Shared.NodeSdk.csproj", "{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +139,7 @@ Global
 		{1B3D6F88-3A29-43FF-9017-FFBD92CD977C} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{042F52E3-1C8B-476D-A4FE-4DE165771F97} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2} = {27B2E266-20B8-4319-9822-68025944A5F3}
+		{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -283,5 +286,9 @@ Global
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8CA2D20-C100-4DBA-92B8-A91E81E9AE43}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -13,8 +13,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj" />
-      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Nodes\AiPipeline.Orchestration.Shared.Nodes.csproj" />
+      <ProjectReference Include="..\..\..\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.NodeSdk\AiPipeline.Orchestration.Shared.NodeSdk.csproj" />
       <ProjectReference Include="..\..\..\AiPipeline.ServiceDefaults\AiPipeline.ServiceDefaults.csproj" />
       <ProjectReference Include="..\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.csproj" />
     </ItemGroup>

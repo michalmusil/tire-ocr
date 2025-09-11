@@ -1,17 +1,26 @@
+using AiPipeline.Orchestration.Shared.NodeSdk;
 using AiPipeline.TireOcr.TasyDbMatcher.Application;
 using AiPipeline.TireOcr.TasyDbMatcher.Infrastructure;
-using AiPipeline.TireOcr.TasyDbMatcher.Messaging;
 
-var builder = WebApplication.CreateBuilder(args);
+var app = AiPipelineSharedNodeSdk
+    .CreateNodeApplication(
+        nodeId: "tire-ocr-tasy-db-matcher",
+        provideRabbitMqConnectionString: builder =>
+        {
+            return builder.Configuration.GetConnectionString("rabbitmq") ??
+                   throw new InvalidOperationException("RabbitMqConnectionString not present in configuration");
+        },
+        configureBuilder: builder =>
+        {
+            builder.Services
+                .AddApplication()
+                .AddInfrastructure(builder.Configuration);
 
-builder.Services
-    .AddApplication()
-    .AddInfrastructure(builder.Configuration)
-    .AddPresentation(builder.Host);
+            builder.AddServiceDefaults();
+        },
+        assemblies: typeof(Program).Assembly
+    );
 
-builder.AddServiceDefaults();
-
-var app = builder.Build();
 app.MapDefaultEndpoints();
 app.UseHttpsRedirection();
 app.Run();

@@ -44,9 +44,6 @@ public static class WolverineExtension
                 exc.BindTopic(
                         $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPostprocessingId}")
                     .ToQueue(MessagingConstants.TireOcrPostprocessingId);
-                exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrTasyDbMatcherId}")
-                    .ToQueue(MessagingConstants.TireOcrTasyDbMatcherId);
             });
     }
 
