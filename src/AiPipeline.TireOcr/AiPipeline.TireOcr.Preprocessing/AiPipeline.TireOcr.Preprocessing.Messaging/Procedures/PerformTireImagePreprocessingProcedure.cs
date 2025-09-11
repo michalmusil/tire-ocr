@@ -1,10 +1,10 @@
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
-using AiPipeline.Orchestration.Shared.Nodes.Dtos.FileReferenceUploader;
-using AiPipeline.Orchestration.Shared.Nodes.Procedures;
-using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceDownloader;
-using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
+using AiPipeline.Orchestration.Shared.NodeSdk.Dtos.FileReferenceUploader;
+using AiPipeline.Orchestration.Shared.NodeSdk.Procedures;
+using AiPipeline.Orchestration.Shared.NodeSdk.Services.FileReferenceDownloader;
+using AiPipeline.Orchestration.Shared.NodeSdk.Services.FileReferenceUploader;
 using AiPipeline.TireOcr.Shared.Models;
 using JasperFx.Core;
 using MediatR;

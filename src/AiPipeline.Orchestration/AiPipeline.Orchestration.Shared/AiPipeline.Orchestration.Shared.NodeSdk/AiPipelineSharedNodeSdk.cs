@@ -1,6 +1,5 @@
 using System.Reflection;
 using AiPipeline.Orchestration.Shared.All.Constants;
-using AiPipeline.Orchestration.Shared.All.Extensions;
 using AiPipeline.Orchestration.Shared.NodeSdk.Extensions;
 using AiPipeline.Orchestration.Shared.NodeSdk.Producers;
 using Microsoft.AspNetCore.Builder;
@@ -12,11 +11,11 @@ namespace AiPipeline.Orchestration.Shared.NodeSdk;
 
 public static class AiPipelineSharedNodeSdk
 {
-    public static WebApplication CreateNodeApplication(
+    public static async Task<WebApplication> CreateNodeApplication(
         string nodeId,
         Func<WebApplicationBuilder, string> provideRabbitMqConnectionString,
         Func<WebApplicationBuilder, Uri>? provideGrpcServerUri = null,
-        Action<WebApplicationBuilder>? configureBuilder = null,
+        Func<WebApplicationBuilder, Task>? configureBuilder = null,
         params Assembly[] assemblies
     )
     {
@@ -49,10 +48,12 @@ public static class AiPipelineSharedNodeSdk
         });
 
         builder.Services.AddProcedureRoutingFromAssemblies(assemblies);
+        
         if (provideGrpcServerUri is not null)
             builder.Services.AddFileManipulation(provideGrpcServerUri(builder));
-        
-        configureBuilder?.Invoke(builder);
+
+        if (configureBuilder is not null)
+            await configureBuilder(builder);
 
         return builder.Build();
     }

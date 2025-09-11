@@ -7,11 +7,6 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="WolverineFx" Version="4.2.0" />
-        <PackageReference Include="WolverineFx.RabbitMQ" Version="4.2.0" />
-    </ItemGroup>
-    
-    <ItemGroup>
       <ProjectReference Include="..\..\..\AiPipeline.Shared\AiPipeline.Shared.csproj" />
     </ItemGroup>
 

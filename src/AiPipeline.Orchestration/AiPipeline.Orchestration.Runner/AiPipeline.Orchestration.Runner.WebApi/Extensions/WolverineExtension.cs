@@ -9,7 +9,7 @@ using Wolverine;
 using Wolverine.RabbitMQ;
 using Wolverine.RabbitMQ.Internal;
 
-namespace AiPipeline.Orchestration.Shared.All.Extensions;
+namespace AiPipeline.Orchestration.Runner.WebApi.Extensions;
 
 public static class WolverineExtension
 {
@@ -34,16 +34,6 @@ public static class WolverineExtension
             .DeclareExchange(MessagingConstants.RunPipelineExchangeName, exc =>
             {
                 exc.ExchangeType = ExchangeType.Topic;
-
-                exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPreprocessingId}")
-                    .ToQueue(MessagingConstants.TireOcrPreprocessingId);
-                exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrOcrId}")
-                    .ToQueue(MessagingConstants.TireOcrOcrId);
-                exc.BindTopic(
-                        $"{MessagingConstants.RunPipelineExchangeName}.{MessagingConstants.TireOcrPostprocessingId}")
-                    .ToQueue(MessagingConstants.TireOcrPostprocessingId);
             });
     }
 

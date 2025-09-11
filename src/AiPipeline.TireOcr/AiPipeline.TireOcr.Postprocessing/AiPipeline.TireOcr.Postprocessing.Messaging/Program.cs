@@ -1,17 +1,28 @@
-using AiPipeline.TireOcr.Postprocessing.Messaging;
+using AiPipeline.Orchestration.Shared.NodeSdk;
+
 using TireOcr.Postprocessing.Application;
 using TireOcr.Postprocessing.Infrastructure;
 
-var builder = WebApplication.CreateBuilder(args);
+var app =  await AiPipelineSharedNodeSdk
+    .CreateNodeApplication(
+        nodeId: "tire-ocr-postprocessing",
+        provideRabbitMqConnectionString: builder =>
+        {
+            return builder.Configuration.GetConnectionString("rabbitmq") ??
+                   throw new InvalidOperationException("RabbitMqConnectionString not present in configuration");
+        },
+        configureBuilder: builder =>
+        {
+            builder.Services
+                .AddApplication()
+                .AddInfrastructure();
 
-builder.Services
-    .AddApplication()
-    .AddInfrastructure()
-    .AddPresentation(builder.Host);
+            builder.AddServiceDefaults();
+            return Task.CompletedTask;
+        },
+        assemblies: typeof(Program).Assembly
+    );
 
-builder.AddServiceDefaults();
-
-var app = builder.Build();
 app.MapDefaultEndpoints();
 app.UseHttpsRedirection();
 app.Run();

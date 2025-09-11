@@ -1,8 +1,8 @@
 using System.Text.Json.Serialization;
 using AiPipeline.Orchestration.Runner.WebApi.AuthenticationSchemas.UserOrApiKey;
+using AiPipeline.Orchestration.Runner.WebApi.Extensions;
 using AiPipeline.Orchestration.Shared.All.Constants;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Converters;
-using AiPipeline.Orchestration.Shared.All.Extensions;
 using Asp.Versioning;
 using Microsoft.OpenApi.Models;
 using Wolverine;

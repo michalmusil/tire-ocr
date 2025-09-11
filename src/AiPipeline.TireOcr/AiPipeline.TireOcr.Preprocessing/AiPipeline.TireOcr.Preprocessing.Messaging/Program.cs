@@ -1,24 +1,36 @@
-using AiPipeline.TireOcr.Preprocessing.Messaging;
+using AiPipeline.Orchestration.Shared.NodeSdk;
 using TireOcr.Preprocessing.Application;
 using TireOcr.Preprocessing.Infrastructure;
 using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 
-var builder = WebApplication.CreateBuilder(args);
 
-builder.Services
-    .AddApplication()
-    .AddInfrastructure()
-    .AddPresentation(builder.Host, builder.Configuration);
+var app = await AiPipelineSharedNodeSdk
+    .CreateNodeApplication(
+        nodeId: "tire-ocr-preprocessing",
+        provideRabbitMqConnectionString: builder =>
+        {
+            return builder.Configuration.GetConnectionString("rabbitmq") ??
+                   throw new InvalidOperationException("RabbitMqConnectionString not present in configuration");
+        },
+        provideGrpcServerUri: _ => new Uri("http://FileService"),
+        configureBuilder: async builder =>
+        {
+            builder.Services
+                .AddApplication()
+                .AddInfrastructure();
+            
+            builder.AddServiceDefaults();
+            
+            await using (var provider = builder.Services.BuildServiceProvider())
+            {
+                var modelResolver = provider.GetRequiredService<IMlModelResolverService>();
+                await modelResolver.EnsureAllModelsLoadedAsync();
+            }
 
-builder.AddServiceDefaults();
+        },
+        assemblies: typeof(Program).Assembly
+    );
 
-await using (var provider = builder.Services.BuildServiceProvider())
-{
-    var modelResolver = provider.GetRequiredService<IMlModelResolverService>();
-    await modelResolver.EnsureAllModelsLoadedAsync();
-}
-
-var app = builder.Build();
 app.MapDefaultEndpoints();
 app.UseHttpsRedirection();
 app.Run();

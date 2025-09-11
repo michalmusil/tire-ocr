@@ -2,7 +2,7 @@ using AiPipeline.Orchestration.Shared.NodeSdk;
 using AiPipeline.TireOcr.TasyDbMatcher.Application;
 using AiPipeline.TireOcr.TasyDbMatcher.Infrastructure;
 
-var app = AiPipelineSharedNodeSdk
+var app = await AiPipelineSharedNodeSdk
     .CreateNodeApplication(
         nodeId: "tire-ocr-tasy-db-matcher",
         provideRabbitMqConnectionString: builder =>
@@ -17,6 +17,7 @@ var app = AiPipelineSharedNodeSdk
                 .AddInfrastructure(builder.Configuration);
 
             builder.AddServiceDefaults();
+            return Task.CompletedTask;
         },
         assemblies: typeof(Program).Assembly
     );

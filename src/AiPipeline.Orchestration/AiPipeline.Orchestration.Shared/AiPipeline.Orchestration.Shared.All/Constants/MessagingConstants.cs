@@ -2,10 +2,6 @@ namespace AiPipeline.Orchestration.Shared.All.Constants;
 
 public static class MessagingConstants
 {
-    public static string TireOcrPreprocessingId => "tire-ocr-preprocessing";
-    public static string TireOcrOcrId => "tire-ocr-ocr";
-    public static string TireOcrPostprocessingId => "tire-ocr-postprocessing";
-
     public static string RunPipelineExchangeName => "run-pipeline";
     public static string CompletedPipelineStepsExchangeName => "completed-pipeline-steps";
     public static string CompletedPipelineStepsQueueName => "completed-pipeline-steps-queue";

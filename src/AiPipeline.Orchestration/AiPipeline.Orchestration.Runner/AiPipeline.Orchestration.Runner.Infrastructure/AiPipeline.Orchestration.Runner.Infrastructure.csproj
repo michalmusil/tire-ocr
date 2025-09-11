@@ -25,6 +25,8 @@
       <PackageReference Include="Minio" Version="6.0.5" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.13.1" />
+        <PackageReference Include="WolverineFx" Version="4.2.0" />
+        <PackageReference Include="WolverineFx.RabbitMQ" Version="4.2.0" />
     </ItemGroup>
 
 </Project>

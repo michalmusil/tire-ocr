@@ -1,7 +1,7 @@
 using AiPipeline.Orchestration.Shared.All.Contracts.Commands.RunPipelineStep;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
-using AiPipeline.Orchestration.Shared.Nodes.Procedures;
+using AiPipeline.Orchestration.Shared.NodeSdk.Procedures;
 using MediatR;
 using TireOcr.Postprocessing.Application.Queries.TireCodePostprocessing;
 using TireOcr.Shared.Result;
