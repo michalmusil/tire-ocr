@@ -55,9 +55,18 @@ public static class DependencyInjection
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
         serviceCollection.AddHttpClient<IOcrClient, OcrClient>(client =>
-        {
-            client.BaseAddress = new("https+http://OcrService");
-        });
+            {
+                client.BaseAddress = new("https+http://OcrService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromMinutes(3);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
+        ;
         serviceCollection.AddHttpClient<IPostprocessingClient, PostprocessingClient>(client =>
         {
             client.BaseAddress = new("https+http://PostprocessingService");

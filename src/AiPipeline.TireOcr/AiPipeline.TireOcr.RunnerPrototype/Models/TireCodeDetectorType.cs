@@ -7,4 +7,6 @@ public enum TireCodeDetectorType
     OpenAiGpt = 2,
     GoogleCloudVision = 3,
     AzureAiVision = 4,
+    Ollama = 5,
+    LmStudio = 6
 }

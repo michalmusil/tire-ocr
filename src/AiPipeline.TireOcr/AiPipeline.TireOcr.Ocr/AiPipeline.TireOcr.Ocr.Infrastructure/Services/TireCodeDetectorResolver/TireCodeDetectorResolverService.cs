@@ -13,7 +13,8 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
-    public TireCodeDetectorResolverService(IImageConvertorService imageConvertorService, HttpClient httpClient, IConfiguration configuration)
+    public TireCodeDetectorResolverService(IImageConvertorService imageConvertorService, HttpClient httpClient,
+        IConfiguration configuration)
     {
         _imageConvertorService = imageConvertorService;
         _httpClient = httpClient;
@@ -26,11 +27,15 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
         {
             TireCodeDetectorType.GoogleGemini => new GoogleGeminiTireCodeDetectorService(
                 _httpClient, _imageConvertorService, _configuration),
-            TireCodeDetectorType.MistralPixtral => new MistralPixtralTireCodeDetectorService(_httpClient, _imageConvertorService,
+            TireCodeDetectorType.MistralPixtral => new MistralPixtralTireCodeDetectorService(_httpClient,
+                _imageConvertorService,
                 _configuration),
             TireCodeDetectorType.OpenAiGpt => new OpenAiGptTireCodeDetectorService(_configuration),
             TireCodeDetectorType.GoogleCloudVision => new GoogleCloudVisionTireCodeDetectorService(_configuration),
             TireCodeDetectorType.AzureAiVision => new AzureAiVisionTireCodeDetectorService(_configuration),
+            TireCodeDetectorType.Ollama => new OllamaTireCodeDetectorService(_httpClient, _imageConvertorService,
+                _configuration),
+            TireCodeDetectorType.LmStudio => new LmStudioTireCodeDetectorService(_configuration),
             _ => null
         };
 
