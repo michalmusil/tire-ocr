@@ -13,18 +13,18 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
 
     private List<string> NormalizedReferenceCodes => _referenceCodes.Select(NormalizeTireCode).ToList();
 
-    public DataResult<IEnumerable<string>> ApproximateStringsFromCharacters(
+    public DataResult<IEnumerable<StringInImage>> ApproximateStringsFromCharacters(
         IEnumerable<CharacterInImage> imageCharacters)
     {
         var characterList = imageCharacters.ToList();
         if (!characterList.Any())
-            return DataResult<IEnumerable<string>>.NotFound("No characters found");
+            return DataResult<IEnumerable<StringInImage>>.NotFound("No characters found");
 
         var sortedLtr = characterList
             .OrderBy(charInImage => charInImage.TopLeftCoordinate.X)
             .ToList();
         var usedIndices = new HashSet<int>();
-        var strings = new List<string>();
+        var strings = new List<StringInImage>();
 
         for (int i = 0; i < sortedLtr.Count; i++)
         {
@@ -33,6 +33,7 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
 
             var currentString = sortedLtr[i].Character.ToString();
             var currentChar = sortedLtr[i];
+            List<CharacterInImage> currentStringCharacters = [currentChar];
 
             var nextCharFound = true;
             while (nextCharFound)
@@ -44,11 +45,15 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
                     if (usedIndices.Contains(investigatedIndex))
                         continue;
 
-                    if (currentChar.IsWithinVerticalSpanOf(sortedLtr[j]) && currentChar.IsLeftNeighborOf(sortedLtr[j]))
+                    var investigatedCharacter = sortedLtr[j];
+
+                    if (currentChar.IsWithinVerticalSpanOf(investigatedCharacter) &&
+                        currentChar.IsLeftNeighborOf(investigatedCharacter))
                     {
-                        var charToAppend = sortedLtr[j].Character;
+                        var charToAppend = investigatedCharacter.Character;
                         currentString += charToAppend;
-                        currentChar = sortedLtr[j];
+                        currentStringCharacters.Add(investigatedCharacter);
+                        currentChar = investigatedCharacter;
                         usedIndices.Add(investigatedIndex);
                         nextCharFound = true;
                         break;
@@ -56,26 +61,30 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
                 }
             }
 
-            strings.Add(currentString);
+            strings.Add(new()
+            {
+                RawString = currentString,
+                Characters = currentStringCharacters
+            });
         }
 
-        return DataResult<IEnumerable<string>>.Success(strings);
+        return DataResult<IEnumerable<StringInImage>>.Success(strings);
     }
 
-    public DataResult<Dictionary<string, int>> GetTireCodeLevenshteinDistanceOfStrings(IEnumerable<string> strings)
+    public DataResult<Dictionary<StringInImage, int>> GetTireCodeLevenshteinDistanceOfStrings(IEnumerable<StringInImage> strings)
     {
         var stringsList = strings.ToList();
         if (!stringsList.Any())
-            return DataResult<Dictionary<string, int>>.Invalid("No strings for Levenshtein distance provided");
+            return DataResult<Dictionary<StringInImage, int>>.Invalid("No strings for Levenshtein distance provided");
 
         var normalizedReferenceCodes = NormalizedReferenceCodes;
-        Dictionary<string, int> results = new Dictionary<string, int>();
+        Dictionary<StringInImage, int> results = new Dictionary<StringInImage, int>();
 
-        foreach (string detected in stringsList)
+        foreach (var detected in stringsList)
         {
-            var detectedNormalized = NormalizeTireCode(detected);
+            var detectedNormalized = NormalizeTireCode(detected.RawString);
             var bestScore = int.MaxValue;
-            var bestMatch = "";
+            var bestMatch = detected;
 
             foreach (var reference in normalizedReferenceCodes)
             {
@@ -95,7 +104,7 @@ public class ImageTextApproximatorService : IImageTextApproximatorService
             results[bestMatch] = bestScore;
         }
 
-        return DataResult<Dictionary<string, int>>.Success(results);
+        return DataResult<Dictionary<StringInImage, int>>.Success(results);
     }
 
     private string NormalizeTireCode(string input)

@@ -2,9 +2,9 @@ using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Preprocessing.Application.Dtos;
-using TireOcr.Preprocessing.Application.Queries.GetPreprocessedImage;
 using TireOcr.Preprocessing.Application.Queries.GetResizedImage;
-using TireOcr.Preprocessing.WebApi.Contracts.ExtractRoi;
+using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
+using TireOcr.Preprocessing.WebApi.Contracts.Extract;
 using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
 using TireOcr.Preprocessing.WebApi.Extensions;
 using TireOcr.Shared.Result;
@@ -19,8 +19,6 @@ public class PreprocessController : ControllerBase
     private readonly IMediator _mediator;
     private readonly ILogger<PreprocessController> _logger;
 
-    private const string FallbackContentType = "application/octet-stream";
-
     public PreprocessController(IMediator mediator, ILogger<PreprocessController> logger)
     {
         _mediator = mediator;
@@ -31,17 +29,22 @@ public class PreprocessController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<ExtractRoiResponse>> PreprocessImage([FromForm] ExtractRoiRequest request)
+    public async Task<ActionResult<ExtractResponse>> ExtractRoi([FromForm] ExtractRequest request)
     {
         var imageData = await request.Image.ToByteArray();
-        var query = new GetPreprocessedImageQuery(imageData, request.Image.FileName, request.Image.ContentType);
+        var query = new GetTireCodeRoiQuery(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            RemoveBackground: request.RemoveBackground
+        );
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<PreprocessedImageDto, ExtractRoiResponse>(
+        return result.ToActionResult<PreprocessedImageDto, ExtractResponse>(
             onSuccess: dto =>
             {
                 var base64Data = Convert.ToBase64String(dto.ImageData);
-                var response = new ExtractRoiResponse(
+                var response = new ExtractResponse(
                     FileName: dto.Name,
                     ContentType: dto.ContentType,
                     Base64ImageData: base64Data,
@@ -50,6 +53,7 @@ public class PreprocessController : ControllerBase
                 return response;
             });
     }
+
 
     [HttpPost("ResizeToMaxSide")]
     [ProducesResponseType(StatusCodes.Status200OK)]

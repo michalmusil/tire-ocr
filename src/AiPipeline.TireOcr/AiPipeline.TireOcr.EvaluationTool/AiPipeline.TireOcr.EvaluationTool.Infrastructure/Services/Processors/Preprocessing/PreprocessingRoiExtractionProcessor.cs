@@ -42,6 +42,13 @@ public class PreprocessingRoiExtractionProcessor : IPreprocessingProcessor
                 }
             });
 
+            var removeBackground = preprocessingType switch
+            {
+                PreprocessingType.ExtractRoiAndRemoveBg => true,
+                _ => false
+            };
+            content.Add(new StringContent(removeBackground.ToString()), "RemoveBackground");
+
             var res = await _remoteProcessorClient.PostAsync("/api/v1/Preprocess/ExtractRoi", content);
             if (!res.IsSuccessStatusCode)
             {
