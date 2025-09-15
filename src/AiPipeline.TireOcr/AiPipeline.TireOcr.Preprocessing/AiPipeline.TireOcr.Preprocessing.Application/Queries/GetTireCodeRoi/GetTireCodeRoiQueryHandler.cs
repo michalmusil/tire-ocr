@@ -8,19 +8,19 @@ using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetPreprocessedImage;
+namespace TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 
-public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedImageQuery, PreprocessedImageDto>
+public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, PreprocessedImageDto>
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
     private readonly ITextDetectionFacade _textDetectionFacade;
     private readonly IContentTypeResolverService _contentTypeResolverService;
-    private ILogger<GetPreprocessedImageQueryHandler> _logger;
+    private readonly ILogger<GetTireCodeRoiQueryHandler> _logger;
 
-    public GetPreprocessedImageQueryHandler(IImageManipulationService imageManipulationService,
+    public GetTireCodeRoiQueryHandler(IImageManipulationService imageManipulationService,
         ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade,
-        IContentTypeResolverService contentTypeResolverService, ILogger<GetPreprocessedImageQueryHandler> logger)
+        IContentTypeResolverService contentTypeResolverService, ILogger<GetTireCodeRoiQueryHandler> logger)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
@@ -30,7 +30,7 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
-        GetPreprocessedImageQuery request,
+        GetTireCodeRoiQuery request,
         CancellationToken cancellationToken
     )
     {
@@ -53,7 +53,7 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         return DataResult<PreprocessedImageDto>.Success(resultDto);
     }
 
-    private async Task<DataResult<Image>> PerformPreprocessing(GetPreprocessedImageQuery request)
+    private async Task<DataResult<Image>> PerformPreprocessing(GetTireCodeRoiQuery request)
     {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)
@@ -94,7 +94,9 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         if (unwrappedImage is null)
             return HandleUnsuccessfulPreprocessing(request.OriginalContentType, fallbackImage);
 
-        var textArea = await _textDetectionFacade.GetTextAreaFromImageAsync(unwrappedImage);
+        var textArea = request.RemoveBackground
+            ? await _textDetectionFacade.ExtractTireCodeRoiAndRemoveBg(unwrappedImage)
+            : await _textDetectionFacade.ExtractTireCodeRoi(unwrappedImage);
         return textArea.Map(
             onFailure: failures => HandleUnsuccessfulPreprocessing(
                 request.OriginalContentType,

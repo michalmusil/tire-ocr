@@ -24,6 +24,7 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
         {
             PreprocessingType.Resize => _resizeProcessor,
             PreprocessingType.ExtractRoi => _roiExtractionProcessor,
+            PreprocessingType.ExtractRoiAndRemoveBg => _roiExtractionProcessor,
             _ => null
         };
         if (processor == null)

@@ -8,7 +8,7 @@ using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
 using AiPipeline.TireOcr.Shared.Models;
 using JasperFx.Core;
 using MediatR;
-using TireOcr.Preprocessing.Application.Queries.GetPreprocessedImage;
+using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Preprocessing.Messaging.Procedures;
@@ -80,10 +80,11 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
             return DataResult<IApElement>.Failure(imageDataResult.Failures);
 
         var imageData = await imageDataResult.Data!.ReadAllBytesAsync();
-        var query = new GetPreprocessedImageQuery(
+        var query = new GetTireCodeRoiQuery(
             ImageData: imageData,
             ImageName: Path.GetFileName(inputFileReference.Path),
-            OriginalContentType: inputFileReference.ContentType
+            OriginalContentType: inputFileReference.ContentType,
+            RemoveBackground: false
         );
         var result = await _mediator.Send(query);
 
