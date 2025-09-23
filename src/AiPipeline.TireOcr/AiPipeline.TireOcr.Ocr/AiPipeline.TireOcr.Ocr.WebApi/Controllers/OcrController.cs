@@ -41,7 +41,7 @@ public class OcrController : ControllerBase
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<OcrWithBillingDto, PerformOcrResponse>(
-            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.EstimatedCosts)
+            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.DetectedManufacturer?.ToUpper(), dto.EstimatedCosts)
         );
     }
 }

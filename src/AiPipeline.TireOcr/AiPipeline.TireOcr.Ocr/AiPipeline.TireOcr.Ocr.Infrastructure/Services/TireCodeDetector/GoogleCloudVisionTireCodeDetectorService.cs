@@ -36,7 +36,8 @@ public class GoogleCloudVisionTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
             var result = new OcrResultDto(
-                foundTireCode,
+                DetectedTireCode: foundTireCode,
+                DetectedManufacturer: null,
                 new OcrRequestBillingDto(0, 1, BillingUnitType.Transaction)
             );
             return DataResult<OcrResultDto>.Success(result);

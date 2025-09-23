@@ -17,7 +17,8 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
 
-    public GoogleGeminiTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService, IConfiguration configuration)
+    public GoogleGeminiTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService,
+        IConfiguration configuration)
     {
         _httpClient = httpClient;
         _imageConvertorService = imageConvertorService;
@@ -48,8 +49,19 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
+            string? foundManufacturer = null;
+            var indexOfManufacturerSplit = foundTireCode.IndexOf('|');
+            var manufacturerFound = indexOfManufacturerSplit > 0;
+            if (manufacturerFound)
+            {
+                foundManufacturer = foundTireCode.Substring(0, indexOfManufacturerSplit);
+                foundTireCode = foundTireCode.Substring(indexOfManufacturerSplit + 1);
+            }
+
+
             var result = new OcrResultDto(
-                foundTireCode,
+                DetectedTireCode: foundTireCode,
+                DetectedManufacturer: foundManufacturer,
                 new OcrRequestBillingDto(
                     responseDto.UsageMetadata.PromptTokenCount,
                     responseDto.UsageMetadata.CandidatesTokenCount,

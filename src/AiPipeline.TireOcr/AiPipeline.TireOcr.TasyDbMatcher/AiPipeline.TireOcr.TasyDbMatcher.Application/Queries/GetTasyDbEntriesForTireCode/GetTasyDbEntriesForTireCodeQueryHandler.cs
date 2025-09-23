@@ -25,7 +25,8 @@ public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEn
     {
         var existingTireEntriesResult = await _tireParamsRepository.GetAllTireParamEntries();
         if (existingTireEntriesResult.IsFailure)
-            return DataResult<List<TireDbMatchDto>>.Failure(existingTireEntriesResult.Failures);
+            return DataResult<List<TireDbMatchDto>>.Success([]); // TODO: Remove when endpoint is fixed
+            // return DataResult<List<TireDbMatchDto>>.Failure(existingTireEntriesResult.Failures);
 
         var matchingEntries = await _matchingService.GetOrderedMatchingEntriesForCode(
             tireCode: request.DetectedCode,
@@ -34,8 +35,9 @@ public class GetTasyDbEntriesForTireCodeQueryHandler : IQueryHandler<GetTasyDbEn
         );
 
         if (!matchingEntries.Any())
-            return DataResult<List<TireDbMatchDto>>.NotFound(
-                $"No existing matches were found in the database for '{request.DetectedCode.PostprocessedTireCode}'");
+            return DataResult<List<TireDbMatchDto>>.Success([]); // TODO: Remove when endpoint is fixed
+            // return DataResult<List<TireDbMatchDto>>.NotFound(
+            //     $"No existing matches were found in the database for '{request.DetectedCode.PostprocessedTireCode}'");
 
         return DataResult<List<TireDbMatchDto>>.Success(matchingEntries);
     }
