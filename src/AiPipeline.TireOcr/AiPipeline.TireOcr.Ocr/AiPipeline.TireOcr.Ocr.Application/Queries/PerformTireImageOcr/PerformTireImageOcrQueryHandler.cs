@@ -29,7 +29,8 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
 
         var ocrResultData = ocrResult.Data!;
         var result = new OcrWithBillingDto(
-            DetectedCode: ocrResultData.DetectedCode,
+            DetectedCode: ocrResultData.DetectedTireCode,
+            DetectedManufacturer: ocrResultData.DetectedManufacturer,
             EstimatedCosts: null
         );
 

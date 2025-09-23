@@ -47,6 +47,12 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         try
         {
             var resized = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
+            var resultDto = new PreprocessedImageDto(
+                resized.Name,
+                resized.Data,
+                request.OriginalContentType
+            );
+            return DataResult<PreprocessedImageDto>.Success(resultDto);
             var withClahe = _imageManipulationService.ApplyClahe(
                 resized,
                 windowSize: new ImageSize(10, 10)

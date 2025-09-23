@@ -42,8 +42,18 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
+            string? foundManufacturer = null;
+            var indexOfManufacturerSplit = foundTireCode.IndexOf('|');
+            var manufacturerFound = indexOfManufacturerSplit > 0;
+            if (manufacturerFound)
+            {
+                foundManufacturer = foundTireCode.Substring(0, indexOfManufacturerSplit);
+                foundTireCode = foundTireCode.Substring(indexOfManufacturerSplit + 1);
+            }
+
             var result = new OcrResultDto(
-                foundTireCode,
+                DetectedTireCode: foundTireCode,
+                DetectedManufacturer: foundManufacturer,
                 new OcrRequestBillingDto(
                     completion.Value.Usage.InputTokenCount,
                     completion.Value.Usage.OutputTokenCount,
