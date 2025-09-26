@@ -52,7 +52,7 @@ public class PerformTireCodePostprocessingProcedure : IProcedure
         var inputString = (ApString)input;
         var rawTireCode = inputString.Value;
 
-        var query = new TireCodePostprocessingQuery(rawTireCode);
+        var query = new TireCodePostprocessingQuery(RawTireCode: rawTireCode);
         var result = await _mediator.Send(query);
 
         return result.Map(

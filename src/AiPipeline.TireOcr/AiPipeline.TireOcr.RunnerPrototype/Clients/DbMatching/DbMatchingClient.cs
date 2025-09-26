@@ -18,13 +18,15 @@ public class DbMatchingClient : IDbMatchingClient
         _logger = logger;
     }
 
-    public async Task<DataResult<DbMatcherServiceResponseDto>> GetDbMatchesForTireCode(TirePostprocessingResultDto postprocessedTireCode)
+    public async Task<DataResult<DbMatcherServiceResponseDto>> GetDbMatchesForTireCode(
+        TirePostprocessingResultDto postprocessedTireCode, string? rawManufacturer)
     {
         try
         {
             var content = new
             {
-                TireCode = postprocessedTireCode
+                TireCode = postprocessedTireCode,
+                Manufacturer = rawManufacturer
             };
             var res = await _httpClient.PostAsJsonAsync("/api/v1/TireDbMatches", content);
             if (!res.IsSuccessStatusCode)

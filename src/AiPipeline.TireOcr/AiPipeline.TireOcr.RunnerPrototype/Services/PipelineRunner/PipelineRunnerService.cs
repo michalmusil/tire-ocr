@@ -59,14 +59,15 @@ public class PipelineRunnerService : IPipelineRunnerService
         var ocrResultData = ocrResult.Item2.Data!;
 
         var postprocessingResult = await PerformTimeMeasuredTask("Postprocessing",
-            () => _postprocessingClient.PostprocessTireCode(ocrResultData.DetectedCode));
+            () => _postprocessingClient.PostprocessTireCode(ocrResultData.DetectedCode)
+        );
         if (postprocessingResult.Item2.IsFailure)
             return DataResult<TireOcrResultDto>.Failure(postprocessingResult.Item2.Failures);
 
         var postprocessedTireCode = postprocessingResult.Item2.Data!;
 
         var dbMatchingResult = await PerformTimeMeasuredTask("DbMatching",
-            () => _dbMatchingClient.GetDbMatchesForTireCode(postprocessedTireCode));
+            () => _dbMatchingClient.GetDbMatchesForTireCode(postprocessedTireCode, ocrResultData.DetectedManufacturer));
         if (dbMatchingResult.Item2.IsFailure)
             return DataResult<TireOcrResultDto>.Failure(dbMatchingResult.Item2.Failures);
 
@@ -87,7 +88,7 @@ public class PipelineRunnerService : IPipelineRunnerService
             DetectorType: detectorType,
             OcrResult: ocrResultData,
             PostprocessingResult: postprocessedTireCode,
-            MatchedDbVariations: dbMatches.OrderedMatches,
+            TasyDbMatchesResult: dbMatches,
             TotalDurationMs: totalStopwatch.Elapsed.TotalMilliseconds,
             RunTrace: runTrace
         );

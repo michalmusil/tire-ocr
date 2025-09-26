@@ -1,3 +1,6 @@
 namespace TireOcr.RunnerPrototype.Dtos.DbMatching;
 
-public record DbMatcherServiceResponseDto(List<TireDbMatchDto> OrderedMatches);
+public record DbMatcherServiceResponseDto(
+    List<TireDbMatchDto> OrderedTireCodeDbMatches,
+    string? ManufacturerDbMatch
+);

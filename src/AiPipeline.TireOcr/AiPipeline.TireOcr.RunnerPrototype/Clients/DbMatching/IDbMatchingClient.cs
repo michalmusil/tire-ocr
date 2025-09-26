@@ -7,6 +7,7 @@ namespace TireOcr.RunnerPrototype.Clients.DbMatching;
 public interface IDbMatchingClient
 {
     public Task<DataResult<DbMatcherServiceResponseDto>> GetDbMatchesForTireCode(
-        TirePostprocessingResultDto postprocessedTireCode
+        TirePostprocessingResultDto postprocessedTireCode,
+        string? rawManufacturer
     );
 }

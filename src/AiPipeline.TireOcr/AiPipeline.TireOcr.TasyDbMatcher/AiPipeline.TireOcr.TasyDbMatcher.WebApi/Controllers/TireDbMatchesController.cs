@@ -1,5 +1,5 @@
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
-using AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetTasyDbEntriesForTireCode;
+using AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetDbMatchesForCodeAndManufacturer;
 using AiPipeline.TireOcr.TasyDbMatcher.WebApi.Contracts.GetMatchesInTireDb;
 using Asp.Versioning;
 using MediatR;
@@ -30,11 +30,15 @@ public class TireDbMatchesController : ControllerBase
     public async Task<ActionResult<GetMatchesInTireDbResponse>> GetMatchesInTireDb(
         [FromBody] GetMatchesInTireDbRequest request)
     {
-        var query = new GetTasyDbEntriesForTireCodeQuery(request.TireCode, MaxEntries: null);
+        var query = new GetDbMatchesForCodeAndManufacturerQuery(
+            request.TireCode,
+            DetectedManufacturer: request.Manufacturer,
+            MaxEntries: null
+        );
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<List<TireDbMatchDto>, GetMatchesInTireDbResponse>(
-            onSuccess: dto => new GetMatchesInTireDbResponse(dto)
+        return result.ToActionResult<DbMatchingResultDto, GetMatchesInTireDbResponse>(
+            onSuccess: dto => new GetMatchesInTireDbResponse(dto.TireDbMatches, dto.ManufacturerDbMatch)
         );
     }
 }

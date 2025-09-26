@@ -1,4 +1,5 @@
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
+using AiPipeline.TireOcr.TasyDbMatcher.Application.Repositories;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Services;
 using Fastenshtein;
 
@@ -6,9 +7,21 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.Services;
 
 public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
 {
-    public Task<List<TireDbMatchDto>> GetOrderedMatchingEntriesForCode(
-        DetectedTireCodeDto tireCode, IEnumerable<ProcessedTireParamsDatabaseEntryDto> entriesToMatch, int? limit)
+    private readonly ITireParamsDbRepository _repository;
+
+    public LevenshteinTireCodeMatchingService(ITireParamsDbRepository repository)
     {
+        _repository = repository;
+    }
+
+    public async Task<List<TireDbMatchDto>> GetOrderedMatchingEntriesForCode(
+        DetectedTireCodeDto tireCode, int? limit)
+    {
+        var existingTireDbEntriesResult = await _repository.GetAllTireParamEntries();
+        if (existingTireDbEntriesResult.IsFailure)
+            return [];
+
+        var entriesToMatch = existingTireDbEntriesResult.Data!.ToList();
         var stringTireCode = tireCode.PostprocessedTireCode;
         var ratedEntries = entriesToMatch
             .Select(entry =>
@@ -37,7 +50,7 @@ public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
                 .Take(limit.Value)
                 .ToList();
 
-        return Task.FromResult(orderedMatches);
+        return orderedMatches;
     }
 
     private decimal GetAccuracyForLevenshteinDistance(int distance, string string1, string string2)

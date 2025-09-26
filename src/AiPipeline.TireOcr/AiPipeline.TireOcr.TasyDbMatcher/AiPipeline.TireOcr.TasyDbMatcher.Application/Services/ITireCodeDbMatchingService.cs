@@ -6,7 +6,6 @@ public interface ITireCodeDbMatchingService
 {
     public Task<List<TireDbMatchDto>> GetOrderedMatchingEntriesForCode(
         DetectedTireCodeDto tireCode,
-        IEnumerable<ProcessedTireParamsDatabaseEntryDto> entriesToMatch,
         int? limit
     );
 }
