@@ -4,7 +4,7 @@ public class ProcessedTireParamsDatabaseEntryDto
 {
     public int Width { get; init; }
     public decimal Diameter { get; init; }
-    public int Profile { get; init; }
+    public decimal Profile { get; init; }
     public string Construction { get; init; }
     public int? LoadIndex { get; init; }
     public string? SpeedIndex { get; init; }
@@ -16,7 +16,7 @@ public class ProcessedTireParamsDatabaseEntryDto
         Width = parsedWidth ? width : 0;
         var parsedDiameter = decimal.TryParse(rawParams.ProductSizeDiameter, out var diameter);
         Diameter = parsedDiameter ? diameter : 0;
-        var parsedProfile = int.TryParse(rawParams.ProductSizeProfile, out var profile);
+        var parsedProfile = decimal.TryParse(rawParams.ProductSizeProfile, out var profile);
         Profile = parsedProfile ? profile : 0;
         var parsedLoadIndex = int.TryParse(rawParams.ProductLi, out var li);
         LoadIndex = parsedLoadIndex ? li : 0;

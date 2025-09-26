@@ -27,5 +27,6 @@ public static class DependencyInjection
         services.AddScoped<ITireCodeDetectorResolverService, TireCodeDetectorResolverService>();
         services.AddScoped<ITireCodeOcrService, TireCodeOcrService>();
         services.AddScoped<ICostEstimationService, ConfigurationCostEstimationService>();
+        services.AddScoped<IImageResizeService, ImageResizeService>();
     }
 }

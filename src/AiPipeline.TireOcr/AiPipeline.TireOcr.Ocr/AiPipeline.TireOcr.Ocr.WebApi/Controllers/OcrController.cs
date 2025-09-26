@@ -31,17 +31,19 @@ public class OcrController : ControllerBase
     {
         var imageData = await request.Image.ToByteArray();
         var query = new PerformTireImageOcrQuery(
-            request.DetectorType,
-            imageData,
-            request.Image.FileName,
-            request.Image.ContentType,
-            true
+            DetectorType: request.DetectorType,
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            ImageContentType: request.Image.ContentType,
+            IncludeCostEstimation: true,
+            ResizeToMaxSide: 2048
         );
 
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<OcrWithBillingDto, PerformOcrResponse>(
-            onSuccess: dto => new PerformOcrResponse(dto.DetectedCode, dto.DetectedManufacturer?.ToUpper(), dto.EstimatedCosts)
+            onSuccess: dto =>
+                new PerformOcrResponse(dto.DetectedCode, dto.DetectedManufacturer?.ToUpper(), dto.EstimatedCosts)
         );
     }
 }

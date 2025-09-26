@@ -23,7 +23,13 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
     {
         var image = new Image(request.ImageData, request.ImageName, request.ImageContentType);
 
-        var ocrResult = await _tireCodeOcrService.DetectAsync(request.DetectorType, image);
+        var ocrResult = await _tireCodeOcrService.DetectAsync(
+            detectorType: request.DetectorType,
+            image: image,
+            resizeOptions: request.ResizeToMaxSide.HasValue
+                ? new ResizeImageToMaxSideOptions(request.ResizeToMaxSide.Value)
+                : null
+        );
         if (ocrResult.IsFailure)
             return DataResult<OcrWithBillingDto>.Failure(ocrResult.Failures);
 
