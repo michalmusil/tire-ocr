@@ -10,7 +10,7 @@ public record TireOcrResultDto(
     TireCodeDetectorType DetectorType,
     OcrServiceResultDto OcrResult,
     TirePostprocessingResultDto PostprocessingResult,
-    List<TireDbMatchDto> MatchedDbVariations,
+    DbMatcherServiceResponseDto TasyDbMatchesResult,
     double TotalDurationMs,
     List<RunStatDto> RunTrace
 );

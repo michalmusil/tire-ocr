@@ -24,10 +24,12 @@ public static class DependencyInjection
         {
             client.BaseAddress = new(remoteDbAddress);
         });
+        services.AddScoped<ISupportedManufacturersRepository, SupportedManufacturersStaticRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
     {
         services.AddScoped<ITireCodeDbMatchingService, LevenshteinTireCodeMatchingService>();
+        services.AddScoped<IManufacturerDbMatchingService, ManufacturerDbMatchingService>();
     }
 }

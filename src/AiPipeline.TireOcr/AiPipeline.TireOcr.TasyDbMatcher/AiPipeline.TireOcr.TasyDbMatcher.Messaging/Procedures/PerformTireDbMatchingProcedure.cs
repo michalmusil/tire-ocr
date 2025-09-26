@@ -3,7 +3,7 @@ using AiPipeline.Orchestration.Shared.All.Contracts.Schema;
 using AiPipeline.Orchestration.Shared.All.Contracts.Schema.Properties;
 using AiPipeline.Orchestration.Shared.Nodes.Procedures;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
-using AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetTasyDbEntriesForTireCode;
+using AiPipeline.TireOcr.TasyDbMatcher.Application.Queries.GetDbMatchesForCodeAndManufacturer;
 using MediatR;
 using TireOcr.Shared.Result;
 
@@ -71,16 +71,17 @@ public class PerformTireDbMatchingProcedure : IProcedure
         if (parsedInputResult.IsFailure)
             return DataResult<IApElement>.Failure(parsedInputResult.Failures);
 
-        var query = new GetTasyDbEntriesForTireCodeQuery(
+        var query = new GetDbMatchesForCodeAndManufacturerQuery(
             DetectedCode: parsedInputResult.Data!,
+            DetectedManufacturer: null,
             MaxEntries: null
         );
         var result = await _mediator.Send(query);
 
         return result.Map(
-            onSuccess: entries =>
+            onSuccess: res =>
             {
-                var mappedEntries = entries
+                var mappedEntries = res.TireDbMatches
                     .Select<TireDbMatchDto, IApElement>(e =>
                     {
                         var entryObject = new ApObject(
