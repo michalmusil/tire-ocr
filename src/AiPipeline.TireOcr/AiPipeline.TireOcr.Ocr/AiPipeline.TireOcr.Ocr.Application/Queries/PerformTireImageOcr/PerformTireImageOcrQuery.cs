@@ -9,5 +9,6 @@ public record PerformTireImageOcrQuery(
     byte[] ImageData,
     string ImageName,
     string ImageContentType,
-    bool IncludeCostEstimation
+    bool IncludeCostEstimation,
+    int? ResizeToMaxSide
 ) : IQuery<OcrWithBillingDto>;

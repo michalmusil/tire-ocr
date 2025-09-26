@@ -13,16 +13,23 @@ public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
         var ratedEntries = entriesToMatch
             .Select(entry =>
             {
+                var primaryParameterMatchCount = GetPrimaryParameterMatchCount(tireCode, entry);
                 var entryAsString = entry.GetTireCodeString();
                 var distance = new Levenshtein(entryAsString)
                     .DistanceFrom(stringTireCode);
                 var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, entryAsString, stringTireCode);
 
-                return new TireDbMatchDto(entry, distance, estimatedAccuracy);
+                return new TireDbMatchDto(
+                    TireEntry: entry,
+                    RequiredCharEdits: distance,
+                    MatchedMainParameterCount: primaryParameterMatchCount,
+                    EstimatedAccuracy: estimatedAccuracy
+                );
             });
 
         var orderedMatches = ratedEntries
-            .OrderBy(m => m.RequiredCharEdits)
+            .OrderByDescending(m => m.MatchedMainParameterCount)
+            .ThenBy(m => m.RequiredCharEdits)
             .ToList();
 
         if (limit.HasValue)
@@ -39,5 +46,25 @@ public class LevenshteinTireCodeMatchingService : ITireCodeDbMatchingService
         if (stringLength == 0)
             return 0;
         return 1 - distance / stringLength;
+    }
+
+    private int GetPrimaryParameterMatchCount(DetectedTireCodeDto tireCode, ProcessedTireParamsDatabaseEntryDto entry)
+    {
+        var matchCount = 0;
+        if (tireCode.Width == entry.Width)
+            matchCount++;
+
+        if (tireCode.AspectRatio.HasValue && tireCode.AspectRatio.Value == entry.Profile)
+            matchCount++;
+
+        if (tireCode.Construction is not null &&
+            tireCode.Construction.Equals(entry.Construction, StringComparison.OrdinalIgnoreCase))
+            matchCount++;
+
+        if (tireCode.Diameter.HasValue && tireCode.Diameter.Value == entry.Diameter)
+            matchCount++;
+
+
+        return matchCount;
     }
 }

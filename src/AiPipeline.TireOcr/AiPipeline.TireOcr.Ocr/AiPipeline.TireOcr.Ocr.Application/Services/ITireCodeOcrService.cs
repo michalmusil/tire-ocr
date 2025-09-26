@@ -7,5 +7,6 @@ namespace TireOcr.Ocr.Application.Services;
 
 public interface ITireCodeOcrService
 {
-    public Task<DataResult<OcrResultDto>> DetectAsync(TireCodeDetectorType detectorType, Image image);
+    public Task<DataResult<OcrResultDto>> DetectAsync(TireCodeDetectorType detectorType, Image image,
+        ResizeImageToMaxSideOptions? resizeOptions = null);
 }

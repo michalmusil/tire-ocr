@@ -97,7 +97,8 @@ public class PerformSingleOcrProcedure : IProcedure
             ImageData: imageData,
             ImageName: Path.GetFileName(inputFileReference.Path),
             ImageContentType: inputFile.ContentType,
-            IncludeCostEstimation: true
+            IncludeCostEstimation: true,
+            ResizeToMaxSide: null
         );
 
         var result = await _mediator.Send(query);
