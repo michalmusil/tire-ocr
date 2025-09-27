@@ -91,6 +91,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.EvaluationTool", "AiPipeline.TireOcr.EvaluationTool", "{7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Domain", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Domain\AiPipeline.TireOcr.EvaluationTool.Domain.csproj", "{F45668CE-5596-49BC-96D7-EFFCE89974B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Application\AiPipeline.TireOcr.EvaluationTool.Application.csproj", "{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Infrastructure\AiPipeline.TireOcr.EvaluationTool.Infrastructure.csproj", "{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -137,6 +145,10 @@ Global
 		{1B3D6F88-3A29-43FF-9017-FFBD92CD977C} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{042F52E3-1C8B-476D-A4FE-4DE165771F97} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2} = {27B2E266-20B8-4319-9822-68025944A5F3}
+		{7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
+		{F45668CE-5596-49BC-96D7-EFFCE89974B5} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
+		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
+		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{525474C0-9249-4040-9784-F9673CBAD457}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -283,5 +295,17 @@ Global
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F45668CE-5596-49BC-96D7-EFFCE89974B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F45668CE-5596-49BC-96D7-EFFCE89974B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F45668CE-5596-49BC-96D7-EFFCE89974B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F45668CE-5596-49BC-96D7-EFFCE89974B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
