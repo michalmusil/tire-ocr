@@ -17,13 +17,15 @@ public class EvaluationRun
 
     public TireCodeValueObject? ExpectedPostprocessingResult { get; }
 
-    public ImageValueObject? PreprocessingResult { get; private set; }
+    public PreprocessingResultValueObject? PreprocessingResult { get; private set; }
     public OcrResultValueObject? OcrResult { get; private set; }
-    public TireCodeValueObject? PostprocessingResult { get; private set; }
+    public PostprocessingResultValueObject? PostprocessingResult { get; private set; }
     public DbMatchingResultValueObject? DbMatchingResult { get; private set; }
 
     public bool HasFinished => FinishedAt.HasValue;
     public bool HasRunFailed => FinishedAt.HasValue && PostprocessingResult is null;
+
+    public TimeSpan? TotalExecutionDuration => FinishedAt.HasValue ? FinishedAt.Value - StartedAt : null;
 
     public EvaluationRunFailureReason? FailureReason => HasRunFailed
         ? null
@@ -60,12 +62,12 @@ public class EvaluationRun
         DbMatchingResult = null;
     }
 
-    public void SetPreprocessingResult(ImageValueObject preprocessingResult) =>
+    public void SetPreprocessingResult(PreprocessingResultValueObject preprocessingResult) =>
         PreprocessingResult = preprocessingResult;
 
     public void SetOcrResult(OcrResultValueObject ocrResult) => OcrResult = ocrResult;
 
-    public void SetPostprocessingResult(TireCodeValueObject postprocessingResult)
+    public void SetPostprocessingResult(PostprocessingResultValueObject postprocessingResult)
     {
         PostprocessingResult = postprocessingResult;
         if (DbMatchingType is DbMatchingType.None)
