@@ -25,4 +25,16 @@ public record TireCodeDto(
         LoadIndex: domain.LoadIndex,
         SpeedRating: domain.SpeedRating
     );
+
+    public TireCodeValueObject ToDomain() => new()
+    {
+        RawCode = RawCode,
+        VehicleClass = VehicleClass,
+        Width = Width,
+        AspectRatio = AspectRatio,
+        Construction = Construction,
+        Diameter = Diameter,
+        LoadIndex = LoadIndex,
+        SpeedRating = SpeedRating
+    };
 }
