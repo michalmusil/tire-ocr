@@ -6,6 +6,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 
 public interface IPostprocessingProcessor
 {
-    public Task<DataResult<TireCodeValueObject>> Process(OcrResultValueObject ocrResult,
+    public Task<DataResult<PostprocessingResultValueObject>> Process(OcrResultValueObject ocrResult,
         PostprocessingType postprocessingType);
 }

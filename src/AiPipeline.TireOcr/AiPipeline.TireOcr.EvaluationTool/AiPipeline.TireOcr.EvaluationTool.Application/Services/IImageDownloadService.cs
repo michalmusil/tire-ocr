@@ -13,25 +13,12 @@ public interface IImageDownloadService
     public Task<DataResult<ImageDto>> DownloadImageAsync(string imageUrl);
 
     /// <summary>
-    /// Attempts to download all images specified by URLs on best effort basis - the method will return only
-    /// images that were downloaded successfully. In case some of the download fail, they are simply excluded
-    /// from result.
+    /// Attempts to download all images specified by URLs.
     /// </summary>
     /// <param name="imageUrls">A collection of image URLs to download</param>
     /// <param name="sequentially">If true, images will be downloaded sequentially instead of in parallel. Defaults to false</param>
-    /// <returns>A dictionary where key is the original image URL, value is the downloaded image data`</returns>
-    public Task<Dictionary<string, ImageDto>> DownloadImageBatchBestEffortAsync(
-        IEnumerable<string> imageUrls,
-        bool sequentially = false
-    );
-
-    /// <summary>
-    /// Attempts to download all images specified by URLs - failure of one image download causes the entire method to fail.
-    /// </summary>
-    /// <param name="imageUrls">A collection of image URLs to download</param>
-    /// <param name="sequentially">If true, images will be downloaded sequentially instead of in parallel. Defaults to false</param>
-    /// <returns>A DataResult containing failure if just one of the download fails, or a dictionary with key as the original image URL and value as the downloaded image if all image downloads succeeded`</returns>
-    public Task<DataResult<Dictionary<string, ImageDto>>> DownloadImageBatch(
+    /// <returns>A dictionary with provided image URLs as keys and DataResults of given image downloads as values</returns>
+    public Task<Dictionary<string, DataResult<ImageDto>>> DownloadImageBatchAsync(
         IEnumerable<string> imageUrls,
         bool sequentially = false
     );
