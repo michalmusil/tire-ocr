@@ -6,5 +6,5 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 
 public interface IPreprocessingProcessor
 {
-    public Task<DataResult<ImageDto>> Process(ImageDto image, PreprocessingType preprocessingType);
+    public Task<DataResult<PreprocessingProcessorResult>> Process(ImageDto image, PreprocessingType preprocessingType);
 }

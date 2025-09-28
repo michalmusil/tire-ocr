@@ -1,0 +1,65 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
+using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Dtos.RemoteOcrProcessor;
+using Microsoft.Extensions.Logging;
+using TireOcr.Shared.Exceptions;
+using TireOcr.Shared.Result;
+
+namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.Ocr;
+
+public class OcrRemoteServicesProcessor : IOcrProcessor
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<OcrRemoteServicesProcessor> _logger;
+
+    public async Task<DataResult<OcrResultValueObject>> Process(ImageDto image, OcrType ocrType)
+    {
+        try
+        {
+            using var content = new MultipartFormDataContent();
+            content.Add(new ByteArrayContent(image.ImageData)
+            {
+                Headers =
+                {
+                    ContentType = MediaTypeHeaderValue.Parse(image.ContentType),
+                    ContentDisposition = new ContentDispositionHeaderValue("form-data")
+                    {
+                        Name = "Image",
+                        FileName = image.FileName
+                    }
+                }
+            });
+            content.Add(new StringContent(ocrType.ToString()), "DetectorType");
+
+            var res = await _httpClient.PostAsync("/api/v1/Ocr", content);
+            if (!res.IsSuccessStatusCode)
+            {
+                var errorContent = await res.Content.ReadAsStringAsync();
+                throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
+            }
+
+            var ocrResult = await res.Content.ReadFromJsonAsync<OcrServiceResponseDto>();
+
+            return DataResult<OcrResultValueObject>.Success(ocrResult!.ToDomain());
+        }
+        catch (HttpRequestExceptionWithContent ex)
+        {
+            var statusCode = ex.StatusCode;
+            ex.TryGetContentJsonProperty("detail", out var content);
+            var failureMessage = $"Remote OCR failed: {content ?? "No tire code was detected during Ocr"}";
+
+            _logger.LogError(ex, failureMessage);
+            return DataResult<OcrResultValueObject>.Failure(new Failure((int)statusCode!, failureMessage));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error while calling remote Ocr processor.");
+            return DataResult<OcrResultValueObject>.Failure(new Failure(500,
+                $"Failed to perform OCR on image '{image.FileName}' due to unexpected error."));
+        }
+    }
+}

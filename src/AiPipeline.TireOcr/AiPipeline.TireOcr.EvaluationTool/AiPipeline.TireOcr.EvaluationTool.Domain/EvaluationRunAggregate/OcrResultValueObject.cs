@@ -11,7 +11,7 @@ public class OcrResultValueObject : ValueObject
     public string? BillingUnit { get; init; }
     public decimal? EstimatedCost { get; init; }
     public string? EstimatedCostCurrency { get; init; }
-    public long DurationMs { get; init; }
+    public required long DurationMs { get; init; }
 
     protected override IEnumerable<object?> GetEqualityComponents() =>
     [
