@@ -7,10 +7,8 @@ using TireOcr.Shared.UseCase;
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunSingleEvaluation;
 
 public record RunSingleEvaluationCommand(
-    ImageDto InputImage,
-    TireCodeValueObject? ExpectedTireCode,
-    PreprocessingType PreprocessingType,
-    OcrType OcrType,
-    PostprocessingType PostprocessingType,
-    DbMatchingType DbMatchingType
+    ImageDto? InputImage,
+    string? InputImageUrl,
+    TireCodeDto? ExpectedTireCode,
+    RunConfigDto RunConfig
 ) : ICommand<EvaluationRunDto>;

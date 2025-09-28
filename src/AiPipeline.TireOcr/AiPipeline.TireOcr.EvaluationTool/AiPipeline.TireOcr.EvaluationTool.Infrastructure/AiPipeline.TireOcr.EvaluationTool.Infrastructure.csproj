@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\AiPipeline.TireOcr.EvaluationTool.Application\AiPipeline.TireOcr.EvaluationTool.Application.csproj" />
+    </ItemGroup>
+
 </Project>
