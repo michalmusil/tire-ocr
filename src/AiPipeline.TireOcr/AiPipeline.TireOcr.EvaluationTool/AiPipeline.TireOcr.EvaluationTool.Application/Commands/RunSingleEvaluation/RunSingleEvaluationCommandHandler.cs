@@ -1,6 +1,6 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
-using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -18,11 +18,24 @@ public class RunSingleEvaluationCommandHandler : ICommandHandler<RunSingleEvalua
     public async Task<DataResult<EvaluationRunDto>> Handle(RunSingleEvaluationCommand request,
         CancellationToken cancellationToken)
     {
+        var inputDetails = new RunEntityInputDetailsDto(
+            Id: request.RunId,
+            Title: request.RunTitle
+        );
+
         var result = request.InputImage is null
-            ? await _runFacade.RunSingleEvaluationAsync(request.InputImageUrl!, request.RunConfig,
-                request.ExpectedTireCode?.ToDomain())
-            : await _runFacade.RunSingleEvaluationAsync(request.InputImage, request.RunConfig,
-                request.ExpectedTireCode?.ToDomain());
+            ? await _runFacade.RunSingleEvaluationAsync(
+                imageUrl: request.InputImageUrl!,
+                runConfig: request.RunConfig,
+                expectedTireCode: request.ExpectedTireCode?.ToDomain(),
+                runEntityInputDetailsDto: inputDetails
+            )
+            : await _runFacade.RunSingleEvaluationAsync(
+                image: request.InputImage,
+                runConfig: request.RunConfig,
+                expectedTireCode: request.ExpectedTireCode?.ToDomain(),
+                runEntityInputDetailsDto: inputDetails
+            );
 
         if (result.IsFailure)
             return DataResult<EvaluationRunDto>.Failure(result.Failures);

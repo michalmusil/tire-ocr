@@ -13,9 +13,10 @@ public interface IRunFacade
     /// <param name="image">Data of the input image</param>
     /// <param name="runConfig">Configuration of the evaluation run</param>
     /// <param name="expectedTireCode">Optional expected tire code. No evaluation can be calculated if this is not provided</param>
+    /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run</param>
     /// <returns>A DataResult containing the full evaluation run result if successful, failure otherwise</returns>
     public Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
-        TireCodeValueObject? expectedTireCode);
+        TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto);
 
     /// <summary>
     /// Downloads input image and starts an evaluation run on it based on the specified run configuration.
@@ -23,9 +24,10 @@ public interface IRunFacade
     /// <param name="imageUrl">URL of the input image</param>
     /// <param name="runConfig">Configuration of the evaluation run</param>
     /// <param name="expectedTireCode">Optional expected tire code. No evaluation can be calculated if this is not provided</param>
+    /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run</param>
     /// <returns>A DataResult containing the full evaluation run result if successful, failure otherwise</returns>
     public Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(string imageUrl, RunConfigDto runConfig,
-        TireCodeValueObject? expectedTireCode);
+        TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto);
 
     /// <summary>
     /// Downloads all provided images from their URLs, then runs evaluation run for all of them. The evaluation
@@ -35,7 +37,12 @@ public interface IRunFacade
     /// <param name="imageUrls">A dictionary with image URLs as keys and optional expected tire codes as values</param>
     /// <param name="batchSize">Size of one evaluation processing batch. Must be >= 1</param>
     /// <param name="runConfig">Configuration used for all evaluation runs</param>
+    /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run batch</param>
     /// <returns>A DataResult containing results of all the evaluations aggregated in one EvaluationRunBatch if successful, failure otherwise</returns>
     public Task<DataResult<EvaluationRunBatch>> RunEvaluationBatchAsync(
-        Dictionary<string, TireCodeValueObject?> imageUrls, int batchSize, RunConfigDto runConfig);
+        Dictionary<string, TireCodeValueObject?> imageUrls,
+        int batchSize,
+        RunConfigDto runConfig,
+        RunEntityInputDetailsDto? runEntityInputDetailsDto
+    );
 }

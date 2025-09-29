@@ -6,6 +6,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 public class EvaluationRun
 {
     public Guid Id { get; }
+    public string Title { get; }
     public ImageValueObject InputImage { get; }
     public DateTime StartedAt { get; }
     public DateTime? FinishedAt { get; private set; }
@@ -15,6 +16,8 @@ public class EvaluationRun
     public PostprocessingType PostprocessingType { get; }
     public DbMatchingType DbMatchingType { get; }
 
+    public EvaluationRunFailure? RunFailure { get; private set; }
+
     public TireCodeValueObject? ExpectedPostprocessingResult { get; }
 
     public PreprocessingResultValueObject? PreprocessingResult { get; private set; }
@@ -23,33 +26,24 @@ public class EvaluationRun
     public DbMatchingResultValueObject? DbMatchingResult { get; private set; }
 
     public bool HasFinished => FinishedAt.HasValue;
-    public bool HasRunFailed => FinishedAt.HasValue && PostprocessingResult is null;
+    public bool HasRunFailed => RunFailure is not null;
 
     public TimeSpan? TotalExecutionDuration => FinishedAt.HasValue ? FinishedAt.Value - StartedAt : null;
-
-    public EvaluationRunFailureReason? FailureReason => HasRunFailed
-        ? null
-        : PreprocessingType is not PreprocessingType.None && PreprocessingResult is null
-            ? EvaluationRunFailureReason.Preprocessing
-            : OcrResult is null
-                ? EvaluationRunFailureReason.Ocr
-                : PostprocessingResult is null
-                    ? EvaluationRunFailureReason.Postprocessing
-                    : EvaluationRunFailureReason.Unexpected;
 
     private EvaluationRun()
     {
     }
 
     public EvaluationRun(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
-        PostprocessingType postprocessingType, DbMatchingType dbMatchingType,
+        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title,
         TireCodeValueObject? expectedPostprocessingResult, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
+        Title = title ?? Id.ToString();
         InputImage = inputImage;
         StartedAt = DateTime.UtcNow;
         FinishedAt = null;
-
+        RunFailure = null;
         PreprocessingType = preprocessingType;
         OcrType = ocrType;
         PostprocessingType = postprocessingType;
@@ -60,6 +54,12 @@ public class EvaluationRun
         OcrResult = null;
         PostprocessingResult = null;
         DbMatchingResult = null;
+    }
+
+    public void SetFailure(EvaluationRunFailure failure)
+    {
+        RunFailure = failure;
+        SetFinishedAt(DateTime.UtcNow);
     }
 
     public void SetPreprocessingResult(PreprocessingResultValueObject preprocessingResult) =>
@@ -79,4 +79,6 @@ public class EvaluationRun
         DbMatchingResult = dbMatchingResult;
         FinishedAt = DateTime.UtcNow;
     }
+
+    public void SetFinishedAt(DateTime finishedAt) => FinishedAt = finishedAt.ToUniversalTime();
 }

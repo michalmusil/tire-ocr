@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
 using TireOcr.Shared.Result;
@@ -17,11 +18,17 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
     public async Task<DataResult<EvaluationRunBatchDto>> Handle(RunEvaluationBatchCommand request,
         CancellationToken cancellationToken)
     {
+        var inputDetails = new RunEntityInputDetailsDto(
+            Id: request.BatchId,
+            Title: request.BatchTitle
+        );
+
         var result = await _runFacade.RunEvaluationBatchAsync(
             imageUrls: request.InputImagesWithExpectedTireCodes
                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToDomain()),
             batchSize: request.ProcessingBatchSize,
-            runConfig: request.RunConfig
+            runConfig: request.RunConfig,
+            runEntityInputDetailsDto: inputDetails
         );
 
         if (result.IsFailure)
