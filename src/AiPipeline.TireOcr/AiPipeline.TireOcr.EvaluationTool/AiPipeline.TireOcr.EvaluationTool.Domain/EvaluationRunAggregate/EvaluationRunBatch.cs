@@ -3,8 +3,10 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 public class EvaluationRunBatch
 {
     public Guid Id { get; }
-    
+    public string Title { get; }
+
     public DateTime? StartedAt => EvaluationRuns.Min(r => r.StartedAt);
+
     public DateTime? FinishedAt =>
         EvaluationRuns.All(r => r.HasFinished) ? EvaluationRuns.Max(e => e.FinishedAt) : null;
 
@@ -15,9 +17,10 @@ public class EvaluationRunBatch
     {
     }
 
-    public EvaluationRunBatch(List<EvaluationRun> evaluationRuns, Guid? id = null)
+    public EvaluationRunBatch(List<EvaluationRun> evaluationRuns, string? title, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
+        Title = title ?? Id.ToString();
         _evaluationRuns = evaluationRuns;
     }
 

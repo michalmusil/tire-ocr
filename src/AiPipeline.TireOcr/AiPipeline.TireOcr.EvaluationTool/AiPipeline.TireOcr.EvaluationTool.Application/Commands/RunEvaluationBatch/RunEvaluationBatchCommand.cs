@@ -7,5 +7,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunEvaluationBa
 public record RunEvaluationBatchCommand(
     Dictionary<string, TireCodeDto?> InputImagesWithExpectedTireCodes,
     RunConfigDto RunConfig,
-    int ProcessingBatchSize = 5
+    int ProcessingBatchSize = 5,
+    Guid? BatchId = null,
+    string? BatchTitle = null
 ) : ICommand<EvaluationRunBatchDto>;
