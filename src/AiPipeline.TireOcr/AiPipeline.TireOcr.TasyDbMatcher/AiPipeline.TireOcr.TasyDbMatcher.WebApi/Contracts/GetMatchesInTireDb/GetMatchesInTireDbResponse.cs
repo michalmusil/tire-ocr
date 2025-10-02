@@ -4,5 +4,6 @@ namespace AiPipeline.TireOcr.TasyDbMatcher.WebApi.Contracts.GetMatchesInTireDb;
 
 public record GetMatchesInTireDbResponse(
     List<TireDbMatchDto> OrderedTireCodeDbMatches,
-    string? ManufacturerDbMatch
+    string? ManufacturerDbMatch,
+    long DurationMs
 );

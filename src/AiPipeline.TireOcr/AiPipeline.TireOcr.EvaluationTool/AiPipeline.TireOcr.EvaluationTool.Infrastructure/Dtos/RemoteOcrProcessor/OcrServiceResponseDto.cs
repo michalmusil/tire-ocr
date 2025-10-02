@@ -6,7 +6,8 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Dtos.RemoteOcrProcess
 public record OcrServiceResponseDto(
     [Required] string DetectedCode,
     string? DetectedManufacturer,
-    EstimatedCostsResponseDto? EstimatedCosts
+    EstimatedCostsResponseDto? EstimatedCosts,
+    [Required] long DurationMs
 )
 {
     public OcrResultValueObject ToDomain()
@@ -20,7 +21,7 @@ public record OcrServiceResponseDto(
             BillingUnit = EstimatedCosts?.BillingUnit,
             EstimatedCost = EstimatedCosts?.EstimatedCost,
             EstimatedCostCurrency = EstimatedCosts?.EstimatedCostCurrency,
-            DurationMs = 0 // TODO: Add in remote service
+            DurationMs = DurationMs
         };
-    } 
+    }
 }

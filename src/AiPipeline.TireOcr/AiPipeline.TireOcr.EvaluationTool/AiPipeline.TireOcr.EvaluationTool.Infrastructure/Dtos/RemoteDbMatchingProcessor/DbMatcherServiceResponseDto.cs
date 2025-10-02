@@ -4,7 +4,8 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Dtos.RemoteDbMatching
 
 public record DbMatcherServiceResponseDto(
     string? ManufacturerDbMatch,
-    List<TireDbMatchResponseDto> OrderedTireCodeDbMatches
+    List<TireDbMatchResponseDto> OrderedTireCodeDbMatches,
+    long DurationMs
 )
 {
     public DbMatchingResultValueObject ToDomain()
@@ -24,7 +25,7 @@ public record DbMatcherServiceResponseDto(
                     LoadIndexSpeedIndex: x.TireEntry.LoadIndexSpeedIndex
                 )).ToList(),
             ManufacturerMatch = ManufacturerDbMatch,
-            DurationMs = 0 // TODO: add to remote dbMatching service
+            DurationMs = DurationMs
         };
     }
 }

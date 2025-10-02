@@ -1,5 +1,6 @@
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Dtos;
 using AiPipeline.TireOcr.TasyDbMatcher.Application.Services;
+using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -11,11 +12,6 @@ public class GetDbMatchesForCodeAndManufacturerQueryHandler : IQueryHandler<GetD
     private readonly ITireCodeDbMatchingService _tireMatchingService;
     private readonly IManufacturerDbMatchingService _manufacturerMatchingService;
 
-    private readonly DbMatchingResultDto _fallbackResult = new(
-        TireDbMatches: [],
-        ManufacturerDbMatch: null
-    );
-
     public GetDbMatchesForCodeAndManufacturerQueryHandler(ITireCodeDbMatchingService tireMatchingService,
         IManufacturerDbMatchingService manufacturerMatchingService)
     {
@@ -23,9 +19,30 @@ public class GetDbMatchesForCodeAndManufacturerQueryHandler : IQueryHandler<GetD
         _manufacturerMatchingService = manufacturerMatchingService;
     }
 
+    private record MatchedResults(
+        List<TireDbMatchDto> TireDbMatches,
+        string? ManufacturerDbMatch
+    );
+
     public async Task<DataResult<DbMatchingResultDto>> Handle(
         GetDbMatchesForCodeAndManufacturerQuery request,
         CancellationToken cancellationToken)
+    {
+        var result = await PerformanceUtils.PerformTimeMeasuredTask(
+            runTask: () => PerformMatching(request)
+        );
+        var timeTaken = result.Item1;
+        var dbMatches = result.Item2;
+
+
+        return DataResult<DbMatchingResultDto>.Success(new DbMatchingResultDto(
+            TireDbMatches: dbMatches.TireDbMatches,
+            ManufacturerDbMatch: dbMatches.ManufacturerDbMatch,
+            DurationMs: (long)timeTaken.TotalMilliseconds
+        ));
+    }
+
+    private async Task<MatchedResults> PerformMatching(GetDbMatchesForCodeAndManufacturerQuery request)
     {
         var matchingEntries = await _tireMatchingService.GetOrderedMatchingEntriesForCode(
             tireCode: request.DetectedCode,
@@ -41,9 +58,6 @@ public class GetDbMatchesForCodeAndManufacturerQueryHandler : IQueryHandler<GetD
             onFailure: _ => null
         );
 
-        return DataResult<DbMatchingResultDto>.Success(new DbMatchingResultDto(
-            TireDbMatches: matchingEntries,
-            ManufacturerDbMatch: manufacturerDbMatch
-        ));
+        return new MatchedResults(matchingEntries, manufacturerDbMatch);
     }
 }

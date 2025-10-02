@@ -38,7 +38,7 @@ public class TireDbMatchesController : ControllerBase
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<DbMatchingResultDto, GetMatchesInTireDbResponse>(
-            onSuccess: dto => new GetMatchesInTireDbResponse(dto.TireDbMatches, dto.ManufacturerDbMatch)
+            onSuccess: dto => new GetMatchesInTireDbResponse(dto.TireDbMatches, dto.ManufacturerDbMatch, dto.DurationMs)
         );
     }
 }

@@ -1,8 +1,10 @@
 using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Dtos.RemotePreprocessingProcessor;
 using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
@@ -47,10 +49,11 @@ public class PreprocessingRoiExtractionProcessor : IPreprocessingProcessor
                 throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
             }
 
-            var imageData = await res.Content.ReadAsByteArrayAsync();
+            var responseContent = await res.Content.ReadFromJsonAsync<TirePreprocessingResponseDto>();
+            var imageData = Convert.FromBase64String(responseContent!.Base64ImageData);
             var finalResult = new PreprocessingProcessorResult(
-                Image: new ImageDto(image.FileName, image.ContentType, imageData),
-                DurationMs: 0 // TODO: Add in remote preprocessing service
+                Image: new ImageDto(responseContent.FileName, responseContent.ContentType, imageData),
+                DurationMs: responseContent.DurationMs
             );
             return DataResult<PreprocessingProcessorResult>.Success(finalResult);
         }

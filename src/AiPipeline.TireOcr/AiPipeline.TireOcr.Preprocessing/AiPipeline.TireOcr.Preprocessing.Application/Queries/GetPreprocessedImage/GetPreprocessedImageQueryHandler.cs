@@ -4,6 +4,7 @@ using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
+using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -33,9 +34,30 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         CancellationToken cancellationToken
     )
     {
+        var preprocessingResult = await PerformanceUtils.PerformTimeMeasuredTask(
+            runTask: () => PerformPreprocessing(request)
+        );
+        var timeTaken = preprocessingResult.Item1;
+        var preprocessedImageResult = preprocessingResult.Item2;
+        if (preprocessedImageResult.IsFailure)
+            return DataResult<PreprocessedImageDto>.Failure(preprocessingResult.Item2.Failures);
+
+        var preprocessedImage = preprocessedImageResult.Data!;
+        var resultDto = new PreprocessedImageDto(
+            preprocessedImage.Name,
+            preprocessedImage.Data,
+            request.OriginalContentType,
+            DurationMs: (long)timeTaken.TotalMilliseconds
+        );
+
+        return DataResult<PreprocessedImageDto>.Success(resultDto);
+    }
+
+    private async Task<DataResult<Image>> PerformPreprocessing(GetPreprocessedImageQuery request)
+    {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)
-            return DataResult<PreprocessedImageDto>.Invalid(
+            return DataResult<Image>.Invalid(
                 $"Content type {request.OriginalContentType} is not supported");
 
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
@@ -85,12 +107,7 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
                 _logger.LogInformation(
                     $"Preprocessing completed:\nTire detection: {tireDetectionSeconds}s\nText detection: {textDetectionSeconds}s");
 
-                var resultDto = new PreprocessedImageDto(
-                    res.BestImage.Name,
-                    res.BestImage.Data,
-                    request.OriginalContentType
-                );
-                return DataResult<PreprocessedImageDto>.Success(resultDto);
+                return DataResult<Image>.Success(res.BestImage);
             }
         );
     }
@@ -106,23 +123,18 @@ public class GetPreprocessedImageQueryHandler : IQueryHandler<GetPreprocessedIma
         );
     }
 
-    private DataResult<PreprocessedImageDto> HandleUnsuccessfulPreprocessing(string contentType, Image? image = null,
+    private DataResult<Image> HandleUnsuccessfulPreprocessing(string contentType, Image? image = null,
         Failure[]? failures = null)
     {
         if (image == null)
         {
             _logger.LogError("Preprocessing failed with no image to return");
-            return DataResult<PreprocessedImageDto>.Failure(failures ??
+            return DataResult<Image>.Failure(failures ??
             [
                 new Failure(500, "Fatal failure during preprocessing")
             ]);
         }
 
-        var resultDto = new PreprocessedImageDto(
-            image.Name,
-            image.Data,
-            contentType
-        );
-        return DataResult<PreprocessedImageDto>.Success(resultDto);
+        return DataResult<Image>.Success(image);
     }
 }
