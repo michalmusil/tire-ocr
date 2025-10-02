@@ -38,9 +38,8 @@ public class RemoteTireParamsDbRepository : ITireParamsDbRepository
                 throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
             }
 
-            var rawTireParams = (await res.Content.ReadFromJsonAsync<IEnumerable<RawTireParamsDatabaseEntryDto>>())!
-                .ToList();
-            var processedTireParams = rawTireParams
+            var rawTireParams = await res.Content.ReadFromJsonAsync<List<RawTireParamsDatabaseEntryDto>>();
+            var processedTireParams = rawTireParams!
                 .Select(raw => new ProcessedTireParamsDatabaseEntryDto(raw))
                 .ToList();
             _responseCache.Set(key, processedTireParams, CacheDuration);
