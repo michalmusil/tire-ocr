@@ -9,6 +9,7 @@ public record EvaluationRunDto(
     DateTime StartedAt,
     DateTime? FinishedAt,
     RunConfigDto RunConfig,
+    EvaluationRunFailureDto? Failure,
     TireCodeDto? ExpectedPostprocessingResult,
     PreprocessingResultDto? PreprocessingResult,
     OcrResultDto? OcrResult,
@@ -25,6 +26,13 @@ public record EvaluationRunDto(
             InputImage: ImageInfoDto.FromDomain(domain.InputImage),
             StartedAt: domain.StartedAt,
             FinishedAt: domain.FinishedAt,
+            Failure: domain.RunFailure is null
+                ? null
+                : new EvaluationRunFailureDto(
+                    FailureReason: domain.RunFailure.Reason.ToString(),
+                    Code: domain.RunFailure.Code,
+                    Message: domain.RunFailure.Message
+                ),
             TotalExecutionDurationMs: (long?)domain.TotalExecutionDuration?.TotalMilliseconds,
             RunConfig: new(
                 PreprocessingType: domain.PreprocessingType,

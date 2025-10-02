@@ -20,6 +20,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.GrpcServer\AiPipeline.Orchestration.FileService.GrpcServer.csproj" />
     <ProjectReference Include="..\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj" />
+    <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.WebApi\AiPipeline.TireOcr.EvaluationTool.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Messaging\AiPipeline.TireOcr.Ocr.Messaging.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj" />
     <ProjectReference Include="..\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Messaging\AiPipeline.TireOcr.Postprocessing.Messaging.csproj" />

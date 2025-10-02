@@ -1,7 +1,8 @@
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Dtos.RemoteDbMatchingProcessor;
 
 public record TireDbMatchResponseDto(
-    TireDbEntryResponseDto TireEntryResponse,
+    TireDbEntryResponseDto TireEntry,
     int RequiredCharEdits,
+    int MatchedMainParameterCount,
     decimal EstimatedAccuracy
 );
