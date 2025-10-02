@@ -19,12 +19,17 @@ public static class DependencyInjection
     private static void AddRepositories(IServiceCollection services, IConfiguration configuration)
     {
         services.AddMemoryCache();
-        var remoteDbAddress = configuration.GetValue<string>("RemoteTireDbAddress") ?? "";
+        
         services.AddHttpClient<ITireParamsDbRepository, RemoteTireParamsDbRepository>(client =>
         {
-            client.BaseAddress = new(remoteDbAddress);
+            var tireDbAddress = configuration.GetValue<string>("RemoteTireDbAddress") ?? "";
+            client.BaseAddress = new(tireDbAddress);
         });
-        services.AddScoped<ISupportedManufacturersRepository, SupportedManufacturersStaticRepository>();
+        services.AddHttpClient<ISupportedManufacturersRepository, SupportedManufacturersRemoteRepository>(client =>
+        {
+            var manufacturerDbAddress = configuration.GetValue<string>("RemoteManufacturerDbAddress") ?? "";
+            client.BaseAddress = new(manufacturerDbAddress);
+        });
     }
 
     private static void AddServices(IServiceCollection services)
