@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using TireOcr.RunnerPrototype.Dtos.Preprocessing;
 using TireOcr.RunnerPrototype.Models;
 using TireOcr.Shared.Exceptions;
 using TireOcr.Shared.Result;
@@ -43,8 +44,11 @@ public class PreprocessingClient : IPreprocessingClient
                 throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
             }
 
-            var imageData = await res.Content.ReadAsByteArrayAsync();
-            return DataResult<Image>.Success(new Image(imageData, image.FileName, image.ContentType));
+            var responseContent = await res.Content.ReadFromJsonAsync<PreprocessingResponseDto>();
+            var imageData = Convert.FromBase64String(responseContent!.Base64ImageData);
+            return DataResult<Image>.Success(
+                new Image(imageData, responseContent.FileName, responseContent.ContentType)
+            );
         }
         catch (HttpRequestExceptionWithContent ex)
         {

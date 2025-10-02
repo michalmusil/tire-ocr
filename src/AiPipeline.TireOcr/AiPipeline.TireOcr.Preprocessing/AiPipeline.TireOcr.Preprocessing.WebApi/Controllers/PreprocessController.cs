@@ -1,8 +1,11 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Queries.GetPreprocessedImage;
-using TireOcr.Preprocessing.WebApi.Contracts.Preprocess;
+using TireOcr.Preprocessing.Application.Queries.GetResizedImage;
+using TireOcr.Preprocessing.WebApi.Contracts.ExtractRoi;
+using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
 using TireOcr.Preprocessing.WebApi.Extensions;
 using TireOcr.Shared.Result;
 
@@ -24,26 +27,56 @@ public class PreprocessController : ControllerBase
         _logger = logger;
     }
 
-    [HttpPost]
+    [HttpPost("ExtractRoi")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> PreprocessImage([FromForm] PreprocessImageRequest request)
+    public async Task<ActionResult<ExtractRoiResponse>> PreprocessImage([FromForm] ExtractRoiRequest request)
     {
         var imageData = await request.Image.ToByteArray();
         var query = new GetPreprocessedImageQuery(imageData, request.Image.FileName, request.Image.ContentType);
         var result = await _mediator.Send(query);
 
-        return result.Map(
-            onSuccess: dto => File(dto.ImageData, dto.ContentType),
-            onFailure: failures =>
+        return result.ToActionResult<PreprocessedImageDto, ExtractRoiResponse>(
+            onSuccess: dto =>
             {
-                var primaryFailure = failures.FirstOrDefault();
-                var otherFailures = failures.Skip(1).ToArray();
+                var base64Data = Convert.ToBase64String(dto.ImageData);
+                var response = new ExtractRoiResponse(
+                    FileName: dto.Name,
+                    ContentType: dto.ContentType,
+                    Base64ImageData: base64Data,
+                    DurationMs: dto.DurationMs
+                );
+                return response;
+            });
+    }
 
-                return primaryFailure?.ToActionResult(otherFailures) ??
-                       Problem("Failed to preprocess image", null, 500);
-            }
+    [HttpPost("ResizeToMaxSide")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ResizeToMaxSideResponse>> ResizeToMaxSide([FromForm] ResizeToMaxSideRequest request)
+    {
+        var imageData = await request.Image.ToByteArray();
+        var query = new GetResizedImageQuery(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            MaxImageSideDimension: request.MaxSidePixels
         );
+        var result = await _mediator.Send(query);
+
+        return result.ToActionResult<PreprocessedImageDto, ResizeToMaxSideResponse>(
+            onSuccess: dto =>
+            {
+                var base64Data = Convert.ToBase64String(dto.ImageData);
+                var response = new ResizeToMaxSideResponse(
+                    FileName: dto.Name,
+                    ContentType: dto.ContentType,
+                    Base64ImageData: base64Data,
+                    DurationMs: dto.DurationMs
+                );
+                return response;
+            });
     }
 }

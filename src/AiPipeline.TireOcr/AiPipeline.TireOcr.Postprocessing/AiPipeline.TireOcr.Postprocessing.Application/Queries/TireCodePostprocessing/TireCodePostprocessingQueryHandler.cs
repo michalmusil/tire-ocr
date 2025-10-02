@@ -1,5 +1,7 @@
 using TireOcr.Postprocessing.Application.Dtos;
 using TireOcr.Postprocessing.Application.Services;
+using TireOcr.Postprocessing.Domain.TireCodeEntity;
+using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -17,17 +19,17 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
     public async Task<DataResult<ProcessedTireCodeResultDto>> Handle(TireCodePostprocessingQuery request,
         CancellationToken cancellationToken)
     {
-        var tireCodesResult = _codeFeatureExtractionService.ExtractTireCodes(request.RawTireCode);
-        if (tireCodesResult.IsFailure)
-            return DataResult<ProcessedTireCodeResultDto>.Failure(tireCodesResult.Failures);
+        var result = await PerformanceUtils.PerformTimeMeasuredTask(
+            runTask: () => PerformPostprocessing(request)
+        );
+        var timeTaken = result.Item1;
+        var postprocessingResult = result.Item2;
 
-        var potentialTireCodes = tireCodesResult.Data!;
-        var bestTireCodeResult = _codeFeatureExtractionService.PickBestMatchingTireCode(potentialTireCodes);
-        if (bestTireCodeResult.IsFailure)
-            return DataResult<ProcessedTireCodeResultDto>.Failure(bestTireCodeResult.Failures);
+        if (postprocessingResult.IsFailure)
+            return DataResult<ProcessedTireCodeResultDto>.Failure(postprocessingResult.Failures);
 
-        var bestTireCode = bestTireCodeResult.Data!;
-        var result = new ProcessedTireCodeResultDto
+        var bestTireCode = postprocessingResult.Data!;
+        var dto = new ProcessedTireCodeResultDto
         (
             RawCode: request.RawTireCode,
             PostprocessedTireCode: bestTireCode.GetProcessedCode(),
@@ -37,9 +39,25 @@ public class TireCodePostprocessingQueryHandler : IQueryHandler<TireCodePostproc
             Construction: bestTireCode.Construction,
             Diameter: bestTireCode.Diameter,
             LoadIndex: bestTireCode.LoadIndex,
-            SpeedRating: bestTireCode.SpeedRating
+            SpeedRating: bestTireCode.SpeedRating,
+            DurationMs: (long)timeTaken.TotalMilliseconds
         );
 
-        return DataResult<ProcessedTireCodeResultDto>.Success(result);
+        return DataResult<ProcessedTireCodeResultDto>.Success(dto);
+    }
+
+    private async Task<DataResult<TireCode>> PerformPostprocessing(TireCodePostprocessingQuery request)
+    {
+        var tireCodesResult = _codeFeatureExtractionService.ExtractTireCodes(request.RawTireCode);
+        if (tireCodesResult.IsFailure)
+            return DataResult<TireCode>.Failure(tireCodesResult.Failures);
+
+        var potentialTireCodes = tireCodesResult.Data!;
+        var bestTireCodeResult = _codeFeatureExtractionService.PickBestMatchingTireCode(potentialTireCodes);
+        if (bestTireCodeResult.IsFailure)
+            return DataResult<TireCode>.Failure(bestTireCodeResult.Failures);
+
+        var bestTireCode = bestTireCodeResult.Data!;
+        return DataResult<TireCode>.Success(bestTireCode);
     }
 }

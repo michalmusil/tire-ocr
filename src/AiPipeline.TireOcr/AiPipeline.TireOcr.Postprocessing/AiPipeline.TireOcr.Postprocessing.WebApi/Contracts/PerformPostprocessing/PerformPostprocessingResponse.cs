@@ -9,5 +9,6 @@ public record PerformPostprocessingResponse(
     string? Construction,
     decimal? Diameter,
     string? LoadIndex,
-    string? SpeedRating
+    string? SpeedRating,
+    long DurationMs
 );

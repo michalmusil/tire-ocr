@@ -1,6 +1,7 @@
 using TireOcr.Ocr.Application.Dtos;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
+using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -18,8 +19,37 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
         _costEstimationService = costEstimationService;
     }
 
+    private record OcrResultWithoutDuration(
+        string DetectedCode,
+        string? DetectedManufacturer,
+        EstimatedCostsDto? EstimatedCosts
+    );
+
     public async Task<DataResult<OcrWithBillingDto>> Handle(PerformTireImageOcrQuery request,
         CancellationToken cancellationToken)
+    {
+        var result = await PerformanceUtils.PerformTimeMeasuredTask(
+            runTask: () => PerformOcr(request)
+        );
+        var timeTaken = result.Item1;
+        var actualResult = result.Item2;
+
+        return actualResult.Map(
+            onSuccess: res =>
+            {
+                var withDuration = new OcrWithBillingDto(
+                    DetectedCode: res.DetectedCode,
+                    DetectedManufacturer: res.DetectedManufacturer,
+                    EstimatedCosts: res.EstimatedCosts,
+                    DurationMs: (long)timeTaken.TotalMilliseconds
+                );
+                return DataResult<OcrWithBillingDto>.Success(withDuration);
+            },
+            onFailure: failures => DataResult<OcrWithBillingDto>.Failure(failures)
+        );
+    }
+
+    private async Task<DataResult<OcrResultWithoutDuration>> PerformOcr(PerformTireImageOcrQuery request)
     {
         var image = new Image(request.ImageData, request.ImageName, request.ImageContentType);
 
@@ -31,10 +61,10 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
                 : null
         );
         if (ocrResult.IsFailure)
-            return DataResult<OcrWithBillingDto>.Failure(ocrResult.Failures);
+            return DataResult<OcrResultWithoutDuration>.Failure(ocrResult.Failures);
 
         var ocrResultData = ocrResult.Data!;
-        var result = new OcrWithBillingDto(
+        var result = new OcrResultWithoutDuration(
             DetectedCode: ocrResultData.DetectedTireCode,
             DetectedManufacturer: ocrResultData.DetectedManufacturer,
             EstimatedCosts: null
@@ -49,6 +79,6 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
             result = result with { EstimatedCosts = costEstimationResult.Data };
         }
 
-        return DataResult<OcrWithBillingDto>.Success(result);
+        return DataResult<OcrResultWithoutDuration>.Success(result);
     }
 }

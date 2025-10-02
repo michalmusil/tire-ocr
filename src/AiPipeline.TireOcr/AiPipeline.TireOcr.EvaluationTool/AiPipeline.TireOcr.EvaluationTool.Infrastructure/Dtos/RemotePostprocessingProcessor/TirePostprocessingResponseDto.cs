@@ -11,7 +11,8 @@ public record TirePostprocessingResponseDto(
     string? Construction,
     decimal? Diameter,
     string? LoadIndex,
-    string? SpeedRating
+    string? SpeedRating,
+    long DurationMs
 )
 {
     public PostprocessingResultValueObject ToDomain()
@@ -29,7 +30,7 @@ public record TirePostprocessingResponseDto(
                 LoadIndex = LoadIndex,
                 SpeedRating = SpeedRating
             },
-            DurationMs = 0 // TODO: add in remote postprocessing service
+            DurationMs = DurationMs
         };
     }
 }

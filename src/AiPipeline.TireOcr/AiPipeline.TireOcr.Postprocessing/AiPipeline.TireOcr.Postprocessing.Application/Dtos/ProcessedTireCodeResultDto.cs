@@ -9,5 +9,6 @@ public record ProcessedTireCodeResultDto(
     string? Construction,
     decimal? Diameter,
     string? LoadIndex,
-    string? SpeedRating
+    string? SpeedRating,
+    long DurationMs
 );

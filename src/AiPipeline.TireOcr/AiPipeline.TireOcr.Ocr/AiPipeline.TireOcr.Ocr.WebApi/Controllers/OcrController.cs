@@ -43,7 +43,12 @@ public class OcrController : ControllerBase
 
         return result.ToActionResult<OcrWithBillingDto, PerformOcrResponse>(
             onSuccess: dto =>
-                new PerformOcrResponse(dto.DetectedCode, dto.DetectedManufacturer?.ToUpper(), dto.EstimatedCosts)
+                new PerformOcrResponse(
+                    DetectedCode: dto.DetectedCode,
+                    DetectedManufacturer: dto.DetectedManufacturer?.ToUpper(),
+                    EstimatedCosts: dto.EstimatedCosts,
+                    DurationMs: dto.DurationMs
+                )
         );
     }
 }

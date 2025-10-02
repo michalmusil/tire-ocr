@@ -3,5 +3,6 @@ namespace TireOcr.Ocr.Application.Dtos;
 public record OcrWithBillingDto(
     string DetectedCode,
     string? DetectedManufacturer,
-    EstimatedCostsDto? EstimatedCosts
+    EstimatedCostsDto? EstimatedCosts,
+    long DurationMs
 );
