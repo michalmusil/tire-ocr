@@ -16,6 +16,12 @@ public class OcrRemoteServicesProcessor : IOcrProcessor
     private readonly HttpClient _httpClient;
     private readonly ILogger<OcrRemoteServicesProcessor> _logger;
 
+    public OcrRemoteServicesProcessor(HttpClient httpClient, ILogger<OcrRemoteServicesProcessor> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
     public async Task<DataResult<OcrResultValueObject>> Process(ImageDto image, OcrType ocrType)
     {
         try

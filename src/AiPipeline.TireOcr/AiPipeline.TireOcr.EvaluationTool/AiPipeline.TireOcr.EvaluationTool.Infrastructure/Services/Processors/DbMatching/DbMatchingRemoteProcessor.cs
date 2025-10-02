@@ -28,7 +28,7 @@ public class DbMatchingRemoteProcessor : IDbMatchingProcessor
         {
             var content = new
             {
-                TireCode = postprocessingResult.ToString(),
+                TireCode = DbMatcherServiceRequestDto.FromDomain(postprocessingResult),
                 Manufacturer = ocrResult.DetectedManufacturer
             };
             var res = await _httpClient.PostAsJsonAsync("/api/v1/TireDbMatches", content);

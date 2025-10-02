@@ -42,13 +42,22 @@ public static class DependencyInjection
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
         services.AddHttpClient<OcrRemoteServicesProcessor>(client =>
-        {
-            client.BaseAddress = new("https+http://OcrService");
-        });
+            {
+                client.BaseAddress = new("https+http://OcrService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(90);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
         services.AddHttpClient<PostprocessingRemoteServiceProcessor>(client =>
         {
             client.BaseAddress = new("https+http://PostprocessingService");
         });
+        services.AddScoped<DbMatchingNoneProcessor>();
         services.AddHttpClient<DbMatchingRemoteProcessor>(client =>
         {
             client.BaseAddress = new("https+http://TasyDbMatcherService");
