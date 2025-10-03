@@ -8,6 +8,8 @@ public record TirePostprocessingResultDto(
     decimal? AspectRatio,
     string? Construction,
     decimal? Diameter,
-    string? LoadIndex,
+    char? LoadRange,
+    int? LoadIndex,
+    int? LoadIndex2,
     string? SpeedRating
 );

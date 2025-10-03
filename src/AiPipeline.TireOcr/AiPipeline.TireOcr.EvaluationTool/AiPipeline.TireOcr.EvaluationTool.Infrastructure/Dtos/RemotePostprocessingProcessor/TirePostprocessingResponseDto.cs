@@ -10,7 +10,9 @@ public record TirePostprocessingResponseDto(
     decimal? AspectRatio,
     string? Construction,
     decimal? Diameter,
-    string? LoadIndex,
+    char? LoadRange,
+    int? LoadIndex,
+    int? LoadIndex2,
     string? SpeedRating,
     long DurationMs
 )
@@ -27,7 +29,10 @@ public record TirePostprocessingResponseDto(
                 AspectRatio = AspectRatio,
                 Construction = Construction,
                 Diameter = Diameter,
+                LoadRange = LoadRange,
                 LoadIndex = LoadIndex,
+                LoadIndex2 = LoadIndex2,
+                
                 SpeedRating = SpeedRating
             },
             DurationMs = DurationMs

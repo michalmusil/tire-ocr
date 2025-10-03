@@ -148,7 +148,10 @@ public class PerformTireDbMatchingProcedure : IProcedure
                 aspectRatio?.Value,
                 construction?.Value,
                 diameter?.Value,
-                loadIndex?.Value,
+                // TODO: Fix if messaging service ever needed again
+                null,
+                /*loadIndex?.Value*/0,
+                0,
                 speedRating?.Value
             );
 

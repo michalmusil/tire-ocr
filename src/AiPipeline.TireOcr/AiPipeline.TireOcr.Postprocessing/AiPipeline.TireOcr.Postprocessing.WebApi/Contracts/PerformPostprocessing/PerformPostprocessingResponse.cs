@@ -8,7 +8,9 @@ public record PerformPostprocessingResponse(
     decimal? AspectRatio,
     string? Construction,
     decimal? Diameter,
-    string? LoadIndex,
+    char? LoadRange,
+    int? LoadIndex,
+    int? LoadIndex2,
     string? SpeedRating,
     long DurationMs
 );
