@@ -11,7 +11,9 @@ public record TireCodeDto(
     decimal? AspectRatio,
     string? Construction,
     decimal? Diameter,
-    string? LoadIndex,
+    char? LoadRange,
+    int? LoadIndex,
+    int? LoadIndex2,
     string? SpeedRating
 )
 {
@@ -23,7 +25,9 @@ public record TireCodeDto(
         AspectRatio: domain.AspectRatio,
         Construction: domain.Construction,
         Diameter: domain.Diameter,
+        LoadRange: domain.LoadRange,
         LoadIndex: domain.LoadIndex,
+        LoadIndex2: domain.LoadIndex2,
         SpeedRating: domain.SpeedRating
     );
 
@@ -35,7 +39,9 @@ public record TireCodeDto(
         AspectRatio = AspectRatio,
         Construction = Construction,
         Diameter = Diameter,
+        LoadRange = LoadRange,
         LoadIndex = LoadIndex,
+        LoadIndex2 = LoadIndex2,
         SpeedRating = SpeedRating
     };
 

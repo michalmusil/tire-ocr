@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.RegularExpressions;
 using TireOcr.Postprocessing.Application.Services;
 using TireOcr.Postprocessing.Domain.TireCodeEntity;
@@ -71,8 +70,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             .Replace("|", "/")
             .Replace(";", "")
             .Replace(":", "")
-            .Replace(",", "")
-            .Replace(".", "");
+            .Replace(",", "");
         cleanedUp = Regex.Replace(cleanedUp, @"\s+", "|");
         cleanedUp = cleanedUp.ToUpperInvariant();
 
@@ -81,7 +79,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private IEnumerable<Match> GetAnchorMatches(string code)
     {
-        var regex = new Regex(@"/(?<AspectRatio>\d{2,3})");
+        var regex = new Regex(@"/(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1})");
         return regex.Matches(code);
     }
 
@@ -92,7 +90,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
             RawCode = code,
         };
 
-        var aspectRatioValid = int.TryParse(tireCodeAnchorMatch.Groups["AspectRatio"].Value, out var aspectRatio);
+        var aspectRatioValid = decimal.TryParse(tireCodeAnchorMatch.Groups["AspectRatio"].Value, out var aspectRatio);
         if (!aspectRatioValid)
             return tireCode;
 
@@ -128,11 +126,11 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private int ExtractSectionWidth(TireCode code, string leftOfAspectRatio)
     {
-        Match widthMatch = Regex.Match(leftOfAspectRatio, @"(?<Width>\d{3})\|?$");
+        Match widthMatch = Regex.Match(leftOfAspectRatio, @"(?<Width>\d{3}|\d{1,2}\.\d{1,2})\|?$");
         var width = widthMatch.Success ? widthMatch.Groups["Width"].Value : null;
         if (width != null)
         {
-            var widthIsValid = int.TryParse(width, out var widthValue);
+            var widthIsValid = decimal.TryParse(width, out var widthValue);
             if (widthIsValid)
                 code.Width = widthValue;
         }
@@ -168,7 +166,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private int ExtractDiameter(TireCode code, string leftOfConstruction)
     {
-        Match diameterMatch = Regex.Match(leftOfConstruction, @"^(?<Diameter>\d{1,2})\|?");
+        Match diameterMatch = Regex.Match(leftOfConstruction, @"^(?<Diameter>\d{1,3}|\d{1,2}\.\d{1,2})\|?");
         var diameter = diameterMatch.Success ? diameterMatch.Groups["Diameter"].Value : null;
         if (diameter is not null)
         {
@@ -182,17 +180,33 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private int ExtractLoadIndex(TireCode code, string leftOfDiameter)
     {
+        char[] validLoadRanges = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'L', 'M', 'N'];
+
         Match loadRangeIndexMatch =
-            Regex.Match(leftOfDiameter, @"^\|?(?<LoadRange>[A-Z]{1,2})?\|?(?<LoadIndex>(\d{1,3}/?)?\d{2,3})\|?");
+            Regex.Match(leftOfDiameter, @"^\|?(?<LoadRange>[A-Z]{1})?\|?(?<LoadIndex>(\d{1,3}/?)?\d{2,3})\|?");
         if (!loadRangeIndexMatch.Success)
             return 0;
 
-        var loadIndex = loadRangeIndexMatch.Groups["LoadIndex"].Value;
-        // var loadRange = loadRangeIndexMatch.Groups["LoadRange"].Success
-        //     ? loadRangeIndexMatch.Groups["LoadRange"].Value
-        //     : null;
-        // var loadRangeAndIndex = $"{loadRange ?? ""}{loadIndex}";
-        code.LoadIndex = loadIndex;
+        var loadIndex = loadRangeIndexMatch.Groups["LoadIndex"].Success
+            ? loadRangeIndexMatch.Groups["LoadIndex"].Value
+            : null;
+        char? loadRange = loadRangeIndexMatch.Groups["LoadRange"].Success
+            ? loadRangeIndexMatch.Groups["LoadRange"].Value.FirstOrDefault()
+            : null;
+
+        if (loadRange is not null && validLoadRanges.Contains(loadRange.Value))
+            code.LoadRange = loadRange.Value;
+
+        if (loadIndex is not null)
+        {
+            var loadIndices = loadIndex.Split('/');
+            var firstLoadIndexValid = int.TryParse(loadIndices[0], out var li1);
+            if (firstLoadIndexValid)
+                code.LoadIndex = li1;
+
+            if (loadIndices.Length > 1 && int.TryParse(loadIndices[1], out var li2))
+                code.LoadIndex2 = li2;
+        }
 
         return loadRangeIndexMatch.Length;
     }

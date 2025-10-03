@@ -70,7 +70,7 @@ public class PerformTireCodePostprocessingProcedure : IProcedure
                 AddPropIfNotNull(returnedObject, data.AspectRatio, "aspectRatio", ar => new ApDecimal(ar!.Value));
                 AddPropIfNotNull(returnedObject, data.Construction, "construction", c => new ApString(c));
                 AddPropIfNotNull(returnedObject, data.Diameter, "diameter", d => new ApDecimal(d!.Value));
-                AddPropIfNotNull(returnedObject, data.LoadIndex, "loadIndex", li => new ApString(li));
+                AddPropIfNotNull(returnedObject, data.LoadIndex, "loadIndex", li => new ApString(li.ToString()!)); // TODO: Fix if messaging service ever needed again
                 AddPropIfNotNull(returnedObject, data.SpeedRating, "speedRating", sr => new ApString(sr));
 
                 return DataResult<IApElement>.Success(returnedObject);

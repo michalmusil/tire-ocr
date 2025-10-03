@@ -11,7 +11,9 @@ public class TireCodeValueObject : ValueObject
     public decimal? AspectRatio { get; init; }
     public string? Construction { get; init; }
     public decimal? Diameter { get; init; }
-    public string? LoadIndex { get; init; }
+    public char? LoadRange { get; init; }
+    public int? LoadIndex { get; init; }
+    public int? LoadIndex2 { get; init; }
     public string? SpeedRating { get; init; }
 
     public override string ToString()
@@ -28,8 +30,14 @@ public class TireCodeValueObject : ValueObject
             .Append(AspectRatio)
             .Append(Construction)
             .Append(Diameter)
-            .Append(LoadIndex)
-            .Append(SpeedRating);
+            .Append(LoadRange)
+            .Append(LoadIndex);
+        if (LoadIndex2 is not null)
+            builder
+                .Append('/')
+                .Append(LoadIndex2);
+
+        builder.Append(SpeedRating);
         return builder.ToString();
     }
 
