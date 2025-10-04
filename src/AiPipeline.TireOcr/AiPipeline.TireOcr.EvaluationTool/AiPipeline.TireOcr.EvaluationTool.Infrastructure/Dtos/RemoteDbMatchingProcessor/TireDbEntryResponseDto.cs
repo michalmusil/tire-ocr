@@ -13,18 +13,17 @@ public record TireDbEntryResponseDto(
     string LoadIndexSpeedIndex
 )
 {
-    public TireCodeValueObject ToDomain() => new()
-    {
-        RawCode = $"{Width}/{Profile}{Construction}{Diameter}{LoadIndex}{GetLoadIndex2String()}{SpeedIndex}",
-        VehicleClass = null,
-        Width = Width,
-        Diameter = Diameter,
-        AspectRatio = Profile,
-        Construction = Construction,
-        LoadIndex = LoadIndex,
-        LoadIndex2 = LoadIndex2,
-        SpeedRating = SpeedIndex,
-    };
+    public TireCodeValueObject ToDomain() => new(
+        rawCode: $"{Width}/{Profile}{Construction}{Diameter}{LoadIndex}{GetLoadIndex2String()}{SpeedIndex}",
+        vehicleClass: null,
+        width: Width,
+        diameter: Diameter,
+        aspectRatio: Profile,
+        construction: Construction,
+        loadIndex: LoadIndex,
+        loadIndex2: LoadIndex2,
+        speedRating: SpeedIndex
+    );
 
     private string GetLoadIndex2String() => LoadIndex2 is null ? "" : $"/{LoadIndex2}";
 }
