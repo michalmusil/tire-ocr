@@ -64,18 +64,7 @@ var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_W
 //     .WithReference(rabbitMq)
 //     .WaitFor(rabbitMq);
 
-// var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
-//     .WithHttpsHealthCheck("/health")
-//     .WithReference(preprocessingService)
-//     .WaitFor(preprocessingService)
-//     .WithReference(ocrService)
-//     .WaitFor(ocrService)
-//     .WithReference(postprocessingService)
-//     .WaitFor(postprocessingService)
-//     .WithReference(tireDbMatcherService)
-//     .WaitFor(tireDbMatcherService);
-
-var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi>("EvaluationTool")
+var runnerPrototype = builder.AddProject<AiPipeline_TireOcr_RunnerPrototype>("RunnerPrototype")
     .WithHttpsHealthCheck("/health")
     .WithReference(preprocessingService)
     .WaitFor(preprocessingService)
@@ -85,5 +74,16 @@ var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi
     .WaitFor(postprocessingService)
     .WithReference(tireDbMatcherService)
     .WaitFor(tireDbMatcherService);
+
+// var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi>("EvaluationTool")
+//     .WithHttpsHealthCheck("/health")
+//     .WithReference(preprocessingService)
+//     .WaitFor(preprocessingService)
+//     .WithReference(ocrService)
+//     .WaitFor(ocrService)
+//     .WithReference(postprocessingService)
+//     .WaitFor(postprocessingService)
+//     .WithReference(tireDbMatcherService)
+//     .WaitFor(tireDbMatcherService);
 
 builder.Build().Run();

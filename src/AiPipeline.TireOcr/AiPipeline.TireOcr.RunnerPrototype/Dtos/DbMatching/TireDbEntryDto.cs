@@ -1,11 +1,12 @@
 namespace TireOcr.RunnerPrototype.Dtos.DbMatching;
 
 public record TireDbEntryDto(
-    int Width,
+    decimal Width,
     decimal Diameter,
-    int Profile,
+    decimal Profile,
     string Construction,
     int? LoadIndex,
+    int? LoadIndex2,
     string? SpeedIndex,
     string LoadIndexSpeedIndex
 );

@@ -42,7 +42,7 @@ public class PreprocessingRoiExtractionProcessor : IPreprocessingProcessor
                 }
             });
 
-            var res = await _remoteProcessorClient.PostAsync("/api/v1/Preprocess", content);
+            var res = await _remoteProcessorClient.PostAsync("/api/v1/Preprocess/ExtractRoi", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();

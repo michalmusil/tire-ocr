@@ -4,8 +4,10 @@ public record RawTireParamsDatabaseEntryDto(
     string ProductSizeWidth,
     string ProductSizeDiameter,
     string ProductSizeProfile,
-    string ProductConstruction,
+    string? ProductConstruction,
     string? ProductLi,
+    string? ProductLi2,
     string? ProductSi,
+    string? ProductSi2,
     string? ProductLisi
 );

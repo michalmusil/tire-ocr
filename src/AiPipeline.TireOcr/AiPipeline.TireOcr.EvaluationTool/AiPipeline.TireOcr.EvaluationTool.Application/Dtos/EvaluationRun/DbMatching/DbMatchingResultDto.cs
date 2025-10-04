@@ -12,17 +12,8 @@ public record DbMatchingResultDto(
     {
         return new DbMatchingResultDto(
             Matches: domain.Matches
-                .Select(m => new TireCodeMatchDto(
-                    RequiredCharEdits: m.RequiredCharEdits,
-                    EstimatedAccuracy: m.EstimatedAccuracy,
-                    Width: m.Width,
-                    Diameter: m.Diameter,
-                    Profile: m.Profile,
-                    Construction: m.Construction,
-                    LoadIndexSpeedIndex: m.LoadIndexSpeedIndex,
-                    LoadIndex: m.LoadIndex,
-                    SpeedIndex: m.SpeedIndex
-                )).ToList(),
+                .Select(TireCodeMatchDto.FromDomain)
+                .ToList(),
             ManufacturerMatch: domain.ManufacturerMatch,
             DurationMs: domain.DurationMs
         );

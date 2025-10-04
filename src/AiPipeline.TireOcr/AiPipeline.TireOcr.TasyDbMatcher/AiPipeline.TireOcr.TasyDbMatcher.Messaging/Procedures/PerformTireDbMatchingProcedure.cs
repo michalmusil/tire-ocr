@@ -41,7 +41,7 @@ public class PerformTireDbMatchingProcedure : IProcedure
                     "entry", new ApObject(
                         properties: new()
                         {
-                            { "width", ApInt.Template() },
+                            { "width", ApDecimal.Template() },
                             { "diameter", ApDecimal.Template() },
                             { "profile", ApDecimal.Template() },
                             { "construction", ApString.Template() },
@@ -87,7 +87,7 @@ public class PerformTireDbMatchingProcedure : IProcedure
                         var entryObject = new ApObject(
                             properties: new()
                             {
-                                { "width", new ApInt(e.TireEntry.Width) },
+                                { "width", new ApDecimal(e.TireEntry.Width) },
                                 { "diameter", new ApDecimal(e.TireEntry.Diameter) },
                                 { "profile", new ApDecimal(e.TireEntry.Profile) },
                                 { "construction", new ApString(e.TireEntry.Construction) }
@@ -105,7 +105,7 @@ public class PerformTireDbMatchingProcedure : IProcedure
                                 {
                                     "entry", entryObject
                                 },
-                                { "requiredCharEdits", new ApInt(e.RequiredCharEdits) },
+                                { "requiredCharEdits", new ApInt(e.TotalRequiredCharEdits) },
                                 { "estimatedAccuracy", new ApDecimal(e.EstimatedAccuracy) },
                             }
                         );

@@ -12,7 +12,7 @@ public class EvaluationRunFailure : ValueObject
 
     public static EvaluationRunFailure PreprocessingFailure(Failure failure) => new()
     {
-        Reason = EvaluationRunFailureReason.Postprocessing,
+        Reason = EvaluationRunFailureReason.Preprocessing,
         Code = failure.Code,
         Message = failure.Message,
     };
