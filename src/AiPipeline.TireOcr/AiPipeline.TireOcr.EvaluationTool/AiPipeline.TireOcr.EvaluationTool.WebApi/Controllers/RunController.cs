@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunSingleEvaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunWithImage;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.Extensions;
 using Asp.Versioning;
@@ -23,7 +24,7 @@ public class RunController : ControllerBase
         _mediator = mediator;
         _logger = logger;
     }
-    
+
     [HttpPost("WithImage")]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunWithImageResponse))]
@@ -47,10 +48,16 @@ public class RunController : ControllerBase
             DbMatchingType: request.DbMatchingType
         );
 
+        var expectedTireCodeResult = request.ExpectedTireCode is null
+            ? null
+            : TireCodeValueObject.FromLabelString(request.ExpectedTireCode);
+
         var command = new RunSingleEvaluationCommand(
             InputImage: imageDto,
             InputImageUrl: null,
-            ExpectedTireCode: null, // TODO: Add after parsing is implemented
+            ExpectedTireCode: expectedTireCodeResult?.IsSuccess ?? false
+                ? TireCodeDto.FromDomain(expectedTireCodeResult.Data!)
+                : null,
             RunConfig: runConfig,
             RunId: request.RunId,
             RunTitle: request.RunTitle
@@ -62,7 +69,7 @@ public class RunController : ControllerBase
             onSuccess: dto => new RunWithImageResponse(dto)
         );
     }
-    
+
     // [HttpPost("batch")]
     // [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunBatchResponse))]
     // [ProducesResponseType(StatusCodes.Status400BadRequest)]

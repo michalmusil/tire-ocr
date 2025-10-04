@@ -79,7 +79,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private IEnumerable<Match> GetAnchorMatches(string code)
     {
-        var regex = new Regex(@"/(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1})");
+        var regex = new Regex(@"/(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1,2})");
         return regex.Matches(code);
     }
 
@@ -116,7 +116,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         var diameterCharCount = ExtractDiameter(tireCode, rightOfAnchor);
         rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, diameterCharCount, fromStart: true);
 
-        var rangeAndIndexCharCount = ExtractLoadIndex(tireCode, rightOfAnchor);
+        var rangeAndIndexCharCount = ExtractLoadRangeAndIndex(tireCode, rightOfAnchor);
         rightOfAnchor = rightOfAnchor = SubtractCharacters(rightOfAnchor, rangeAndIndexCharCount, fromStart: true);
 
         ExtractSpeedRating(tireCode, rightOfAnchor);
@@ -178,7 +178,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
         return diameterMatch.Length;
     }
 
-    private int ExtractLoadIndex(TireCode code, string leftOfDiameter)
+    private int ExtractLoadRangeAndIndex(TireCode code, string leftOfDiameter)
     {
         char[] validLoadRanges = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'L', 'M', 'N'];
 

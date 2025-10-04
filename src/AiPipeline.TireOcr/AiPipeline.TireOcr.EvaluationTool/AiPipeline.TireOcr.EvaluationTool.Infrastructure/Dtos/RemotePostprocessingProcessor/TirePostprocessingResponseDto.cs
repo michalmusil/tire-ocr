@@ -22,19 +22,18 @@ public record TirePostprocessingResponseDto(
         return new PostprocessingResultValueObject
         {
             TireCode = new TireCodeValueObject
-            {
-                RawCode = RawCode,
-                VehicleClass = VehicleClass,
-                Width = Width,
-                AspectRatio = AspectRatio,
-                Construction = Construction,
-                Diameter = Diameter,
-                LoadRange = LoadRange,
-                LoadIndex = LoadIndex,
-                LoadIndex2 = LoadIndex2,
-                
-                SpeedRating = SpeedRating
-            },
+            (
+                rawCode: RawCode,
+                vehicleClass: VehicleClass,
+                width: Width,
+                aspectRatio: AspectRatio,
+                construction: Construction,
+                diameter: Diameter,
+                loadRange: LoadRange,
+                loadIndex: LoadIndex,
+                loadIndex2: LoadIndex2,
+                speedRating: SpeedRating
+            ),
             DurationMs = DurationMs
         };
     }
