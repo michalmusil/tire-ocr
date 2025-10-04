@@ -46,6 +46,7 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
       RemoteTireDbAddress: ${TireDbEndpoint}
+      RemoteManufacturerDbAddress: ${ManufacturerDbEndpoint}
     restart: unless-stopped
   RunnerPrototype:
     container_name: "RunnerPrototype"
