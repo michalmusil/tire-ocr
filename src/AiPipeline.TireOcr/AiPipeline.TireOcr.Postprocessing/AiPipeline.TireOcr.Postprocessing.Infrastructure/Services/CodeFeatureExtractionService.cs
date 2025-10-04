@@ -140,7 +140,7 @@ public class CodeFeatureExtractionService : ICodeFeatureExtractionService
 
     private int ExtractVehicleClass(TireCode code, string leftOfWidth)
     {
-        Match classMatch = Regex.Match(leftOfWidth, @"[\\,|,^]+(?<VehicleClass>[ACLPST]{1,2})\|?$");
+        Match classMatch = Regex.Match(leftOfWidth, @"^[\\,|]*(?<VehicleClass>[ACLPST]{1,2})\|?$");
         var vehicleClass = classMatch.Success ? classMatch.Groups["VehicleClass"].Value : null;
         code.VehicleClass = vehicleClass;
 

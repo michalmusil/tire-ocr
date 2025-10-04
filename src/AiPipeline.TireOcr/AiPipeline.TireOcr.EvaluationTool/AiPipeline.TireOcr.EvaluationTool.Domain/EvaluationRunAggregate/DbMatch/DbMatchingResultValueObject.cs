@@ -4,7 +4,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatc
 
 public class DbMatchingResultValueObject : ValueObject
 {
-    public required List<TireDbMatch> Matches { get; init; }
+    public required List<TireDbMatchValueObject> Matches { get; init; }
     public string? ManufacturerMatch { get; init; }
     public required long DurationMs { get; init; }
 

@@ -37,7 +37,7 @@ public class PreprocessingClient : IPreprocessingClient
                 }
             });
 
-            var res = await _httpClient.PostAsync("/api/v1/Preprocess", content);
+            var res = await _httpClient.PostAsync("/api/v1/Preprocess/ExtractRoi", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();

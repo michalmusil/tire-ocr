@@ -14,7 +14,7 @@ public class ImageResizeService : IImageResizeService
         using var outputStream = new MemoryStream();
 
         inputImage.Mutate(x => x.Resize(resizeOptions.Width, resizeOptions.Height));
-        await inputImage.SaveAsPngAsync(outputStream);
+        await inputImage.SaveAsJpegAsync(outputStream);
 
         var resizedImage = new Domain.ImageEntity.Image(outputStream.ToArray(), image.Name, image.ContentType);
         return resizedImage;

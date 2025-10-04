@@ -13,17 +13,8 @@ public record DbMatcherServiceResponseDto(
         return new DbMatchingResultValueObject
         {
             Matches = OrderedTireCodeDbMatches
-                .Select(x => new TireDbMatch(
-                    RequiredCharEdits: x.RequiredCharEdits,
-                    EstimatedAccuracy: x.EstimatedAccuracy,
-                    Width: x.TireEntry.Width,
-                    Diameter: x.TireEntry.Diameter,
-                    Profile: x.TireEntry.Profile,
-                    Construction: x.TireEntry.Construction,
-                    LoadIndex: x.TireEntry.LoadIndex,
-                    SpeedIndex: x.TireEntry.SpeedIndex,
-                    LoadIndexSpeedIndex: x.TireEntry.LoadIndexSpeedIndex
-                )).ToList(),
+                .Select(x => x.ToDomain())
+                .ToList(),
             ManufacturerMatch = ManufacturerDbMatch,
             DurationMs = DurationMs
         };

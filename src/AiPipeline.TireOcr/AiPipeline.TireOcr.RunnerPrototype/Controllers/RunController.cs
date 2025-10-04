@@ -24,13 +24,14 @@ public class RunController : ControllerBase
     }
 
     /// <summary>
-    /// Processes a single tire image by sequentially performing preprocessing, ocr and postprocessing pipeline steps. 
+    /// Processes a single tire image by sequentially performing preprocessing, ocr, postprocessing and db matching pipeline steps. 
     /// </summary>
     /// <remarks>
-    /// This endpoint is designed to analyze an uploaded image of a tire photo, extract general parameters of the tire
-    /// and return them in a structured format. Ensuring that the whole tire is visible in the photo, the tire code is
-    /// not obscured, the tire is well lighted and the tire in the photo is not skewed (perspective of the photographer
-    /// is roughly 90° in each direction) will ensure the best possible results.
+    /// This endpoint is designed to analyze an uploaded image of a tire photo, extract general parameters of the tire,
+    /// match them against existing tire code variations stored in a database and return the results in a structured
+    /// format. Ensuring that the whole tire is visible in the photo, the tire code is not obscured, the tire is well
+    /// lighted and the tire in the photo is not skewed (perspective of the photographer is roughly 90° in each
+    /// direction) will ensure the best possible results.
     ///
     /// ### Expected inputs
     /// * A tire photo with aforementioned qualities in one of following formats: [jpg, jpeg, png, webp]
@@ -42,7 +43,9 @@ public class RunController : ControllerBase
     /// * Aspect ratio - aspect ratio of the sidewall height to the tire width
     /// * Construction - 1 letter indicating the construction type of the tire
     /// * Diameter - diameter of the tire in inches (rarely in millimeters)
-    /// * Load index - load index of the tire, usually a single number, but may have varying formats (for example separate load indexes for front/back tires) examples: 91, 111/115 etc.
+    /// * Load range - a single letter indicating tire ply rating (only rarely present, only on light truck tires)
+    /// * Load index - a whole number, indicates load index of the tire for a normal tire, or single-rear-wheel load index for light truck tire
+    /// * Load index 2 - a whole number, only present in light truck tires - indicates dual-rear-wheel load index 
     /// * Speed rating - 1 letter (sometimes with an additional number) indicating the speed rating of the tire
     ///
     /// ### Request format
