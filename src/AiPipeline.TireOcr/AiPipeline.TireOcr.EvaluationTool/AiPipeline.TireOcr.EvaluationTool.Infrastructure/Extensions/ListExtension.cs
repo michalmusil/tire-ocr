@@ -10,4 +10,10 @@ public static class ListExtension
             .Select(x => x.Select(v => v.Value).ToList())
             .ToList();
     }
+
+    public static void AddIfNotNull<T>(this List<T> list, T? value)
+    {
+        if (value is not null)
+            list.Add(value);
+    }
 }

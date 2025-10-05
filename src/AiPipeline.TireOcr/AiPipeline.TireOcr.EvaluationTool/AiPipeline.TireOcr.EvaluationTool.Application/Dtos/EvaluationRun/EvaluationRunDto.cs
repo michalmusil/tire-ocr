@@ -1,4 +1,5 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun.DbMatching;
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun.Ocr;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
@@ -10,7 +11,7 @@ public record EvaluationRunDto(
     DateTime? FinishedAt,
     RunConfigDto RunConfig,
     EvaluationRunFailureDto? Failure,
-    TireCodeDto? ExpectedPostprocessingResult,
+    EvaluationDto? Evaluation,
     PreprocessingResultDto? PreprocessingResult,
     OcrResultDto? OcrResult,
     PostprocessingResultDto? PostprocessingResult,
@@ -40,9 +41,7 @@ public record EvaluationRunDto(
                 PostprocessingType: domain.PostprocessingType,
                 DbMatchingType: domain.DbMatchingType
             ),
-            ExpectedPostprocessingResult: domain.ExpectedPostprocessingResult is null
-                ? null
-                : TireCodeDto.FromDomain(domain.ExpectedPostprocessingResult),
+            Evaluation: domain.Evaluation is null ? null : EvaluationDto.FromDomain(domain.Evaluation),
             PreprocessingResult: domain.PreprocessingResult is null
                 ? null
                 : PreprocessingResultDto.FromDomain(domain.PreprocessingResult),
