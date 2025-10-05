@@ -1,4 +1,5 @@
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Extensions;
 

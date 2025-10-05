@@ -43,6 +43,18 @@ public static class DependencyInjection
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
+        services.AddHttpClient<PreprocessingResizeProcessor>(client =>
+            {
+                client.BaseAddress = new("https+http://PreprocessingService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(60);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
         services.AddHttpClient<OcrRemoteServicesProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://OcrService");

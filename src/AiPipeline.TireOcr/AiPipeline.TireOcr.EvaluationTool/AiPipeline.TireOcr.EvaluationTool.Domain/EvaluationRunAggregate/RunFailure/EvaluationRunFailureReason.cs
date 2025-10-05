@@ -1,4 +1,4 @@
-namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 
 public enum EvaluationRunFailureReason
 {
