@@ -1,4 +1,5 @@
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatch;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
@@ -16,9 +17,9 @@ public class EvaluationRun
     public PostprocessingType PostprocessingType { get; }
     public DbMatchingType DbMatchingType { get; }
 
-    public EvaluationRunFailure? RunFailure { get; private set; }
+    public EvaluationRunFailureValueObject? RunFailure { get; private set; }
 
-    public TireCodeValueObject? ExpectedPostprocessingResult { get; }
+    public EvaluationValueObject? Evaluation { get; private set; }
 
     public PreprocessingResultValueObject? PreprocessingResult { get; private set; }
     public OcrResultValueObject? OcrResult { get; private set; }
@@ -35,8 +36,7 @@ public class EvaluationRun
     }
 
     public EvaluationRun(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
-        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title,
-        TireCodeValueObject? expectedPostprocessingResult, Guid? id = null)
+        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         Title = title ?? Id.ToString();
@@ -48,17 +48,22 @@ public class EvaluationRun
         OcrType = ocrType;
         PostprocessingType = postprocessingType;
         DbMatchingType = dbMatchingType;
-
-        ExpectedPostprocessingResult = expectedPostprocessingResult;
+        Evaluation = null;
         PreprocessingResult = null;
         OcrResult = null;
         PostprocessingResult = null;
         DbMatchingResult = null;
     }
 
-    public void SetFailure(EvaluationRunFailure failure)
+    public void SetFailure(EvaluationRunFailureValueObject failureValueObject)
     {
-        RunFailure = failure;
+        RunFailure = failureValueObject;
+        SetFinishedAt(DateTime.UtcNow);
+    }
+
+    public void SetEvaluation(EvaluationValueObject evaluation)
+    {
+        Evaluation = evaluation;
         SetFinishedAt(DateTime.UtcNow);
     }
 

@@ -13,6 +13,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Facades;
 public class RunFacade : IRunFacade
 {
     private readonly IImageDownloadService _imageDownloadService;
+    private readonly ITireCodeSimilarityEvaluationService _evaluationService;
 
     private readonly IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor> _preprocessingMapper;
     private readonly IEnumToObjectMapper<OcrType, IOcrProcessor> _ocrMapper;
@@ -23,13 +24,15 @@ public class RunFacade : IRunFacade
         IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor> preprocessingMapper,
         IEnumToObjectMapper<OcrType, IOcrProcessor> ocrMapper,
         IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor> postprocessingMapper,
-        IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor> dbMatchingMapper)
+        IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor> dbMatchingMapper,
+        ITireCodeSimilarityEvaluationService evaluationService)
     {
         _imageDownloadService = imageDownloadService;
         _preprocessingMapper = preprocessingMapper;
         _ocrMapper = ocrMapper;
         _postprocessingMapper = postprocessingMapper;
         _dbMatchingMapper = dbMatchingMapper;
+        _evaluationService = evaluationService;
     }
 
     public async Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
@@ -52,7 +55,6 @@ public class RunFacade : IRunFacade
             inputImage: image.ToDomain(),
             title: runEntityInputDetailsDto?.Title,
             id: runEntityInputDetailsDto?.Id,
-            expectedPostprocessingResult: expectedTireCode,
             preprocessingType: runConfig.PreprocessingType,
             ocrType: runConfig.OcrType,
             postprocessingType: runConfig.PostprocessingType,
@@ -72,7 +74,7 @@ public class RunFacade : IRunFacade
         else
         {
             evaluationRun.SetFailure(
-                EvaluationRunFailure.PreprocessingFailure(preprocessingResult.PrimaryFailure!)
+                EvaluationRunFailureValueObject.PreprocessingFailure(preprocessingResult.PrimaryFailure!)
             );
             return DataResult<EvaluationRun>.Success(evaluationRun);
         }
@@ -86,7 +88,7 @@ public class RunFacade : IRunFacade
         else
         {
             evaluationRun.SetFailure(
-                EvaluationRunFailure.OcrFailure(ocrResult.PrimaryFailure!)
+                EvaluationRunFailureValueObject.OcrFailure(ocrResult.PrimaryFailure!)
             );
             return DataResult<EvaluationRun>.Success(evaluationRun);
         }
@@ -96,11 +98,21 @@ public class RunFacade : IRunFacade
             postprocessingType: runConfig.PostprocessingType
         );
         if (postprocessingResult.IsSuccess)
+        {
             evaluationRun.SetPostprocessingResult(postprocessingResult.Data!);
+            if (expectedTireCode is not null)
+            {
+                var evaluation = await _evaluationService.EvaluateTireCodeSimilarity(
+                    expectedTireCode: expectedTireCode,
+                    actualTireCode: postprocessingResult.Data!.TireCode
+                );
+                evaluationRun.SetEvaluation(evaluation);
+            }
+        }
         else
         {
             evaluationRun.SetFailure(
-                EvaluationRunFailure.PostprocessingFailure(postprocessingResult.PrimaryFailure!)
+                EvaluationRunFailureValueObject.PostprocessingFailure(postprocessingResult.PrimaryFailure!)
             );
             return DataResult<EvaluationRun>.Success(evaluationRun);
         }
@@ -189,14 +201,13 @@ public class RunFacade : IRunFacade
                     preprocessingType: runConfig.PreprocessingType,
                     ocrType: runConfig.OcrType,
                     postprocessingType: runConfig.PostprocessingType,
-                    dbMatchingType: runConfig.DbMatchingType,
-                    expectedPostprocessingResult: expectedTireCode
+                    dbMatchingType: runConfig.DbMatchingType
                 );
 
                 if (!successfullyDownloaded)
                 {
                     fallbackEvaluationRun.SetFailure(
-                        EvaluationRunFailure.UnexpectedFailure(
+                        EvaluationRunFailureValueObject.UnexpectedFailure(
                             new Failure(500, $"Failed to download image '{imageUrl}'")
                         )
                     );
@@ -216,7 +227,7 @@ public class RunFacade : IRunFacade
                         onFailure: unexpectedFailures =>
                         {
                             fallbackEvaluationRun.SetFailure(
-                                EvaluationRunFailure.UnexpectedFailure(unexpectedFailures.First())
+                                EvaluationRunFailureValueObject.UnexpectedFailure(unexpectedFailures.First())
                             );
                             return fallbackEvaluationRun;
                         }
