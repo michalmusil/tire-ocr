@@ -1,7 +1,7 @@
 using TireOcr.Shared.Domain;
 using TireOcr.Shared.Result;
 
-namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 
 public class EvaluationRunFailureValueObject : ValueObject
 {

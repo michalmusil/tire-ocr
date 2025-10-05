@@ -8,13 +8,13 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.ProcessorMap
 
 public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor>
 {
-    private readonly PreprocessingNoneProcessor _noneProcessor;
+    private readonly PreprocessingResizeProcessor _resizeProcessor;
     private readonly PreprocessingRoiExtractionProcessor _roiExtractionProcessor;
 
-    public PreprocessingProcessorMapper(PreprocessingNoneProcessor noneProcessor,
+    public PreprocessingProcessorMapper(PreprocessingResizeProcessor resizeProcessor,
         PreprocessingRoiExtractionProcessor roiExtractionProcessor)
     {
-        _noneProcessor = noneProcessor;
+        _resizeProcessor = resizeProcessor;
         _roiExtractionProcessor = roiExtractionProcessor;
     }
 
@@ -22,7 +22,7 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
     {
         IPreprocessingProcessor? processor = input switch
         {
-            PreprocessingType.None => _noneProcessor,
+            PreprocessingType.Resize => _resizeProcessor,
             PreprocessingType.ExtractRoi => _roiExtractionProcessor,
             _ => null
         };

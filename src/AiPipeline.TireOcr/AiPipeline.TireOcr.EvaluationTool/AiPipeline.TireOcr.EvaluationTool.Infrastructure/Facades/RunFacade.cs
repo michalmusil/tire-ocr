@@ -4,6 +4,7 @@ using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Extensions;
 using TireOcr.Shared.Result;

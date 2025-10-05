@@ -1,5 +1,6 @@
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatch;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
