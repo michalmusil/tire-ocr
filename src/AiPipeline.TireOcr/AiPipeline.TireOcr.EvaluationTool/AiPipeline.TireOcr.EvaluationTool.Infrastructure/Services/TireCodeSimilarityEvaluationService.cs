@@ -86,7 +86,7 @@ public class TireCodeSimilarityEvaluationService : ITireCodeSimilarityEvaluation
             return null;
         var levenshtein = new Levenshtein(parameter1 ?? "");
         var distance = levenshtein.DistanceFrom(parameter2 ?? "");
-        var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, parameter1, parameter2);
+        var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, parameter1 ?? "", parameter2 ?? "");
 
         return new ParameterEvaluationValueObject
         {

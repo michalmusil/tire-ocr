@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -23,17 +24,21 @@ public class RunSingleEvaluationCommandHandler : ICommandHandler<RunSingleEvalua
             Title: request.RunTitle
         );
 
+        var expectedTireCodeResult = request.ExpectedTireCodeLabel is null
+            ? null
+            : TireCodeValueObject.FromLabelString(request.ExpectedTireCodeLabel);
+
         var result = request.InputImage is null
             ? await _runFacade.RunSingleEvaluationAsync(
                 imageUrl: request.InputImageUrl!,
                 runConfig: request.RunConfig,
-                expectedTireCode: request.ExpectedTireCode?.ToDomain(),
+                expectedTireCode: expectedTireCodeResult?.Data,
                 runEntityInputDetailsDto: inputDetails
             )
             : await _runFacade.RunSingleEvaluationAsync(
                 image: request.InputImage,
                 runConfig: request.RunConfig,
-                expectedTireCode: request.ExpectedTireCode?.ToDomain(),
+                expectedTireCode: expectedTireCodeResult?.Data,
                 runEntityInputDetailsDto: inputDetails
             );
 
