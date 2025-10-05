@@ -1,4 +1,4 @@
-using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 

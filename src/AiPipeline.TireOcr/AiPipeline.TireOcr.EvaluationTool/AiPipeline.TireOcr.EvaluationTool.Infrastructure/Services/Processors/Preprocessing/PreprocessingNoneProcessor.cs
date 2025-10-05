@@ -11,5 +11,5 @@ public class PreprocessingNoneProcessor : IPreprocessingProcessor
         Process(ImageDto image, PreprocessingType preprocessingType) =>
         Task.FromResult(
             DataResult<PreprocessingProcessorResult>.Success(
-                new PreprocessingProcessorResult(Image: image, DurationMs: 0)));
+                new PreprocessingProcessorResult(EvaluationRunId: Guid.Empty, Image: image, DurationMs: 0)));
 }

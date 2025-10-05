@@ -64,6 +64,7 @@ public class TireCodeSimilarityEvaluationService : ITireCodeSimilarityEvaluation
 
         return new EvaluationEntity
         (
+            evaluationRunId: Guid.Empty,
             expectedTireCode: expectedTireCode,
             totalDistance: totalDistance,
             fullMatchParameterCount: fullMatchParameterCount,

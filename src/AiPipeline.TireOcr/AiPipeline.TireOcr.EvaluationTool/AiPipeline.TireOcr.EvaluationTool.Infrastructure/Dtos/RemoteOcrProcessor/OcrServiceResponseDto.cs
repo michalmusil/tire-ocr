@@ -13,6 +13,7 @@ public record OcrServiceResponseDto(
     public OcrResultEntity ToDomain()
     {
         return new OcrResultEntity(
+            evaluationRunId: Guid.Empty,
             detectedCode: DetectedCode,
             detectedManufacturer: DetectedManufacturer,
             inputUnitCount: EstimatedCosts?.InputUnitCount,

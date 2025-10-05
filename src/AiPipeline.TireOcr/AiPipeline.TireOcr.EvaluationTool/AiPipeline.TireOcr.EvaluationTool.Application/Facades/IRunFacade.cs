@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Facades;

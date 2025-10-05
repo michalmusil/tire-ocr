@@ -5,6 +5,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evalua
 public class EvaluationEntity : TimestampedEntity
 {
     public Guid Id { get; }
+    public Guid RunId { get; private set; }
     public TireCodeValueObject ExpectedTireCode { get; }
     public int TotalDistance { get; }
     public int FullMatchParameterCount { get; }
@@ -19,8 +20,12 @@ public class EvaluationEntity : TimestampedEntity
     public ParameterEvaluationValueObject? LoadIndex2Evaluation { get; }
     public ParameterEvaluationValueObject? SpeedRatingEvaluation { get; }
 
-    public EvaluationEntity(TireCodeValueObject expectedTireCode, int totalDistance, int fullMatchParameterCount,
-        decimal estimatedAccuracy, ParameterEvaluationValueObject? vehicleClassEvaluation,
+    private EvaluationEntity()
+    {
+    }
+
+    public EvaluationEntity(Guid evaluationRunId, TireCodeValueObject expectedTireCode, int totalDistance,
+        int fullMatchParameterCount, decimal estimatedAccuracy, ParameterEvaluationValueObject? vehicleClassEvaluation,
         ParameterEvaluationValueObject? widthEvaluation, ParameterEvaluationValueObject? diameterEvaluation,
         ParameterEvaluationValueObject? aspectRatioEvaluation, ParameterEvaluationValueObject? constructionEvaluation,
         ParameterEvaluationValueObject? loadRangeEvaluation, ParameterEvaluationValueObject? loadIndexEvaluation,
@@ -28,6 +33,7 @@ public class EvaluationEntity : TimestampedEntity
         Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
+        RunId = evaluationRunId;
         ExpectedTireCode = expectedTireCode;
         TotalDistance = totalDistance;
         FullMatchParameterCount = fullMatchParameterCount;
@@ -41,5 +47,11 @@ public class EvaluationEntity : TimestampedEntity
         LoadIndexEvaluation = loadIndexEvaluation;
         LoadIndex2Evaluation = loadIndex2Evaluation;
         SpeedRatingEvaluation = speedRatingEvaluation;
+    }
+    
+    public void SetEvaluationRunId(Guid evaluationRunId)
+    {
+        RunId = evaluationRunId;
+        SetUpdated();
     }
 }

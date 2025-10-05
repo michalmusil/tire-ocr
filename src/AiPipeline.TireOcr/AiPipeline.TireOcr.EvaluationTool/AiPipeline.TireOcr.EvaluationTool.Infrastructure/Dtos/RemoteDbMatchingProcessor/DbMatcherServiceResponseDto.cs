@@ -12,6 +12,7 @@ public record DbMatcherServiceResponseDto(
     {
         return new DbMatchingResultEntity
         (
+            evaluationRunId: Guid.Empty,
             matches: OrderedTireCodeDbMatches
                 .Select(x => x.ToDomain())
                 .ToList(),

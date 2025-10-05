@@ -5,6 +5,7 @@ using AiPipeline.TireOcr.EvaluationTool.Application.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Extensions;
 using TireOcr.Shared.Result;
@@ -67,7 +68,11 @@ public class RunFacade : IRunFacade
             preprocessingType: runConfig.PreprocessingType
         );
         if (preprocessingResult.IsSuccess)
-            evaluationRun.SetPreprocessingResult(preprocessingResult.Data!.ToDomain());
+        {
+            var domainResult = preprocessingResult.Data!.ToDomain();
+            domainResult.SetEvaluationRunId(evaluationRun.Id);
+            evaluationRun.SetPreprocessingResult(domainResult);
+        }
         else
         {
             evaluationRun.SetFailure(
@@ -81,7 +86,11 @@ public class RunFacade : IRunFacade
             ocrType: runConfig.OcrType
         );
         if (ocrResult.IsSuccess)
-            evaluationRun.SetOcrResult(ocrResult.Data!);
+        {
+            var domainResult = ocrResult.Data!;
+            domainResult.SetEvaluationRunId(evaluationRun.Id);
+            evaluationRun.SetOcrResult(domainResult);
+        }
         else
         {
             evaluationRun.SetFailure(
@@ -96,13 +105,16 @@ public class RunFacade : IRunFacade
         );
         if (postprocessingResult.IsSuccess)
         {
-            evaluationRun.SetPostprocessingResult(postprocessingResult.Data!);
+            var domainResult = postprocessingResult.Data!;
+            domainResult.SetEvaluationRunId(evaluationRun.Id);
+            evaluationRun.SetPostprocessingResult(domainResult);
             if (expectedTireCode is not null)
             {
                 var evaluation = await _evaluationService.EvaluateTireCodeSimilarity(
                     expectedTireCode: expectedTireCode,
-                    actualTireCode: postprocessingResult.Data!.TireCode
+                    actualTireCode: domainResult.TireCode
                 );
+                evaluation.SetEvaluationRunId(evaluationRun.Id);
                 evaluationRun.SetEvaluation(evaluation);
             }
         }
@@ -120,7 +132,11 @@ public class RunFacade : IRunFacade
             dbMatchingType: runConfig.DbMatchingType
         );
         if (dbMatchingResult.IsSuccess)
-            evaluationRun.SetDbMatchingResult(dbMatchingResult.Data!);
+        {
+            var domainResult = dbMatchingResult.Data!;
+            domainResult.SetEvaluationRunId(evaluationRun.Id);
+            evaluationRun.SetDbMatchingResult(domainResult);
+        }
         else
             evaluationRun.SetFinishedAt(DateTime.UtcNow);
 
@@ -161,7 +177,8 @@ public class RunFacade : IRunFacade
             var batchUrls = batch.ToDictionary();
             var processedBatch = await ProcessOcrPipelineBatch(
                 imageUrls: batchUrls,
-                runConfig: runConfig
+                runConfig: runConfig,
+                batchId: result.Id
             );
 
             result.AddEvaluationRuns(processedBatch.ToArray());
@@ -172,7 +189,7 @@ public class RunFacade : IRunFacade
 
     private async Task<IEnumerable<EvaluationRunEntity>> ProcessOcrPipelineBatch(
         Dictionary<string, TireCodeValueObject?> imageUrls,
-        RunConfigDto runConfig
+        RunConfigDto runConfig, Guid batchId
     )
     {
         var downloadedImages = (await _imageDownloadService
@@ -189,6 +206,7 @@ public class RunFacade : IRunFacade
                 var successfullyDownloaded = downloadedImages.TryGetValue(imageUrl, out var downloadedImage);
 
                 var fallbackEvaluationRun = new EvaluationRunEntity(
+                    batchId: batchId,
                     title: null,
                     inputImage: downloadedImage?.ToDomain() ?? new()
                     {

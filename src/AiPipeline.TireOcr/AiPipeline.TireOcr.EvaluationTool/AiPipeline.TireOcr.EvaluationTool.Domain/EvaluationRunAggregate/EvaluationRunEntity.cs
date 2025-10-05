@@ -9,6 +9,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 public class EvaluationRunEntity : TimestampedEntity
 {
     public Guid Id { get; }
+    public Guid? BatchId { get; }
     public string Title { get; }
     public ImageValueObject InputImage { get; }
     public DateTime StartedAt { get; }
@@ -38,9 +39,11 @@ public class EvaluationRunEntity : TimestampedEntity
     }
 
     public EvaluationRunEntity(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
-        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, Guid? id = null)
+        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, Guid? batchId = null,
+        Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
+        BatchId = batchId;
         Title = title ?? Id.ToString();
         InputImage = inputImage;
         StartedAt = DateTime.UtcNow;
