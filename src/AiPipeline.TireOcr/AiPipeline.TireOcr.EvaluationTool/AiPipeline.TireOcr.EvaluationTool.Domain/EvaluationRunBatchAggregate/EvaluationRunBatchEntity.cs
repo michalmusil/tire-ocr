@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Domain.Common;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 
-namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 
 public class EvaluationRunBatchEntity: TimestampedEntity
 {

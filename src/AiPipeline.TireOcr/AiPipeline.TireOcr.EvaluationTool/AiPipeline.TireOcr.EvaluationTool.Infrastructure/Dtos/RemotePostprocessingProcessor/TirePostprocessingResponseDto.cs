@@ -21,6 +21,7 @@ public record TirePostprocessingResponseDto(
     {
         return new PostprocessingResultEntity
         (
+            evaluationRunId: Guid.Empty,
             tireCode: new TireCodeValueObject
             (
                 rawCode: RawCode,

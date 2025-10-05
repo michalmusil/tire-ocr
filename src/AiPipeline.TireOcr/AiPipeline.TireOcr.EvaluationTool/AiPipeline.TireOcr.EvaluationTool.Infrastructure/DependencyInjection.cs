@@ -2,6 +2,7 @@ using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Extensions;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Facades;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services;
@@ -10,16 +11,19 @@ using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.DbMat
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.Ocr;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.Postprocessing;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.Preprocessing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         AddServices(services);
         AddFacades(services);
+        AddDbContext(services, configuration);
         return services;
     }
 
@@ -89,5 +93,11 @@ public static class DependencyInjection
     private static void AddFacades(IServiceCollection services)
     {
         services.AddScoped<IRunFacade, RunFacade>();
+    }
+
+    private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString("AiPipelineEvaluationToolDb");
+        services.AddDbContextFactory<EvaluationToolDbContext>(options => { options.UseNpgsql(connectionString); });
     }
 }

@@ -52,6 +52,7 @@ public class PreprocessingResizeProcessor : IPreprocessingProcessor
             var responseContent = await res.Content.ReadFromJsonAsync<TirePreprocessingResponseDto>();
             var imageData = Convert.FromBase64String(responseContent!.Base64ImageData);
             var finalResult = new PreprocessingProcessorResult(
+                EvaluationRunId: Guid.Empty,
                 Image: new ImageDto(responseContent.FileName, responseContent.ContentType, imageData),
                 DurationMs: responseContent.DurationMs
             );

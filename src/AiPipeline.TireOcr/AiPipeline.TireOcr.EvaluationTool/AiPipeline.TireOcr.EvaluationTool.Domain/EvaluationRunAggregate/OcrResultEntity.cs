@@ -5,6 +5,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 public class OcrResultEntity : TimestampedEntity
 {
     public Guid Id { get; }
+    public Guid RunId { get; private set; }
     public string DetectedCode { get; }
     public string? DetectedManufacturer { get; }
     public decimal? InputUnitCount { get; }
@@ -14,9 +15,14 @@ public class OcrResultEntity : TimestampedEntity
     public string? EstimatedCostCurrency { get; }
     public long DurationMs { get; }
 
-    public OcrResultEntity(string detectedCode, long durationMs, string? detectedManufacturer = null,
-        decimal? inputUnitCount = null, decimal? outputUnitCount = null, string? billingUnit = null,
-        decimal? estimatedCost = null, string? estimatedCostCurrency = null, Guid? id = null)
+    private OcrResultEntity()
+    {
+    }
+
+    public OcrResultEntity(Guid evaluationRunId, string detectedCode, long durationMs,
+        string? detectedManufacturer = null, decimal? inputUnitCount = null, decimal? outputUnitCount = null,
+        string? billingUnit = null, decimal? estimatedCost = null, string? estimatedCostCurrency = null,
+        Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         DetectedCode = detectedCode;
@@ -27,5 +33,11 @@ public class OcrResultEntity : TimestampedEntity
         EstimatedCost = estimatedCost;
         EstimatedCostCurrency = estimatedCostCurrency;
         DurationMs = durationMs;
+    }
+
+    public void SetEvaluationRunId(Guid evaluationRunId)
+    {
+        RunId = evaluationRunId;
+        SetUpdated();
     }
 }
