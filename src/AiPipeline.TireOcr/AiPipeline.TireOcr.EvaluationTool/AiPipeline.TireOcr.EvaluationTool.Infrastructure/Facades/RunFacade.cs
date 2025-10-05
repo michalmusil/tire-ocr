@@ -36,7 +36,7 @@ public class RunFacade : IRunFacade
         _evaluationService = evaluationService;
     }
 
-    public async Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
+    public async Task<DataResult<EvaluationRunEntity>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
         TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto)
     {
         var preprocessingProcessorResult = _preprocessingMapper.Map(runConfig.PreprocessingType);
@@ -50,9 +50,9 @@ public class RunFacade : IRunFacade
             .Concat(dbMatchingProcessorResult.Failures)
             .ToArray();
         if (processorMappingFailures.Any())
-            return DataResult<EvaluationRun>.Failure(processorMappingFailures);
+            return DataResult<EvaluationRunEntity>.Failure(processorMappingFailures);
 
-        var evaluationRun = new EvaluationRun(
+        var evaluationRun = new EvaluationRunEntity(
             inputImage: image.ToDomain(),
             title: runEntityInputDetailsDto?.Title,
             id: runEntityInputDetailsDto?.Id,
@@ -67,17 +67,13 @@ public class RunFacade : IRunFacade
             preprocessingType: runConfig.PreprocessingType
         );
         if (preprocessingResult.IsSuccess)
-            evaluationRun.SetPreprocessingResult(new PreprocessingResultValueObject
-            {
-                PreprocessingResult = preprocessingResult.Data!.Image.ToDomain(),
-                DurationMs = preprocessingResult.Data!.DurationMs
-            });
+            evaluationRun.SetPreprocessingResult(preprocessingResult.Data!.ToDomain());
         else
         {
             evaluationRun.SetFailure(
                 EvaluationRunFailureValueObject.PreprocessingFailure(preprocessingResult.PrimaryFailure!)
             );
-            return DataResult<EvaluationRun>.Success(evaluationRun);
+            return DataResult<EvaluationRunEntity>.Success(evaluationRun);
         }
 
         var ocrResult = await ocrProcessorResult.Data!.Process(
@@ -91,7 +87,7 @@ public class RunFacade : IRunFacade
             evaluationRun.SetFailure(
                 EvaluationRunFailureValueObject.OcrFailure(ocrResult.PrimaryFailure!)
             );
-            return DataResult<EvaluationRun>.Success(evaluationRun);
+            return DataResult<EvaluationRunEntity>.Success(evaluationRun);
         }
 
         var postprocessingResult = await postprocessingProcessorResult.Data!.Process(
@@ -115,7 +111,7 @@ public class RunFacade : IRunFacade
             evaluationRun.SetFailure(
                 EvaluationRunFailureValueObject.PostprocessingFailure(postprocessingResult.PrimaryFailure!)
             );
-            return DataResult<EvaluationRun>.Success(evaluationRun);
+            return DataResult<EvaluationRunEntity>.Success(evaluationRun);
         }
 
         var dbMatchingResult = await dbMatchingProcessorResult.Data!.Process(
@@ -128,15 +124,15 @@ public class RunFacade : IRunFacade
         else
             evaluationRun.SetFinishedAt(DateTime.UtcNow);
 
-        return DataResult<EvaluationRun>.Success(evaluationRun);
+        return DataResult<EvaluationRunEntity>.Success(evaluationRun);
     }
 
-    public async Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(string imageUrl, RunConfigDto runConfig,
+    public async Task<DataResult<EvaluationRunEntity>> RunSingleEvaluationAsync(string imageUrl, RunConfigDto runConfig,
         TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto)
     {
         var imageResult = await _imageDownloadService.DownloadImageAsync(imageUrl);
         if (imageResult.IsFailure)
-            return DataResult<EvaluationRun>.Failure(imageResult.Failures);
+            return DataResult<EvaluationRunEntity>.Failure(imageResult.Failures);
 
         return await RunSingleEvaluationAsync(
             image: imageResult.Data!,
@@ -146,14 +142,14 @@ public class RunFacade : IRunFacade
         );
     }
 
-    public async Task<DataResult<EvaluationRunBatch>> RunEvaluationBatchAsync(
+    public async Task<DataResult<EvaluationRunBatchEntity>> RunEvaluationBatchAsync(
         Dictionary<string, TireCodeValueObject?> imageUrls,
         int batchSize,
         RunConfigDto runConfig,
         RunEntityInputDetailsDto? runEntityInputDetailsDto
     )
     {
-        var result = new EvaluationRunBatch(
+        var result = new EvaluationRunBatchEntity(
             evaluationRuns: [],
             title: runEntityInputDetailsDto?.Title,
             id: runEntityInputDetailsDto?.Id
@@ -171,10 +167,10 @@ public class RunFacade : IRunFacade
             result.AddEvaluationRuns(processedBatch.ToArray());
         }
 
-        return DataResult<EvaluationRunBatch>.Success(result);
+        return DataResult<EvaluationRunBatchEntity>.Success(result);
     }
 
-    private async Task<IEnumerable<EvaluationRun>> ProcessOcrPipelineBatch(
+    private async Task<IEnumerable<EvaluationRunEntity>> ProcessOcrPipelineBatch(
         Dictionary<string, TireCodeValueObject?> imageUrls,
         RunConfigDto runConfig
     )
@@ -184,7 +180,7 @@ public class RunFacade : IRunFacade
             .Where(x => x.Value.IsSuccess)
             .ToDictionary(x => x.Key, x => x.Value.Data!);
 
-        var results = new List<EvaluationRun>();
+        var results = new List<EvaluationRunEntity>();
         var batchProcessingTasks = imageUrls
             .Select(async x =>
             {
@@ -192,7 +188,7 @@ public class RunFacade : IRunFacade
                 var expectedTireCode = x.Value;
                 var successfullyDownloaded = downloadedImages.TryGetValue(imageUrl, out var downloadedImage);
 
-                var fallbackEvaluationRun = new EvaluationRun(
+                var fallbackEvaluationRun = new EvaluationRunEntity(
                     title: null,
                     inputImage: downloadedImage?.ToDomain() ?? new()
                     {

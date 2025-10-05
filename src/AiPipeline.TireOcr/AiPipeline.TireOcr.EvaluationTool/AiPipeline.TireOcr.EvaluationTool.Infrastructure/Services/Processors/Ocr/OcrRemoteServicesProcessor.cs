@@ -22,7 +22,7 @@ public class OcrRemoteServicesProcessor : IOcrProcessor
         _logger = logger;
     }
 
-    public async Task<DataResult<OcrResultValueObject>> Process(ImageDto image, OcrType ocrType)
+    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType)
     {
         try
         {
@@ -50,7 +50,7 @@ public class OcrRemoteServicesProcessor : IOcrProcessor
 
             var ocrResult = await res.Content.ReadFromJsonAsync<OcrServiceResponseDto>();
 
-            return DataResult<OcrResultValueObject>.Success(ocrResult!.ToDomain());
+            return DataResult<OcrResultEntity>.Success(ocrResult!.ToDomain());
         }
         catch (HttpRequestExceptionWithContent ex)
         {
@@ -59,12 +59,12 @@ public class OcrRemoteServicesProcessor : IOcrProcessor
             var failureMessage = $"Remote OCR failed: {content ?? "No tire code was detected during Ocr"}";
 
             _logger.LogError(ex, failureMessage);
-            return DataResult<OcrResultValueObject>.Failure(new Failure((int)statusCode!, failureMessage));
+            return DataResult<OcrResultEntity>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while calling remote Ocr processor.");
-            return DataResult<OcrResultValueObject>.Failure(new Failure(500,
+            return DataResult<OcrResultEntity>.Failure(new Failure(500,
                 $"Failed to perform OCR on image '{image.FileName}' due to unexpected error."));
         }
     }

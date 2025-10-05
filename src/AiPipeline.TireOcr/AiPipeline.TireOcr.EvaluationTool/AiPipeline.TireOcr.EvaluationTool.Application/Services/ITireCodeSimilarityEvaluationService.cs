@@ -5,6 +5,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Services;
 
 public interface ITireCodeSimilarityEvaluationService
 {
-    public Task<EvaluationValueObject> EvaluateTireCodeSimilarity(TireCodeValueObject expectedTireCode,
+    public Task<EvaluationEntity> EvaluateTireCodeSimilarity(TireCodeValueObject expectedTireCode,
         TireCodeValueObject actualTireCode);
 }

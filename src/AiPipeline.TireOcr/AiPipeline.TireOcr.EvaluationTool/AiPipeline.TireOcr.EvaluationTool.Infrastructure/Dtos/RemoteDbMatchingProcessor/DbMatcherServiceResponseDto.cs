@@ -8,15 +8,15 @@ public record DbMatcherServiceResponseDto(
     long DurationMs
 )
 {
-    public DbMatchingResultValueObject ToDomain()
+    public DbMatchingResultEntity ToDomain()
     {
-        return new DbMatchingResultValueObject
-        {
-            Matches = OrderedTireCodeDbMatches
+        return new DbMatchingResultEntity
+        (
+            matches: OrderedTireCodeDbMatches
                 .Select(x => x.ToDomain())
                 .ToList(),
-            ManufacturerMatch = ManufacturerDbMatch,
-            DurationMs = DurationMs
-        };
+            manufacturerMatch: ManufacturerDbMatch,
+            durationMs: DurationMs
+        );
     }
 }

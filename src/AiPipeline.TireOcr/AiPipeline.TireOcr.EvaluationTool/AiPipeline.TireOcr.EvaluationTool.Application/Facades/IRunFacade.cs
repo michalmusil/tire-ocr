@@ -15,7 +15,7 @@ public interface IRunFacade
     /// <param name="expectedTireCode">Optional expected tire code. No evaluation can be calculated if this is not provided</param>
     /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run</param>
     /// <returns>A DataResult containing the full evaluation run result if successful, failure otherwise</returns>
-    public Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
+    public Task<DataResult<EvaluationRunEntity>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
         TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto);
 
     /// <summary>
@@ -26,7 +26,7 @@ public interface IRunFacade
     /// <param name="expectedTireCode">Optional expected tire code. No evaluation can be calculated if this is not provided</param>
     /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run</param>
     /// <returns>A DataResult containing the full evaluation run result if successful, failure otherwise</returns>
-    public Task<DataResult<EvaluationRun>> RunSingleEvaluationAsync(string imageUrl, RunConfigDto runConfig,
+    public Task<DataResult<EvaluationRunEntity>> RunSingleEvaluationAsync(string imageUrl, RunConfigDto runConfig,
         TireCodeValueObject? expectedTireCode, RunEntityInputDetailsDto? runEntityInputDetailsDto);
 
     /// <summary>
@@ -39,7 +39,7 @@ public interface IRunFacade
     /// <param name="runConfig">Configuration used for all evaluation runs</param>
     /// <param name="runEntityInputDetailsDto">Optional metadata of created evaluation run batch</param>
     /// <returns>A DataResult containing results of all the evaluations aggregated in one EvaluationRunBatch if successful, failure otherwise</returns>
-    public Task<DataResult<EvaluationRunBatch>> RunEvaluationBatchAsync(
+    public Task<DataResult<EvaluationRunBatchEntity>> RunEvaluationBatchAsync(
         Dictionary<string, TireCodeValueObject?> imageUrls,
         int batchSize,
         RunConfigDto runConfig,

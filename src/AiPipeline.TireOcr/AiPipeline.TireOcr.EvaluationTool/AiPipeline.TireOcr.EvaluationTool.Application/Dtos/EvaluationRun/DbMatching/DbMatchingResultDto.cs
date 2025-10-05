@@ -8,7 +8,7 @@ public record DbMatchingResultDto(
     long DurationMs
 )
 {
-    public static DbMatchingResultDto FromDomain(DbMatchingResultValueObject domain)
+    public static DbMatchingResultDto FromDomain(DbMatchingResultEntity domain)
     {
         return new DbMatchingResultDto(
             Matches: domain.Matches

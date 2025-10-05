@@ -7,7 +7,7 @@ public record PostprocessingResultDto(
     long DurationMs
 )
 {
-    public static PostprocessingResultDto FromDomain(PostprocessingResultValueObject domain) => new(
+    public static PostprocessingResultDto FromDomain(PostprocessingResultEntity domain) => new(
         PostprocessedTireCode: TireCodeDto.FromDomain(domain.TireCode),
         DurationMs: domain.DurationMs);
 }

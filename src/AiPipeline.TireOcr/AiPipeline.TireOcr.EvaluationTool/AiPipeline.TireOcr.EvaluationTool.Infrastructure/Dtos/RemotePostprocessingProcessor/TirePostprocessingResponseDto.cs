@@ -17,11 +17,11 @@ public record TirePostprocessingResponseDto(
     long DurationMs
 )
 {
-    public PostprocessingResultValueObject ToDomain()
+    public PostprocessingResultEntity ToDomain()
     {
-        return new PostprocessingResultValueObject
-        {
-            TireCode = new TireCodeValueObject
+        return new PostprocessingResultEntity
+        (
+            tireCode: new TireCodeValueObject
             (
                 rawCode: RawCode,
                 vehicleClass: VehicleClass,
@@ -34,7 +34,7 @@ public record TirePostprocessingResponseDto(
                 loadIndex2: LoadIndex2,
                 speedRating: SpeedRating
             ),
-            DurationMs = DurationMs
-        };
+            durationMs: DurationMs
+        );
     }
 }

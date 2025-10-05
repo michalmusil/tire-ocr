@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Domain.Common;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatch;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
@@ -5,7 +6,7 @@ using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 
-public class EvaluationRun
+public class EvaluationRunEntity : TimestampedEntity
 {
     public Guid Id { get; }
     public string Title { get; }
@@ -20,23 +21,23 @@ public class EvaluationRun
 
     public EvaluationRunFailureValueObject? RunFailure { get; private set; }
 
-    public EvaluationValueObject? Evaluation { get; private set; }
+    public EvaluationEntity? Evaluation { get; private set; }
 
-    public PreprocessingResultValueObject? PreprocessingResult { get; private set; }
-    public OcrResultValueObject? OcrResult { get; private set; }
-    public PostprocessingResultValueObject? PostprocessingResult { get; private set; }
-    public DbMatchingResultValueObject? DbMatchingResult { get; private set; }
+    public PreprocessingResultEntity? PreprocessingResult { get; private set; }
+    public OcrResultEntity? OcrResult { get; private set; }
+    public PostprocessingResultEntity? PostprocessingResult { get; private set; }
+    public DbMatchingResultEntity? DbMatchingResult { get; private set; }
 
     public bool HasFinished => FinishedAt.HasValue;
     public bool HasRunFailed => RunFailure is not null;
 
     public TimeSpan? TotalExecutionDuration => FinishedAt.HasValue ? FinishedAt.Value - StartedAt : null;
 
-    private EvaluationRun()
+    private EvaluationRunEntity()
     {
     }
 
-    public EvaluationRun(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
+    public EvaluationRunEntity(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
         PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
@@ -62,29 +63,42 @@ public class EvaluationRun
         SetFinishedAt(DateTime.UtcNow);
     }
 
-    public void SetEvaluation(EvaluationValueObject evaluation)
+    public void SetEvaluation(EvaluationEntity evaluation)
     {
         Evaluation = evaluation;
         SetFinishedAt(DateTime.UtcNow);
     }
 
-    public void SetPreprocessingResult(PreprocessingResultValueObject preprocessingResult) =>
+    public void SetPreprocessingResult(PreprocessingResultEntity preprocessingResult)
+    {
         PreprocessingResult = preprocessingResult;
+        SetUpdated();
+    }
 
-    public void SetOcrResult(OcrResultValueObject ocrResult) => OcrResult = ocrResult;
+    public void SetOcrResult(OcrResultEntity ocrResult)
+    {
+        OcrResult = ocrResult;
+        SetUpdated();
+    }
 
-    public void SetPostprocessingResult(PostprocessingResultValueObject postprocessingResult)
+
+    public void SetPostprocessingResult(PostprocessingResultEntity postprocessingResult)
     {
         PostprocessingResult = postprocessingResult;
         if (DbMatchingType is DbMatchingType.None)
             FinishedAt = DateTime.UtcNow;
+        SetUpdated();
     }
 
-    public void SetDbMatchingResult(DbMatchingResultValueObject dbMatchingResult)
+    public void SetDbMatchingResult(DbMatchingResultEntity dbMatchingResult)
     {
         DbMatchingResult = dbMatchingResult;
-        FinishedAt = DateTime.UtcNow;
+        SetFinishedAt(DateTime.UtcNow);
     }
 
-    public void SetFinishedAt(DateTime finishedAt) => FinishedAt = finishedAt.ToUniversalTime();
+    public void SetFinishedAt(DateTime finishedAt)
+    {
+        FinishedAt = finishedAt.ToUniversalTime();
+        SetUpdated();
+    }
 }
