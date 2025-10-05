@@ -7,6 +7,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 
 public interface IDbMatchingProcessor
 {
-    public Task<DataResult<DbMatchingResultValueObject>> Process(OcrResultValueObject ocrResult,
+    public Task<DataResult<DbMatchingResultEntity>> Process(OcrResultEntity ocrResult,
         TireCodeValueObject postprocessingResult, DbMatchingType dbMatchingType);
 }

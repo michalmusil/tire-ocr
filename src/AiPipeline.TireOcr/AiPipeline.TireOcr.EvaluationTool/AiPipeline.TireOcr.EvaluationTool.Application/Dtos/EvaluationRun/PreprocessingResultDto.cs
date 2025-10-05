@@ -7,7 +7,7 @@ public record PreprocessingResultDto(
     long DurationMs
 )
 {
-    public static PreprocessingResultDto FromDomain(PreprocessingResultValueObject domain) => new(
+    public static PreprocessingResultDto FromDomain(PreprocessingResultEntity domain) => new(
         PreprocessedImage: ImageInfoDto.FromDomain(domain.PreprocessingResult),
         DurationMs: domain.DurationMs
     );

@@ -9,7 +9,7 @@ public record OcrResultDto(
     long DurationMs
 )
 {
-    public static OcrResultDto FromDomain(OcrResultValueObject domain)
+    public static OcrResultDto FromDomain(OcrResultEntity domain)
     {
         var shouldIncludeEstimatedCosts = domain.InputUnitCount != null || domain.OutputUnitCount != null ||
                                           domain.BillingUnit != null || domain.EstimatedCost != null ||

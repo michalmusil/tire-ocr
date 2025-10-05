@@ -9,7 +9,7 @@ public record EvaluationRunBatchDto(
     IEnumerable<EvaluationRunDto> EvaluationRuns
 )
 {
-    public static EvaluationRunBatchDto FromDomain(EvaluationRunBatch domain)
+    public static EvaluationRunBatchDto FromDomain(EvaluationRunBatchEntity domain)
     {
         return new EvaluationRunBatchDto(
             Id: domain.Id.ToString(),

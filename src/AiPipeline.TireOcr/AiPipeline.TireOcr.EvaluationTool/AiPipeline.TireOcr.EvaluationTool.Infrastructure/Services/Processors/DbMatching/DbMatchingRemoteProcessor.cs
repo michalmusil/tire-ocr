@@ -21,7 +21,7 @@ public class DbMatchingRemoteProcessor : IDbMatchingProcessor
         _logger = logger;
     }
 
-    public async Task<DataResult<DbMatchingResultValueObject>> Process(OcrResultValueObject ocrResult,
+    public async Task<DataResult<DbMatchingResultEntity>> Process(OcrResultEntity ocrResult,
         TireCodeValueObject postprocessingResult, DbMatchingType dbMatchingType)
     {
         try
@@ -39,7 +39,7 @@ public class DbMatchingRemoteProcessor : IDbMatchingProcessor
             }
 
             var dbMatchingResult = await res.Content.ReadFromJsonAsync<DbMatcherServiceResponseDto>();
-            return DataResult<DbMatchingResultValueObject>.Success(dbMatchingResult!.ToDomain());
+            return DataResult<DbMatchingResultEntity>.Success(dbMatchingResult!.ToDomain());
         }
         catch (HttpRequestExceptionWithContent ex)
         {
@@ -49,12 +49,12 @@ public class DbMatchingRemoteProcessor : IDbMatchingProcessor
                 $"Remote dbMatching failure: {content ?? "Failed to get DB matches during DbMatching"}";
 
             _logger.LogError(ex, failureMessage);
-            return DataResult<DbMatchingResultValueObject>.Failure(new Failure((int)statusCode!, failureMessage));
+            return DataResult<DbMatchingResultEntity>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while calling DbMatcher service.");
-            return DataResult<DbMatchingResultValueObject>.Failure(new Failure(500,
+            return DataResult<DbMatchingResultEntity>.Failure(new Failure(500,
                 $"Failed to perform dbMatching on code '${postprocessingResult}' due to unexpected error."));
         }
     }

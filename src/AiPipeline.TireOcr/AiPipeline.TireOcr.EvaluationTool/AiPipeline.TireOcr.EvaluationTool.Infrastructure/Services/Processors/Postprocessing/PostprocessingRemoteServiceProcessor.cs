@@ -21,7 +21,7 @@ public class PostprocessingRemoteServiceProcessor : IPostprocessingProcessor
         _logger = logger;
     }
 
-    public async Task<DataResult<PostprocessingResultValueObject>> Process(OcrResultValueObject ocrResult,
+    public async Task<DataResult<PostprocessingResultEntity>> Process(OcrResultEntity ocrResult,
         PostprocessingType postprocessingType)
     {
         try
@@ -39,7 +39,7 @@ public class PostprocessingRemoteServiceProcessor : IPostprocessingProcessor
             }
 
             var postprocessResult = await res.Content.ReadFromJsonAsync<TirePostprocessingResponseDto>();
-            return DataResult<PostprocessingResultValueObject>.Success(postprocessResult!.ToDomain());
+            return DataResult<PostprocessingResultEntity>.Success(postprocessResult!.ToDomain());
         }
         catch (HttpRequestExceptionWithContent ex)
         {
@@ -49,12 +49,12 @@ public class PostprocessingRemoteServiceProcessor : IPostprocessingProcessor
                 $"Remote postprocessing failed: {content ?? "No tire code was detected during Postprocessing"}";
 
             _logger.LogError(ex, failureMessage);
-            return DataResult<PostprocessingResultValueObject>.Failure(new Failure((int)statusCode!, failureMessage));
+            return DataResult<PostprocessingResultEntity>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error while calling Postprocess service.");
-            return DataResult<PostprocessingResultValueObject>.Failure(new Failure(500,
+            return DataResult<PostprocessingResultEntity>.Failure(new Failure(500,
                 $"Failed to postprocess code '{ocrResult.DetectedCode}' due to unexpected error."));
         }
     }

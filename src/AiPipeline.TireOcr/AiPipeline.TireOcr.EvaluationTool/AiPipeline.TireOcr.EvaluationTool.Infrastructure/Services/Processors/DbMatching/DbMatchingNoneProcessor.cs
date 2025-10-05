@@ -8,14 +8,8 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.D
 
 public class DbMatchingNoneProcessor : IDbMatchingProcessor
 {
-    public Task<DataResult<DbMatchingResultValueObject>> Process(OcrResultValueObject ocrResult,
+    public Task<DataResult<DbMatchingResultEntity>> Process(OcrResultEntity ocrResult,
         TireCodeValueObject postprocessingResult, DbMatchingType dbMatchingType) =>
         Task.FromResult(
-            DataResult<DbMatchingResultValueObject>.Success(new DbMatchingResultValueObject
-            {
-                Matches = [],
-                ManufacturerMatch = null,
-                DurationMs = 0
-            })
-        );
+            DataResult<DbMatchingResultEntity>.Failure(new Failure(204, "Db matching was not requested")));
 }

@@ -19,7 +19,7 @@ public record EvaluationRunDto(
     long? TotalExecutionDurationMs
 )
 {
-    public static EvaluationRunDto FromDomain(Domain.EvaluationRunAggregate.EvaluationRun domain)
+    public static EvaluationRunDto FromDomain(Domain.EvaluationRunAggregate.EvaluationRunEntity domain)
     {
         return new
         (

@@ -9,7 +9,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services;
 
 public class TireCodeSimilarityEvaluationService : ITireCodeSimilarityEvaluationService
 {
-    public async Task<EvaluationValueObject> EvaluateTireCodeSimilarity(TireCodeValueObject expectedTireCode,
+    public async Task<EvaluationEntity> EvaluateTireCodeSimilarity(TireCodeValueObject expectedTireCode,
         TireCodeValueObject actualTireCode)
     {
         var parameterEvaluations = new List<ParameterEvaluationValueObject>();
@@ -62,22 +62,22 @@ public class TireCodeSimilarityEvaluationService : ITireCodeSimilarityEvaluation
         var fullMatchParameterCount = parameterEvaluations
             .Count(m => m.Distance == 0);
 
-        return new EvaluationValueObject
-        {
-            ExpectedTireCode = expectedTireCode,
-            TotalDistance = totalDistance,
-            FullMatchParameterCount = fullMatchParameterCount,
-            EstimatedAccuracy = estimatedAccuracy,
-            VehicleClassEvaluation = vehicleClassEvaluation,
-            WidthEvaluation = widthEvaluation,
-            DiameterEvaluation = diameterEvaluation,
-            AspectRatioEvaluation = aspectRatioEvaluation,
-            ConstructionEvaluation = constructionEvaluation,
-            LoadRangeEvaluation = loadRangeEvaluation,
-            LoadIndexEvaluation = loadIndexEvaluation,
-            LoadIndex2Evaluation = loadIndex2Evaluation,
-            SpeedRatingEvaluation = speedRatingEvaluation
-        };
+        return new EvaluationEntity
+        (
+            expectedTireCode: expectedTireCode,
+            totalDistance: totalDistance,
+            fullMatchParameterCount: fullMatchParameterCount,
+            estimatedAccuracy: estimatedAccuracy,
+            vehicleClassEvaluation: vehicleClassEvaluation,
+            widthEvaluation: widthEvaluation,
+            diameterEvaluation: diameterEvaluation,
+            aspectRatioEvaluation: aspectRatioEvaluation,
+            constructionEvaluation: constructionEvaluation,
+            loadRangeEvaluation: loadRangeEvaluation,
+            loadIndexEvaluation: loadIndexEvaluation,
+            loadIndex2Evaluation: loadIndex2Evaluation,
+            speedRatingEvaluation: speedRatingEvaluation
+        );
     }
 
     private ParameterEvaluationValueObject? GetParameterMatch(string? parameter1, string? parameter2)

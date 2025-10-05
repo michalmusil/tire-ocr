@@ -18,7 +18,7 @@ public record EvaluationDto(
     ParameterEvaluationDto? SpeedRatingEvaluation
 )
 {
-    public static EvaluationDto FromDomain(EvaluationValueObject domain) => new EvaluationDto(
+    public static EvaluationDto FromDomain(EvaluationEntity domain) => new EvaluationDto(
         ExpectedTireCode: TireCodeDto.FromDomain(domain.ExpectedTireCode),
         TotalDistance: domain.TotalDistance,
         FullMatchParameterCount: domain.FullMatchParameterCount,

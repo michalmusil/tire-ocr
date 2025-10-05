@@ -7,5 +7,5 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 
 public interface IOcrProcessor
 {
-    public Task<DataResult<OcrResultValueObject>> Process(ImageDto image, OcrType ocrType);
+    public Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType);
 }
