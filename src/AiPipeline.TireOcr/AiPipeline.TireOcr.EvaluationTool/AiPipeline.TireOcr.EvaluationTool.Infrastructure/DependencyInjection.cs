@@ -27,6 +27,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IContentTypeValidationService, StaticContentTypeValidationService>();
         services.AddScoped<ITireCodeSimilarityEvaluationService, TireCodeSimilarityEvaluationService>();
+        services.AddScoped<ICsvParserService, CsvParserService>();
         services.AddHttpClient<IImageDownloadService, ImageDownloaderService>();
 
         services.AddScoped<PreprocessingNoneProcessor>();

@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
@@ -23,9 +24,20 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
             Title: request.BatchTitle
         );
 
+        var imageUrlsWithExpectedTireCodes = request.ImageUrlsWithExpectedTireCodeLabels
+            .ToDictionary(
+                keySelector: kvp => kvp.Key,
+                elementSelector: kvp =>
+                {
+                    var expectedTireCodeResult = kvp.Value is null
+                        ? null
+                        : TireCodeValueObject.FromLabelString(kvp.Value);
+                    return expectedTireCodeResult?.Data;
+                }
+            );
+
         var result = await _runFacade.RunEvaluationBatchAsync(
-            imageUrls: request.InputImagesWithExpectedTireCodes
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value?.ToDomain()),
+            imageUrls: imageUrlsWithExpectedTireCodes,
             batchSize: request.ProcessingBatchSize,
             runConfig: request.RunConfig,
             runEntityInputDetailsDto: inputDetails

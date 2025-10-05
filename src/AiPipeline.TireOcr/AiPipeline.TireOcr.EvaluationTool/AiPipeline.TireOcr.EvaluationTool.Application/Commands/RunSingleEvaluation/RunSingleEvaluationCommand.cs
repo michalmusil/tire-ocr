@@ -7,7 +7,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunSingleEvalua
 public record RunSingleEvaluationCommand(
     ImageDto? InputImage,
     string? InputImageUrl,
-    TireCodeDto? ExpectedTireCode,
+    string? ExpectedTireCodeLabel,
     RunConfigDto RunConfig,
     Guid? RunId = null,
     string? RunTitle = null

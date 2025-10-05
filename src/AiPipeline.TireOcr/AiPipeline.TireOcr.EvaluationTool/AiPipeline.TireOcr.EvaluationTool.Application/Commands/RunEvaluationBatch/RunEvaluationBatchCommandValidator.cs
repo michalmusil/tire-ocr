@@ -6,7 +6,7 @@ public class RunEvaluationBatchCommandValidator : AbstractValidator<RunEvaluatio
 {
     public RunEvaluationBatchCommandValidator()
     {
-        RuleFor(c => c.InputImagesWithExpectedTireCodes)
+        RuleFor(c => c.ImageUrlsWithExpectedTireCodeLabels)
             .NotNull()
             .NotEmpty();
 
