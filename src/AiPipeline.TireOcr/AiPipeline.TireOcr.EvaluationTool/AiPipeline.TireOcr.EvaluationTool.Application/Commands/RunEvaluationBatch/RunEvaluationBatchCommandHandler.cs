@@ -8,7 +8,7 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunEvaluationBatch;
 
-public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBatchCommand, EvaluationRunBatchDto>
+public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBatchCommand, EvaluationRunBatchFullDto>
 {
     private readonly IRunFacade _runFacade;
     private readonly IUnitOfWork _unitOfWork;
@@ -19,7 +19,7 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<DataResult<EvaluationRunBatchDto>> Handle(RunEvaluationBatchCommand request,
+    public async Task<DataResult<EvaluationRunBatchFullDto>> Handle(RunEvaluationBatchCommand request,
         CancellationToken cancellationToken)
     {
         var inputDetails = new RunEntityInputDetailsDto(
@@ -47,13 +47,13 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
         );
 
         if (result.IsFailure)
-            return DataResult<EvaluationRunBatchDto>.Failure(result.Failures);
+            return DataResult<EvaluationRunBatchFullDto>.Failure(result.Failures);
 
         var batch = result.Data!;
         await _unitOfWork.EvaluationRunBatchRepository.Add(batch);
         await _unitOfWork.SaveChangesAsync();
 
-        var dto = EvaluationRunBatchDto.FromDomain(result.Data!);
-        return DataResult<EvaluationRunBatchDto>.Success(dto);
+        var dto = EvaluationRunBatchFullDto.FromDomain(result.Data!);
+        return DataResult<EvaluationRunBatchFullDto>.Success(dto);
     }
 }

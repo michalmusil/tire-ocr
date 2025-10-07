@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using TireOcr.Shared.UseCase;
 
@@ -9,4 +10,4 @@ public record RunEvaluationBatchCommand(
     int ProcessingBatchSize = 5,
     Guid? BatchId = null,
     string? BatchTitle = null
-) : ICommand<EvaluationRunBatchDto>;
+) : ICommand<EvaluationRunBatchFullDto>;
