@@ -127,7 +127,7 @@ public class RunController : ControllerBase
 
         var result = await _mediator.Send(command);
 
-        return result.ToActionResult<EvaluationRunBatchDto, RunBatchJsonOnlyResponse>(
+        return result.ToActionResult<EvaluationRunBatchFullDto, RunBatchJsonOnlyResponse>(
             onSuccess: dto => new RunBatchJsonOnlyResponse(dto)
         );
     }
@@ -172,7 +172,7 @@ public class RunController : ControllerBase
 
         var result = await _mediator.Send(command);
 
-        return result.ToActionResult<EvaluationRunBatchDto, RunBatchFormResponse>(
+        return result.ToActionResult<EvaluationRunBatchFullDto, RunBatchFormResponse>(
             onSuccess: dto => new RunBatchFormResponse(dto)
         );
     }

@@ -9,7 +9,7 @@ public interface IEvaluationRunBatchEntityRepository : IEntityRepository
     public Task<PaginatedCollection<EvaluationRunBatchEntity>> GetEvaluationRunBatchesPaginatedAsync(
         PaginationParams pagination);
 
-    public Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id);
+    public Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id, bool includeFullData);
 
     public Task Add(EvaluationRunBatchEntity batch);
     public Task AddRange(IEnumerable<EvaluationRunBatchEntity> batch);

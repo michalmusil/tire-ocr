@@ -21,15 +21,19 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
     public async Task<PaginatedCollection<EvaluationRunBatchEntity>> GetEvaluationRunBatchesPaginatedAsync(
         PaginationParams pagination)
     {
-        var query = GetBasicQuery()
+        var query = _dbContext.EvaluationRunBatches
             .OrderByDescending(erb => erb.UpdatedAt);
 
         return await query.ToPaginatedList(pagination);
     }
 
-    public async Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id)
+    public async Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id, bool includeFullData)
     {
-        return await GetBasicQuery()
+        var query = includeFullData
+            ? GetFullQuery()
+            : _dbContext.EvaluationRunBatches;
+
+        return await query
             .FirstOrDefaultAsync(erb => erb.Id == id);
     }
 
@@ -49,7 +53,7 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
         return Task.CompletedTask;
     }
 
-    private IQueryable<EvaluationRunBatchEntity> GetBasicQuery()
+    private IQueryable<EvaluationRunBatchEntity> GetFullQuery()
     {
         return _dbContext.EvaluationRunBatches
             .Include(erb => erb.EvaluationRuns)

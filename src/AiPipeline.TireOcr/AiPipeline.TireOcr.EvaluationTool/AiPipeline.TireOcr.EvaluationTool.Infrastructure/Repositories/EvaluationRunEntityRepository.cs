@@ -27,6 +27,14 @@ public class EvaluationRunEntityRepository : IEvaluationRunEntityRepository
         return await query.ToPaginatedList(pagination);
     }
 
+    public async Task<IEnumerable<EvaluationRunEntity>> GetEvaluationRunsByBatchIdAsync(Guid batchId)
+    {
+        return await GetBasicQuery()
+            .Where(er => er.BatchId == batchId)
+            .OrderByDescending(er => er.UpdatedAt)
+            .ToListAsync();
+    }
+
     public async Task<EvaluationRunEntity?> GetEvaluationRunByIdAsync(Guid id)
     {
         return await GetBasicQuery()
