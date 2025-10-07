@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 
-namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunBatchForm;
+namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Batch.RunBatchForm;
 
 public record RunBatchFormRequest(
     [Required] IFormFile ImageUrlsWithExpectedTireCodeLabelsCsv,

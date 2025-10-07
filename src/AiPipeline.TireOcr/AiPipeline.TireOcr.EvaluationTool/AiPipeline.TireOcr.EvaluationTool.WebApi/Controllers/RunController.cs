@@ -1,16 +1,17 @@
-using AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunSingleEvaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
-using AiPipeline.TireOcr.EvaluationTool.Application.Services;
-using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunBatchForm;
-using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunBatchJsonOnly;
+using AiPipeline.TireOcr.EvaluationTool.Application.Queries.GetEvaluationRunById;
+using AiPipeline.TireOcr.EvaluationTool.Application.Queries.GetEvaluationRunsPaginated;
+using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.GetById;
+using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.GetPaginated;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunWithImage;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunWithImageUrl;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.Extensions;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Controllers;
@@ -21,14 +22,41 @@ namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Controllers;
 public class RunController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly ICsvParserService _csvParserService;
     private readonly ILogger<RunController> _logger;
 
-    public RunController(IMediator mediator, ILogger<RunController> logger, ICsvParserService csvParserService)
+    public RunController(IMediator mediator, ILogger<RunController> logger)
     {
         _mediator = mediator;
         _logger = logger;
-        _csvParserService = csvParserService;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<GetRunsPaginatedResponse>> GetAllResults([FromQuery] GetRunsPaginatedRequest request)
+    {
+        var query = new GetEvaluationRunsPaginatedQuery(new PaginationParams(request.PageNumber, request.PageSize));
+        var result = await _mediator.Send(query);
+
+        return result.ToActionResult<PaginatedCollection<EvaluationRunDto>, GetRunsPaginatedResponse>(
+            onSuccess: dto => new GetRunsPaginatedResponse(dto.Items, dto.Pagination)
+        );
+    }
+
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<GetRunByIdResponse>> GetResultOfPipeline([FromRoute] Guid id)
+    {
+        var query = new GetEvaluationRunByIdQuery(id);
+        var result = await _mediator.Send(query);
+
+        return result.ToActionResult<EvaluationRunDto, GetRunByIdResponse>(
+            onSuccess: dto => new GetRunByIdResponse(dto)
+        );
     }
 
     [HttpPost("WithImage")]
@@ -99,81 +127,6 @@ public class RunController : ControllerBase
 
         return result.ToActionResult<EvaluationRunDto, RunWithImageUrlResponse>(
             onSuccess: dto => new RunWithImageUrlResponse(dto)
-        );
-    }
-
-    [HttpPost("Batch/Json")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunBatchJsonOnlyResponse))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<RunBatchJsonOnlyResponse>> RunBatchJsonOnly(
-        [FromBody] RunBatchJsonOnlyRequest request)
-    {
-        var runConfig = new RunConfigDto(
-            PreprocessingType: request.PreprocessingType,
-            OcrType: request.OcrType,
-            PostprocessingType: request.PostprocessingType,
-            DbMatchingType: request.DbMatchingType
-        );
-
-        var command = new RunEvaluationBatchCommand(
-            ImageUrlsWithExpectedTireCodeLabels: request.ImageUrlsWithExpectedTireCodeLabels,
-            RunConfig: runConfig,
-            ProcessingBatchSize: request.ProcessingBatchSize,
-            BatchId: request.RunId,
-            BatchTitle: request.RunTitle
-        );
-
-        var result = await _mediator.Send(command);
-
-        return result.ToActionResult<EvaluationRunBatchFullDto, RunBatchJsonOnlyResponse>(
-            onSuccess: dto => new RunBatchJsonOnlyResponse(dto)
-        );
-    }
-
-    [HttpPost("Batch/Form")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunBatchFormResponse))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<RunBatchFormResponse>> RunBatchJsonOnly(
-        [FromForm] RunBatchFormRequest request)
-    {
-        var csvFile = request.ImageUrlsWithExpectedTireCodeLabelsCsv;
-        if (csvFile.Length < 1)
-            return BadRequest("The CSV file must contain at least one url-label pair (label is optional)");
-
-        var isCsvFile = Path.GetExtension(csvFile.FileName)
-            .Equals(".csv", StringComparison.OrdinalIgnoreCase);
-        if (!isCsvFile)
-            return BadRequest("Only .csv files are accepted.");
-
-        await using var csvFileStream = csvFile.OpenReadStream();
-        var parsingResult = await _csvParserService.ParseImageUrlLabelPairs(csvFileStream);
-        if (parsingResult.IsFailure)
-            return UnprocessableEntity(parsingResult.PrimaryFailure?.Message ?? "Failed to parse CSV file.");
-
-
-        var runConfig = new RunConfigDto(
-            PreprocessingType: request.PreprocessingType,
-            OcrType: request.OcrType,
-            PostprocessingType: request.PostprocessingType,
-            DbMatchingType: request.DbMatchingType
-        );
-
-        var command = new RunEvaluationBatchCommand(
-            ImageUrlsWithExpectedTireCodeLabels: parsingResult.Data!,
-            RunConfig: runConfig,
-            ProcessingBatchSize: request.ProcessingBatchSize,
-            BatchId: request.RunId,
-            BatchTitle: request.RunTitle
-        );
-
-        var result = await _mediator.Send(command);
-
-        return result.ToActionResult<EvaluationRunBatchFullDto, RunBatchFormResponse>(
-            onSuccess: dto => new RunBatchFormResponse(dto)
         );
     }
 }
