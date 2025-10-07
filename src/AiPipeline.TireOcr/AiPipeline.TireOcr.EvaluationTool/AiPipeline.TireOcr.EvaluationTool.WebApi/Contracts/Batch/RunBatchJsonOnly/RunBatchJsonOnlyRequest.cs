@@ -2,7 +2,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 
-namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Run.RunBatchJsonOnly;
+namespace AiPipeline.TireOcr.EvaluationTool.WebApi.Contracts.Batch.RunBatchJsonOnly;
 
 public record RunBatchJsonOnlyRequest(
     [Required] Dictionary<string, string?> ImageUrlsWithExpectedTireCodeLabels,

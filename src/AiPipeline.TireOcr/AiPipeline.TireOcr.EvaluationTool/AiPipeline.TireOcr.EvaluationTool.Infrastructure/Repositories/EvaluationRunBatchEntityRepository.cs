@@ -27,13 +27,9 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
         return await query.ToPaginatedList(pagination);
     }
 
-    public async Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id, bool includeFullData)
+    public async Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id)
     {
-        var query = includeFullData
-            ? GetFullQuery()
-            : _dbContext.EvaluationRunBatches;
-
-        return await query
+        return await _dbContext.EvaluationRunBatches
             .FirstOrDefaultAsync(erb => erb.Id == id);
     }
 
@@ -51,20 +47,5 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
     {
         _dbContext.EvaluationRunBatches.Remove(batch);
         return Task.CompletedTask;
-    }
-
-    private IQueryable<EvaluationRunBatchEntity> GetFullQuery()
-    {
-        return _dbContext.EvaluationRunBatches
-            .Include(erb => erb.EvaluationRuns)
-            .ThenInclude(er => er.Evaluation)
-            .Include(erb => erb.EvaluationRuns)
-            .ThenInclude(er => er.PreprocessingResult)
-            .Include(erb => erb.EvaluationRuns)
-            .ThenInclude(er => er.OcrResult)
-            .Include(erb => erb.EvaluationRuns)
-            .ThenInclude(er => er.PostprocessingResult)
-            .Include(erb => erb.EvaluationRuns)
-            .ThenInclude(er => er.DbMatchingResult);
     }
 }
