@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.BatchEvaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 
@@ -8,16 +9,19 @@ public record EvaluationRunBatchFullDto(
     string Title,
     DateTime StartedAt,
     DateTime FinishedAt,
+    BatchEvaluationDto? BatchEvaluation,
     IEnumerable<EvaluationRunDto> EvaluationRuns
 )
 {
-    public static EvaluationRunBatchFullDto FromDomain(EvaluationRunBatchEntity domain)
+    public static EvaluationRunBatchFullDto FromDomain(EvaluationRunBatchEntity domain,
+        BatchEvaluationDto? batchEvaluation)
     {
         return new EvaluationRunBatchFullDto(
             Id: domain.Id.ToString(),
             Title: domain.Title,
             StartedAt: domain.StartedAt ?? DateTime.MinValue.ToUniversalTime(),
             FinishedAt: domain.FinishedAt ?? DateTime.UtcNow,
+            BatchEvaluation: batchEvaluation,
             EvaluationRuns: domain.EvaluationRuns
                 .Select(EvaluationRunDto.FromDomain)
         );

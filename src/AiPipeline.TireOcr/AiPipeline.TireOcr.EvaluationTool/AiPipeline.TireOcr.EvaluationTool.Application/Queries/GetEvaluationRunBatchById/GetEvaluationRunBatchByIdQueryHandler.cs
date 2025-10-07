@@ -1,5 +1,6 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
+using AiPipeline.TireOcr.EvaluationTool.Application.Services;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -10,10 +11,12 @@ public class
     GetEvaluationRunBatchByIdQueryHandler : IQueryHandler<GetEvaluationRunBatchByIdQuery, EvaluationRunBatchFullDto>
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBatchEvaluationService _batchEvaluationService;
 
-    public GetEvaluationRunBatchByIdQueryHandler(IUnitOfWork unitOfWork)
+    public GetEvaluationRunBatchByIdQueryHandler(IUnitOfWork unitOfWork, IBatchEvaluationService batchEvaluationService)
     {
         _unitOfWork = unitOfWork;
+        _batchEvaluationService = batchEvaluationService;
     }
 
     public async Task<DataResult<EvaluationRunBatchFullDto>> Handle(GetEvaluationRunBatchByIdQuery request,
@@ -31,7 +34,9 @@ public class
             evaluationRuns: runs.ToList()
         );
 
-        var dto = EvaluationRunBatchFullDto.FromDomain(batchWithRuns);
+        var batchEvaluation = await _batchEvaluationService.EvaluateBatch(batchWithRuns);
+
+        var dto = EvaluationRunBatchFullDto.FromDomain(batchWithRuns, batchEvaluation.Data);
         return DataResult<EvaluationRunBatchFullDto>.Success(dto);
     }
 }
