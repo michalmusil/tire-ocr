@@ -53,7 +53,7 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
         await _unitOfWork.EvaluationRunBatchRepository.Add(batch);
         await _unitOfWork.SaveChangesAsync();
 
-        var dto = EvaluationRunBatchFullDto.FromDomain(result.Data!);
+        var dto = EvaluationRunBatchFullDto.FromDomain(result.Data!, null);
         return DataResult<EvaluationRunBatchFullDto>.Success(dto);
     }
 }
