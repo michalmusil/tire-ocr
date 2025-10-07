@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
@@ -10,10 +11,12 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.Commands.RunSingleEvalua
 public class RunSingleEvaluationCommandHandler : ICommandHandler<RunSingleEvaluationCommand, EvaluationRunDto>
 {
     private readonly IRunFacade _runFacade;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public RunSingleEvaluationCommandHandler(IRunFacade runFacade)
+    public RunSingleEvaluationCommandHandler(IRunFacade runFacade, IUnitOfWork unitOfWork)
     {
         _runFacade = runFacade;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<DataResult<EvaluationRunDto>> Handle(RunSingleEvaluationCommand request,
@@ -44,6 +47,10 @@ public class RunSingleEvaluationCommandHandler : ICommandHandler<RunSingleEvalua
 
         if (result.IsFailure)
             return DataResult<EvaluationRunDto>.Failure(result.Failures);
+
+        var evaluationRun = result.Data!;
+        await _unitOfWork.EvaluationRunRepository.Add(evaluationRun);
+        await _unitOfWork.SaveChangesAsync();
 
         var dto = EvaluationRunDto.FromDomain(result.Data!);
         return DataResult<EvaluationRunDto>.Success(dto);
