@@ -1,10 +1,13 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Application.Facades;
+using AiPipeline.TireOcr.EvaluationTool.Application.Repositories;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Extensions;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Facades;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Repositories;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.ProcessorMappers;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.Processors.DbMatching;
@@ -21,10 +24,23 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        AddRepositories(services);
+        AddUnitOfWork(services);
         AddServices(services);
         AddFacades(services);
         AddDbContext(services, configuration);
         return services;
+    }
+
+    public static void AddUnitOfWork(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
+    }
+
+    public static void AddRepositories(this IServiceCollection serviceCollection)
+    {
+        serviceCollection.AddScoped<IEvaluationRunEntityRepository, EvaluationRunEntityRepository>();
+        serviceCollection.AddScoped<IEvaluationRunBatchEntityRepository, EvaluationRunBatchEntityRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
