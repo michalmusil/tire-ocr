@@ -51,7 +51,6 @@ public static class DependencyInjection
         services.AddScoped<IBatchEvaluationService, BatchEvaluationService>();
         services.AddHttpClient<IImageDownloadService, ImageDownloaderService>();
 
-        services.AddScoped<PreprocessingNoneProcessor>();
         services.AddHttpClient<PreprocessingRoiExtractionProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://PreprocessingService");
@@ -79,6 +78,18 @@ public static class DependencyInjection
         services.AddHttpClient<OcrRemoteServicesProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://OcrService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(90);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
+        services.AddHttpClient<OcrRemotePaddleProcessor>(client =>
+            {
+                client.BaseAddress = new("https+http://OcrPaddleService");
             })
             .RemoveResilienceHandlers()
             .AddStandardResilienceHandler(opt =>
