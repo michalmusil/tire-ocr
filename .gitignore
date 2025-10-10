@@ -340,6 +340,10 @@ paket-files/
 __pycache__/
 *.pyc
 
+# Python realted
+**/.venv/
+poetry.lock
+
 # Cake - Uncomment if you are using it
 # tools/**
 # !tools/packages.config
