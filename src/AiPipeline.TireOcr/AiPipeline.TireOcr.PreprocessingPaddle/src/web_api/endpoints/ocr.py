@@ -20,18 +20,18 @@ router = APIRouter(
     description="Accepts an image file via multipart/form-data and returns recognized text if found, 404 otherwise.",
 )
 async def perform_paddle_ocr(
-    image_file: Annotated[
+    image: Annotated[
         UploadFile, File(description="Image file to perform Tire OCR on.")
     ],
     ocr_service: Annotated[OcrService, Depends(get_ocr_service)],
 ) -> OCRResult:
-    content_type: str = image_file.content_type if image_file.content_type else ""
+    content_type: str = image.content_type if image.content_type else ""
     if not content_type.startswith("image/"):
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail=f"Invalid file type. Expected an image, got {content_type}",
         )
-    image_bytes: bytes = await image_file.read()
+    image_bytes: bytes = await image.read()
 
     if not image_bytes:
         raise HTTPException(
@@ -55,5 +55,5 @@ async def perform_paddle_ocr(
 
     return OCRResponse(
         detectedCode=ocr_result.extracted_text,
-        durationMs=ocr_result.duration_ms,
+        DurationMs=ocr_result.duration_ms,
     )

@@ -9,10 +9,13 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Services.ProcessorMap
 public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
 {
     private readonly OcrRemoteServicesProcessor _remoteServicesProcessor;
+    private readonly OcrRemotePaddleProcessor _remotePaddleProcessor;
 
-    public OcrProcessorMapper(OcrRemoteServicesProcessor remoteServicesProcessor)
+    public OcrProcessorMapper(OcrRemoteServicesProcessor remoteServicesProcessor,
+        OcrRemotePaddleProcessor remotePaddleProcessor)
     {
         _remoteServicesProcessor = remoteServicesProcessor;
+        _remotePaddleProcessor = remotePaddleProcessor;
     }
 
     public DataResult<IOcrProcessor> Map(OcrType input)
@@ -24,7 +27,7 @@ public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
             OcrType.OpenAiGpt => _remoteServicesProcessor,
             OcrType.GoogleCloudVision => _remoteServicesProcessor,
             OcrType.AzureAiVision => _remoteServicesProcessor,
-            OcrType.PaddleOcr => throw new NotImplementedException(), // TODO: implement ocr processor for PaddleOcr
+            OcrType.PaddleOcr => _remotePaddleProcessor,
             _ => null
         };
 
