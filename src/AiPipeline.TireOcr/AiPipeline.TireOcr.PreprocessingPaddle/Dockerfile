@@ -1,4 +1,4 @@
-FROM python:3.13.8-slim-bookworm as build
+FROM amd64/python:3.13.8-slim-bookworm as build
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -26,7 +26,7 @@ RUN touch README.md
 RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
 
-FROM python:3.13.8-slim-bookworm as final
+FROM amd64/python:3.13.8-slim-bookworm as final
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

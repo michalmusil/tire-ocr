@@ -14,7 +14,7 @@ def get_paddle_ocr_engine() -> PaddleOCR:
     global PADDLE_OCR_ENGINE
     if PADDLE_OCR_ENGINE is None:
         print("PaddleOCR: INITIALIZING")
-        PADDLE_OCR_ENGINE = PaddleOCR(use_angle_cls=True, lang="en")
+        PADDLE_OCR_ENGINE = PaddleOCR(use_textline_orientation=True, lang="en")
         print("PaddleOCR: INITIALIZED")
     return PADDLE_OCR_ENGINE
 
