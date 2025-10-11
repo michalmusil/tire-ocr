@@ -1,4 +1,4 @@
-FROM python:3.13.8-slim-bookworm as build
+FROM amd64/python:3.13.8-slim-bookworm as build
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -18,15 +18,15 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 
-COPY pyproject.toml ./
-COPY main.py ./
-COPY src ./src
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/pyproject.toml ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/main.py ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/src ./src
 RUN touch README.md
 
 RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
 
 
-FROM python:3.13.8-slim-bookworm as final
+FROM amd64/python:3.13.8-slim-bookworm as final
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -40,8 +40,8 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 WORKDIR /app
 COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY main.py ./
-COPY src ./src
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/main.py ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/src ./src
 EXPOSE 10100
 
 # Pre-download PaddleOCR models during the build
