@@ -1,0 +1,92 @@
+services:
+  PreprocessingService:
+    container_name: "PreprocessingService"
+    image: "michalmusil/tire-ocr_preprocessing-service:latest"
+    volumes:
+      - preprocessing-volume:/app/models
+    networks:
+      - aipipeline-tireocr-network 
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+    restart: unless-stopped
+  OcrService:
+    container_name: "OcrService"
+    image: "michalmusil/tire-ocr_ocr-service:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      ApiKeys__Gemini: ${ApiKeys_Gemini}
+      ApiKeys__AzureAiVision: ${ApiKeys_AzureAiVision}
+      ApiKeys__Mistral: ${ApiKeys_Mistral}
+      ApiKeys__OpenAi: ${ApiKeys_OpenAi}
+      ApiKeys__GcpJsonCredentials: ${ApiKeys_GcpJsonCredentials}
+      HTTP_PORTS: "8080"
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
+  OcrPaddleService:
+    container_name: "OcrPaddleService"
+    image: "michalmusil/tire-ocr_ocr-paddle-service:latest"
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
+  PostprocessingService:
+    container_name: "PostprocessingService"
+    image: "michalmusil/tire-ocr_postprocessing-service:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
+  TasyDbMatcherService:
+    container_name: "TasyDbMatcherService"
+    image: "michalmusil/tire-ocr_tire-db-matcher-service:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      RemoteTireDbAddress: ${TireDbEndpoint}
+      RemoteManufacturerDbAddress: ${ManufacturerDbEndpoint}
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
+  EvaluationTool:
+    container_name: "EvaluationTool"
+    image: "michalmusil/tire-ocr_evaluation-tool:latest"
+    environment:
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
+      OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
+      ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
+      HTTP_PORTS: "8080"
+      services__PreprocessingService__http__0: "http://PreprocessingService:8080"
+      services__OcrService__http__0: "http://OcrService:8080"
+      services__PostprocessingService__http__0: "http://PostprocessingService:8080"
+      services__TasyDbMatcherService__http__0: "http://TasyDbMatcherService:8080"
+      services__OcrPaddleService__http__0: "http://OcrPaddleService:10100"
+    ports:
+      - target: 8080
+        published: 10006
+      - target: 8443
+        published: 10007
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
+volumes:
+  preprocessing-volume:
+    driver: local
+networks:
+  aipipeline-tireocr-network:
+    external: true
