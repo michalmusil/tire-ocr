@@ -228,26 +228,28 @@ public class RunFacade : IRunFacade
                     );
                     results.Add(fallbackEvaluationRun);
                 }
+                else if(downloadedImage is not null)
+                {
+                    var result = await RunSingleEvaluationAsync(
+                        image: downloadedImage,
+                        runConfig: runConfig,
+                        expectedTireCode: expectedTireCode,
+                        runEntityInputDetailsDto: null
+                    );
 
-                var result = await RunSingleEvaluationAsync(
-                    image: downloadedImage!,
-                    runConfig: runConfig,
-                    expectedTireCode: expectedTireCode,
-                    runEntityInputDetailsDto: null
-                );
-
-                results.Add(
-                    result.Map(
-                        onSuccess: r => r,
-                        onFailure: unexpectedFailures =>
-                        {
-                            fallbackEvaluationRun.SetFailure(
-                                EvaluationRunFailureValueObject.UnexpectedFailure(unexpectedFailures.First())
-                            );
-                            return fallbackEvaluationRun;
-                        }
-                    )
-                );
+                    results.Add(
+                        result.Map(
+                            onSuccess: r => r,
+                            onFailure: unexpectedFailures =>
+                            {
+                                fallbackEvaluationRun.SetFailure(
+                                    EvaluationRunFailureValueObject.UnexpectedFailure(unexpectedFailures.First())
+                                );
+                                return fallbackEvaluationRun;
+                            }
+                        )
+                    );   
+                }
             });
 
         await Task.WhenAll(batchProcessingTasks);
