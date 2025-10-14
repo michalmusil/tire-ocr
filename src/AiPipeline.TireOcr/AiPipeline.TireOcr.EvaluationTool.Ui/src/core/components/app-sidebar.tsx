@@ -10,7 +10,9 @@ const AppSidebar: React.FC = () => {
   const menuItems = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
     { to: "/runs", icon: List, label: "Evaluation Runs" },
+    { to: "/batches", icon: List, label: "Evaluation Batches" },
     { to: "/create-run", icon: FilePlus, label: "New Run" },
+    { to: "/create-batch", icon: FilePlus, label: "New Batch" },
   ];
 
   return (
