@@ -5,13 +5,17 @@ import {
   type RunBatch,
 } from "../dtos/get-run-batch-dto";
 import { EvaluationRunBatchesTable } from "../components/evaluation-run-batches-table";
+import { useSearchParams } from "react-router-dom";
+import { GenericPagination } from "@/core/components/generic-pagination";
 
 const EvaluationBatchesPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const pageNumber = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("size") || "15", 10);
+
   const [batches, setBatches] = useState<RunBatch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -37,8 +41,14 @@ const EvaluationBatchesPage: React.FC = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex flex-col justify-center items-center">
       <EvaluationRunBatchesTable batches={batches} />
+      <GenericPagination
+        className="mt-5"
+        currentPage={pageNumber}
+        totalPages={totalPages}
+        getPageHref={(page) => `/batches?page=${page}&size=${pageSize}`}
+      />
     </div>
   );
 };

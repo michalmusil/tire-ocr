@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { PaginatedEvaluationRunsSchema } from "../dtos/get-evaluation-run-dto";
 import { EvaluationRunsTable } from "../components/evaluation-runs-table";
+import { GenericPagination } from "@/core/components/generic-pagination";
 
 const EvaluationRunsPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const pageNumber = parseInt(searchParams.get("page") || "1", 10);
+  const pageSize = parseInt(searchParams.get("size") || "15", 10);
+
   const [runs, setRuns] = useState<EvaluationRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
-  const [pageSize] = useState(15);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -40,8 +44,14 @@ const EvaluationRunsPage: React.FC = () => {
     );
 
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex flex-col justify-center items-center">
       <EvaluationRunsTable runs={runs} />
+      <GenericPagination
+        className="mt-5"
+        currentPage={pageNumber}
+        totalPages={totalPages}
+        getPageHref={(page) => `/runs?page=${page}&size=${pageSize}`}
+      />
     </div>
   );
 };
