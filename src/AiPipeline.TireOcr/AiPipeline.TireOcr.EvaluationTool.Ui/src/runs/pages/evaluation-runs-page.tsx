@@ -4,7 +4,7 @@ import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { PaginatedEvaluationRunsSchema } from "../dtos/get-evaluation-run-dto";
 import { EvaluationRunsTable } from "../components/evaluation-runs-table";
 
-const EvaluationRuns: React.FC = () => {
+const EvaluationRunsPage: React.FC = () => {
   const [runs, setRuns] = useState<EvaluationRun[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -46,4 +46,4 @@ const EvaluationRuns: React.FC = () => {
   );
 };
 
-export default EvaluationRuns;
+export default EvaluationRunsPage;
