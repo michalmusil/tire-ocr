@@ -37,7 +37,7 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
           <TableRow
             key={run.id}
             onClick={() => handleRowClick(run.id)}
-            className="cursor-pointer hover:bg-muted-foreground"
+            className="cursor-pointer"
           >
             <TableCell>{run.title}</TableCell>
             <TableCell>{run.failure ? "🔴 Failed" : "🟢 Success"}</TableCell>

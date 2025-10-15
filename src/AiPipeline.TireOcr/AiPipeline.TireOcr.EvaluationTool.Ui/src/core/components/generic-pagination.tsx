@@ -53,23 +53,19 @@ export function GenericPagination({
         </PaginationItem>
 
         {pagesToShow.map((page, index) => (
-          <>
+          <div className="flex flex-row" key={index}>
             {index > 0 && page - pagesToShow[index - 1] > 1 && (
               <PaginationEllipsis />
             )}
             <PaginationItem key={page}>
               <PaginationLink
                 href={getPageHref(page)}
-                // onClick={(e) => {
-                //   e.preventDefault();
-                //   onPageChange(page);
-                // }}
                 isActive={page === currentPage}
               >
                 {page}
               </PaginationLink>
             </PaginationItem>
-          </>
+          </div>
         ))}
 
         <PaginationItem>

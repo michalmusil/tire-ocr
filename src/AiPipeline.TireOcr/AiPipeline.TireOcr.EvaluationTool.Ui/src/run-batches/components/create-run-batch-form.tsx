@@ -7,7 +7,7 @@ import {
   OcrTypeSchema,
   PostprocessingTypeSchema,
   PreprocessingTypeSchema,
-} from "@/core/dtos/run-steps-types";
+} from "@/core/models/run-steps-types";
 import FormSelectInput from "@/core/components/form-select-input";
 import { Button } from "@/core/components/ui/button";
 import FormFileInput from "@/core/components/form-file-input";

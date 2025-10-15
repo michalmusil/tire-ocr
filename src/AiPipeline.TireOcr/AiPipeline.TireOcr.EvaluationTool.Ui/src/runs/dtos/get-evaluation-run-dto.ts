@@ -1,9 +1,10 @@
+import { PaginationSchema } from "@/core/models/pagination";
 import {
   DbMatchingTypeSchema,
   OcrTypeSchema,
   PostprocessingTypeSchema,
   PreprocessingTypeSchema,
-} from "@/core/dtos/run-steps-types";
+} from "@/core/models/run-steps-types";
 import { z } from "zod";
 
 const ImageFileSchema = z.object({
@@ -92,12 +93,7 @@ export type EvaluationRun = z.infer<typeof EvaluationRunSchema>;
 
 export const PaginatedEvaluationRunsSchema = z.object({
   items: z.array(EvaluationRunSchema),
-  pagination: z.object({
-    pageNumber: z.number(),
-    pageSize: z.number(),
-    totalPages: z.number(),
-    totalCount: z.number(),
-  }),
+  pagination: PaginationSchema,
 });
 export type PaginatedEvaluationRuns = z.infer<
   typeof PaginatedEvaluationRunsSchema
