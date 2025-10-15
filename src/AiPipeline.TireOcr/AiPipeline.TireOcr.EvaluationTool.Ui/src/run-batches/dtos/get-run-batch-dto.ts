@@ -1,3 +1,4 @@
+import { PaginationSchema } from "@/core/models/pagination";
 import { z } from "zod";
 
 export const RunBatchSchema = z.object({
@@ -9,12 +10,7 @@ export type RunBatch = z.infer<typeof RunBatchSchema>;
 
 export const PaginatedRunBatchesSchema = z.object({
   items: z.array(RunBatchSchema),
-  pagination: z.object({
-    pageNumber: z.number(),
-    pageSize: z.number(),
-    totalPages: z.number(),
-    totalCount: z.number(),
-  }),
+  pagination: PaginationSchema,
 });
 
 export type PaginatedRunBatches = z.infer<typeof PaginatedRunBatchesSchema>;
