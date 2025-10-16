@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import DefaultLayout from "./core/layouts/sidabar-layout";
 import EvaluationRunsPage from "./runs/pages/evaluation-runs-page";
 import EvaluationBatchesPage from "./run-batches/pages/evaluation-batches-page";
+import EvaluationBatchDetailPage from "./run-batches/pages/evaluation-batch-detail-page";
 import CreateRun from "./runs/pages/create-run-page";
 import CreateBatch from "./run-batches/pages/create-batch-page";
 
@@ -16,6 +17,7 @@ const App: React.FC = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/runs" element={<EvaluationRunsPage />} />
           <Route path="/batches" element={<EvaluationBatchesPage />} />
+          <Route path="/batches/:batchId" element={<EvaluationBatchDetailPage />} />
           <Route path="/create-run" element={<CreateRun />} />
           <Route path="/create-batch" element={<CreateBatch />} />
         </Routes>

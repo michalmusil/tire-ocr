@@ -3,6 +3,7 @@ import { EvaluationRunsTable } from "../components/evaluation-runs-table";
 import { GenericPagination } from "@/core/components/generic-pagination";
 import { useEvaluationRuns } from "../hooks/use-evaluation-runs";
 import SpinnerFullpage from "@/core/components/spinner-fullpage";
+import ErrorFullpage from "@/core/components/error-fullpage";
 
 const EvaluationRunsPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -14,11 +15,7 @@ const EvaluationRunsPage: React.FC = () => {
 
   if (pageStatus.isLoading) return <SpinnerFullpage />;
   if (pageStatus.errorMessage)
-    return (
-      <div className="text-red-500 text-center flex flex-row justify-center">
-        {pageStatus.errorMessage}
-      </div>
-    );
+    return <ErrorFullpage errorMessage={pageStatus.errorMessage} />;
 
   return (
     <div className="flex flex-col justify-center items-center">
