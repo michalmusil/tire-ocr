@@ -1,3 +1,4 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.Repositories;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.DataAccess;
@@ -18,11 +19,19 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
 
     public Task<int> SaveChangesAsync() => _dbContext.SaveChangesAsync();
 
-    public async Task<PaginatedCollection<EvaluationRunBatchEntity>> GetEvaluationRunBatchesPaginatedAsync(
+    public async Task<PaginatedCollection<EvaluationRunBatchLightDto>> GetEvaluationRunBatchesPaginatedAsync(
         PaginationParams pagination)
     {
         var query = _dbContext.EvaluationRunBatches
-            .OrderByDescending(erb => erb.UpdatedAt);
+            .OrderByDescending(erb => erb.CreatedAt)
+            .Select(erb => new EvaluationRunBatchLightDto(
+                erb.Id.ToString(),
+                erb.Title,
+                erb._evaluationRuns.Count,
+                erb.CreatedAt,
+                erb._evaluationRuns.Count > 0 ? erb._evaluationRuns.Min(e => e.StartedAt) : null,
+                erb._evaluationRuns.Count > 0 ? erb._evaluationRuns.Max(e => e.FinishedAt) : null
+            ));
 
         return await query.ToPaginatedList(pagination);
     }

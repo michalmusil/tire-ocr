@@ -26,7 +26,6 @@ public class GetEvaluationRunBatchesPaginatedQueryHandler
             .GetEvaluationRunBatchesPaginatedAsync(request.Pagination);
 
         var resultDtos = foundResults.Items
-            .Select(EvaluationRunBatchLightDto.FromDomain)
             .ToList();
 
         var dtosCollection = new PaginatedCollection<EvaluationRunBatchLightDto>(
