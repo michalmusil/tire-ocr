@@ -174,6 +174,7 @@ public class RunFacade : IRunFacade
             id: runEntityInputDetailsDto?.Id
         );
 
+        var completedCount = 0;
         var processedBatches = imageUrls.ToList().GetSubLists(batchSize);
         foreach (var batch in processedBatches)
         {
@@ -183,6 +184,8 @@ public class RunFacade : IRunFacade
                 runConfig: runConfig,
                 batchId: result.Id
             );
+            completedCount += batch.Count;
+            _logger.LogInformation($"BATCH COMPLETION: {completedCount}/{batchUrls.Count}");
 
             result.AddEvaluationRuns(processedBatch.ToArray());
         }
