@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/core/components/ui/table";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
+import { Check, X } from "lucide-react";
 
 type EvaluationRunsTableProps = {
   runs: EvaluationRun[];
@@ -40,7 +41,13 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
             className="cursor-pointer"
           >
             <TableCell>{run.title}</TableCell>
-            <TableCell>{run.failure ? "🔴 Failed" : "🟢 Success"}</TableCell>
+            <TableCell>
+              {run.failure ? (
+                <X className="text-red-500" />
+              ) : (
+                <Check className="text-green-500" />
+              )}
+            </TableCell>
             <TableCell>
               {(run.totalExecutionDurationMs / 1000).toFixed(2)}s
             </TableCell>
