@@ -24,21 +24,67 @@ export const BatchEvaluationCountsCard = ({
     countsEvaluation.failedPostprocessingCount +
     countsEvaluation.failedUnexpectedCount;
 
+  const falsePositives =
+    countsEvaluation.totalCount - totalCorrect - totalFailed;
+
+  const correctPercentage = (totalCorrect / countsEvaluation.totalCount) * 100;
+  const falsePositivePercentage =
+    (falsePositives / countsEvaluation.totalCount) * 100;
+  const noCodePercentage = (totalFailed / countsEvaluation.totalCount) * 100;
   return (
     <Card>
       <CardHeader>
         <CardTitle>Evaluation overview</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-10 items-start">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-10 items-start">
           <HeadingProperty
             label="Total Count"
             value={`${countsEvaluation.totalCount}`}
           />
+          <HeadingProperty
+            label="False positives"
+            value={`${falsePositives}`}
+            percentage={falsePositivePercentage}
+            className="text-red-600"
+          />
+          <div className="flex flex-col gap-y-1">
+            <HeadingProperty
+              label="No code detected"
+              value={`${totalFailed}`}
+              percentage={noCodePercentage}
+              className="text-orange-600 mb-2"
+            />
+            <PropertyDetails
+              details={[
+                {
+                  label: "preprocessing",
+                  value: `${countsEvaluation.failedPreprocessingCount}`,
+                  colorClass: "text-orange-600",
+                },
+                {
+                  label: "ocr",
+                  value: `${countsEvaluation.failedOcrCount}`,
+                  colorClass: "text-orange-600",
+                },
+                {
+                  label: "postprocessing",
+                  value: `${countsEvaluation.failedPostprocessingCount}`,
+                  colorClass: "text-orange-600",
+                },
+                {
+                  label: "unexpected",
+                  value: `${countsEvaluation.failedUnexpectedCount}`,
+                  colorClass: "text-orange-600",
+                },
+              ]}
+            />
+          </div>
           <div className="flex flex-col gap-y-1">
             <HeadingProperty
               label="Correct"
               value={`${totalCorrect}`}
+              percentage={correctPercentage}
               className="text-green-600 mb-2"
             />
             <PropertyDetails
@@ -56,37 +102,6 @@ export const BatchEvaluationCountsCard = ({
               ]}
             />
           </div>
-          <div className="flex flex-col gap-y-1">
-            <HeadingProperty
-              label="Failed"
-              value={`${totalFailed}`}
-              className="text-red-700 mb-2"
-            />
-            <PropertyDetails
-              details={[
-                {
-                  label: "preprocessing",
-                  value: `${countsEvaluation.failedPreprocessingCount}`,
-                  colorClass: "text-red-600",
-                },
-                {
-                  label: "ocr",
-                  value: `${countsEvaluation.failedOcrCount}`,
-                  colorClass: "text-red-600",
-                },
-                {
-                  label: "postprocessing",
-                  value: `${countsEvaluation.failedPostprocessingCount}`,
-                  colorClass: "text-red-600",
-                },
-                {
-                  label: "unexpected",
-                  value: `${countsEvaluation.failedUnexpectedCount}`,
-                  colorClass: "text-red-600",
-                },
-              ]}
-            />
-          </div>
         </div>
       </CardContent>
     </Card>
@@ -96,8 +111,9 @@ export const BatchEvaluationCountsCard = ({
 const HeadingProperty = ({
   label,
   value,
+  percentage,
   className,
-}: { label: string; value: string } & Pick<
+}: { label: string; value: string; percentage?: number } & Pick<
   React.HTMLAttributes<HTMLDivElement>,
   "className"
 >) => {
@@ -106,7 +122,14 @@ const HeadingProperty = ({
       <p className="text-lg font-semibold text-muted-foreground line-clamp-1">
         {label}
       </p>
-      <p className={cn("text-5xl font-bold", className)}>{value}</p>
+      <div className="flex items-start gap-x-2">
+        <p className={cn("text-5xl font-bold", className)}>{value}</p>
+        {percentage && (
+          <p
+            className={cn("text-sm font-medium", className)}
+          >{`${percentage.toFixed(1)}%`}</p>
+        )}
+      </div>
     </div>
   );
 };

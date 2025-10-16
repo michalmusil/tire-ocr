@@ -93,7 +93,7 @@ public class TireCodeValueObject : ValueObject
             var dimensionsPartRegexMatch = Regex.Match(
                 input: part,
                 pattern:
-                @"^(?<Width>\d{3}|\d{1,2}\.\d{1,2})-(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1,2})(?<Construction>[RDB]{1})(?<Diameter>\d{1,3}|\d{1,2}\.\d{1,2})");
+                @"^(?<Width>\d{3}|\d{1,2}\.\d{1,2})-(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1,2})(?<DeprecatedSpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})?(?<Construction>[RDB]{1})(?<Diameter>\d{1,3}|\d{1,2}\.\d{1,2})");
             var isDimensionsPart = dimensionsPartRegexMatch.Success;
             if (isDimensionsPart)
             {
