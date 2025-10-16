@@ -13,9 +13,13 @@ import { Check, X } from "lucide-react";
 
 type EvaluationRunsTableProps = {
   runs: EvaluationRun[];
+  displayCaption?: boolean;
 };
 
-export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
+export const EvaluationRunsTable = ({
+  runs,
+  displayCaption = true,
+}: EvaluationRunsTableProps) => {
   const navigate = useNavigate();
 
   const handleRowClick = (runId: string) => {
@@ -24,7 +28,9 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
 
   return (
     <Table>
-      <TableCaption>Most recent evaluation runs</TableCaption>
+      {displayCaption && (
+        <TableCaption>Most recent evaluation runs</TableCaption>
+      )}
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>

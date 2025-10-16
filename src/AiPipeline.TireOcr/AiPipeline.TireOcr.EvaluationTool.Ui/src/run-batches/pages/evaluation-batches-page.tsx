@@ -3,6 +3,7 @@ import { EvaluationRunBatchesTable } from "../components/evaluation-run-batches-
 import { GenericPagination } from "@/core/components/generic-pagination";
 import { useRunBatches } from "../hooks/use-run-batches";
 import SpinnerFullpage from "@/core/components/spinner-fullpage";
+import ErrorFullpage from "@/core/components/error-fullpage";
 
 const EvaluationBatchesPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -16,11 +17,7 @@ const EvaluationBatchesPage: React.FC = () => {
 
   if (pageStatus.isLoading) return <SpinnerFullpage />;
   if (pageStatus.errorMessage)
-    return (
-      <div className="text-red-500 text-center flex flex-row justify-center">
-        {pageStatus.errorMessage}
-      </div>
-    );
+    return <ErrorFullpage errorMessage={pageStatus.errorMessage} />;
 
   return (
     <div className="flex flex-col justify-center items-center">

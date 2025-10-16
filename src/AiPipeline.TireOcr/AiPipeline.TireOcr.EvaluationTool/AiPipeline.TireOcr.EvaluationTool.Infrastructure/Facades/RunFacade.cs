@@ -8,6 +8,7 @@ using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Extensions;
+using Microsoft.Extensions.Logging;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Facades;
@@ -21,13 +22,14 @@ public class RunFacade : IRunFacade
     private readonly IEnumToObjectMapper<OcrType, IOcrProcessor> _ocrMapper;
     private readonly IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor> _postprocessingMapper;
     private readonly IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor> _dbMatchingMapper;
+    private readonly ILogger<RunFacade> _logger;
 
     public RunFacade(IImageDownloadService imageDownloadService,
         IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor> preprocessingMapper,
         IEnumToObjectMapper<OcrType, IOcrProcessor> ocrMapper,
         IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor> postprocessingMapper,
         IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor> dbMatchingMapper,
-        ITireCodeSimilarityEvaluationService evaluationService)
+        ITireCodeSimilarityEvaluationService evaluationService, ILogger<RunFacade> logger)
     {
         _imageDownloadService = imageDownloadService;
         _preprocessingMapper = preprocessingMapper;
@@ -35,6 +37,7 @@ public class RunFacade : IRunFacade
         _postprocessingMapper = postprocessingMapper;
         _dbMatchingMapper = dbMatchingMapper;
         _evaluationService = evaluationService;
+        _logger = logger;
     }
 
     public async Task<DataResult<EvaluationRunEntity>> RunSingleEvaluationAsync(ImageDto image, RunConfigDto runConfig,
@@ -221,6 +224,7 @@ public class RunFacade : IRunFacade
 
                 if (!successfullyDownloaded)
                 {
+                    _logger.LogError($"Failed to download image '{imageUrl}'");
                     fallbackEvaluationRun.SetFailure(
                         EvaluationRunFailureValueObject.UnexpectedFailure(
                             new Failure(500, $"Failed to download image '{imageUrl}'")
@@ -228,7 +232,7 @@ public class RunFacade : IRunFacade
                     );
                     results.Add(fallbackEvaluationRun);
                 }
-                else if(downloadedImage is not null)
+                else if (downloadedImage is not null)
                 {
                     var result = await RunSingleEvaluationAsync(
                         image: downloadedImage,
@@ -248,7 +252,11 @@ public class RunFacade : IRunFacade
                                 return fallbackEvaluationRun;
                             }
                         )
-                    );   
+                    );
+                }
+                else
+                {
+                    _logger.LogError($"Image '{imageUrl}' was supposedly downloaded, but was 'null' ");
                 }
             });
 
