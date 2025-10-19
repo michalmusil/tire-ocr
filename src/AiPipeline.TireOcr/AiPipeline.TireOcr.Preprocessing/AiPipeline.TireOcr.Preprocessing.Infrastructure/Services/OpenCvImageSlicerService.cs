@@ -52,7 +52,7 @@ public class OpenCvImageSlicerService : IImageSlicerService
             for (var i = 0; i < slices.Count; i++)
             {
                 var slice = slices[i];
-                var imageName = $"{image.Name}_{i + 1}";
+                var imageName = $"{i + 1}_{image.Name}";
                 resultImages.Add(slice.ToDomain(imageName));
 
                 slice.Dispose();

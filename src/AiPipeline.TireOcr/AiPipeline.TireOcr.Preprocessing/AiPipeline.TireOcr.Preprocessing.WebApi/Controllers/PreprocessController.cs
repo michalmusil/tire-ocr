@@ -54,6 +54,34 @@ public class PreprocessController : ControllerBase
             });
     }
 
+    [HttpPost("ExtractRoiReturnFile")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ExtractRoiReturnFile([FromForm] ExtractRequest request)
+    {
+        var imageData = await request.Image.ToByteArray();
+        var query = new GetTireCodeRoiQuery(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            RemoveBackground: request.RemoveBackground
+        );
+        var result = await _mediator.Send(query);
+
+        return result.Map(
+            onSuccess: dto => File(dto.ImageData, dto.ContentType),
+            onFailure: failures =>
+            {
+                var primaryFailure = failures.FirstOrDefault();
+                var otherFailures = failures.Skip(1).ToArray();
+
+                return primaryFailure?.ToActionResult(otherFailures) ??
+                       Problem("Failed to preprocess image", null, 500);
+            }
+        );
+    }
+
 
     [HttpPost("ResizeToMaxSide")]
     [ProducesResponseType(StatusCodes.Status200OK)]
