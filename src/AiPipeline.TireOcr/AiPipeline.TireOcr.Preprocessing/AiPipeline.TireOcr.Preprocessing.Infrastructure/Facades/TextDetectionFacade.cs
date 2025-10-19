@@ -63,7 +63,7 @@ public class TextDetectionFacade : ITextDetectionFacade
 
                 var finalImage = _imageManipulationService.ApplyClahe(roiImageWithoutBg);
                 finalImage =
-                    _imageManipulationService.ApplyBilateralFilter(finalImage, d: 7, sigmaColor: 50, sigmaSpace: 70);
+                    _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
                 finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
 
                 return DataResult<ImageWithDetectedTexts>.Success(roiImage with { Image = finalImage });
