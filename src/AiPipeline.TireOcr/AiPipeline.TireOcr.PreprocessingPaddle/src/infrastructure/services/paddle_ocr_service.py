@@ -1,12 +1,16 @@
+import os
 import io
 import time
 import numpy as np
 from PIL import Image
 from paddleocr import PaddleOCR
+from dotenv import load_dotenv
+
 
 from typing import Optional, Any
 from src.application.services.ocr_service import OCRResult, OcrService
 
+load_dotenv()
 PADDLE_OCR_ENGINE: Optional[PaddleOCR] = None
 
 
@@ -14,7 +18,16 @@ def get_paddle_ocr_engine() -> PaddleOCR:
     global PADDLE_OCR_ENGINE
     if PADDLE_OCR_ENGINE is None:
         print("PaddleOCR: INITIALIZING")
-        PADDLE_OCR_ENGINE = PaddleOCR(use_textline_orientation=True, lang="en")
+        model_name = os.getenv("CUSTOM_REC_MODEL_NAME")
+        model_dir = os.getenv("CUSTOM_REC_MODEL_PATH")
+
+        PADDLE_OCR_ENGINE = PaddleOCR(
+            use_doc_orientation_classify=False,
+            # use_textline_orientation=False,
+            lang="en",
+            text_recognition_model_name=model_name,
+            text_recognition_model_dir=model_dir,
+        )
         print("PaddleOCR: INITIALIZED")
     return PADDLE_OCR_ENGINE
 
