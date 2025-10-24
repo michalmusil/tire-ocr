@@ -11,6 +11,12 @@ import {
 import FormSelectInput from "@/core/components/form-select-input";
 import { Button } from "@/core/components/ui/button";
 import FormFileInput from "@/core/components/form-file-input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/core/components/ui/card";
 
 export const formSchema = z.object({
   runTitle: z.string().nullish(),
@@ -54,44 +60,65 @@ export const CreateBatchForm = ({
 
   return (
     <FormProvider {...form}>
-      <div className="max-w-screen-sm flex-col">
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormInput<CreateBatchFormSchema> label="Title" name="runTitle" />
-          <FormInput<CreateBatchFormSchema>
-            label="Processing batch size"
-            name="processingBatchSize"
-            type="number"
-          />
-          <FormFileInput<CreateBatchFormSchema>
-            label="Expected tire code"
-            name="imageUrlsWithExpectedTireCodeLabelsCsv"
-            accept="text/csv"
-          />
-          <FormSelectInput
-            label="Preprocessing"
-            name="preprocessingType"
-            options={PreprocessingTypeSchema.options}
-          />
-          <FormSelectInput
-            label="Ocr"
-            name="ocrType"
-            options={OcrTypeSchema.options}
-          />
-          <FormSelectInput
-            label="Postprocessing"
-            name="postprocessingType"
-            options={PostprocessingTypeSchema.options}
-          />
-          <FormSelectInput
-            label="DB matching"
-            name="dbMatchingType"
-            options={DbMatchingTypeSchema.options}
-          />
-          <Button type="submit" disabled={isSubmitting}>
-            Create
-          </Button>
-        </form>
-      </div>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full flex flex-col items-center"
+      >
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Batch details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormInput<CreateBatchFormSchema> label="Title" name="runTitle" />
+              <FormInput<CreateBatchFormSchema>
+                label="Processing batch size"
+                name="processingBatchSize"
+                type="number"
+              />
+              <FormFileInput<CreateBatchFormSchema>
+                label="Expected tire code"
+                name="imageUrlsWithExpectedTireCodeLabelsCsv"
+                accept="text/csv"
+              />
+            </CardContent>
+          </Card>
+          <Card className="flex-1">
+            <CardHeader>
+              <CardTitle>Processing steps</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormSelectInput
+                label="Preprocessing"
+                name="preprocessingType"
+                options={PreprocessingTypeSchema.options}
+              />
+              <FormSelectInput
+                label="Ocr"
+                name="ocrType"
+                options={OcrTypeSchema.options}
+              />
+              <FormSelectInput
+                label="Postprocessing"
+                name="postprocessingType"
+                options={PostprocessingTypeSchema.options}
+              />
+              <FormSelectInput
+                label="DB matching"
+                name="dbMatchingType"
+                options={DbMatchingTypeSchema.options}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-5 w-full md:w-md lg:w-lg"
+        >
+          Start processing
+        </Button>
+      </form>
     </FormProvider>
   );
 };

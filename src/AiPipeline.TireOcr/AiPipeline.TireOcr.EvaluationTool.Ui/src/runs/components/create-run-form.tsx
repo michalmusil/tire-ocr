@@ -10,6 +10,12 @@ import {
 } from "@/core/models/run-steps-types";
 import FormSelectInput from "@/core/components/form-select-input";
 import { Button } from "@/core/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/core/components/ui/card";
 
 export const formSchema = z.object({
   runTitle: z.string().min(1, "Title is required"),
@@ -42,45 +48,66 @@ export const CreateEvaluationRunForm = ({
 
   return (
     <FormProvider {...form}>
-      <div className="max-w-screen-sm flex-col">
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <FormInput<CreateEvaluationRunFormSchema>
-            label="Title"
-            name="runTitle"
-          />
-          <FormInput<CreateEvaluationRunFormSchema>
-            label="Image URL"
-            name="imageUrl"
-          />
-          <FormInput<CreateEvaluationRunFormSchema>
-            label="Expected tire code"
-            name="expectedTireCodeLabel"
-          />
-          <FormSelectInput
-            label="Preprocessing"
-            name="preprocessingType"
-            options={PreprocessingTypeSchema.options}
-          />
-          <FormSelectInput
-            label="Ocr"
-            name="ocrType"
-            options={OcrTypeSchema.options}
-          />
-          <FormSelectInput
-            label="Postprocessing"
-            name="postprocessingType"
-            options={PostprocessingTypeSchema.options}
-          />
-          <FormSelectInput
-            label="DB matching"
-            name="dbMatchingType"
-            options={DbMatchingTypeSchema.options}
-          />
-          <Button type="submit" disabled={isSubmitting}>
-            Create
-          </Button>
-        </form>
-      </div>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full flex flex-col items-center"
+      >
+        <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Run details</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormInput<CreateEvaluationRunFormSchema>
+                label="Title"
+                name="runTitle"
+              />
+              <FormInput<CreateEvaluationRunFormSchema>
+                label="Image URL"
+                name="imageUrl"
+              />
+              <FormInput<CreateEvaluationRunFormSchema>
+                label="Expected tire code"
+                name="expectedTireCodeLabel"
+              />
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Processing steps</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <FormSelectInput
+                label="Preprocessing"
+                name="preprocessingType"
+                options={PreprocessingTypeSchema.options}
+              />
+              <FormSelectInput
+                label="Ocr"
+                name="ocrType"
+                options={OcrTypeSchema.options}
+              />
+              <FormSelectInput
+                label="Postprocessing"
+                name="postprocessingType"
+                options={PostprocessingTypeSchema.options}
+              />
+              <FormSelectInput
+                label="DB matching"
+                name="dbMatchingType"
+                options={DbMatchingTypeSchema.options}
+              />
+            </CardContent>
+          </Card>
+        </div>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-5 w-full md:w-md lg:w-lg"
+        >
+          Run evaluation
+        </Button>
+      </form>
     </FormProvider>
   );
 };
