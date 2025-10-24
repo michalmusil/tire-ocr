@@ -1,10 +1,13 @@
+using System.IO.Compression;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Preprocessing.Application.Dtos;
+using TireOcr.Preprocessing.Application.Queries.GetImageSlices;
 using TireOcr.Preprocessing.Application.Queries.GetResizedImage;
 using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 using TireOcr.Preprocessing.WebApi.Contracts.Extract;
+using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlices;
 using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
 using TireOcr.Preprocessing.WebApi.Extensions;
 using TireOcr.Shared.Result;
@@ -110,5 +113,82 @@ public class PreprocessController : ControllerBase
                 );
                 return response;
             });
+    }
+
+    [HttpPost("ExtractSlices")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ExtractSlicesResponse>> ExtractSlices([FromForm] ExtractSlicesRequest request)
+    {
+        var imageData = await request.Image.ToByteArray();
+        var query = new GetImageSlicesQuery(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            NumberOfSlices: request.NumberOfSlices
+        );
+        var result = await _mediator.Send(query);
+
+        return result.ToActionResult<ImageSlicesResultDto, ExtractSlicesResponse>(
+            onSuccess: dto =>
+            {
+                var slices = dto.Slices.Select(s =>
+                    new SliceDto(
+                        FileName: s.Name,
+                        ContentType: s.ContentType,
+                        Base64ImageData: Convert.ToBase64String(s.ImageData)
+                    )
+                );
+                var response = new ExtractSlicesResponse(
+                    Slices: slices,
+                    DurationMs: dto.DurationMs
+                );
+                return response;
+            });
+    }
+
+    [HttpPost("ExtractSlicesReturnFile")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ExtractSlicesReturnFile([FromForm] ExtractSlicesRequest request)
+    {
+        var imageData = await request.Image.ToByteArray();
+        var query = new GetImageSlicesQuery(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            NumberOfSlices: request.NumberOfSlices
+        );
+        var result = await _mediator.Send(query);
+
+        return result.Map(
+            onSuccess: dto =>
+            {
+                using var archiveStream = new MemoryStream();
+                using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, true))
+                {
+                    foreach (var slice in dto.Slices)
+                    {
+                        var zipArchiveEntry = archive.CreateEntry(slice.Name, CompressionLevel.Fastest);
+                        using var entryStream = zipArchiveEntry.Open();
+                        entryStream.Write(slice.ImageData, 0, slice.ImageData.Length);
+                    }
+                }
+
+                var data = archiveStream.ToArray();
+                return File(data, "application/zip", "slices.zip");
+            },
+            onFailure:
+            failures =>
+            {
+                var primaryFailure = failures.FirstOrDefault();
+                var otherFailures = failures.Skip(1).ToArray();
+
+                return primaryFailure?.ToActionResult(otherFailures) ??
+                       Problem("Failed to extract image slices", null, 500);
+            }
+        );
     }
 }
