@@ -41,6 +41,8 @@ ENV VIRTUAL_ENV=/app/.venv \
 WORKDIR /app
 COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
 COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/main.py ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/.env ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/custom_models ./custom_models
 COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/src ./src
 EXPOSE 10100
 

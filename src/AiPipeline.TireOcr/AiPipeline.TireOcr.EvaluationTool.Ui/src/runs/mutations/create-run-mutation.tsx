@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import type { CreateEvaluationRunFormSchema } from "../components/create-run-form";
+import { PostRunResponseSchema } from "../dtos/post-run-response-dto";
 
 const getFormAsFormData = (
   data: CreateEvaluationRunFormSchema,
@@ -39,6 +40,9 @@ const createRun = async (data: CreateEvaluationRunFormSchema) => {
   if (!response.ok) {
     throw new Error("Failed to create new evaluation run");
   }
+  const json = await response.json();
+  const parsed = PostRunResponseSchema.parse(json);
+  return parsed.result.id;
 };
 
 export const useCreateRunMutation = () =>

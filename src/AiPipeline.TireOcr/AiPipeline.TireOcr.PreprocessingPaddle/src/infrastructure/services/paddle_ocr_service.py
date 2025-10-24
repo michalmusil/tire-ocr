@@ -56,7 +56,7 @@ class PaddleOcrService(OcrService):
                     recognized_texts = page_result["rec_texts"]
                     detected_text_list.extend(recognized_texts)
 
-            detected_text: str = "\n".join(detected_text_list).strip()
+            detected_text: str = " ".join(detected_text_list).strip()
             duration = int((time.perf_counter() - start_time) * 1000)
 
             if detected_text:
