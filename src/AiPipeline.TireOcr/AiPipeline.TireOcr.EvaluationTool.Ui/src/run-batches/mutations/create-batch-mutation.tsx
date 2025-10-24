@@ -1,5 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import type { CreateBatchFormSchema } from "../components/create-run-batch-form";
+import { PostRunBatchResponseSchema } from "../dtos/post-run-batch-response-dto";
 
 const createBatch = async (data: CreateBatchFormSchema) => {
   const formData = new FormData();
@@ -21,6 +22,9 @@ const createBatch = async (data: CreateBatchFormSchema) => {
   if (!response.ok) {
     throw new Error("Failed to create new evaluation run batch");
   }
+  const json = await response.json();
+  const parsed = PostRunBatchResponseSchema.parse(json);
+  return parsed.result.id;
 };
 
 export const useCreateBatchMutation = () =>
