@@ -185,7 +185,7 @@ public class RunFacade : IRunFacade
                 batchId: result.Id
             );
             completedCount += batch.Count;
-            _logger.LogInformation($"BATCH COMPLETION: {completedCount}/{batchUrls.Count}");
+            _logger.LogInformation($"BATCH COMPLETION: {completedCount}/{imageUrls.Count}");
 
             result.AddEvaluationRuns(processedBatch.ToArray());
         }
