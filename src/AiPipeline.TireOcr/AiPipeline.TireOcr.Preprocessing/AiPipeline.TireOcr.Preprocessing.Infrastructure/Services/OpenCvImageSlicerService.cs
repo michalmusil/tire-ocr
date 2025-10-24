@@ -40,8 +40,12 @@ public class OpenCvImageSlicerService : IImageSlicerService
                 {
                     var xmin = (int)x;
                     var ymin = (int)y;
-                    var xmax = (int)Math.Min(x + realSliceWidth, width);
-                    var ymax = (int)Math.Min(y + realSliceHeight, height);
+                    var xmax = (int)(x + realSliceWidth);
+                    var ymax = (int)(y + realSliceHeight);
+
+                    // Skipping slices overflowing image dimensions 
+                    if (xmax > width || ymax > height)
+                        continue;
 
                     var rect = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
                     slices.Add(new Mat(inputImage, rect));
