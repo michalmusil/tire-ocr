@@ -244,6 +244,38 @@ public class OpenCvImageManipulationService : IImageManipulationService
         return onlyBoundingBoxes.ToDomain(image.Name);
     }
 
+    public Image? StackImagesVertically(List<Image> images)
+    {
+        if (images.Count < 1)
+            return null;
+
+        var cv2Images = images
+            .Select(image => image.ToCv2())
+            .ToArray();
+
+        var width = cv2Images.Max(i => i.Width);
+        var height = cv2Images.Sum(i => i.Height);
+        var type = cv2Images.First().Type();
+        if (cv2Images.Any(i => i.Type() != type))
+            return null;
+
+        using var resultImage = new Mat(height, width, type);
+        var yOffset = 0;
+        for (int i = 0; i < cv2Images.Length; i++)
+        {
+            var previousImage = i == 0 ? null : cv2Images[i - 1];
+            var currentImage = cv2Images[i];
+
+            currentImage.CopyTo(new Mat(resultImage, new Rect(0, yOffset, currentImage.Width, currentImage.Height)));
+            yOffset += currentImage.Height;
+        }
+
+        foreach (var image in cv2Images)
+            image.Dispose();
+
+        return resultImage.ToDomain(images.First().Name);
+    }
+
     private bool CoordinateIsValid(ImageCoordinate coordinate, int imageWidth, int imageHeight) => coordinate.X >= 0 &&
         coordinate.Y >= 0 && coordinate.X <= imageWidth && coordinate.Y <= imageHeight;
 }
