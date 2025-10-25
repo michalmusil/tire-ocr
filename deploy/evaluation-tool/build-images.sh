@@ -13,7 +13,7 @@ EVALUATION_TOOL_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool"
 echo "Building image for ocr paddle service"
 docker buildx create --use --name mybuilder
 docker buildx inspect --bootstrap
-docker build --platform linux/amd64 -t "${OCR_PADDLE_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/Dockerfile .
+docker build --platform linux/amd64 -t "${OCR_PADDLE_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/Dockerfile .
 echo "Successfully built ${OCR_PADDLE_IMAGE_NAME}"
 echo ""
 
