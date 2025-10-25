@@ -18,9 +18,9 @@ ENV POETRY_NO_INTERACTION=1 \
 
 WORKDIR /app
 
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/pyproject.toml ./
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/main.py ./
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/src ./src
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/pyproject.toml ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/main.py ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/src ./src
 RUN touch README.md
 
 RUN poetry install --no-root && rm -rf $POETRY_CACHE_DIR
@@ -40,10 +40,10 @@ ENV VIRTUAL_ENV=/app/.venv \
 
 WORKDIR /app
 COPY --from=build ${VIRTUAL_ENV} ${VIRTUAL_ENV}
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/main.py ./
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/.env ./
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/custom_models ./custom_models
-COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PreprocessingPaddle/src ./src
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/main.py ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/.env ./
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/custom_models ./custom_models
+COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.OcrPaddle/src ./src
 EXPOSE 10100
 
 # Pre-download PaddleOCR models during the build
