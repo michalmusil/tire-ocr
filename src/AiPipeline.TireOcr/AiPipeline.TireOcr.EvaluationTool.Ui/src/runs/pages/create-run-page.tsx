@@ -20,7 +20,7 @@ const CreateRunPage: React.FC = () => {
   const navigate = useNavigate();
 
   const onSubmit = (data: CreateEvaluationRunFormSchema) => {
-    setDialogClosed(true);
+    setDialogClosed(false);
     createRunMutation.mutate(data, {
       onSuccess: (id) => {
         navigate(`/runs/${id}`);

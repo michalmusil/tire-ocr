@@ -20,7 +20,7 @@ const CreateBatchPage: React.FC = () => {
   const navigate = useNavigate();
 
   const onSubmit = (data: CreateBatchFormSchema) => {
-    setDialogClosed(true);
+    setDialogClosed(false);
     createBatchMutation.mutate(data, {
       onSuccess: (id) => {
         navigate(`/batches/${id}`);
