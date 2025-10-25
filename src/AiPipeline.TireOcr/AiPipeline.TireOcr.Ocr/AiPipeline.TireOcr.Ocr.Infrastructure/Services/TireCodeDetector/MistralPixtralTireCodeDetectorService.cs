@@ -2,9 +2,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using TireOcr.Ocr.Application.Dtos;
+using TireOcr.Ocr.Application.Repositories;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
-using TireOcr.Ocr.Infrastructure.Constants;
 using TireOcr.Ocr.Infrastructure.Dtos.MistralResponse;
 using TireOcr.Ocr.Infrastructure.Services.ImageUtils;
 using TireOcr.Shared.Result;
@@ -16,12 +16,15 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
     private readonly HttpClient _httpClient;
     private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
+    private readonly IPromptRepository _promptRepository;
 
-    public MistralPixtralTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService, IConfiguration configuration)
+    public MistralPixtralTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService,
+        IConfiguration configuration, IPromptRepository promptRepository)
     {
         _httpClient = httpClient;
         _imageConvertorService = imageConvertorService;
         _configuration = configuration;
+        _promptRepository = promptRepository;
     }
 
     public async Task<DataResult<OcrResultDto>> DetectAsync(Image image)
@@ -34,9 +37,9 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     "Failed to retrieve Mistral endpoint configuration"));
 
-            using var prompt = GetPromptJsonBody(image);
+            using var requestBody = await GetPromptJsonBody(image);
             _httpClient.DefaultRequestHeaders.Add("Authorization", apiKey);
-            using var response = await _httpClient.PostAsync(endpointUri, prompt);
+            using var response = await _httpClient.PostAsync(endpointUri, requestBody);
             _httpClient.DefaultRequestHeaders.Remove("Authorization");
 
             response.EnsureSuccessStatusCode();
@@ -50,7 +53,7 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
 
             if (foundTireCode is null)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
-            
+
             string? foundManufacturer = null;
             var indexOfManufacturerSplit = foundTireCode.IndexOf('|');
             var manufacturerFound = indexOfManufacturerSplit > 0;
@@ -104,8 +107,9 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
     }
 
 
-    private StringContent GetPromptJsonBody(Image image)
+    private async Task<StringContent> GetPromptJsonBody(Image image)
     {
+        var prompt = await _promptRepository.GetMainPromptAsync();
         var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
@@ -120,7 +124,7 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
                         new
                         {
                             type = "text",
-                            text = ModelPrompts.TireCodeOcrPrompt
+                            text = prompt
                         },
                         new
                         {
@@ -129,7 +133,8 @@ public class MistralPixtralTireCodeDetectorService : ITireCodeDetectorService
                         }
                     }
                 }
-            }
+            },
+            temperature = 0.2
         };
         var jsonPayload = JsonConvert.SerializeObject(payload);
         return new StringContent(jsonPayload, Encoding.UTF8, "application/json");

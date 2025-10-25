@@ -2,9 +2,9 @@ using System.Text;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using TireOcr.Ocr.Application.Dtos;
+using TireOcr.Ocr.Application.Repositories;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
-using TireOcr.Ocr.Infrastructure.Constants;
 using TireOcr.Ocr.Infrastructure.Dtos.GoogleGeminiResponse;
 using TireOcr.Ocr.Infrastructure.Services.ImageUtils;
 using TireOcr.Shared.Result;
@@ -16,13 +16,15 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     private readonly HttpClient _httpClient;
     private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
+    private readonly IPromptRepository _promptRepository;
 
     public GoogleGeminiTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService,
-        IConfiguration configuration)
+        IConfiguration configuration, IPromptRepository promptRepository)
     {
         _httpClient = httpClient;
         _imageConvertorService = imageConvertorService;
         _configuration = configuration;
+        _promptRepository = promptRepository;
     }
 
     public async Task<DataResult<OcrResultDto>> DetectAsync(Image image)
@@ -34,7 +36,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     "Failed to retrieve Google Gemini endpoint configuration"));
 
-            using var prompt = GetPromptJsonBody(image);
+            using var prompt = await GetPromptJsonBody(image);
             using var response = await _httpClient.PostAsync(endpointUri, prompt);
 
             response.EnsureSuccessStatusCode();
@@ -92,8 +94,9 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
         }
     }
 
-    private StringContent GetPromptJsonBody(Image image)
+    private async Task<StringContent> GetPromptJsonBody(Image image)
     {
+        var prompt = await _promptRepository.GetMainPromptAsync();
         var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
@@ -103,7 +106,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                 {
                     parts = new object[]
                     {
-                        new { text = ModelPrompts.TireCodeOcrPrompt },
+                        new { text = prompt },
                         new
                         {
                             inline_data = new
@@ -114,6 +117,10 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                         }
                     }
                 }
+            },
+            generationConfig = new
+            {
+                temperature = 0.2
             }
         };
         var jsonPayload = JsonConvert.SerializeObject(payload);

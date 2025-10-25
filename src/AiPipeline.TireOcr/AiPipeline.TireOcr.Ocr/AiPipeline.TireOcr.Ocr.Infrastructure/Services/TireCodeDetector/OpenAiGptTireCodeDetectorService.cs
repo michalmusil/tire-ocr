@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
 using TireOcr.Ocr.Application.Dtos;
+using TireOcr.Ocr.Application.Repositories;
 using TireOcr.Ocr.Application.Services;
 using TireOcr.Ocr.Domain.ImageEntity;
-using TireOcr.Ocr.Infrastructure.Constants;
 using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
@@ -11,10 +11,12 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly IConfiguration _configuration;
+    private readonly IPromptRepository _promptRepository;
 
-    public OpenAiGptTireCodeDetectorService(IConfiguration configuration)
+    public OpenAiGptTireCodeDetectorService(IConfiguration configuration, IPromptRepository promptRepository)
     {
         _configuration = configuration;
+        _promptRepository = promptRepository;
     }
 
     public async Task<DataResult<OcrResultDto>> DetectAsync(Image image)
@@ -26,15 +28,20 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     "Failed to retrieve OpenAi endpoint configuration"));
 
+            var prompt = await _promptRepository.GetMainPromptAsync();
             List<ChatMessage> messages =
             [
                 new UserChatMessage(
-                    ChatMessageContentPart.CreateTextPart(ModelPrompts.TireCodeOcrPrompt),
+                    ChatMessageContentPart.CreateTextPart(prompt),
                     ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data), image.ContentType,
                         ChatImageDetailLevel.High)
                 )
             ];
-            var completion = await client.CompleteChatAsync(messages);
+            var options = new ChatCompletionOptions
+            {
+                Temperature = 0.2f
+            };
+            var completion = await client.CompleteChatAsync(messages, options);
             var foundTireCode = completion.Value.Content
                 .Select(c => c.Text)
                 .FirstOrDefault(t => !string.IsNullOrEmpty(t) && t.Contains('/'));

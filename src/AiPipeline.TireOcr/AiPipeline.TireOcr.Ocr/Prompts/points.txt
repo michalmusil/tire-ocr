@@ -1,0 +1,13 @@
+Analyze the provided image of a tire sidewall. Your task is to accurately identify the **Manufacturer** and the **Tire Code**.
+
+**Instructions and Output Format:**
+
+1.  **Strict Confidence Requirement:** Only provide an output if you are **certain** of the Manufacturer and the full Tire Code.
+2.  **Tire Code Format:** The tire code **must** adhere to the standard format (e.g., "195/65R15 91H" or "205/75R16C 113/111T"). The code includes the section width, aspect ratio, construction type, rim diameter, load index, and speed rating.
+3.  **Required Output Format:** Concatenate the Manufacturer and the Tire Code using a single pipe character '|'.
+    * **Format:** `<MANUFACTURER>|<STANDARD TIRE CODE>`
+    * **Example (if sure):** `Michelin|205/55R16 91H`
+4.  **Fallback (Minimize False Positives):** If you are **not absolutely certain** of both the Manufacturer and the Standard Tire Code, you **must not guess**. Instead, output only the single uppercase letter **N**.
+
+---
+**Image Analysis Start**

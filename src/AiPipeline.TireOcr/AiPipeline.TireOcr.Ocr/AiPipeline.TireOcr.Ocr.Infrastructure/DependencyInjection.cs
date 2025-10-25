@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
+using TireOcr.Ocr.Application.Repositories;
 using TireOcr.Ocr.Application.Services;
+using TireOcr.Ocr.Infrastructure.Repositories;
 using TireOcr.Ocr.Infrastructure.Services;
 using TireOcr.Ocr.Infrastructure.Services.ImageUtils;
 using TireOcr.Ocr.Infrastructure.Services.TireCodeDetectorResolver;
@@ -11,6 +13,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
         AddClients(services);
+        AddRepositories(services);
         AddServices(services);
         return services;
     }
@@ -18,6 +21,11 @@ public static class DependencyInjection
     private static void AddClients(IServiceCollection services)
     {
         services.AddHttpClient<ITireCodeDetectorResolverService>(c => c.Timeout = TimeSpan.FromSeconds(30));
+    }
+
+    private static void AddRepositories(IServiceCollection services)
+    {
+        services.AddScoped<IPromptRepository, PromptRepositoryConfiguration>();
     }
 
     private static void AddServices(IServiceCollection services)
