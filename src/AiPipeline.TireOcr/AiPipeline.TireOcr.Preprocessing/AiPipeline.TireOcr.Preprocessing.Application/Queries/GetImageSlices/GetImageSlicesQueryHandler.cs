@@ -42,7 +42,7 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
             return DataResult<PreprocessedImageDto>.Failure(slicedCompositionResult.Failures);
 
         var composedImage = slicedCompositionResult.Data!;
-        
+
         var result = new PreprocessedImageDto(
             Name: composedImage.Name,
             ContentType: request.OriginalContentType,
@@ -79,13 +79,13 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
 
         var sliceSize = new ImageSize(
             height: unwrappedExtended.Size.Height,
-            width: unwrappedExtended.Size.Width / request.NumberOfSlices
+            width: (int)Math.Ceiling((decimal)unwrappedExtended.Size.Width / (decimal)request.NumberOfSlices)
         );
 
-        var slicesResult = await _imageSlicerService.SliceImage(
+        var slicesResult = await _imageSlicerService.SliceImageAdditiveOverlap(
             image: unwrappedExtended,
             sliceSize: sliceSize,
-            xOverlapRatio: 0,
+            xOverlapRatio: 0.15,
             yOverlapRatio: 0
         );
         if (slicesResult.IsFailure)
@@ -100,7 +100,7 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
             return DataResult<Image>.Failure(
                 new Failure(500, "Failed to compose generated slices vertically.")
             );
-        
+
         var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
         finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
         finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);

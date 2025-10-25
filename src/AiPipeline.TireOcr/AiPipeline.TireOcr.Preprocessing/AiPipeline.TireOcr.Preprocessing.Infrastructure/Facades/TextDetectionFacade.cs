@@ -89,7 +89,7 @@ public class TextDetectionFacade : ITextDetectionFacade
             image.Size.Height,
             (int)(image.Size.Width * 0.17)
         );
-        var slicesResult = await _imageSlicerService.SliceImage(image, sliceSize, 0.3, 0);
+        var slicesResult = await _imageSlicerService.SliceImageNormalOverlap(image, sliceSize, 0.3, 0);
         if (slicesResult.IsFailure)
             return DataResult<ImageWithDetectedTexts>.Failure(slicesResult.Failures);
 
