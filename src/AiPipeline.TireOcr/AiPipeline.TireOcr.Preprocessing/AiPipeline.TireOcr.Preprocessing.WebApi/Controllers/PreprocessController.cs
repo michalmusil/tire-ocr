@@ -1,4 +1,3 @@
-using System.IO.Compression;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +6,7 @@ using TireOcr.Preprocessing.Application.Queries.GetImageSlices;
 using TireOcr.Preprocessing.Application.Queries.GetResizedImage;
 using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 using TireOcr.Preprocessing.WebApi.Contracts.Extract;
-using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlices;
+using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlicesComposition;
 using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
 using TireOcr.Preprocessing.WebApi.Extensions;
 using TireOcr.Shared.Result;
@@ -115,73 +114,55 @@ public class PreprocessController : ControllerBase
             });
     }
 
-    [HttpPost("ExtractSlices")]
+    [HttpPost("ExtractSlicesComposition")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<ExtractSlicesResponse>> ExtractSlices([FromForm] ExtractSlicesRequest request)
+    public async Task<ActionResult<ExtractSlicesCompositionResponse>> ExtractSlicesComposition(
+        [FromForm] ExtractSlicesCompositionRequest compositionRequest)
     {
-        var imageData = await request.Image.ToByteArray();
+        var imageData = await compositionRequest.Image.ToByteArray();
         var query = new GetImageSlicesQuery(
             ImageData: imageData,
-            ImageName: request.Image.FileName,
-            OriginalContentType: request.Image.ContentType,
-            NumberOfSlices: request.NumberOfSlices
+            ImageName: compositionRequest.Image.FileName,
+            OriginalContentType: compositionRequest.Image.ContentType,
+            NumberOfSlices: compositionRequest.NumberOfSlices
         );
         var result = await _mediator.Send(query);
 
-        return result.ToActionResult<ImageSlicesResultDto, ExtractSlicesResponse>(
+        return result.ToActionResult<PreprocessedImageDto, ExtractSlicesCompositionResponse>(
             onSuccess: dto =>
             {
-                var slices = dto.Slices.Select(s =>
-                    new SliceDto(
-                        FileName: s.Name,
-                        ContentType: s.ContentType,
-                        Base64ImageData: Convert.ToBase64String(s.ImageData)
-                    )
-                );
-                var response = new ExtractSlicesResponse(
-                    Slices: slices,
+                var base64Data = Convert.ToBase64String(dto.ImageData);
+                var response = new ExtractSlicesCompositionResponse(
+                    FileName: dto.Name,
+                    ContentType: dto.ContentType,
+                    Base64ImageData: base64Data,
                     DurationMs: dto.DurationMs
                 );
                 return response;
             });
     }
 
-    [HttpPost("ExtractSlicesReturnFile")]
+    [HttpPost("ExtractSlicesCompositionReturnFile")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> ExtractSlicesReturnFile([FromForm] ExtractSlicesRequest request)
+    public async Task<ActionResult> ExtractSlicesCompositionReturnFile(
+        [FromForm] ExtractSlicesCompositionRequest compositionRequest)
     {
-        var imageData = await request.Image.ToByteArray();
+        var imageData = await compositionRequest.Image.ToByteArray();
         var query = new GetImageSlicesQuery(
             ImageData: imageData,
-            ImageName: request.Image.FileName,
-            OriginalContentType: request.Image.ContentType,
-            NumberOfSlices: request.NumberOfSlices
+            ImageName: compositionRequest.Image.FileName,
+            OriginalContentType: compositionRequest.Image.ContentType,
+            NumberOfSlices: compositionRequest.NumberOfSlices
         );
         var result = await _mediator.Send(query);
 
         return result.Map(
-            onSuccess: dto =>
-            {
-                using var archiveStream = new MemoryStream();
-                using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, true))
-                {
-                    foreach (var slice in dto.Slices)
-                    {
-                        var zipArchiveEntry = archive.CreateEntry(slice.Name, CompressionLevel.Fastest);
-                        using var entryStream = zipArchiveEntry.Open();
-                        entryStream.Write(slice.ImageData, 0, slice.ImageData.Length);
-                    }
-                }
-
-                var data = archiveStream.ToArray();
-                return File(data, "application/zip", "slices.zip");
-            },
-            onFailure:
-            failures =>
+            onSuccess: dto => File(dto.ImageData, dto.ContentType),
+            onFailure: failures =>
             {
                 var primaryFailure = failures.FirstOrDefault();
                 var otherFailures = failures.Skip(1).ToArray();

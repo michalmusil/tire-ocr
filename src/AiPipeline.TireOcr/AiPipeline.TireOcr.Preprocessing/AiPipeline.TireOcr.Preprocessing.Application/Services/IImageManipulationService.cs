@@ -24,4 +24,5 @@ public interface IImageManipulationService
     public Image CopyAndAppendImagePortionFromLeft(Image image, double appendPortionWidthRatio);
     public BoundingBox GetBoundingBoxForTireCodeString(Image image, StringInImage stringInImage);
     public Image ApplyMaskToEverythingExceptBoundingBoxes(Image image, IEnumerable<BoundingBox> boundingBoxes);
+    public Image? StackImagesVertically(List<Image> images);
 }

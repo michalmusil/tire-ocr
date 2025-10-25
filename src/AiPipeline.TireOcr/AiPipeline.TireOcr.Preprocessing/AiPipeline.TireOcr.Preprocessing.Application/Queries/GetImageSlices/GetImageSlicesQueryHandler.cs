@@ -9,7 +9,7 @@ using TireOcr.Shared.UseCase;
 
 namespace TireOcr.Preprocessing.Application.Queries.GetImageSlices;
 
-public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, ImageSlicesResultDto>
+public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, PreprocessedImageDto>
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
@@ -28,38 +28,36 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Ima
         _logger = logger;
     }
 
-    public async Task<DataResult<ImageSlicesResultDto>> Handle(
+    public async Task<DataResult<PreprocessedImageDto>> Handle(
         GetImageSlicesQuery request,
         CancellationToken cancellationToken
     )
     {
         var preprocessingResult = await PerformanceUtils.PerformTimeMeasuredTask(
-            runTask: () => PerformSlicing(request)
+            runTask: () => PerformSlicingAndComposition(request)
         );
         var timeTaken = preprocessingResult.Item1;
-        var slicesResult = preprocessingResult.Item2;
-        if (slicesResult.IsFailure)
-            return DataResult<ImageSlicesResultDto>.Failure(preprocessingResult.Item2.Failures);
+        var slicedCompositionResult = preprocessingResult.Item2;
+        if (slicedCompositionResult.IsFailure)
+            return DataResult<PreprocessedImageDto>.Failure(slicedCompositionResult.Failures);
 
-        var slices = slicesResult.Data!;
-        var resultDto = new ImageSlicesResultDto(
-            Slices: slices.Select(s =>
-                new ImageSliceDto(
-                    Name: s.Name,
-                    ImageData: s.Data,
-                    ContentType: request.OriginalContentType
-                )),
+        var composedImage = slicedCompositionResult.Data!;
+        
+        var result = new PreprocessedImageDto(
+            Name: composedImage.Name,
+            ContentType: request.OriginalContentType,
+            ImageData: composedImage.Data,
             DurationMs: (long)timeTaken.TotalMilliseconds
         );
 
-        return DataResult<ImageSlicesResultDto>.Success(resultDto);
+        return DataResult<PreprocessedImageDto>.Success(result);
     }
 
-    private async Task<DataResult<IEnumerable<Image>>> PerformSlicing(GetImageSlicesQuery request)
+    private async Task<DataResult<Image>> PerformSlicingAndComposition(GetImageSlicesQuery request)
     {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)
-            return DataResult<IEnumerable<Image>>.Invalid(
+            return DataResult<Image>.Invalid(
                 $"Content type {request.OriginalContentType} is not supported");
 
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
@@ -73,7 +71,7 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Ima
 
         var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
         if (detectedTireResult.IsFailure)
-            return DataResult<IEnumerable<Image>>.Failure(detectedTireResult.Failures);
+            return DataResult<Image>.Failure(detectedTireResult.Failures);
 
         var detectedTire = detectedTireResult.Data!;
         var unwrapped = GetUnwrappedTireStrip(withClahe, detectedTire.RimCircle);
@@ -84,13 +82,31 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Ima
             width: unwrappedExtended.Size.Width / request.NumberOfSlices
         );
 
-        var slices = await _imageSlicerService.SliceImage(
+        var slicesResult = await _imageSlicerService.SliceImage(
             image: unwrappedExtended,
             sliceSize: sliceSize,
             xOverlapRatio: 0,
             yOverlapRatio: 0
         );
-        return slices;
+        if (slicesResult.IsFailure)
+            return DataResult<Image>.Failure(slicesResult.Failures);
+
+        var slices = slicesResult.Data!.ToList();
+        if (!slices.Any())
+            return DataResult<Image>.Failure(new Failure(500, "Failed to generate image slices."));
+
+        var stackedImage = _imageManipulationService.StackImagesVertically(slices);
+        if (stackedImage == null)
+            return DataResult<Image>.Failure(
+                new Failure(500, "Failed to compose generated slices vertically.")
+            );
+        
+        var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
+        finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
+        finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
+
+
+        return DataResult<Image>.Success(finalImage);
     }
 
     private Image GetUnwrappedTireStrip(Image image, CircleInImage rimCircle)
