@@ -10,6 +10,11 @@ import {
 } from "@/core/components/ui/table";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { Check, X } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/core/components/ui/tooltip";
 
 type EvaluationRunsTableProps = {
   runs: EvaluationRun[];
@@ -34,37 +39,57 @@ export const EvaluationRunsTable = ({
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>
-          <TableHead>Status</TableHead>
+          <TableHead className="flex justify-center items-center">
+            Run completed
+          </TableHead>
           <TableHead>Duration</TableHead>
+          <TableHead>Expected code</TableHead>
           <TableHead>Result/Failure Reason</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {runs.map((run) => (
-          <TableRow
-            key={run.id}
-            onClick={() => handleRowClick(run.id)}
-            className="cursor-pointer"
-          >
-            <TableCell>{run.title}</TableCell>
-            <TableCell>
-              {run.failure ? (
-                <X className="text-red-500" />
-              ) : (
-                <Check className="text-green-500" />
-              )}
-            </TableCell>
-            <TableCell>
-              {(run.totalExecutionDurationMs / 1000).toFixed(2)}s
-            </TableCell>
-            <TableCell>
-              {run.failure
-                ? run.failure.failureReason
-                : run.postprocessingResult?.postprocessedTireCode
-                    .processedCode ?? "Unknown"}
-            </TableCell>
-          </TableRow>
-        ))}
+        {runs.map((run) => {
+          return (
+            <TableRow
+              key={run.id}
+              onClick={() => handleRowClick(run.id)}
+              className="cursor-pointer"
+            >
+              <TableCell>{run.title}</TableCell>
+              <TableCell className="flex justify-center">
+                {run.failure ? (
+                  <X className="text-red-500" />
+                ) : (
+                  <Check className="text-green-500" />
+                )}
+              </TableCell>
+              <TableCell>
+                {(run.totalExecutionDurationMs / 1000).toFixed(2)}s
+              </TableCell>
+              <TableCell>
+                {run.evaluation?.expectedTireCode?.processedCode ?? "-"}
+              </TableCell>
+              <TableCell>
+                {run.failure ? (
+                  run.failure.failureReason
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger>
+                      {run.postprocessingResult?.postprocessedTireCode
+                        .processedCode ?? "Unknown"}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {`Raw: ${
+                        run.postprocessingResult?.postprocessedTireCode
+                          .rawCode ?? "Unknown"
+                      }`}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );

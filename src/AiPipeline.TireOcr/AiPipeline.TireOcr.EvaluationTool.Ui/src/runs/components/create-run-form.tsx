@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/core/components/ui/card";
+import { Spinner } from "@/core/components/ui/spinner";
 
 export const formSchema = z.object({
   runTitle: z.string().min(1, "Title is required"),
@@ -105,7 +106,8 @@ export const CreateEvaluationRunForm = ({
           disabled={isSubmitting}
           className="mt-5 w-full md:w-md lg:w-lg"
         >
-          Run evaluation
+          {isSubmitting && <Spinner />}
+          {isSubmitting ? "Evaluation in progress" : "Run evaluation"}
         </Button>
       </form>
     </FormProvider>
