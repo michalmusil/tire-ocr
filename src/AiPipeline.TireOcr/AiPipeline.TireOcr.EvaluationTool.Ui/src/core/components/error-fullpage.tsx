@@ -21,8 +21,8 @@ const ErrorFullpage = ({
     >
       <Card className="p-14 bg-accent/25">
         <div className="flex flex-col items-center gap-y-4">
-          <AlertCircle className="w-12 h-12 text-destructive" />
-          <p className="text-destructive text-lg font-semibold">
+          <AlertCircle className="w-12 h-12 text-red-600 dark:text-red-400" />
+          <p className="text-red-600 dark:text-red-400 text-lg font-semibold">
             {errorMessage}
           </p>
         </div>

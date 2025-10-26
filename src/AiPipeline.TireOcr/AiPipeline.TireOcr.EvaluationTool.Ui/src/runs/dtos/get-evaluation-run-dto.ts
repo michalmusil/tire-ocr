@@ -26,6 +26,8 @@ const TireCodeSchema = z.object({
   speedRating: z.string().nullish(),
 });
 
+export type TireCode = z.infer<typeof TireCodeSchema>;
+
 const EvaluationResultParameterSchema = z.object({
   distance: z.number(),
   estimatedAccuracy: z.number(),

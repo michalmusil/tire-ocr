@@ -7,6 +7,7 @@ import EvaluationBatchesPage from "./run-batches/pages/evaluation-batches-page";
 import EvaluationBatchDetailPage from "./run-batches/pages/evaluation-batch-detail-page";
 import CreateRun from "./runs/pages/create-run-page";
 import CreateBatch from "./run-batches/pages/create-batch-page";
+import EvaluationRunDetailPage from "./runs/pages/evaluation-run-detail-page";
 
 const Dashboard = () => <div>Dashboard</div>;
 const App: React.FC = () => {
@@ -16,8 +17,12 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/runs" element={<EvaluationRunsPage />} />
+          <Route path="/runs/:runId" element={<EvaluationRunDetailPage />} />
           <Route path="/batches" element={<EvaluationBatchesPage />} />
-          <Route path="/batches/:batchId" element={<EvaluationBatchDetailPage />} />
+          <Route
+            path="/batches/:batchId"
+            element={<EvaluationBatchDetailPage />}
+          />
           <Route path="/create-run" element={<CreateRun />} />
           <Route path="/create-batch" element={<CreateBatch />} />
         </Routes>
