@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, List, FilePlus } from "lucide-react";
+import { LayoutDashboard, Package, Workflow, Play } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
 
@@ -9,10 +9,10 @@ const AppSidebar: React.FC = () => {
 
   const menuItems = [
     { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/runs", icon: List, label: "Evaluation Runs" },
-    { to: "/batches", icon: List, label: "Evaluation Batches" },
-    { to: "/create-run", icon: FilePlus, label: "New Run" },
-    { to: "/create-batch", icon: FilePlus, label: "New Batch" },
+    { to: "/runs", icon: Workflow, label: "Evaluation Runs" },
+    { to: "/create-run", icon: Play, label: "New Run" },
+    { to: "/batches", icon: Package, label: "Evaluation Batches" },
+    { to: "/create-batch", icon: Play, label: "New Batch" },
   ];
 
   return (
