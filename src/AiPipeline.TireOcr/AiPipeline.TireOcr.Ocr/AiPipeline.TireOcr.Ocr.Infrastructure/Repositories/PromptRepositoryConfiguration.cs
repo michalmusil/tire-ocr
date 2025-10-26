@@ -12,7 +12,7 @@ public class PromptRepositoryConfiguration : IPromptRepository
         _configuration = configuration;
     }
 
-    public Task<string> GetMainPromptAsync() => GetPointsPromptAsync();
+    public Task<string> GetMainPromptAsync() => GetPointsStrictPromptAsync();
 
     public Task<string> GetBasePromptAsync() => Task.FromResult(GetPromptFromConfiguration("Base"));
 
@@ -21,6 +21,9 @@ public class PromptRepositoryConfiguration : IPromptRepository
     public Task<string> GetPointsPromptAsync() => Task.FromResult(GetPromptFromConfiguration("Points"));
 
     public Task<string> GetPointsStrictPromptAsync() => Task.FromResult(GetPromptFromConfiguration("PointsStrict"));
+
+    public Task<string> GetPointsStrictWithLisiContextPromptAsync() =>
+        Task.FromResult(GetPromptFromConfiguration("PointsStrictLisiContext"));
 
     private string GetPromptFromConfiguration(string promptKey)
     {

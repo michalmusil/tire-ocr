@@ -7,4 +7,5 @@ public interface IPromptRepository
     public Task<string> GetBaseStrictPromptAsync();
     public Task<string> GetPointsPromptAsync();
     public Task<string> GetPointsStrictPromptAsync();
+    public Task<string> GetPointsStrictWithLisiContextPromptAsync();
 }
