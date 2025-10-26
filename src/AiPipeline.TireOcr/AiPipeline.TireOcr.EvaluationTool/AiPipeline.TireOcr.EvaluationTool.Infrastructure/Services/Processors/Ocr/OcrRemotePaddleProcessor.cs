@@ -22,7 +22,7 @@ public class OcrRemotePaddleProcessor : IOcrProcessor
         _logger = logger;
     }
 
-    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType)
+    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType, PreprocessingType preprocessingType)
     {
         try
         {
@@ -39,6 +39,8 @@ public class OcrRemotePaddleProcessor : IOcrProcessor
                     }
                 }
             });
+            if(preprocessingType == PreprocessingType.ExtractAndComposeSlices)
+                content.Add(new StringContent("2"), "number_of_vertical_stacked_slices");
 
             var res = await _httpClient.PostAsync("/ocr/paddle", content);
             if (!res.IsSuccessStatusCode)

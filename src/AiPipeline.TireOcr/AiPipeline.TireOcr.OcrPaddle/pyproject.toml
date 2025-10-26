@@ -1,5 +1,5 @@
 [project]
-name = "aipipeline-tireocr-preprocessingpaddle"
+name = "aipipeline-tireocr-ocrpaddle"
 version = "0.1.0"
 description = "Ocr rest api for interacting with paddle ocr library"
 authors = [

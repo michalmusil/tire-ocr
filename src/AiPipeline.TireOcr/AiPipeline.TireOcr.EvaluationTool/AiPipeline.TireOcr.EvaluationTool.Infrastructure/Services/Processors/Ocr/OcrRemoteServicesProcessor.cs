@@ -22,7 +22,7 @@ public class OcrRemoteServicesProcessor : IOcrProcessor
         _logger = logger;
     }
 
-    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType)
+    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType, PreprocessingType preprocessingType)
     {
         try
         {
