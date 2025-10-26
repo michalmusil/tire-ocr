@@ -6,6 +6,7 @@ import { BatchInfoCard } from "../components/batch-info-card";
 import { BatchEvaluationCountsCard } from "../components/batch-evaluation-counts-card";
 import { BatchAverageDistancesCard } from "../components/batch-average-distances-card";
 import { BatchEvaluationRunsCard } from "../components/batch-evaluation-runs-card";
+import { BatchAverageTimesCard } from "../components/batch-average-times-card";
 
 const EvaluationBatchDetailPage: React.FC = () => {
   const { batchId } = useParams<{ batchId: string }>();
@@ -21,6 +22,14 @@ const EvaluationBatchDetailPage: React.FC = () => {
     return <ErrorFullpage errorMessage="Failed to load batch details" />;
   if (!batchDetail) return null;
 
+  const totalCost = batchDetail.evaluationRuns.reduce(
+    (total, run) => total + (run.ocrResult?.estimatedCosts?.estimatedCost ?? 0),
+    0
+  );
+  const totalCostCurrency =
+    batchDetail.evaluationRuns[0]?.ocrResult?.estimatedCosts
+      ?.estimatedCostCurrency ?? ",-";
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <BatchInfoCard
@@ -28,6 +37,11 @@ const EvaluationBatchDetailPage: React.FC = () => {
         batchId={batchDetail.id}
         startedAt={batchDetail.startedAt}
         finishedAt={batchDetail.finishedAt}
+        totalCost={
+          totalCost > 0
+            ? { amount: totalCost, currency: totalCostCurrency }
+            : null
+        }
       />
 
       <BatchEvaluationCountsCard
@@ -37,6 +51,8 @@ const EvaluationBatchDetailPage: React.FC = () => {
       <BatchAverageDistancesCard
         distances={batchDetail.batchEvaluation.distances}
       />
+
+      <BatchAverageTimesCard batchDetail={batchDetail} />
 
       <BatchEvaluationRunsCard runs={batchDetail.evaluationRuns} />
     </div>
