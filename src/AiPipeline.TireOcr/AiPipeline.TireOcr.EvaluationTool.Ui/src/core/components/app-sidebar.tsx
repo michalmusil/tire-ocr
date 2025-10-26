@@ -1,44 +1,78 @@
-import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Package, Workflow, Play } from "lucide-react";
-import { Button } from "@/core/components/ui/button";
+/// <reference types="vite-plugin-svgr/client" />
+
+import { Link } from "react-router-dom";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarHeader,
+} from "./ui/sidebar";
+import { Package, Workflow, Play } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
+import Logo from "../assets/tire-icon.svg?react";
 
-const AppSidebar: React.FC = () => {
-  const location = useLocation();
+const singleRunItems = [
+  { to: "/runs", icon: Workflow, label: "Results" },
+  { to: "/create-run", icon: Play, label: "New Run" },
+];
 
-  const menuItems = [
-    { to: "/", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/runs", icon: Workflow, label: "Evaluation Runs" },
-    { to: "/create-run", icon: Play, label: "New Run" },
-    { to: "/batches", icon: Package, label: "Evaluation Batches" },
-    { to: "/create-batch", icon: Play, label: "New Batch" },
-  ];
+const runBatchItems = [
+  { to: "/batches", icon: Package, label: "Batch results" },
+  { to: "/create-batch", icon: Play, label: "New Batch" },
+];
 
+const AppSidebar = () => {
   return (
-    <div className="m-6">
-      <div className="flex flex-row justify-around w-full overflow-clip p-3 bg-accent/25 rounded-md md:flex-col md:justify-start md:w-56 lg:w-64 md:h-full">
-        <div className="p-4 flex space-x-5">
-          <ModeToggle />
-          <h2 className="text-2xl font-semibold">Tire OCR</h2>
+    <Sidebar>
+      <SidebarHeader className="flex flex-row justify-between items-center">
+        <div className="flex items-center">
+          <Logo className="block w-12 h-12" />
+          <h1 className="text-xl font-semibold">Tire OCR</h1>
         </div>
-        <nav className="px-2 flex flex-col md:mt-4">
-          {menuItems.map((item) => (
-            <Button
-              key={item.to}
-              asChild
-              variant={location.pathname === item.to ? "secondary" : "ghost"}
-              className="md:w-full justify-start mb-1 overflow-clip"
-            >
-              <Link to={item.to}>
-                <item.icon className="mr-2 h-4 w-4" />
-                {item.label}
-              </Link>
-            </Button>
-          ))}
-        </nav>
-      </div>
-    </div>
+        <ModeToggle />
+      </SidebarHeader>
+      <SidebarContent>
+        <SidebarGroup>
+          <SidebarGroupLabel>Single run</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {singleRunItems.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton asChild>
+                    <Link to={item.to}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Run batch</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {runBatchItems.map((item) => (
+                <SidebarMenuItem key={item.to}>
+                  <SidebarMenuButton asChild>
+                    <Link to={item.to}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
   );
 };
 
