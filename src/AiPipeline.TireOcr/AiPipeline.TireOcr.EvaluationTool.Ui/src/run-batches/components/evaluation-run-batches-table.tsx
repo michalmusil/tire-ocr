@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@/core/components/ui/table";
 import type { RunBatch } from "../dtos/get-run-batch-dto";
-import { getDisplayedBatchDuration } from "../utils/data-utils";
+import { getDisplayedDurationFromDatetimeBoundaries } from "../utils/data-utils";
 
 type EvaluationRunBatchesTableProps = {
   batches: RunBatch[];
@@ -46,7 +46,10 @@ export const EvaluationRunBatchesTable = ({
             <TableCell>{batch.numberOfEvaluations}</TableCell>
             <TableCell>{batch.createdAt}</TableCell>
             <TableCell>
-              {getDisplayedBatchDuration(batch.startedAt, batch.finishedAt)}
+              {getDisplayedDurationFromDatetimeBoundaries(
+                batch.startedAt,
+                batch.finishedAt
+              )}
             </TableCell>
           </TableRow>
         ))}

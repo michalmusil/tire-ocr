@@ -31,6 +31,14 @@ const EvaluationResultParameterSchema = z.object({
   estimatedAccuracy: z.number(),
 });
 
+const EstimatedCostsSchema = z.object({
+  inputUnitCount: z.number().nullish(),
+  outputUnitCount: z.number().nullish(),
+  billingUnit: z.string().nullish(),
+  estimatedCost: z.number().nullish(),
+  estimatedCostCurrency: z.string().nullish(),
+});
+
 export const EvaluationRunSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -77,7 +85,7 @@ export const EvaluationRunSchema = z.object({
     .object({
       detectedCode: z.string(),
       detectedManufacturer: z.string().nullish(),
-      estimatedCosts: z.any().nullish(),
+      estimatedCosts: EstimatedCostsSchema.nullish(),
       durationMs: z.number(),
     })
     .nullish(),
