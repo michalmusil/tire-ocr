@@ -86,7 +86,8 @@ public class RunFacade : IRunFacade
 
         var ocrResult = await ocrProcessorResult.Data!.Process(
             image: preprocessingResult.Data!.Image,
-            ocrType: runConfig.OcrType
+            ocrType: runConfig.OcrType,
+            preprocessingType: runConfig.PreprocessingType
         );
         if (ocrResult.IsSuccess)
         {

@@ -10,12 +10,15 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
 {
     private readonly PreprocessingResizeProcessor _resizeProcessor;
     private readonly PreprocessingRoiExtractionProcessor _roiExtractionProcessor;
+    private readonly PreprocessingSlicesCompositionProcessor _slicesCompositionProcessor;
 
     public PreprocessingProcessorMapper(PreprocessingResizeProcessor resizeProcessor,
-        PreprocessingRoiExtractionProcessor roiExtractionProcessor)
+        PreprocessingRoiExtractionProcessor roiExtractionProcessor,
+        PreprocessingSlicesCompositionProcessor slicesCompositionProcessor)
     {
         _resizeProcessor = resizeProcessor;
         _roiExtractionProcessor = roiExtractionProcessor;
+        _slicesCompositionProcessor = slicesCompositionProcessor;
     }
 
     public DataResult<IPreprocessingProcessor> Map(PreprocessingType input)
@@ -25,6 +28,7 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
             PreprocessingType.Resize => _resizeProcessor,
             PreprocessingType.ExtractRoi => _roiExtractionProcessor,
             PreprocessingType.ExtractRoiAndRemoveBg => _roiExtractionProcessor,
+            PreprocessingType.ExtractAndComposeSlices => _slicesCompositionProcessor,
             _ => null
         };
         if (processor == null)

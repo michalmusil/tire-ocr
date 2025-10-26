@@ -7,7 +7,7 @@ from paddleocr import PaddleOCR
 from dotenv import load_dotenv
 
 
-from typing import Optional, Any
+from typing import Optional, Any, List
 from src.application.services.ocr_service import OCRResult, OcrService
 
 load_dotenv()
@@ -23,7 +23,7 @@ def get_paddle_ocr_engine() -> PaddleOCR:
 
         PADDLE_OCR_ENGINE = PaddleOCR(
             use_doc_orientation_classify=False,
-            # use_textline_orientation=False,
+            use_doc_unwarping=False,
             lang="en",
             text_recognition_model_name=model_name,
             text_recognition_model_dir=model_dir,
@@ -85,3 +85,39 @@ class PaddleOcrService(OcrService):
                 extracted_text=None,
                 duration_ms=duration,
             )
+
+    async def perform_tire_ocr_on_slices(self, image_slices: List[bytes]) -> OCRResult:
+        combined_text_parts: List[str] = []
+        total_duration_ms = 0
+
+        for i, slice_bytes in enumerate(image_slices):
+            ocr_result: OCRResult = await self.perform_tire_ocr(slice_bytes)
+            total_duration_ms += ocr_result.duration_ms
+
+            if ocr_result.status == "success" and ocr_result.extracted_text:
+                # Only append if extracted text contains '/' character
+                if "/" in ocr_result.extracted_text:
+                    combined_text_parts.append(ocr_result.extracted_text)
+            elif ocr_result.status == "error":
+                return OCRResult(
+                    status="error",
+                    message=f"Tire OCR failed on slice {i}: {ocr_result.message}",
+                    extracted_text=None,
+                    duration_ms=total_duration_ms,
+                )
+        if not combined_text_parts:
+            return OCRResult(
+                status="not_found",
+                message="Tire OCR failed to detect any text in any of the image slices",
+                extracted_text=None,
+                duration_ms=total_duration_ms,
+            )
+
+        combined_text = " ".join(combined_text_parts)
+
+        return OCRResult(
+            status="success",
+            message=f"Tire OCR was successful on {len(combined_text_parts)} out of {len(image_slices)} slices.",
+            extracted_text=combined_text,
+            duration_ms=total_duration_ms,
+        )
