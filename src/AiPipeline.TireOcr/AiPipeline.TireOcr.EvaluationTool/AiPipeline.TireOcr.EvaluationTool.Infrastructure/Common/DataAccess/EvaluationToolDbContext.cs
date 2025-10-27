@@ -3,6 +3,7 @@ using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatch;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
+using AiPipeline.TireOcr.EvaluationTool.Domain.UserAggregate;
 using Microsoft.EntityFrameworkCore;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Common.DataAccess;
@@ -20,9 +21,11 @@ public class EvaluationToolDbContext : DbContext
     public DbSet<OcrResultEntity> OcrResults => Set<OcrResultEntity>();
     public DbSet<PostprocessingResultEntity> PostprocessingResults => Set<PostprocessingResultEntity>();
     public DbSet<DbMatchingResultEntity> DbMatchingResults => Set<DbMatchingResultEntity>();
-
     public DbSet<EvaluationRunBatchEntity> EvaluationRunBatches => Set<EvaluationRunBatchEntity>();
-    
+    public DbSet<Domain.UserAggregate.User> Users => Set<Domain.UserAggregate.User>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

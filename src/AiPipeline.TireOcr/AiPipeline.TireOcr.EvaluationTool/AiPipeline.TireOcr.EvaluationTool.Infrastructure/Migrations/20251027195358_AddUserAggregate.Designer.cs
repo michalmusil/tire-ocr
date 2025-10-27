@@ -3,6 +3,7 @@ using System;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Common.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Migrations
 {
     [DbContext(typeof(EvaluationToolDbContext))]
-    partial class EvaluationToolDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251027195358_AddUserAggregate")]
+    partial class AddUserAggregate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

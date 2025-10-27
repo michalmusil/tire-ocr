@@ -6,6 +6,8 @@ using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Services.Processors;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Repositories;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Services;
+using AiPipeline.TireOcr.EvaluationTool.Application.User.Repositories;
+using AiPipeline.TireOcr.EvaluationTool.Application.User.Services;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Common.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.Common.Extensions;
@@ -20,6 +22,8 @@ using AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRun.Services.Pr
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRun.Services.Processors.Preprocessing;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRunBatch.Repositories;
 using AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRunBatch.Services;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.User.Repositories;
+using AiPipeline.TireOcr.EvaluationTool.Infrastructure.User.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,6 +37,7 @@ public static class DependencyInjection
         AddRepositories(services);
         AddUnitOfWork(services);
         AddServices(services);
+        AddExternalServices(services);
         AddFacades(services);
         AddDbContext(services, configuration);
         return services;
@@ -47,6 +52,9 @@ public static class DependencyInjection
     {
         serviceCollection.AddScoped<IEvaluationRunEntityRepository, EvaluationRunEntityRepository>();
         serviceCollection.AddScoped<IEvaluationRunBatchEntityRepository, EvaluationRunBatchEntityRepository>();
+        serviceCollection.AddScoped<IUserEntityRepository, UserEntityRepository>();
+        serviceCollection.AddScoped<IRefreshTokenEntityRepository, RefreshTokenEntityRepository>();
+        serviceCollection.AddScoped<IApiKeyRepository, ApiKeyRepository>();
     }
 
     private static void AddServices(IServiceCollection services)
@@ -56,7 +64,20 @@ public static class DependencyInjection
         services.AddScoped<ICsvParserService, CsvParserService>();
         services.AddScoped<IBatchEvaluationService, BatchEvaluationService>();
         services.AddHttpClient<IImageDownloadService, ImageDownloaderService>();
+        services.AddScoped<IAuthService, AuthService>();
+        services.AddSingleton<IHashService, HashService>();
+        services.AddSingleton<ICryptographyService, CryptographyService>();
 
+        services
+            .AddScoped<IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor>, PreprocessingProcessorMapper>();
+        services.AddScoped<IEnumToObjectMapper<OcrType, IOcrProcessor>, OcrProcessorMapper>();
+        services
+            .AddScoped<IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor>, PostprocessingProcessorMapper>();
+        services.AddScoped<IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor>, DbMatchingProcessorMapper>();
+    }
+
+    private static void AddExternalServices(IServiceCollection services)
+    {
         services.AddHttpClient<PreprocessingRoiExtractionProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://PreprocessingService");
@@ -126,14 +147,6 @@ public static class DependencyInjection
         {
             client.BaseAddress = new("https+http://TasyDbMatcherService");
         });
-
-        services
-            .AddScoped<IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor>, PreprocessingProcessorMapper>();
-        services.AddScoped<IEnumToObjectMapper<OcrType, IOcrProcessor>, OcrProcessorMapper>();
-        services
-            .AddScoped<IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor>,
-                PostprocessingProcessorMapper>();
-        services.AddScoped<IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor>, DbMatchingProcessorMapper>();
     }
 
     private static void AddFacades(IServiceCollection services)
