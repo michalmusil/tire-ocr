@@ -24,9 +24,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Common\" />
       <Folder Include="EvaluationRunBatch\Contracts\" />
       <Folder Include="EvaluationRun\Contracts\" />
+      <Folder Include="User\Contracts\User\" />
     </ItemGroup>
 
 </Project>
