@@ -30,10 +30,12 @@ const AppSidebar = () => {
   return (
     <Sidebar>
       <SidebarHeader className="flex flex-row justify-between items-center">
-        <div className="flex items-center">
-          <Logo className="block w-12 h-12" />
-          <h1 className="text-xl font-semibold">Tire OCR</h1>
-        </div>
+        <Link to="/">
+          <div className="flex items-center">
+            <Logo className="block w-12 h-12" />
+            <h1 className="text-xl font-semibold">Tire OCR</h1>
+          </div>
+        </Link>
         <ModeToggle />
       </SidebarHeader>
       <SidebarContent>
