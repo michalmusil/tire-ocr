@@ -10,4 +10,11 @@
       <ProjectReference Include="..\AiPipeline.TireOcr.EvaluationTool.Domain\AiPipeline.TireOcr.EvaluationTool.Domain.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="EvaluationRunBatch\Commands\" />
+      <Folder Include="EvaluationRunBatch\Queries\" />
+      <Folder Include="EvaluationRun\Commands\" />
+      <Folder Include="EvaluationRun\Queries\" />
+    </ItemGroup>
+
 </Project>
