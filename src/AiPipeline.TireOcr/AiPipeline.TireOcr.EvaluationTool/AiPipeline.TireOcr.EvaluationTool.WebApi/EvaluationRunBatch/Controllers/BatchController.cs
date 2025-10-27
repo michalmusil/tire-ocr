@@ -10,6 +10,7 @@ using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batc
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.RunBatchJsonOnly;
 using Asp.Versioning;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TireOcr.Shared.Pagination;
 using TireOcr.Shared.Result;
@@ -17,6 +18,7 @@ using TireOcr.Shared.Result;
 namespace AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Controllers;
 
 [ApiController]
+[Authorize]
 [ApiVersion("1.0")]
 [Route("api/v{v:apiVersion}/[controller]")]
 public class BatchController : ControllerBase
