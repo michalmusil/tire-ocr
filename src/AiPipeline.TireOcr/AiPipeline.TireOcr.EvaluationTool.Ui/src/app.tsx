@@ -2,20 +2,19 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import DefaultLayout from "./core/layouts/sidabar-layout";
+import DashboardPage from "./core/pages/dashboard-page";
 import EvaluationRunsPage from "./runs/pages/evaluation-runs-page";
 import EvaluationBatchesPage from "./run-batches/pages/evaluation-batches-page";
 import EvaluationBatchDetailPage from "./run-batches/pages/evaluation-batch-detail-page";
 import CreateRun from "./runs/pages/create-run-page";
 import CreateBatch from "./run-batches/pages/create-batch-page";
 import EvaluationRunDetailPage from "./runs/pages/evaluation-run-detail-page";
-
-const Dashboard = () => <div>Dashboard</div>;
 const App: React.FC = () => {
   return (
     <Router>
       <DefaultLayout>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/" element={<DashboardPage />} />
           <Route path="/runs" element={<EvaluationRunsPage />} />
           <Route path="/runs/:runId" element={<EvaluationRunDetailPage />} />
           <Route path="/batches" element={<EvaluationBatchesPage />} />
