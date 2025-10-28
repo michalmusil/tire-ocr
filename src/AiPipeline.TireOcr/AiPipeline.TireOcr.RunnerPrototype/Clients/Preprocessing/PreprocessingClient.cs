@@ -36,19 +36,17 @@ public class PreprocessingClient : IPreprocessingClient
                     }
                 }
             });
+            content.Add(new StringContent("2"), "NumberOfSlices");
 
-            var res = await _httpClient.PostAsync("/api/v1/Preprocess/ExtractRoi", content);
+            var res = await _httpClient.PostAsync("/api/v1/Preprocess/ExtractSlicesCompositionReturnFile", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();
                 throw new HttpRequestExceptionWithContent(res.StatusCode, content: errorContent);
             }
 
-            var responseContent = await res.Content.ReadFromJsonAsync<PreprocessingResponseDto>();
-            var imageData = Convert.FromBase64String(responseContent!.Base64ImageData);
-            return DataResult<Image>.Success(
-                new Image(imageData, responseContent.FileName, responseContent.ContentType)
-            );
+            var imageData = await res.Content.ReadAsByteArrayAsync();
+            return DataResult<Image>.Success(new Image(imageData, image.FileName, image.ContentType));
         }
         catch (HttpRequestExceptionWithContent ex)
         {

@@ -61,7 +61,7 @@ public static class DependencyInjection
             .RemoveResilienceHandlers()
             .AddStandardResilienceHandler(opt =>
             {
-                var timeout = TimeSpan.FromSeconds(30);
+                var timeout = TimeSpan.FromSeconds(60);
                 opt.AttemptTimeout.Timeout = timeout;
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
