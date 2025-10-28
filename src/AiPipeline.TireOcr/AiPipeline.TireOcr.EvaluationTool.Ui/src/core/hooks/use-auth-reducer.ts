@@ -80,7 +80,7 @@ const getInitialState = (): AuthState | null => {
   const accessToken = localStorage.getItem(AT_KEY);
   const refreshToken = localStorage.getItem(RT_KEY);
   const userStr = localStorage.getItem(USER_KEY);
-  const user = userStr ? LoggedInUserSchema.parse(userStr) : null;
+  const user = userStr ? LoggedInUserSchema.parse(JSON.parse(userStr)) : null;
 
   if (!accessToken || !refreshToken || !user) {
     delete axios.defaults.headers.common["Authorization"];
