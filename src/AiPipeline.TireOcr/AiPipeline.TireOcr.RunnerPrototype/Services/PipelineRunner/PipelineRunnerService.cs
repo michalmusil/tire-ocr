@@ -42,16 +42,16 @@ public class PipelineRunnerService : IPipelineRunnerService
         var totalStopwatch = new Stopwatch();
         totalStopwatch.Start();
 
-        // var preprocessingResult = await PerformTimeMeasuredTask("Preprocessing",
-        //     () => _preprocessingClient.PreprocessImage(image)
-        // );
-        // if (preprocessingResult.Item2.IsFailure)
-        //     return DataResult<TireOcrResultDto>.Failure(preprocessingResult.Item2.Failures);
-        //
-        // var preprocessedImage = preprocessingResult.Item2.Data!;
+        var preprocessingResult = await PerformTimeMeasuredTask("Preprocessing",
+            () => _preprocessingClient.PreprocessImage(image)
+        );
+        if (preprocessingResult.Item2.IsFailure)
+            return DataResult<TireOcrResultDto>.Failure(preprocessingResult.Item2.Failures);
+        
+        var preprocessedImage = preprocessingResult.Item2.Data!;
 
         var ocrResult = await PerformTimeMeasuredTask("Ocr",
-            () => _ocrClient.PerformTireCodeOcrOnImage(image, detectorType)
+            () => _ocrClient.PerformTireCodeOcrOnImage(preprocessedImage, detectorType)
         );
         if (ocrResult.Item2.IsFailure)
             return DataResult<TireOcrResultDto>.Failure(ocrResult.Item2.Failures);
@@ -75,7 +75,7 @@ public class PipelineRunnerService : IPipelineRunnerService
 
         List<RunStatDto> runTrace =
         [
-            // preprocessingResult.Item1,
+            preprocessingResult.Item1,
             ocrResult.Item1,
             postprocessingResult.Item1,
             dbMatchingResult.Item1
