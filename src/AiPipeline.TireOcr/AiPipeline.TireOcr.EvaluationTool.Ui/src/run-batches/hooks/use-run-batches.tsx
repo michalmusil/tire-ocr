@@ -4,6 +4,7 @@ import {
   PaginatedRunBatchesSchema,
   type PaginatedRunBatches,
 } from "../dtos/get-run-batch-dto";
+import axios from "axios";
 
 type CurrentPagination = {
   pageNumber: number;
@@ -13,8 +14,9 @@ type CurrentPagination = {
 };
 
 export const useRunBatches = (page: number = 1, pageSize: number = 10) => {
-  const [runBatches, setRunBatches] =
-    useState<PaginatedRunBatches | null>(null);
+  const [runBatches, setRunBatches] = useState<PaginatedRunBatches | null>(
+    null
+  );
   const [pageStatus, setPageStatus] = useState<GenericPageStatus>({
     isLoading: false,
     errorMessage: null,
@@ -46,19 +48,14 @@ export const useRunBatches = (page: number = 1, pageSize: number = 10) => {
   const loadRunBatches = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/api/v1/Batch?pageNumber=${page}&pageSize=${pageSize}`,
-        {
-          method: "GET",
-        }
+      const response = await axios.get(
+        `/api/v1/Batch?pageNumber=${page}&pageSize=${pageSize}`
       );
       setIsLoading(false);
-      if (!response.ok) {
-        setError("Failed to fetch evaluation batches");
-        return;
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch evaluation batches");
       }
-      const json = await response.json();
-      const parsed = PaginatedRunBatchesSchema.parse(json);
+      const parsed = PaginatedRunBatchesSchema.parse(response.data);
       setRunBatches(parsed);
     } catch (err) {
       setIsLoading(false);
@@ -73,4 +70,3 @@ export const useRunBatches = (page: number = 1, pageSize: number = 10) => {
     setError,
   };
 };
-

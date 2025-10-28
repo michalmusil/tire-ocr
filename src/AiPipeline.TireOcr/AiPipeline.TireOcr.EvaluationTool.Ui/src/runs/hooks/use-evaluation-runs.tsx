@@ -4,6 +4,7 @@ import {
   PaginatedEvaluationRunsSchema,
   type PaginatedEvaluationRuns,
 } from "../dtos/get-evaluation-run-dto";
+import axios from "axios";
 
 type CurrentPagination = {
   pageNumber: number;
@@ -46,20 +47,17 @@ export const useEvaluationRuns = (page: number = 1, pageSize: number = 10) => {
   const loadEvaluationRuns = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(
-        `/api/v1/Run?pageNumber=${page}&pageSize=${pageSize}`,
-        {
-          method: "GET",
-        }
+      const response = await axios.get(
+        `/api/v1/Run?pageNumber=${page}&pageSize=${pageSize}`
       );
       setIsLoading(false);
-      if (!response.ok) {
-        setError("Failed to fetch evaluation runs");
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch evaluation runs");
       }
-      const json = await response.json();
-      const parsed = PaginatedEvaluationRunsSchema.parse(json);
+      const parsed = PaginatedEvaluationRunsSchema.parse(response.data);
       setEvaluationRuns(parsed);
     } catch (err) {
+      setIsLoading(false);
       setError("Failed to fetch evaluation runs");
     }
   };

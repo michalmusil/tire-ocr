@@ -3,20 +3,17 @@ import {
   RunBatchDetailResponseSchema,
   type RunBatchDetail,
 } from "../dtos/get-run-batch-detail-dto";
+import axios from "axios";
 
 const fetchRunBatchDetail = async (
   batchId: string
 ): Promise<RunBatchDetail> => {
-  const response = await fetch(`/api/v1/Batch/${batchId}`, {
-    method: "GET",
-  });
-
-  if (!response.ok) {
+  const response = await axios.get(`/api/v1/Batch/${batchId}`);
+  if (response.status !== 200) {
     throw new Error("Failed to fetch run batch detail");
   }
 
-  const json = await response.json();
-  const parsed = RunBatchDetailResponseSchema.parse(json);
+  const parsed = RunBatchDetailResponseSchema.parse(response.data);
   return parsed.item;
 };
 

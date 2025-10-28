@@ -3,18 +3,15 @@ import {
   EvaluationRunSchema,
   type EvaluationRun,
 } from "../dtos/get-evaluation-run-dto";
+import axios from "axios";
 
 const fetchRunDetail = async (runId: string): Promise<EvaluationRun> => {
-  const response = await fetch(`/api/v1/Run/${runId}`, {
-    method: "GET",
-  });
-
-  if (!response.ok) {
+  const response = await axios.get(`/api/v1/Run/${runId}`);
+  if (response.status !== 200) {
     throw new Error("Failed to fetch run detail");
   }
 
-  const json = await response.json();
-  const parsed = EvaluationRunSchema.parse(json["item"]);
+  const parsed = EvaluationRunSchema.parse(response.data["item"]);
   return parsed;
 };
 
