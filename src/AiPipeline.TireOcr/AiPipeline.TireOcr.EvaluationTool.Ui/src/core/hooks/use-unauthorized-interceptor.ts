@@ -68,7 +68,7 @@ const refreshToken = async (
   refreshToken: string
 ): Promise<LoggedInUser | null> => {
   try {
-    const response = await axios.post("/api/v1/Refresh", {
+    const response = await axios.post("/api/v1/Auth/Refresh", {
       accessToken: accessToken,
       refreshToken: refreshToken,
     });
