@@ -1,4 +1,3 @@
-import os
 import io
 import time
 import numpy as np
@@ -18,8 +17,8 @@ def get_paddle_ocr_engine() -> PaddleOCR:
     global PADDLE_OCR_ENGINE
     if PADDLE_OCR_ENGINE is None:
         print("PaddleOCR: INITIALIZING")
-        model_name = os.getenv("CUSTOM_REC_MODEL_NAME")
-        model_dir = os.getenv("CUSTOM_REC_MODEL_PATH")
+        model_name = "PP-OCRv5_mobile_rec"
+        model_dir = "./custom_models/rec/PP-OCRv5_mobile_rec_200e"
 
         PADDLE_OCR_ENGINE = PaddleOCR(
             use_doc_orientation_classify=False,
