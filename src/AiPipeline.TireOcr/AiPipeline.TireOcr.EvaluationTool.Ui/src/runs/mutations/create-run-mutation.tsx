@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import type { CreateEvaluationRunFormSchema } from "../components/create-run-form";
 import { PostRunResponseSchema } from "../dtos/post-run-response-dto";
+import axios from "axios";
 
 const getFormAsFormData = (
   data: CreateEvaluationRunFormSchema,
@@ -26,22 +27,25 @@ const createRun = async (data: CreateEvaluationRunFormSchema) => {
   }
 
   const response = data.image
-    ? await fetch("/api/v1/Run/WithImage", {
-        method: "POST",
-        body: getFormAsFormData(data, data.image[0]),
-      })
-    : await fetch("/api/v1/Run/WithImageUrl", {
-        method: "POST",
+    ? await axios.post(
+        "/api/v1/Run/WithImage",
+        getFormAsFormData(data, data.image[0]),
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+    : await axios.post("/api/v1/Run/WithImageUrl", data, {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
       });
-  if (!response.ok) {
-    throw new Error("Failed to create new evaluation run");
+  if (response.status !== 200) {
+    throw new Error("Failed to create evaluation run");
   }
-  const json = await response.json();
-  const parsed = PostRunResponseSchema.parse(json);
+
+  const parsed = PostRunResponseSchema.parse(response.data);
   return parsed.result.id;
 };
 

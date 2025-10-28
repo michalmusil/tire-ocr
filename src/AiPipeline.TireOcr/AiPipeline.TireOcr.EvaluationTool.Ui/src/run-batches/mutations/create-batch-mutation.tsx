@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import type { CreateBatchFormSchema } from "../components/create-run-batch-form";
 import { PostRunBatchResponseSchema } from "../dtos/post-run-batch-response-dto";
+import axios from "axios";
 
 const createBatch = async (data: CreateBatchFormSchema) => {
   const formData = new FormData();
@@ -15,15 +16,15 @@ const createBatch = async (data: CreateBatchFormSchema) => {
   formData.append("postprocessingType", data.postprocessingType);
   formData.append("dbMatchingType", data.dbMatchingType);
 
-  const response = await fetch("/api/v1/Batch/Form", {
-    method: "POST",
-    body: formData,
+  const response = await axios.post("/api/v1/Batch/Form", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
-  if (!response.ok) {
-    throw new Error("Failed to create new evaluation run batch");
+  if (response.status !== 200) {
+    throw new Error("Failed to create evaluation batch");
   }
-  const json = await response.json();
-  const parsed = PostRunBatchResponseSchema.parse(json);
+  const parsed = PostRunBatchResponseSchema.parse(response.data);
   return parsed.result.id;
 };
 
