@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -21,10 +20,7 @@ type EvaluationRunsTableProps = {
   displayCaption?: boolean;
 };
 
-export const EvaluationRunsTable = ({
-  runs,
-  displayCaption = true,
-}: EvaluationRunsTableProps) => {
+export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
   const navigate = useNavigate();
 
   const handleRowClick = (runId: string) => {
@@ -33,9 +29,6 @@ export const EvaluationRunsTable = ({
 
   return (
     <Table>
-      {displayCaption && (
-        <TableCaption>Most recent evaluation runs</TableCaption>
-      )}
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>

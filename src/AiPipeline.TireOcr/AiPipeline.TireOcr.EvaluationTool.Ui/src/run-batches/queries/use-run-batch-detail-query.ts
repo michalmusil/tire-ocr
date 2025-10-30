@@ -5,6 +5,8 @@ import {
 } from "../dtos/get-run-batch-detail-dto";
 import axios from "axios";
 
+export const RunBatchDetailQueryKey = "runBatchDetail";
+
 const fetchRunBatchDetail = async (
   batchId: string
 ): Promise<RunBatchDetail> => {
@@ -19,7 +21,7 @@ const fetchRunBatchDetail = async (
 
 export const useRunBatchDetailQuery = (batchId: string) => {
   return useQuery({
-    queryKey: ["runBatchDetail", batchId],
+    queryKey: [RunBatchDetailQueryKey, batchId],
     queryFn: () => fetchRunBatchDetail(batchId),
   });
 };

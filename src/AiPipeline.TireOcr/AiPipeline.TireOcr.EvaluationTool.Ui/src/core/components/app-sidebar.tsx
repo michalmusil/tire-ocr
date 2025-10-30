@@ -13,7 +13,7 @@ import {
   SidebarHeader,
   SidebarFooter,
 } from "./ui/sidebar";
-import { Package, Workflow, Play, LogOut, User } from "lucide-react";
+import { Package, Workflow, Play, LogOut, User, Home } from "lucide-react";
 import { ModeToggle } from "./mode-toggle";
 import { useAuth } from "../providers/auth-provider";
 import { Button } from "./ui/button";
@@ -34,6 +34,18 @@ const AppSidebar = () => {
     <Sidebar>
       <Header />
       <SidebarContent>
+        <SidebarGroup>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link to={"/"}>
+                  <Home />
+                  <span>Home</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
         <SingleRunGroup />
         <RunBatchGroup />
       </SidebarContent>

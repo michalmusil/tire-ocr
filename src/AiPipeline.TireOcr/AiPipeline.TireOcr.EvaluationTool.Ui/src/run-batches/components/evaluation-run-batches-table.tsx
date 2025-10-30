@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -15,7 +14,7 @@ type EvaluationRunBatchesTableProps = {
   batches: RunBatch[];
 };
 
-export const EvaluationRunBatchesTable = ({
+const EvaluationRunBatchesTable = ({
   batches,
 }: EvaluationRunBatchesTableProps) => {
   const navigate = useNavigate();
@@ -26,7 +25,6 @@ export const EvaluationRunBatchesTable = ({
 
   return (
     <Table>
-      <TableCaption>Most recent evaluation run batches</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Title</TableHead>
@@ -57,3 +55,5 @@ export const EvaluationRunBatchesTable = ({
     </Table>
   );
 };
+
+export default EvaluationRunBatchesTable;

@@ -13,16 +13,20 @@ import {
 import { DialogHeader } from "@/core/components/ui/dialog";
 import { Spinner } from "@/core/components/ui/spinner";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { RunBatchesQueryKey } from "../queries/use-run-batches-query";
 
 const CreateBatchPage: React.FC = () => {
   const [dialogClosed, setDialogClosed] = useState(false);
   const createBatchMutation = useCreateBatchMutation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const onSubmit = (data: CreateBatchFormSchema) => {
     setDialogClosed(false);
     createBatchMutation.mutate(data, {
       onSuccess: (id) => {
+        queryClient.invalidateQueries({ queryKey: [RunBatchesQueryKey] });
         navigate(`/batches/${id}`);
       },
     });

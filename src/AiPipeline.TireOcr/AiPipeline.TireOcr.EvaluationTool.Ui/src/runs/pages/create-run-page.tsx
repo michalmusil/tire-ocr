@@ -13,16 +13,20 @@ import { useCreateRunMutation } from "../mutations/create-run-mutation";
 import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/core/components/ui/spinner";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { RunsQueryKey } from "../queries/use-runs-query";
 
 const CreateRunPage: React.FC = () => {
   const [dialogClosed, setDialogClosed] = useState(false);
   const createRunMutation = useCreateRunMutation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const onSubmit = (data: CreateEvaluationRunFormSchema) => {
     setDialogClosed(false);
     createRunMutation.mutate(data, {
       onSuccess: (id) => {
+        queryClient.invalidateQueries({ queryKey: [RunsQueryKey] });
         navigate(`/runs/${id}`);
       },
     });

@@ -14,7 +14,7 @@ type GenericPaginationProps = {
   getPageHref: (page: number) => string;
 } & React.HTMLAttributes<HTMLDivElement>;
 
-export function GenericPagination({
+function GenericPagination({
   currentPage,
   totalPages,
   getPageHref,
@@ -84,3 +84,5 @@ export function GenericPagination({
     </Pagination>
   );
 }
+
+export default GenericPagination;

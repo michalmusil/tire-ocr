@@ -5,6 +5,8 @@ import {
 } from "../dtos/get-evaluation-run-dto";
 import axios from "axios";
 
+export const RunDetailQueryKey = "runDetail";
+
 const fetchRunDetail = async (runId: string): Promise<EvaluationRun> => {
   const response = await axios.get(`/api/v1/Run/${runId}`);
   if (response.status !== 200) {
@@ -17,7 +19,7 @@ const fetchRunDetail = async (runId: string): Promise<EvaluationRun> => {
 
 export const useRunDetailQuery = (runId: string) => {
   return useQuery({
-    queryKey: ["runDetail", runId],
+    queryKey: [RunDetailQueryKey, runId],
     queryFn: () => fetchRunDetail(runId),
   });
 };
