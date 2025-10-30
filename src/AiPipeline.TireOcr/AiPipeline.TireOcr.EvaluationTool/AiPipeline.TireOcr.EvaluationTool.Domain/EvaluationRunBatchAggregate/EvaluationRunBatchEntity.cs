@@ -1,12 +1,13 @@
 using AiPipeline.TireOcr.EvaluationTool.Domain.Common;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
+using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 
-public class EvaluationRunBatchEntity: TimestampedEntity
+public class EvaluationRunBatchEntity : TimestampedEntity
 {
     public Guid Id { get; }
-    public string Title { get; }
+    public string Title { get; private set; }
 
     public DateTime? StartedAt => EvaluationRuns.Min(r => r.StartedAt);
 
@@ -32,5 +33,14 @@ public class EvaluationRunBatchEntity: TimestampedEntity
         var newEvaluationRuns = evaluationRuns.Where(r => _evaluationRuns.All(existing => existing.Id != r.Id));
         _evaluationRuns.AddRange(newEvaluationRuns);
         SetUpdated();
+    }
+
+    public Result SetTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title) || title.Trim().Length <= 2)
+            return Result.Invalid("Batch title must be at least 3 characters long");
+
+        Title = title;
+        return Result.Success();
     }
 }

@@ -20,5 +20,9 @@ public class RunSingleEvaluationCommandValidator : AbstractValidator<RunSingleEv
 
         RuleFor(c => c.RunConfig)
             .NotNull();
+        
+        RuleFor(c => c.RunTitle)
+            .Must(rt => rt is null || rt.Trim().Length > 2)
+            .WithMessage("Custom run title must be at least 3 characters long");
     }
 }

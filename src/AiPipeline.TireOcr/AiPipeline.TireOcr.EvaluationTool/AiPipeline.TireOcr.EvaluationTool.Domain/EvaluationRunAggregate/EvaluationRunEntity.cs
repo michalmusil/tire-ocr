@@ -3,6 +3,7 @@ using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.DbMatch;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 using AiPipeline.TireOcr.EvaluationTool.Domain.StepTypes;
+using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 
@@ -10,7 +11,7 @@ public class EvaluationRunEntity : TimestampedEntity
 {
     public Guid Id { get; }
     public Guid? BatchId { get; }
-    public string Title { get; }
+    public string Title { get; private set; }
     public ImageValueObject InputImage { get; }
     public DateTime StartedAt { get; }
     public DateTime? FinishedAt { get; private set; }
@@ -103,5 +104,14 @@ public class EvaluationRunEntity : TimestampedEntity
     {
         FinishedAt = finishedAt.ToUniversalTime();
         SetUpdated();
+    }
+
+    public Result SetTitle(string title)
+    {
+        if (string.IsNullOrWhiteSpace(title) || title.Trim().Length <= 2)
+            return Result.Invalid("Evaluation run title must be at least 3 characters long");
+
+        Title = title;
+        return Result.Success();
     }
 }
