@@ -2,6 +2,7 @@ using AiPipeline.TireOcr.EvaluationTool.Application.Common.DataAccess;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Facades;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Services;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
@@ -12,11 +13,14 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
 {
     private readonly IRunFacade _runFacade;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IBatchEvaluationService _batchEvaluationService;
 
-    public RunEvaluationBatchCommandHandler(IRunFacade runFacade, IUnitOfWork unitOfWork)
+    public RunEvaluationBatchCommandHandler(IRunFacade runFacade, IUnitOfWork unitOfWork,
+        IBatchEvaluationService batchEvaluationService)
     {
         _runFacade = runFacade;
         _unitOfWork = unitOfWork;
+        _batchEvaluationService = batchEvaluationService;
     }
 
     public async Task<DataResult<EvaluationRunBatchFullDto>> Handle(RunEvaluationBatchCommand request,
@@ -53,7 +57,9 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
         await _unitOfWork.EvaluationRunBatchRepository.Add(batch);
         await _unitOfWork.SaveChangesAsync();
 
-        var dto = EvaluationRunBatchFullDto.FromDomain(result.Data!, null);
+        var batchEvaluationResult = await _batchEvaluationService.EvaluateBatch(batch);
+
+        var dto = EvaluationRunBatchFullDto.FromDomain(result.Data!, batchEvaluationResult.Data);
         return DataResult<EvaluationRunBatchFullDto>.Success(dto);
     }
 }

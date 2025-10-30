@@ -1,5 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Common.Dtos;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Commands.DeleteEvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Commands.RunSingleEvaluation;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Commands.UpdateEvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Queries.GetEvaluationRunById;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Queries.GetEvaluationRunsPaginated;
@@ -8,6 +10,7 @@ using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.GetBy
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.GetPaginated;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.RunWithImage;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.RunWithImageUrl;
+using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.UpdateRun;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -100,35 +103,38 @@ public class RunController : ControllerBase
         );
     }
 
-    [HttpPost("WithImageUrl")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunWithImageResponse))]
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateRunResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<RunWithImageUrlResponse>> RunWithImage(
-        [FromBody] RunWithImageUrlRequest request
+    public async Task<ActionResult<UpdateRunResponse>> UpdateRun(
+        [FromRoute] Guid id,
+        [FromBody] UpdateRunRequest request
     )
     {
-        var runConfig = new RunConfigDto(
-            PreprocessingType: request.PreprocessingType,
-            OcrType: request.OcrType,
-            PostprocessingType: request.PostprocessingType,
-            DbMatchingType: request.DbMatchingType
-        );
-
-        var command = new RunSingleEvaluationCommand(
-            InputImage: null,
-            InputImageUrl: request.ImageUrl,
-            ExpectedTireCodeLabel: request.ExpectedTireCodeLabel,
-            RunConfig: runConfig,
-            RunId: request.RunId,
+        var command = new UpdateEvaluationRunCommand(
+            RunId: id,
             RunTitle: request.RunTitle
         );
 
         var result = await _mediator.Send(command);
 
-        return result.ToActionResult<EvaluationRunDto, RunWithImageUrlResponse>(
-            onSuccess: dto => new RunWithImageUrlResponse(dto)
+        return result.ToActionResult<EvaluationRunDto, UpdateRunResponse>(
+            onSuccess: dto => new UpdateRunResponse(dto)
         );
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> DeleteRun([FromRoute] Guid id)
+    {
+        var command = new DeleteEvaluationRunCommand(id);
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult(onSuccess: NoContent);
     }
 }

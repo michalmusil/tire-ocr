@@ -16,5 +16,9 @@ public class RunEvaluationBatchCommandValidator : AbstractValidator<RunEvaluatio
 
         RuleFor(c => c.RunConfig)
             .NotNull();
+
+        RuleFor(c => c.BatchTitle)
+            .Must(bt => bt is null || bt.Trim().Length > 2)
+            .WithMessage("Custom batch title must be at least 3 characters long");
     }
 }

@@ -1,6 +1,8 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.Common.Services;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.DeleteEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.RunEvaluationBatch;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.UpdateEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchById;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchesPaginated;
@@ -8,6 +10,7 @@ using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batc
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.GetPaginated;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.RunBatchForm;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.RunBatchJsonOnly;
+using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.UpdateBatch;
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -38,7 +41,8 @@ public class BatchController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<GetBatchesPaginatedResponse>> GetAllResults([FromQuery] GetBatchesPaginatedRequest request)
+    public async Task<ActionResult<GetBatchesPaginatedResponse>> GetAllResults(
+        [FromQuery] GetBatchesPaginatedRequest request)
     {
         var query = new GetEvaluationRunBatchesPaginatedQuery(
             new PaginationParams(request.PageNumber, request.PageSize));
@@ -137,5 +141,40 @@ public class BatchController : ControllerBase
         return result.ToActionResult<EvaluationRunBatchFullDto, RunBatchFormResponse>(
             onSuccess: dto => new RunBatchFormResponse(dto)
         );
+    }
+
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateBatchResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<UpdateBatchResponse>> UpdateRun(
+        [FromRoute] Guid id,
+        [FromBody] UpdateBatchRequest request
+    )
+    {
+        var command = new UpdateEvaluationBatchCommand(
+            BatchId: id,
+            BatchTitle: request.BatchTitle
+        );
+
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult<EvaluationRunBatchFullDto, UpdateBatchResponse>(
+            onSuccess: dto => new UpdateBatchResponse(dto)
+        );
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> DeleteRun([FromRoute] Guid id)
+    {
+        var command = new DeleteEvaluationBatchCommand(id);
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult(onSuccess: NoContent);
     }
 }
