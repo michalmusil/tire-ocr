@@ -22,7 +22,7 @@ export const BatchEvaluationRunsCard = ({
         <CardDescription>{runs.length} runs in this batch</CardDescription>
       </CardHeader>
       <CardContent>
-        <EvaluationRunsTable runs={runs} displayCaption={false} />
+        <EvaluationRunsTable runs={runs} />
       </CardContent>
     </Card>
   );

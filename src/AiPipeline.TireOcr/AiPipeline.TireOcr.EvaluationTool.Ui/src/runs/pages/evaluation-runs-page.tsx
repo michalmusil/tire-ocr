@@ -1,30 +1,50 @@
 import { useSearchParams } from "react-router-dom";
 import { EvaluationRunsTable } from "../components/evaluation-runs-table";
-import { GenericPagination } from "@/core/components/generic-pagination";
-import { useEvaluationRuns } from "../hooks/use-evaluation-runs";
+import GenericPagination from "@/core/components/generic-pagination";
 import SpinnerFullpage from "@/core/components/spinner-fullpage";
 import ErrorFullpage from "@/core/components/error-fullpage";
+import { useNavigate } from "react-router-dom";
+import { useRunsQuery } from "../queries/use-runs-query";
+import SearchInput from "@/core/components/search-input";
 
 const EvaluationRunsPage: React.FC = () => {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
   const pageNumber = parseInt(searchParams.get("page") || "1", 10);
   const pageSize = parseInt(searchParams.get("size") || "15", 10);
+  const searchTerm = searchParams.get("search");
 
-  const { evaluationRuns, pageStatus, getCurrentPagination } =
-    useEvaluationRuns(pageNumber, pageSize);
+  const onSearch = (searchTerm: string | null) => {
+    let path = `/runs?page=1&size=${pageSize}`;
+    if (searchTerm) path += `&search=${searchTerm ?? ""}`;
+    navigate(path);
+  };
 
-  if (pageStatus.isLoading) return <SpinnerFullpage />;
-  if (pageStatus.errorMessage)
-    return <ErrorFullpage errorMessage={pageStatus.errorMessage} />;
+  const { data, isLoading, error } = useRunsQuery(
+    pageNumber,
+    pageSize,
+    searchTerm
+  );
+
+  if (isLoading) return <SpinnerFullpage />;
+  if (error) return <ErrorFullpage errorMessage={error.message} />;
 
   return (
     <div className="flex flex-col justify-center items-center">
-      <EvaluationRunsTable runs={evaluationRuns?.items ?? []} />
+      <div className="w-full">
+        <div className="flex justify-start w-sm md:w-md lg:w-lg mb-8">
+          <SearchInput onSearchChanged={onSearch} initialValue={searchTerm} />
+        </div>
+      </div>
+      <EvaluationRunsTable runs={data?.items ?? []} />
       <GenericPagination
         className="mt-5"
         currentPage={pageNumber}
-        totalPages={getCurrentPagination().totalPages ?? 1}
-        getPageHref={(page) => `/runs?page=${page}&size=${pageSize}`}
+        totalPages={data?.pagination.totalPages ?? 1}
+        getPageHref={(page) =>
+          `/runs?page=${page}&size=${pageSize}&search=${searchTerm ?? ""}`
+        }
       />
     </div>
   );
