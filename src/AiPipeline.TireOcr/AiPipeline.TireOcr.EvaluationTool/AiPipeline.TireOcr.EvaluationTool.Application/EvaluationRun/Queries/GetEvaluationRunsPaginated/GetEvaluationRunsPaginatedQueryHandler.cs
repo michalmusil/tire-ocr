@@ -23,7 +23,7 @@ public class GetEvaluationRunsPaginatedQueryHandler
     {
         var foundResults = await _unitOfWork
             .EvaluationRunRepository
-            .GetEvaluationRunsPaginatedAsync(request.Pagination);
+            .GetEvaluationRunsPaginatedAsync(request.Pagination, request.SearchTerm);
 
         var resultDtos = foundResults.Items
             .Select(EvaluationRunDto.FromDomain)

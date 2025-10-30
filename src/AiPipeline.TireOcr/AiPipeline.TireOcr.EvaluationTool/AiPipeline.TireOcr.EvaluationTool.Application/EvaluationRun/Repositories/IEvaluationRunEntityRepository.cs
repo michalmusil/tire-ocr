@@ -6,7 +6,11 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Repositori
 
 public interface IEvaluationRunEntityRepository : IEntityRepository
 {
-    public Task<PaginatedCollection<EvaluationRunEntity>> GetEvaluationRunsPaginatedAsync(PaginationParams pagination);
+    public Task<PaginatedCollection<EvaluationRunEntity>> GetEvaluationRunsPaginatedAsync(
+        PaginationParams pagination,
+        string? searchTerm = null
+    );
+
     public Task<IEnumerable<EvaluationRunEntity>> GetEvaluationRunsByBatchIdAsync(Guid batchId);
     public Task<EvaluationRunEntity?> GetEvaluationRunByIdAsync(Guid id);
 

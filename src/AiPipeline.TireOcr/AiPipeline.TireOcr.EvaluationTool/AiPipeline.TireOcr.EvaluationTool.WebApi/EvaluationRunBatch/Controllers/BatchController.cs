@@ -45,7 +45,9 @@ public class BatchController : ControllerBase
         [FromQuery] GetBatchesPaginatedRequest request)
     {
         var query = new GetEvaluationRunBatchesPaginatedQuery(
-            new PaginationParams(request.PageNumber, request.PageSize));
+            SearchTerm: request.SearchTerm,
+            Pagination: new PaginationParams(PageNumber: request.PageNumber, request.PageSize)
+        );
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<PaginatedCollection<EvaluationRunBatchLightDto>, GetBatchesPaginatedResponse>(

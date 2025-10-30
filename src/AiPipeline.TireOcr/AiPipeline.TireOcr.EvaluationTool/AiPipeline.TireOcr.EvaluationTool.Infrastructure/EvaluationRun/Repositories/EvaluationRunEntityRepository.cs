@@ -19,10 +19,18 @@ public class EvaluationRunEntityRepository : IEvaluationRunEntityRepository
     public Task<int> SaveChangesAsync() => _dbContext.SaveChangesAsync();
 
     public async Task<PaginatedCollection<EvaluationRunEntity>> GetEvaluationRunsPaginatedAsync(
-        PaginationParams pagination)
+        PaginationParams pagination,
+        string? searchTerm
+    )
     {
-        var query = GetBasicQuery()
-            .OrderByDescending(er => er.UpdatedAt);
+        var st = searchTerm?.ToLower();
+
+        var query = GetBasicQuery();
+        if (st is not null)
+            query = query.Where(r =>
+                r.Title.ToLower().Contains(st)
+            );
+        query = query.OrderByDescending(er => er.UpdatedAt);
 
         return await query.ToPaginatedList(pagination);
     }

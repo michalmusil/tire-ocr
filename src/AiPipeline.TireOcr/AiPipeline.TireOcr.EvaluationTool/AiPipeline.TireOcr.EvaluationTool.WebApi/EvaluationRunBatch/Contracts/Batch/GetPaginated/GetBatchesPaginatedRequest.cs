@@ -2,5 +2,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.
 
 public record GetBatchesPaginatedRequest(
     int PageNumber,
-    int PageSize
+    int PageSize,
+    string? SearchTerm = null
 );
