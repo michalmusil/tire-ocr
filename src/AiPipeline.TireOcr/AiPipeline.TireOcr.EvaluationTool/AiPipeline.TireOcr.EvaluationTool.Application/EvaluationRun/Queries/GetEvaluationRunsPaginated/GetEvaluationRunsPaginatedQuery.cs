@@ -4,5 +4,5 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Queries.GetEvaluationRunsPaginated;
 
-public record GetEvaluationRunsPaginatedQuery(PaginationParams Pagination)
+public record GetEvaluationRunsPaginatedQuery(PaginationParams Pagination, string? SearchTerm = null)
     : IQuery<PaginatedCollection<EvaluationRunDto>>;

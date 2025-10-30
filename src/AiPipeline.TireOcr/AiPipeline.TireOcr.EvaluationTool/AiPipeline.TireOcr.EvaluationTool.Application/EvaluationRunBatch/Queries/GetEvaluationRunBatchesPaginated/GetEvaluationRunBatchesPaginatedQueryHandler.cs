@@ -23,7 +23,7 @@ public class GetEvaluationRunBatchesPaginatedQueryHandler
     {
         var foundResults = await _unitOfWork
             .EvaluationRunBatchRepository
-            .GetEvaluationRunBatchesPaginatedAsync(request.Pagination);
+            .GetEvaluationRunBatchesPaginatedAsync(request.Pagination, request.SearchTerm);
 
         var resultDtos = foundResults.Items
             .ToList();

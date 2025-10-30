@@ -20,9 +20,20 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
     public Task<int> SaveChangesAsync() => _dbContext.SaveChangesAsync();
 
     public async Task<PaginatedCollection<EvaluationRunBatchLightDto>> GetEvaluationRunBatchesPaginatedAsync(
-        PaginationParams pagination)
+        PaginationParams pagination,
+        string? searchTerm
+    )
     {
-        var query = _dbContext.EvaluationRunBatches
+        var st = searchTerm?.ToLower();
+
+        IQueryable<EvaluationRunBatchEntity> initialQuery = _dbContext.EvaluationRunBatches;
+        if (st is not null)
+            initialQuery = initialQuery.Where(b =>
+                b.Title.ToLower().Contains(st)
+            );
+
+
+        var selectQuery = initialQuery
             .OrderByDescending(erb => erb.CreatedAt)
             .Select(erb => new EvaluationRunBatchLightDto(
                 erb.Id.ToString(),
@@ -33,7 +44,7 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
                 erb._evaluationRuns.Count > 0 ? erb._evaluationRuns.Max(e => e.FinishedAt) : null
             ));
 
-        return await query.ToPaginatedList(pagination);
+        return await selectQuery.ToPaginatedList(pagination);
     }
 
     public async Task<EvaluationRunBatchEntity?> GetEvaluationRunBatchByIdAsync(Guid id)

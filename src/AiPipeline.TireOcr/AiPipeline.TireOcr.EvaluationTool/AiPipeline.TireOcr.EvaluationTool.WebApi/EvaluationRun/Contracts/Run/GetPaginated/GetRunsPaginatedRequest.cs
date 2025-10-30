@@ -2,5 +2,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRun.Contracts.Run.G
 
 public record GetRunsPaginatedRequest(
     int PageNumber,
-    int PageSize
+    int PageSize,
+    string? SearchTerm = null
 );

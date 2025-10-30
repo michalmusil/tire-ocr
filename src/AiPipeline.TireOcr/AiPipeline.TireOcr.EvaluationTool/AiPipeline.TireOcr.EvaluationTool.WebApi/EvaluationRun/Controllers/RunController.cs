@@ -41,7 +41,10 @@ public class RunController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<ActionResult<GetRunsPaginatedResponse>> GetAllResults([FromQuery] GetRunsPaginatedRequest request)
     {
-        var query = new GetEvaluationRunsPaginatedQuery(new PaginationParams(request.PageNumber, request.PageSize));
+        var query = new GetEvaluationRunsPaginatedQuery(
+            SearchTerm: request.SearchTerm,
+            Pagination: new PaginationParams(request.PageNumber, request.PageSize)
+        );
         var result = await _mediator.Send(query);
 
         return result.ToActionResult<PaginatedCollection<EvaluationRunDto>, GetRunsPaginatedResponse>(
