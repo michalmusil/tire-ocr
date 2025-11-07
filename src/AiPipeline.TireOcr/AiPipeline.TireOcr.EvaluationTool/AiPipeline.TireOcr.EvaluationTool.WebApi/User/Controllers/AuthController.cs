@@ -46,32 +46,32 @@ public class AuthController : ControllerBase
         );
     }
 
-    [HttpPost("Register")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<RegisterUserResponse>> Register(
-        [FromBody] RegisterUserRequest contract)
-    {
-        var command = new RegisterUserCommand(
-            contract.Id,
-            contract.Username,
-            contract.Password
-        );
-        var result = await _mediator.Send(command);
-
-        return result.ToActionResult<UserDto, RegisterUserResponse>(
-            onSuccess: userDto =>
-            {
-                var createdAt = Url.Action(
-                    nameof(UsersController.GetById),
-                    nameof(UsersController),
-                    new { id = userDto.Id }
-                );
-                return Created(createdAt, userDto);
-            });
-    }
+    // [HttpPost("Register")]
+    // [ProducesResponseType(StatusCodes.Status201Created)]
+    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    // [ProducesResponseType(StatusCodes.Status409Conflict)]
+    // [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    // public async Task<ActionResult<RegisterUserResponse>> Register(
+    //     [FromBody] RegisterUserRequest contract)
+    // {
+    //     var command = new RegisterUserCommand(
+    //         contract.Id,
+    //         contract.Username,
+    //         contract.Password
+    //     );
+    //     var result = await _mediator.Send(command);
+    //
+    //     return result.ToActionResult<UserDto, RegisterUserResponse>(
+    //         onSuccess: userDto =>
+    //         {
+    //             var createdAt = Url.Action(
+    //                 nameof(UsersController.GetById),
+    //                 nameof(UsersController),
+    //                 new { id = userDto.Id }
+    //             );
+    //             return Created(createdAt, userDto);
+    //         });
+    // }
 
     [HttpPost("Refresh")]
     [ProducesResponseType(StatusCodes.Status200OK)]
