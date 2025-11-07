@@ -10,6 +10,18 @@ TIRE_DB_MATCHER_IMAGE_NAME="michalmusil/tire-ocr_tire-db-matcher-service"
 EVALUATION_TOOL_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool"
 EVALUATION_TOOL_FE_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool-fe"
 
+# EVALUATION_TOOL
+echo "Building image for evaluation tool"
+docker build --platform linux/amd64 -t "${EVALUATION_TOOL_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool/AiPipeline.TireOcr.EvaluationTool.WebApi/Dockerfile .
+echo "Successfully built ${EVALUATION_TOOL_IMAGE_NAME}"
+echo ""
+
+# EVALUATION_TOOL_FE
+echo "Building image for evaluation tool frontend"
+docker build --platform linux/amd64 -t "${EVALUATION_TOOL_FE_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool.Ui/Dockerfile ./src/AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool.Ui
+echo "Successfully built ${EVALUATION_TOOL_FE_IMAGE_NAME}"
+echo ""
+
 # OCR_PADDLE
 echo "Building image for ocr paddle service"
 docker buildx create --use --name mybuilder
@@ -41,18 +53,6 @@ echo ""
 echo "Building image for tire db matcher service"
 docker build --platform linux/amd64 -t "${TIRE_DB_MATCHER_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.TasyDbMatcher/AiPipeline.TireOcr.TasyDbMatcher.WebApi/Dockerfile .
 echo "Successfully built ${TIRE_DB_MATCHER_IMAGE_NAME}"
-echo ""
-
-# EVALUATION_TOOL
-echo "Building image for evaluation tool"
-docker build --platform linux/amd64 -t "${EVALUATION_TOOL_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool/AiPipeline.TireOcr.EvaluationTool.WebApi/Dockerfile .
-echo "Successfully built ${EVALUATION_TOOL_IMAGE_NAME}"
-echo ""
-
-# EVALUATION_TOOL_FE
-echo "Building image for evaluation tool frontend"
-docker build --platform linux/amd64 -t "${EVALUATION_TOOL_FE_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool.Ui/Dockerfile .
-echo "Successfully built ${EVALUATION_TOOL_FE_IMAGE_NAME}"
 echo ""
 
 echo "All docker images built successfully."
