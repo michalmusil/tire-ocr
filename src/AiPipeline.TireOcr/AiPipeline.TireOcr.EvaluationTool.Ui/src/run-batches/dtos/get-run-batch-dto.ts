@@ -4,6 +4,7 @@ import { z } from "zod";
 export const RunBatchSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().nullish(),
   numberOfEvaluations: z.number(),
   createdAt: z.iso.datetime(),
   startedAt: z.iso.datetime().nullish(),

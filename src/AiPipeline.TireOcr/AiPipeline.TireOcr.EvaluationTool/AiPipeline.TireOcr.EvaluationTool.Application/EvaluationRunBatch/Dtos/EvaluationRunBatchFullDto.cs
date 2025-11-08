@@ -7,6 +7,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos;
 public record EvaluationRunBatchFullDto(
     string Id,
     string Title,
+    string? Description,
     DateTime? StartedAt,
     DateTime? FinishedAt,
     BatchEvaluationDto? BatchEvaluation,
@@ -19,6 +20,7 @@ public record EvaluationRunBatchFullDto(
         return new EvaluationRunBatchFullDto(
             Id: domain.Id.ToString(),
             Title: domain.Title,
+            Description: domain.Description,
             StartedAt: domain.StartedAt,
             FinishedAt: domain.FinishedAt,
             BatchEvaluation: batchEvaluation,

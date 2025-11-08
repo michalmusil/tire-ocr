@@ -29,7 +29,7 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
         IQueryable<EvaluationRunBatchEntity> initialQuery = _dbContext.EvaluationRunBatches;
         if (st is not null)
             initialQuery = initialQuery.Where(b =>
-                b.Title.ToLower().Contains(st)
+                b.Title.ToLower().Contains(st) || (b.Description != null && b.Description.ToLower().Contains(st))
             );
 
 
@@ -38,6 +38,7 @@ public class EvaluationRunBatchEntityRepository : IEvaluationRunBatchEntityRepos
             .Select(erb => new EvaluationRunBatchLightDto(
                 erb.Id.ToString(),
                 erb.Title,
+                erb.Description,
                 erb._evaluationRuns.Count,
                 erb.CreatedAt,
                 erb._evaluationRuns.Count > 0 ? erb._evaluationRuns.Min(e => e.StartedAt) : null,

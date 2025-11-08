@@ -15,5 +15,6 @@ public record RunBatchJsonOnlyRequest(
     [DefaultValue(5)]
     int ProcessingBatchSize,
     Guid? RunId = null,
-    string? RunTitle = null
+    string? RunTitle = null,
+    string? RunDescription = null
 );

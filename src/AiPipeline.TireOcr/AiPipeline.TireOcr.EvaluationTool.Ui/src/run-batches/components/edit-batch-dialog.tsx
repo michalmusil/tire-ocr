@@ -19,6 +19,7 @@ import { Spinner } from "@/core/components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { RunBatchDetailQueryKey } from "../queries/use-run-batch-detail-query";
 import { useState } from "react";
+import FormTextArea from "@/core/components/forms/form-text-area";
 
 type EditBatchDialogProps = {
   batch: RunBatchDetail;
@@ -27,6 +28,7 @@ type EditBatchDialogProps = {
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().nullish(),
 });
 type EditBatchFormSchema = z.infer<typeof formSchema>;
 
@@ -39,6 +41,7 @@ const EditBatchDialog = ({ batch, trigger }: EditBatchDialogProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: batch.title,
+      description: batch.description,
     },
   });
 
@@ -46,7 +49,8 @@ const EditBatchDialog = ({ batch, trigger }: EditBatchDialogProps) => {
     mutation.mutate(
       {
         batchId: batch.id,
-        newTitle: data.title,
+        title: data.title,
+        description: data.description,
       },
       {
         onSuccess: () => {
@@ -80,6 +84,13 @@ const EditBatchDialog = ({ batch, trigger }: EditBatchDialogProps) => {
                 name="title"
                 placeholder="Title"
               />
+
+              <FormTextArea<EditBatchFormSchema>
+                label="Batch Description"
+                name="description"
+                placeholder="Description"
+              />
+
               {mutation.error?.message && (
                 <div className="mt-2 text-sm text-destructive">
                   {mutation.error?.message}

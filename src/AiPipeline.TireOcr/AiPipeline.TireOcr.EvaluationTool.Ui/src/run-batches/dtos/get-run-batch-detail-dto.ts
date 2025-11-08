@@ -34,6 +34,7 @@ export type BatchEvaluation = z.infer<typeof BatchEvaluationSchema>;
 export const RunBatchDetailSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().nullish(),
   startedAt: z.iso.datetime().nullish(),
   finishedAt: z.iso.datetime().nullish(),
   batchEvaluation: BatchEvaluationSchema,

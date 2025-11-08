@@ -11,5 +11,6 @@ public record RunWithImageUrlRequest(
     [Required] DbMatchingType DbMatchingType,
     string? ExpectedTireCodeLabel,
     Guid? RunId = null,
-    string? RunTitle = null
+    string? RunTitle = null,
+    string? RunDescription = null
 );

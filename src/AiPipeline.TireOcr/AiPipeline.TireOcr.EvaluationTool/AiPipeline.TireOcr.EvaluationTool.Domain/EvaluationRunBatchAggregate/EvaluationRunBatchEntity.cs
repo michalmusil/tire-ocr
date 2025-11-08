@@ -8,6 +8,7 @@ public class EvaluationRunBatchEntity : TimestampedEntity
 {
     public Guid Id { get; }
     public string Title { get; private set; }
+    public string? Description { get; private set; }
 
     public DateTime? StartedAt => EvaluationRuns.Min(r => r.StartedAt);
 
@@ -21,10 +22,12 @@ public class EvaluationRunBatchEntity : TimestampedEntity
     {
     }
 
-    public EvaluationRunBatchEntity(List<EvaluationRunEntity> evaluationRuns, string? title, Guid? id = null)
+    public EvaluationRunBatchEntity(List<EvaluationRunEntity> evaluationRuns, string? title, string? description = null,
+        Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         Title = title ?? Id.ToString();
+        Description = description;
         _evaluationRuns = evaluationRuns;
     }
 
@@ -41,6 +44,12 @@ public class EvaluationRunBatchEntity : TimestampedEntity
             return Result.Invalid("Batch title must be at least 3 characters long");
 
         Title = title;
+        return Result.Success();
+    }
+
+    public Result SetDescription(string? description)
+    {
+        Description = description;
         return Result.Success();
     }
 }

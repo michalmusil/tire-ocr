@@ -44,6 +44,7 @@ const EstimatedCostsSchema = z.object({
 export const EvaluationRunSchema = z.object({
   id: z.string(),
   title: z.string(),
+  description: z.string().nullish(),
   inputImage: ImageFileSchema,
   startedAt: z.iso.datetime(),
   finishedAt: z.iso.datetime().nullish(),

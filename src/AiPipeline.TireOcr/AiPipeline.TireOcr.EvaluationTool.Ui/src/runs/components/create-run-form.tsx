@@ -17,9 +17,11 @@ import {
   CardTitle,
 } from "@/core/components/ui/card";
 import { Spinner } from "@/core/components/ui/spinner";
+import FormTextArea from "@/core/components/forms/form-text-area";
 
 export const formSchema = z.object({
   runTitle: z.string().min(1, "Title is required"),
+  runDescription: z.string().nullish(),
   imageUrl: z.url().nullish(),
   image: z.instanceof(FileList).nullish(),
   expectedTireCodeLabel: z.string().nullish(),
@@ -58,7 +60,7 @@ export const CreateEvaluationRunForm = ({
             <CardHeader>
               <CardTitle>Run details</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-3">
               <FormInput<CreateEvaluationRunFormSchema>
                 label="Title"
                 name="runTitle"
@@ -71,13 +73,17 @@ export const CreateEvaluationRunForm = ({
                 label="Expected tire code"
                 name="expectedTireCodeLabel"
               />
+              <FormTextArea<CreateEvaluationRunFormSchema>
+                label="Description"
+                name="runDescription"
+              />
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
               <CardTitle>Processing steps</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-3">
               <FormSelectInput
                 label="Preprocessing"
                 name="preprocessingType"

@@ -7,6 +7,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.Evalu
 public record EvaluationRunDto(
     string Id,
     string Title,
+    string? Description,
     ImageInfoDto InputImage,
     DateTime StartedAt,
     DateTime? FinishedAt,
@@ -26,6 +27,7 @@ public record EvaluationRunDto(
         (
             Id: domain.Id.ToString(),
             Title: domain.Title,
+            Description: domain.Description,
             InputImage: ImageInfoDto.FromDomain(domain.InputImage),
             StartedAt: domain.StartedAt,
             FinishedAt: domain.FinishedAt,

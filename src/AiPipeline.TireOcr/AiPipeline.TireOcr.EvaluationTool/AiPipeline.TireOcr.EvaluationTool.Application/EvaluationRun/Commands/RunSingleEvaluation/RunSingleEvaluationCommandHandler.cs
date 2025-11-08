@@ -24,7 +24,8 @@ public class RunSingleEvaluationCommandHandler : ICommandHandler<RunSingleEvalua
     {
         var inputDetails = new RunEntityInputDetailsDto(
             Id: request.RunId,
-            Title: request.RunTitle
+            Title: request.RunTitle,
+            Description: request.RunDescription
         );
 
         var expectedTireCodeResult = request.ExpectedTireCodeLabel is null

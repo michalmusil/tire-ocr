@@ -26,6 +26,7 @@ public class UpdateEvaluationRunCommandHandler : ICommandHandler<UpdateEvaluatio
         // Performing actual updates
         if (request.RunTitle is not null)
             updateResults.Add(foundRun.SetTitle(request.RunTitle));
+        updateResults.Add(foundRun.SetDescription(request.RunDescription));
 
         var failures = updateResults
             .SelectMany(r => r.Failures)

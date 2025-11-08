@@ -18,6 +18,9 @@ public class EvaluationRunBatchBatchEntityConfiguration : IEntityTypeConfigurati
         builder.Property(erb => erb.Title)
             .IsRequired();
 
+        builder.Property(erb => erb.Description)
+            .IsRequired(false);
+
         builder.Property(erb => erb.CreatedAt)
             .IsRequired();
 

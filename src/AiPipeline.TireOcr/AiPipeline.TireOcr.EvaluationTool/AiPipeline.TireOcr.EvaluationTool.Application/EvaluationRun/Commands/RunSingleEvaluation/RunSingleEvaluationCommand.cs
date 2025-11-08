@@ -10,5 +10,6 @@ public record RunSingleEvaluationCommand(
     string? ExpectedTireCodeLabel,
     RunConfigDto RunConfig,
     Guid? RunId = null,
-    string? RunTitle = null
+    string? RunTitle = null,
+    string? RunDescription = null
 ) : ICommand<EvaluationRunDto>;

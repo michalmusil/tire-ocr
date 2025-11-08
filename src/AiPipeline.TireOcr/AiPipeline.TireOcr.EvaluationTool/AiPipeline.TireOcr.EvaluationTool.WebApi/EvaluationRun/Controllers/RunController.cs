@@ -96,7 +96,8 @@ public class RunController : ControllerBase
             ExpectedTireCodeLabel: request.ExpectedTireCodeLabel,
             RunConfig: runConfig,
             RunId: request.RunId,
-            RunTitle: request.RunTitle
+            RunTitle: request.RunTitle,
+            RunDescription: request.RunDescription
         );
 
         var result = await _mediator.Send(command);
@@ -128,7 +129,8 @@ public class RunController : ControllerBase
             ExpectedTireCodeLabel: request.ExpectedTireCodeLabel,
             RunConfig: runConfig,
             RunId: request.RunId,
-            RunTitle: request.RunTitle
+            RunTitle: request.RunTitle,
+            RunDescription: request.RunDescription
         );
 
         var result = await _mediator.Send(command);
@@ -150,7 +152,8 @@ public class RunController : ControllerBase
     {
         var command = new UpdateEvaluationRunCommand(
             RunId: id,
-            RunTitle: request.RunTitle
+            RunTitle: request.Title,
+            RunDescription: request.Description
         );
 
         var result = await _mediator.Send(command);

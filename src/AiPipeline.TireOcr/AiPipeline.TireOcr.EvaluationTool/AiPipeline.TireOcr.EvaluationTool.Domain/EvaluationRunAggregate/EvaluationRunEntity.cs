@@ -12,6 +12,7 @@ public class EvaluationRunEntity : TimestampedEntity
     public Guid Id { get; }
     public Guid? BatchId { get; }
     public string Title { get; private set; }
+    public string? Description { get; private set; }
     public ImageValueObject InputImage { get; }
     public DateTime StartedAt { get; }
     public DateTime? FinishedAt { get; private set; }
@@ -40,12 +41,13 @@ public class EvaluationRunEntity : TimestampedEntity
     }
 
     public EvaluationRunEntity(ImageValueObject inputImage, PreprocessingType preprocessingType, OcrType ocrType,
-        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, Guid? batchId = null,
-        Guid? id = null)
+        PostprocessingType postprocessingType, DbMatchingType dbMatchingType, string? title, string? description = null,
+        Guid? batchId = null, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();
         BatchId = batchId;
         Title = title ?? Id.ToString();
+        Description = description;
         InputImage = inputImage;
         StartedAt = DateTime.UtcNow;
         FinishedAt = null;
@@ -112,6 +114,12 @@ public class EvaluationRunEntity : TimestampedEntity
             return Result.Invalid("Evaluation run title must be at least 3 characters long");
 
         Title = title;
+        return Result.Success();
+    }
+
+    public Result SetDescription(string? description)
+    {
+        Description = description;
         return Result.Success();
     }
 }
