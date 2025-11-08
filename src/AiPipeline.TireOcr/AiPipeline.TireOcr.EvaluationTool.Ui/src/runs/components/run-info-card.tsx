@@ -14,12 +14,11 @@ import { RunsQueryKey } from "../queries/use-runs-query";
 import ConfirmationDialog from "@/core/components/confirmation-dialog";
 import { Button } from "@/core/components/ui/button";
 import { Spinner } from "@/core/components/ui/spinner";
+import EditRunDialog from "./edit-run-dialog";
+import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 
 type RunInfoCardProps = {
-  title: string;
-  runId: string;
-  startedAt?: string | null;
-  finishedAt?: string | null;
+  evaluationRun: EvaluationRun;
   estimatedCost?: {
     amount: number;
     currency: string;
@@ -27,10 +26,7 @@ type RunInfoCardProps = {
 };
 
 export const RunInfoCard = ({
-  title,
-  runId,
-  startedAt,
-  finishedAt,
+  evaluationRun,
   estimatedCost,
 }: RunInfoCardProps) => {
   const navigate = useNavigate();
@@ -39,7 +35,7 @@ export const RunInfoCard = ({
   const deleteMutation = useDeleteRunMutation();
 
   const onDeleteConfirmed = () => {
-    deleteMutation.mutate(runId, {
+    deleteMutation.mutate(evaluationRun.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [RunsQueryKey] });
         navigate(-1);
@@ -54,32 +50,46 @@ export const RunInfoCard = ({
     <Card>
       <CardHeader className="flex justify-between">
         <div>
-          <CardTitle className="text-2xl">{title}</CardTitle>
-          <CardDescription>Run ID: {runId}</CardDescription>
+          <CardTitle className="text-2xl">{evaluationRun.title}</CardTitle>
+          <CardDescription className="wrap-anywhere">
+            Run ID: {evaluationRun.id}
+          </CardDescription>
         </div>
-        <ConfirmationDialog
-          title="Delete"
-          description="Are you sure you want to permanently delete this evaluation run?"
-          type="destructive"
-          confirmText="Delete"
-          cancelText="Cancel"
-          onConfirm={onDeleteConfirmed}
-          trigger={
-            <Button variant="destructive">
-              {deleteMutation.isPending ? <Spinner /> : "Delete"}
-            </Button>
-          }
-        />
+        <div className="flex gap-x-3">
+          <EditRunDialog
+            evaluationRun={evaluationRun}
+            trigger={<Button>Edit</Button>}
+          />
+          <ConfirmationDialog
+            title="Delete"
+            description="Are you sure you want to permanently delete this evaluation run?"
+            type="destructive"
+            confirmText="Delete"
+            cancelText="Cancel"
+            onConfirm={onDeleteConfirmed}
+            trigger={
+              <Button disabled={deleteMutation.isPending} variant="destructive">
+                {deleteMutation.isPending ? <Spinner /> : "Delete"}
+              </Button>
+            }
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <InfoItem label="Started At" value={formatDateTime(startedAt)} />
-          <InfoItem label="Finished At" value={formatDateTime(finishedAt)} />
+          <InfoItem
+            label="Started At"
+            value={formatDateTime(evaluationRun.startedAt)}
+          />
+          <InfoItem
+            label="Finished At"
+            value={formatDateTime(evaluationRun.finishedAt)}
+          />
           <InfoItem
             label="Duration"
             value={getDisplayedDurationFromDatetimeBoundaries(
-              startedAt,
-              finishedAt
+              evaluationRun.startedAt,
+              evaluationRun.finishedAt
             )}
           />
           {estimatedCost && (
