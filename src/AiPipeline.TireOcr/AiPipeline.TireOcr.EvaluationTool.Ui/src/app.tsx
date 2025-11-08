@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import AuthProvider from "./core/providers/auth-provider";
-import { AuthenticatedRoute } from "./core/components/authenticated-route";
+import { AuthenticatedRoute } from "./core/components/providers/authenticated-route";
 import SidebarLayout from "./core/layouts/sidabar-layout";
 import LoginPage from "./core/pages/login-page";
 import DashboardPage from "./core/pages/dashboard-page";
@@ -12,7 +12,7 @@ import EvaluationBatchDetailPage from "./run-batches/pages/evaluation-batch-deta
 import CreateRun from "./runs/pages/create-run-page";
 import CreateBatch from "./run-batches/pages/create-batch-page";
 import EvaluationRunDetailPage from "./runs/pages/evaluation-run-detail-page";
-import { ThemeProvider } from "./core/components/theme-provider";
+import { ThemeProvider } from "./core/components/providers/theme-provider";
 
 const App: React.FC = () => {
   return (

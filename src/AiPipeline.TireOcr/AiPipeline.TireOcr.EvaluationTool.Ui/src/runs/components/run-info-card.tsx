@@ -7,6 +7,13 @@ import {
 } from "@/core/components/ui/card";
 import { formatDateTime } from "@/core/utils/datetime-utils";
 import { getDisplayedDurationFromDatetimeBoundaries } from "@/run-batches/utils/data-utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
+import { useDeleteRunMutation } from "../mutations/delete-run-mutation";
+import { RunsQueryKey } from "../queries/use-runs-query";
+import ConfirmationDialog from "@/core/components/confirmation-dialog";
+import { Button } from "@/core/components/ui/button";
+import { Spinner } from "@/core/components/ui/spinner";
 
 type RunInfoCardProps = {
   title: string;
@@ -26,11 +33,43 @@ export const RunInfoCard = ({
   finishedAt,
   estimatedCost,
 }: RunInfoCardProps) => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useDeleteRunMutation();
+
+  const onDeleteConfirmed = () => {
+    deleteMutation.mutate(runId, {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: [RunsQueryKey] });
+        navigate(-1);
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    });
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-2xl">{title}</CardTitle>
-        <CardDescription>Run ID: {runId}</CardDescription>
+      <CardHeader className="flex justify-between">
+        <div>
+          <CardTitle className="text-2xl">{title}</CardTitle>
+          <CardDescription>Run ID: {runId}</CardDescription>
+        </div>
+        <ConfirmationDialog
+          title="Delete"
+          description="Are you sure you want to permanently delete this evaluation run?"
+          type="destructive"
+          confirmText="Delete"
+          cancelText="Cancel"
+          onConfirm={onDeleteConfirmed}
+          trigger={
+            <Button variant="destructive">
+              {deleteMutation.isPending ? <Spinner /> : "Delete"}
+            </Button>
+          }
+        />
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">

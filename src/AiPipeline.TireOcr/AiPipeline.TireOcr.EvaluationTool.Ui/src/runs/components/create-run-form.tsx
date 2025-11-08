@@ -1,14 +1,14 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import FormInput from "@/core/components/form-input";
+import FormInput from "@/core/components/forms/form-input";
 import {
   DbMatchingTypeSchema,
   OcrTypeSchema,
   PostprocessingTypeSchema,
   PreprocessingTypeSchema,
 } from "@/core/models/run-steps-types";
-import FormSelectInput from "@/core/components/form-select-input";
+import FormSelectInput from "@/core/components/forms/form-select-input";
 import { Button } from "@/core/components/ui/button";
 import {
   Card,
