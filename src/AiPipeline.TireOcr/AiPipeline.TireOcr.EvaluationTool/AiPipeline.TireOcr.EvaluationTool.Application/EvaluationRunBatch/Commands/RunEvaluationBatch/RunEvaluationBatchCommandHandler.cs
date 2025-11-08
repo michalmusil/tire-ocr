@@ -28,7 +28,8 @@ public class RunEvaluationBatchCommandHandler : ICommandHandler<RunEvaluationBat
     {
         var inputDetails = new RunEntityInputDetailsDto(
             Id: request.BatchId,
-            Title: request.BatchTitle
+            Title: request.BatchTitle,
+            Description: request.BatchDescription
         );
 
         var imageUrlsWithExpectedTireCodes = request.ImageUrlsWithExpectedTireCodeLabels

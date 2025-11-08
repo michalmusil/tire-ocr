@@ -19,6 +19,7 @@ import { useState } from "react";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { useUpdateRunMutation } from "../mutations/update-run-mutation";
 import { RunDetailQueryKey } from "../queries/use-run-detail-query";
+import FormTextArea from "@/core/components/forms/form-text-area";
 
 type EditRunDialogProps = {
   evaluationRun: EvaluationRun;
@@ -27,6 +28,7 @@ type EditRunDialogProps = {
 
 const formSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters long"),
+  description: z.string().nullish(),
 });
 type EditRunFormSchema = z.infer<typeof formSchema>;
 
@@ -39,6 +41,7 @@ const EditRunDialog = ({ evaluationRun, trigger }: EditRunDialogProps) => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: evaluationRun.title,
+      description: evaluationRun.description,
     },
   });
 
@@ -46,7 +49,8 @@ const EditRunDialog = ({ evaluationRun, trigger }: EditRunDialogProps) => {
     mutation.mutate(
       {
         runId: evaluationRun.id,
-        newTitle: data.title,
+        title: data.title,
+        description: data.description,
       },
       {
         onSuccess: () => {
@@ -80,6 +84,13 @@ const EditRunDialog = ({ evaluationRun, trigger }: EditRunDialogProps) => {
                 name="title"
                 placeholder="Title"
               />
+
+              <FormTextArea<EditRunFormSchema>
+                label="Run Description"
+                name="description"
+                placeholder="Description"
+              />
+
               {mutation.error?.message && (
                 <div className="mt-2 text-sm text-destructive">
                   {mutation.error?.message}

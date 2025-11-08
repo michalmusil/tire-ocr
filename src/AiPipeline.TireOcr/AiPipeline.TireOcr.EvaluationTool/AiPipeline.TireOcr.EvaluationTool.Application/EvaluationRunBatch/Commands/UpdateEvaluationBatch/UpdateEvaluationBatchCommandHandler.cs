@@ -25,13 +25,14 @@ public class
         var foundBatch = await _unitOfWork.EvaluationRunBatchRepository.GetEvaluationRunBatchByIdAsync(request.BatchId);
         if (foundBatch is null)
             return DataResult<EvaluationRunBatchFullDto>.NotFound($"Batch with id {request.BatchId} does not exist.");
-        
+
 
         var updateResults = new List<Result>();
 
         // Performing actual updates
         if (request.BatchTitle is not null)
             updateResults.Add(foundBatch.SetTitle(request.BatchTitle));
+        updateResults.Add(foundBatch.SetDescription(request.BatchDescription));
 
         var failures = updateResults
             .SelectMany(r => r.Failures)
@@ -39,12 +40,13 @@ public class
 
         if (failures.Any())
             return DataResult<EvaluationRunBatchFullDto>.Failure(failures.ToArray());
-        
-        // Getting child runs
+
+        // Getting child runs for complete output
         var runs = await _unitOfWork.EvaluationRunRepository.GetEvaluationRunsByBatchIdAsync(foundBatch.Id);
         var batchWithRuns = new EvaluationRunBatchEntity(
             id: foundBatch.Id,
             title: foundBatch.Title,
+            description: foundBatch.Description,
             evaluationRuns: runs.ToList()
         );
 

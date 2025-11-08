@@ -61,6 +61,7 @@ public class RunFacade : IRunFacade
         var evaluationRun = new EvaluationRunEntity(
             inputImage: image.ToDomain(),
             title: runEntityInputDetailsDto?.Title,
+            description: runEntityInputDetailsDto?.Description,
             id: runEntityInputDetailsDto?.Id,
             preprocessingType: runConfig.PreprocessingType,
             ocrType: runConfig.OcrType,
@@ -174,6 +175,7 @@ public class RunFacade : IRunFacade
         var result = new EvaluationRunBatchEntity(
             evaluationRuns: [],
             title: runEntityInputDetailsDto?.Title,
+            description: runEntityInputDetailsDto?.Description,
             id: runEntityInputDetailsDto?.Id
         );
 
@@ -188,7 +190,8 @@ public class RunFacade : IRunFacade
                 batchId: result.Id
             );
             completedCount += batch.Count;
-            _logger.LogInformation($"-------------------- BATCH COMPLETION: {completedCount}/{imageUrls.Count} --------------------");
+            _logger.LogInformation(
+                $"-------------------- BATCH COMPLETION: {completedCount}/{imageUrls.Count} --------------------");
 
             result.AddEvaluationRuns(processedBatch.ToArray());
         }

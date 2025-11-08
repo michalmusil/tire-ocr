@@ -18,9 +18,11 @@ import {
   CardTitle,
 } from "@/core/components/ui/card";
 import { Spinner } from "@/core/components/ui/spinner";
+import FormTextArea from "@/core/components/forms/form-text-area";
 
 export const formSchema = z.object({
   runTitle: z.string().nullish(),
+  runDescription: z.string().nullish(),
   imageUrlsWithExpectedTireCodeLabelsCsv: z
     .instanceof(FileList)
     .refine(
@@ -70,7 +72,7 @@ export const CreateBatchForm = ({
             <CardHeader>
               <CardTitle>Batch details</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-3">
               <FormInput<CreateBatchFormSchema> label="Title" name="runTitle" />
               <FormInput<CreateBatchFormSchema>
                 label="Processing batch size"
@@ -82,13 +84,17 @@ export const CreateBatchForm = ({
                 name="imageUrlsWithExpectedTireCodeLabelsCsv"
                 accept="text/csv"
               />
+              <FormTextArea<CreateBatchFormSchema>
+                label="Description"
+                name="runDescription"
+              />
             </CardContent>
           </Card>
           <Card className="flex-1">
             <CardHeader>
               <CardTitle>Processing steps</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col gap-3">
               <FormSelectInput
                 label="Preprocessing"
                 name="preprocessingType"

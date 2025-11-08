@@ -5,5 +5,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Commands.U
 
 public record UpdateEvaluationRunCommand(
     Guid RunId,
-    string? RunTitle
+    string? RunTitle,
+    string? RunDescription
 ) : ICommand<EvaluationRunDto>;

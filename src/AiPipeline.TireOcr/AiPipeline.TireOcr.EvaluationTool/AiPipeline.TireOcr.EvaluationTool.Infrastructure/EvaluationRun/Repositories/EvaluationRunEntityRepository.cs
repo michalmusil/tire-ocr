@@ -28,7 +28,7 @@ public class EvaluationRunEntityRepository : IEvaluationRunEntityRepository
         var query = GetBasicQuery();
         if (st is not null)
             query = query.Where(r =>
-                r.Title.ToLower().Contains(st)
+                r.Title.ToLower().Contains(st) || (r.Description != null && r.Description.ToLower().Contains(st))
             );
         query = query.OrderByDescending(er => er.UpdatedAt);
 

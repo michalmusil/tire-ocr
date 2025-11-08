@@ -16,6 +16,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { RunBatchesQueryKey } from "../queries/use-run-batches-query";
 import EditBatchDialog from "./edit-batch-dialog";
 import type { RunBatchDetail } from "../dtos/get-run-batch-detail-dto";
+import { Separator } from "@/core/components/ui/separator";
 
 type BatchInfoCardProps = {
   batch: RunBatchDetail;
@@ -48,8 +49,8 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
       <CardHeader className="flex justify-between">
         <div>
           <CardTitle className="text-2xl">{batch.title}</CardTitle>
-          <CardDescription className="wrap-anywhere">
-            Batch ID: {batch.id}
+          <CardDescription className="whitespace-pre-wrap">
+            {batch.description}
           </CardDescription>
         </div>
         <div className="flex gap-3">
@@ -69,6 +70,7 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
           />
         </div>
       </CardHeader>
+      <Separator orientation="horizontal" />
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <InfoItem

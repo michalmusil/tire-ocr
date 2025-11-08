@@ -90,7 +90,8 @@ public class BatchController : ControllerBase
             RunConfig: runConfig,
             ProcessingBatchSize: request.ProcessingBatchSize,
             BatchId: request.RunId,
-            BatchTitle: request.RunTitle
+            BatchTitle: request.RunTitle,
+            BatchDescription: request.RunDescription
         );
 
         var result = await _mediator.Send(command);
@@ -135,7 +136,8 @@ public class BatchController : ControllerBase
             RunConfig: runConfig,
             ProcessingBatchSize: request.ProcessingBatchSize,
             BatchId: request.RunId,
-            BatchTitle: request.RunTitle
+            BatchTitle: request.RunTitle,
+            BatchDescription: request.RunDescription
         );
 
         var result = await _mediator.Send(command);
@@ -157,7 +159,8 @@ public class BatchController : ControllerBase
     {
         var command = new UpdateEvaluationBatchCommand(
             BatchId: id,
-            BatchTitle: request.BatchTitle
+            BatchTitle: request.Title,
+            BatchDescription: request.Description
         );
 
         var result = await _mediator.Send(command);

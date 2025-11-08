@@ -6,6 +6,8 @@ import axios from "axios";
 const createBatch = async (data: CreateBatchFormSchema) => {
   const formData = new FormData();
   if (data.runTitle) formData.append("runTitle", data.runTitle);
+  if (data.runDescription)
+    formData.append("runDescription", data.runDescription);
   formData.append(
     "imageUrlsWithExpectedTireCodeLabelsCsv",
     data.imageUrlsWithExpectedTireCodeLabelsCsv[0]

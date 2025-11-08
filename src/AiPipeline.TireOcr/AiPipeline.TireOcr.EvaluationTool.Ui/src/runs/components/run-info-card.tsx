@@ -16,6 +16,7 @@ import { Button } from "@/core/components/ui/button";
 import { Spinner } from "@/core/components/ui/spinner";
 import EditRunDialog from "./edit-run-dialog";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
+import { Separator } from "@/core/components/ui/separator";
 
 type RunInfoCardProps = {
   evaluationRun: EvaluationRun;
@@ -51,8 +52,8 @@ export const RunInfoCard = ({
       <CardHeader className="flex justify-between">
         <div>
           <CardTitle className="text-2xl">{evaluationRun.title}</CardTitle>
-          <CardDescription className="wrap-anywhere">
-            Run ID: {evaluationRun.id}
+          <CardDescription className="whitespace-pre-wrap">
+            {evaluationRun.description}
           </CardDescription>
         </div>
         <div className="flex gap-x-3">
@@ -75,6 +76,7 @@ export const RunInfoCard = ({
           />
         </div>
       </CardHeader>
+      <Separator orientation="horizontal" />
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <InfoItem

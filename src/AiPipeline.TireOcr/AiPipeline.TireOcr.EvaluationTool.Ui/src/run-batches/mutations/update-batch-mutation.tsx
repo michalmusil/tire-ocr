@@ -3,12 +3,18 @@ import axios from "axios";
 
 type UpdateBatchProps = {
   batchId: string;
-  newTitle?: string | null;
+  title?: string | null;
+  description?: string | null;
 };
 
-const updateBatch = async ({ batchId, newTitle }: UpdateBatchProps) => {
+const updateBatch = async ({
+  batchId,
+  title,
+  description,
+}: UpdateBatchProps) => {
   const request = {
-    batchTitle: newTitle,
+    title: title,
+    description: description,
   };
   const response = await axios.put(`/api/v1/Batch/${batchId}`, request);
   if (response.status !== 200) {

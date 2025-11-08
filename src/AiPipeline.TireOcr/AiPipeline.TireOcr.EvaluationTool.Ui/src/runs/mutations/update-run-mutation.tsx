@@ -3,12 +3,14 @@ import axios from "axios";
 
 type UpdateRunProps = {
   runId: string;
-  newTitle?: string | null;
+  title?: string | null;
+  description?: string | null;
 };
 
-const updateRun = async ({ runId, newTitle }: UpdateRunProps) => {
+const updateRun = async ({ runId, title, description }: UpdateRunProps) => {
   const request = {
-    runTitle: newTitle,
+    title: title,
+    description: description,
   };
   const response = await axios.put(`/api/v1/Run/${runId}`, request);
   if (response.status !== 200) {

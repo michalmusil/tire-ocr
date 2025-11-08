@@ -9,6 +9,8 @@ const getFormAsFormData = (
 ) => {
   const formData = new FormData();
   formData.append("runTitle", data.runTitle);
+  if (data.runDescription)
+    formData.append("runDescription", data.runDescription);
   formData.append("image", image);
   formData.append("preprocessingType", data.preprocessingType);
   if (data.expectedTireCodeLabel) {

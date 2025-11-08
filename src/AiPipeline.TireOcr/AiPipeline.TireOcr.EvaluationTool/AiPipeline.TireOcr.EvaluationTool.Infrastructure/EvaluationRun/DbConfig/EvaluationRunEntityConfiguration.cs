@@ -19,6 +19,9 @@ public class EvaluationRunEntityConfiguration : IEntityTypeConfiguration<Evaluat
 
         builder.Property(er => er.Title)
             .IsRequired();
+        
+        builder.Property(er => er.Description)
+            .IsRequired(false);
 
         builder.Property(er => er.StartedAt)
             .IsRequired();

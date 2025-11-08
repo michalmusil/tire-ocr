@@ -9,5 +9,6 @@ public record RunEvaluationBatchCommand(
     RunConfigDto RunConfig,
     int ProcessingBatchSize = 5,
     Guid? BatchId = null,
-    string? BatchTitle = null
+    string? BatchTitle = null,
+    string? BatchDescription = null
 ) : ICommand<EvaluationRunBatchFullDto>;

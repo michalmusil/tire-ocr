@@ -5,5 +5,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Comma
 
 public record UpdateEvaluationBatchCommand(
     Guid BatchId,
-    string? BatchTitle
+    string? BatchTitle,
+    string? BatchDescription
 ) : ICommand<EvaluationRunBatchFullDto>;

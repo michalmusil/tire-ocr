@@ -31,6 +31,7 @@ public class
         var batchWithRuns = new EvaluationRunBatchEntity(
             id: batch.Id,
             title: batch.Title,
+            description: batch.Description,
             evaluationRuns: runs.ToList()
         );
 
