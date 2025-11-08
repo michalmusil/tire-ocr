@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "../providers/auth-provider";
+import { useAuth } from "../../providers/auth-provider";
 
 export const AuthenticatedRoute = () => {
   const { authState } = useAuth();

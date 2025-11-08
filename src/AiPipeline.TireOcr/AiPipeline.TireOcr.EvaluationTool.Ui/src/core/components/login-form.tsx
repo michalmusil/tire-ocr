@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import FormInput from "./form-input";
+import FormInput from "./forms/form-input";
 import { Button } from "./ui/button";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

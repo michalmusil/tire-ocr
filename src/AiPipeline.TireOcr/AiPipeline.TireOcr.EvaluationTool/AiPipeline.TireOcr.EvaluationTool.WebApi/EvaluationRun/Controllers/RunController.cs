@@ -106,6 +106,38 @@ public class RunController : ControllerBase
         );
     }
 
+    [HttpPost("WithImageUrl")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RunWithImageResponse))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<RunWithImageUrlResponse>> RunWithImage(
+        [FromBody] RunWithImageUrlRequest request
+    )
+    {
+        var runConfig = new RunConfigDto(
+            PreprocessingType: request.PreprocessingType,
+            OcrType: request.OcrType,
+            PostprocessingType: request.PostprocessingType,
+            DbMatchingType: request.DbMatchingType
+        );
+
+        var command = new RunSingleEvaluationCommand(
+            InputImage: null,
+            InputImageUrl: request.ImageUrl,
+            ExpectedTireCodeLabel: request.ExpectedTireCodeLabel,
+            RunConfig: runConfig,
+            RunId: request.RunId,
+            RunTitle: request.RunTitle
+        );
+
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult<EvaluationRunDto, RunWithImageUrlResponse>(
+            onSuccess: dto => new RunWithImageUrlResponse(dto)
+        );
+    }
+
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UpdateRunResponse))]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
