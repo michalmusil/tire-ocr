@@ -63,7 +63,7 @@ export const RunResultsCard = ({ run }: RunResultsCardProps) => {
           <>
             <Separator />
             <div className="flex flex-col gap-y-2 p-4 rounded-lg bg-red-50 dark:bg-red-950">
-              <p className="text-lg font-semibold text-red-600 dark:text-red-400">
+              <p className="text-lg font-semibold text-destructive">
                 Run Failed
               </p>
               <p className="text-sm font-medium">

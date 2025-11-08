@@ -66,9 +66,7 @@ const LoginForm = ({ onSubmit, isSubmitting, error }: LoginFormProps) => {
               placeholder="Password"
             />
             {error && (
-              <div className="mt-2 text-sm text-red-600 dark:text-red-400">
-                {error}
-              </div>
+              <div className="mt-2 text-sm text-destructive">{error}</div>
             )}
             <Button
               type="submit"

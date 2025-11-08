@@ -14,32 +14,25 @@ import { useNavigate } from "react-router-dom";
 import { Spinner } from "@/core/components/ui/spinner";
 import { useQueryClient } from "@tanstack/react-query";
 import { RunBatchesQueryKey } from "../queries/use-run-batches-query";
+import EditBatchDialog from "./edit-batch-dialog";
+import type { RunBatchDetail } from "../dtos/get-run-batch-detail-dto";
 
 type BatchInfoCardProps = {
-  title: string;
-  batchId: string;
-  startedAt?: string | null;
-  finishedAt?: string | null;
+  batch: RunBatchDetail;
   totalCost?: {
     amount: number;
     currency: string;
   } | null;
 };
 
-export const BatchInfoCard = ({
-  title,
-  batchId,
-  startedAt,
-  finishedAt,
-  totalCost,
-}: BatchInfoCardProps) => {
+export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const deleteMutation = useDeleteBatchMutation();
 
   const onDeleteConfirmed = () => {
-    deleteMutation.mutate(batchId, {
+    deleteMutation.mutate(batch.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [RunBatchesQueryKey] });
         navigate(-1);
@@ -54,32 +47,43 @@ export const BatchInfoCard = ({
     <Card>
       <CardHeader className="flex justify-between">
         <div>
-          <CardTitle className="text-2xl">{title}</CardTitle>
-          <CardDescription>Batch ID: {batchId}</CardDescription>
+          <CardTitle className="text-2xl">{batch.title}</CardTitle>
+          <CardDescription className="wrap-anywhere">
+            Batch ID: {batch.id}
+          </CardDescription>
         </div>
-        <ConfirmationDialog
-          title="Delete"
-          description="Are you sure you want to permanently delete this batch?"
-          type="destructive"
-          confirmText="Delete"
-          cancelText="Cancel"
-          onConfirm={onDeleteConfirmed}
-          trigger={
-            <Button variant="destructive">
-              {deleteMutation.isPending ? <Spinner /> : "Delete"}
-            </Button>
-          }
-        />
+        <div className="flex gap-3">
+          <EditBatchDialog batch={batch} trigger={<Button>Edit</Button>} />
+          <ConfirmationDialog
+            title="Delete"
+            description="Are you sure you want to permanently delete this batch?"
+            type="destructive"
+            confirmText="Delete"
+            cancelText="Cancel"
+            onConfirm={onDeleteConfirmed}
+            trigger={
+              <Button disabled={deleteMutation.isPending} variant="destructive">
+                {deleteMutation.isPending ? <Spinner /> : "Delete"}
+              </Button>
+            }
+          />
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <InfoItem label="Started At" value={formatDateTime(startedAt)} />
-          <InfoItem label="Finished At" value={formatDateTime(finishedAt)} />
+          <InfoItem
+            label="Started At"
+            value={formatDateTime(batch.startedAt)}
+          />
+          <InfoItem
+            label="Finished At"
+            value={formatDateTime(batch.finishedAt)}
+          />
           <InfoItem
             label="Duration"
             value={getDisplayedDurationFromDatetimeBoundaries(
-              startedAt,
-              finishedAt
+              batch.startedAt,
+              batch.finishedAt
             )}
           />
           {totalCost && (

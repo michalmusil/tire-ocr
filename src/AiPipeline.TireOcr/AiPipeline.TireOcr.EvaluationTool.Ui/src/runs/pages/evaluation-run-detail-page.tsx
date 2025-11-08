@@ -26,13 +26,7 @@ const EvaluationRunDetailPage: React.FC = () => {
 
   return (
     <div className="container flex flex-col gap-y-6 py-8">
-      <RunInfoCard
-        title={run.title}
-        runId={run.id}
-        startedAt={run.startedAt}
-        finishedAt={run.finishedAt}
-        estimatedCost={estimatedCost}
-      />
+      <RunInfoCard evaluationRun={run} estimatedCost={estimatedCost} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RunConfigCard runConfig={run.runConfig} />

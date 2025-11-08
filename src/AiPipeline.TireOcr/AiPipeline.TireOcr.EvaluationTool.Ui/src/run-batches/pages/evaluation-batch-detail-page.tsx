@@ -33,10 +33,7 @@ const EvaluationBatchDetailPage: React.FC = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <BatchInfoCard
-        title={batchDetail.title}
-        batchId={batchDetail.id}
-        startedAt={batchDetail.startedAt}
-        finishedAt={batchDetail.finishedAt}
+        batch={batchDetail}
         totalCost={
           totalCost > 0
             ? { amount: totalCost, currency: totalCostCurrency }
