@@ -23,6 +23,10 @@ const EvaluationRunBatchesTable = ({
     navigate(`/batches/${batchId}`);
   };
 
+  const handleRowAuxClick = (batchId: string) => {
+    window.open(`/batches/${batchId}`);
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -38,6 +42,7 @@ const EvaluationRunBatchesTable = ({
           <TableRow
             key={batch.id}
             onClick={() => handleRowClick(batch.id)}
+            onAuxClick={() => handleRowAuxClick(batch.id)}
             className="cursor-pointer hover:bg-muted-foreground"
           >
             <TableCell>{batch.title}</TableCell>

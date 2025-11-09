@@ -1,12 +1,12 @@
 import { useParams } from "react-router-dom";
 import { useRunDetailQuery } from "../queries/use-run-detail-query";
-import SpinnerFullpage from "@/core/components/spinner-fullpage";
-import ErrorFullpage from "@/core/components/error-fullpage";
 import { RunInfoCard } from "../components/run-info-card";
-import { RunConfigCard } from "../components/run-config-card";
+import { RunConfigCard } from "../../core/components/run-config-card";
 import { RunDurationsCard } from "../components/run-durations-card";
 import { RunEvaluationCard } from "../components/run-evaluation-card";
 import { RunResultsCard } from "../components/run-results-card";
+import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
+import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
 
 const EvaluationRunDetailPage: React.FC = () => {
   const { runId } = useParams<{ runId: string }>();

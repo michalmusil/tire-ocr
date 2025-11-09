@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { EvaluationRunSchema } from "@/runs/dtos/get-evaluation-run-dto";
+import { RunConfigurationSchema } from "@/core/models/run-configuration";
 
 const BatchEvaluationCountsSchema = z.object({
   totalCount: z.number(),
@@ -37,6 +38,7 @@ export const RunBatchDetailSchema = z.object({
   description: z.string().nullish(),
   startedAt: z.iso.datetime().nullish(),
   finishedAt: z.iso.datetime().nullish(),
+  batchConfig: RunConfigurationSchema.nullish(),
   batchEvaluation: BatchEvaluationSchema,
   evaluationRuns: z.array(EvaluationRunSchema),
 });

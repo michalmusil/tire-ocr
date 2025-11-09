@@ -1,10 +1,5 @@
 import { PaginationSchema } from "@/core/models/pagination";
-import {
-  DbMatchingTypeSchema,
-  OcrTypeSchema,
-  PostprocessingTypeSchema,
-  PreprocessingTypeSchema,
-} from "@/core/models/run-steps-types";
+import { RunConfigurationSchema } from "@/core/models/run-configuration";
 import { z } from "zod";
 
 const ImageFileSchema = z.object({
@@ -48,12 +43,7 @@ export const EvaluationRunSchema = z.object({
   inputImage: ImageFileSchema,
   startedAt: z.iso.datetime(),
   finishedAt: z.iso.datetime().nullish(),
-  runConfig: z.object({
-    preprocessingType: PreprocessingTypeSchema,
-    ocrType: OcrTypeSchema,
-    postprocessingType: PostprocessingTypeSchema,
-    dbMatchingType: DbMatchingTypeSchema,
-  }),
+  runConfig: RunConfigurationSchema,
   failure: z
     .object({
       failureReason: z.string(),

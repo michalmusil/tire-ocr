@@ -10,6 +10,7 @@ public record EvaluationRunBatchFullDto(
     string? Description,
     DateTime? StartedAt,
     DateTime? FinishedAt,
+    RunConfigDto? BatchConfig,
     BatchEvaluationDto? BatchEvaluation,
     IEnumerable<EvaluationRunDto> EvaluationRuns
 )
@@ -17,12 +18,22 @@ public record EvaluationRunBatchFullDto(
     public static EvaluationRunBatchFullDto FromDomain(EvaluationRunBatchEntity domain,
         BatchEvaluationDto? batchEvaluation)
     {
+        var firstEvaluationRun = domain.EvaluationRuns.FirstOrDefault();
+
         return new EvaluationRunBatchFullDto(
             Id: domain.Id.ToString(),
             Title: domain.Title,
             Description: domain.Description,
             StartedAt: domain.StartedAt,
             FinishedAt: domain.FinishedAt,
+            BatchConfig: firstEvaluationRun is null
+                ? null
+                : new(
+                    PreprocessingType: firstEvaluationRun.PreprocessingType,
+                    OcrType: firstEvaluationRun.OcrType,
+                    PostprocessingType: firstEvaluationRun.PostprocessingType,
+                    DbMatchingType: firstEvaluationRun.DbMatchingType
+                ),
             BatchEvaluation: batchEvaluation,
             EvaluationRuns: domain.EvaluationRuns
                 .Select(EvaluationRunDto.FromDomain)

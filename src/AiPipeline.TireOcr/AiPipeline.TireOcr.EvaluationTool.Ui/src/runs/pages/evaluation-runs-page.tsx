@@ -1,8 +1,8 @@
 import { useSearchParams } from "react-router-dom";
 import { EvaluationRunsTable } from "../components/evaluation-runs-table";
 import GenericPagination from "@/core/components/generic-pagination";
-import SpinnerFullpage from "@/core/components/spinner-fullpage";
-import ErrorFullpage from "@/core/components/error-fullpage";
+import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
+import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
 import { useNavigate } from "react-router-dom";
 import { useRunsQuery } from "../queries/use-runs-query";
 import SearchInput from "@/core/components/search-input";

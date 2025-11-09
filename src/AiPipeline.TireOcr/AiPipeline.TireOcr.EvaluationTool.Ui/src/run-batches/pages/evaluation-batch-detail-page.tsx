@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
 import { useRunBatchDetailQuery } from "../queries/use-run-batch-detail-query";
-import SpinnerFullpage from "@/core/components/spinner-fullpage";
-import ErrorFullpage from "@/core/components/error-fullpage";
 import { BatchInfoCard } from "../components/batch-info-card";
 import { BatchEvaluationCountsCard } from "../components/batch-evaluation-counts-card";
 import { BatchAverageDistancesCard } from "../components/batch-average-distances-card";
 import { BatchEvaluationRunsCard } from "../components/batch-evaluation-runs-card";
 import { BatchAverageTimesCard } from "../components/batch-average-times-card";
+import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
+import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
+import { RunConfigCard } from "@/core/components/run-config-card";
 
 const EvaluationBatchDetailPage: React.FC = () => {
   const { batchId } = useParams<{ batchId: string }>();
@@ -41,6 +42,13 @@ const EvaluationBatchDetailPage: React.FC = () => {
         }
       />
 
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {batchDetail.batchConfig && (
+          <RunConfigCard runConfig={batchDetail.batchConfig} />
+        )}
+        <BatchAverageTimesCard batchDetail={batchDetail} />
+      </div>
+
       <BatchEvaluationCountsCard
         countsEvaluation={batchDetail.batchEvaluation.counts}
       />
@@ -48,8 +56,6 @@ const EvaluationBatchDetailPage: React.FC = () => {
       <BatchAverageDistancesCard
         distances={batchDetail.batchEvaluation.distances}
       />
-
-      <BatchAverageTimesCard batchDetail={batchDetail} />
 
       <BatchEvaluationRunsCard runs={batchDetail.evaluationRuns} />
     </div>
