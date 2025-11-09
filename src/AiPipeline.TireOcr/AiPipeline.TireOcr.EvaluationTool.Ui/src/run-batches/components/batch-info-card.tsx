@@ -36,7 +36,7 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
     deleteMutation.mutate(batch.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [RunBatchesQueryKey] });
-        navigate(-1);
+        navigate("/batches");
       },
       onError: (error) => {
         console.log(error);

@@ -39,7 +39,7 @@ export const RunInfoCard = ({
     deleteMutation.mutate(evaluationRun.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [RunsQueryKey] });
-        navigate(-1);
+        navigate("/runs");
       },
       onError: (error) => {
         console.log(error);

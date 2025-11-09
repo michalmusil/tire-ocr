@@ -52,7 +52,7 @@ export const BatchAverageTimesCard = ({
       <CardHeader>
         <CardTitle>Average Durations</CardTitle>
         <CardDescription>
-          Average durations of individual run steps
+          Average durations of individual run steps per each run in the batch
         </CardDescription>
       </CardHeader>
       <CardContent>

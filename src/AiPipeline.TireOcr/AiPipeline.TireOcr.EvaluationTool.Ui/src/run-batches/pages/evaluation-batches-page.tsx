@@ -1,8 +1,8 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
 import EvaluationRunBatchesTable from "../components/evaluation-run-batches-table";
 import GenericPagination from "@/core/components/generic-pagination";
-import SpinnerFullpage from "@/core/components/spinner-fullpage";
-import ErrorFullpage from "@/core/components/error-fullpage";
+import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
+import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
 import SearchInput from "@/core/components/search-input";
 import { useRunBatchesQuery } from "../queries/use-run-batches-query";
 

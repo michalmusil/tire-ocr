@@ -27,6 +27,10 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
     navigate(`/runs/${runId}`);
   };
 
+  const handleRowAuxClick = (runId: string) => {
+    window.open(`/runs/${runId}`);
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -46,6 +50,7 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
             <TableRow
               key={run.id}
               onClick={() => handleRowClick(run.id)}
+              onAuxClick={() => handleRowAuxClick(run.id)}
               className="cursor-pointer"
             >
               <TableCell>{run.title}</TableCell>

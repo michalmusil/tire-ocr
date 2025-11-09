@@ -5,11 +5,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/core/components/ui/card";
-import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { Separator } from "@/core/components/ui/separator";
+import type { RunConfiguration } from "@/core/models/run-configuration";
 
 type RunConfigCardProps = {
-  runConfig: EvaluationRun["runConfig"];
+  runConfig: RunConfiguration;
 };
 
 export const RunConfigCard = ({ runConfig }: RunConfigCardProps) => {
