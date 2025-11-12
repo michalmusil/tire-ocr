@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Ap scheme - AiPipeline</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Ap scheme";
+        var mkdocs_page_input_path = "ap-scheme.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AiPipeline
+    </a>
+    <a href="/swagger/index.html">Swagger Documentation</a>
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../architecture/">Architecture</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orchestration-runner/">Orchestration runner</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Ap scheme</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#apelement-structure">ApElement Structure</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#apelement-overview">ApElement Overview</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-apbool">1. ApBool</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-apstring">2. ApString</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-apint">3. ApInt</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#4-apdecimal">4. ApDecimal</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#5-apdatetime">5. ApDateTime</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-apenum">6. ApEnum</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-apfile">6. ApFile</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#6-aplist">6. ApList</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#7-apobject">7. ApObject</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../running-pipelines/">Running pipelines</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../node-creation-2/">Create your own node</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AiPipeline</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Ap scheme</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ap-scheme">Ap scheme</h1>
+<p>The <strong>ApScheme</strong> is a set of predefined JSON structures - <strong>ApElements</strong>, used to represent data types within the AiPipeline platform. This universal schema allows the <strong>Orchestration Runner</strong> and <strong>Nodes</strong> to communicate seamlessly and ensures pipeline compatibility.</p>
+<p>The ApScheme is essential for:</p>
+<ul>
+<li><strong>Node Communication:</strong> Defining the input and output data schemes for node procedures.</li>
+<li><strong>User Input:</strong> Constructing initial pipeline inputs in a universally readable format.</li>
+<li><strong>Pipeline Validation:</strong> Allowing the Orchestration Runner to automatically validate pipeline connections.</li>
+<li><strong>Extensibility:</strong> Providing a universal, human-readable, and JSON-parsable structure that can be easily extended.</li>
+</ul>
+<p>You will encounter ApSchemes when:</p>
+<ul>
+<li><strong>Discovering Nodes:</strong> Procedure input and output are defined using ApScheme.</li>
+<li><strong>Running Pipelines:</strong> The initial input must be a valid ApScheme instance compatible with the first procedure's input.</li>
+<li><strong>Analyzing Results:</strong> Successful pipeline results are stored in the ApScheme format.</li>
+</ul>
+<hr />
+<h2 id="apelement-structure">ApElement Structure</h2>
+<p>All ApElements are JSON objects at their root. While each element has its own set of properties, they all share one mandatory key: <code>type</code>. This property acts as a type discriminator and must always contain the correct string identifier for the respective element (e.g., <code>"type": "ApString"</code>).</p>
+<hr />
+<h2 id="apelement-overview">ApElement Overview</h2>
+<p>The following is a list of all available ApElements with notes on their usage and interpretation.</p>
+<h3 id="1-apbool">1. ApBool</h3>
+<p>Represents a simple boolean value (<code>true</code>/<code>false</code>). The value is stored in the <code>value</code> property. In a procedure I/O scheme definition, the default value is <code>false</code>.</p>
+<p><em>Example:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApBool&quot;,
+  &quot;value&quot;: true
+}
+</code></pre>
+<h3 id="2-apstring">2. ApString</h3>
+<p>Represents a string of characters. The value is stored in the <code>value</code> property. In a procedure I/O scheme definition, the default value is an empty string (<code>""</code>).</p>
+<p><em>Example:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApString&quot;,
+  &quot;value&quot;: &quot;my own string&quot;
+}
+</code></pre>
+<h3 id="3-apint">3. ApInt</h3>
+<p>Represents an integer value. The value is stored in the <code>value</code> property. In a procedure I/O scheme definition, the default value is <code>0</code>.</p>
+<p><em>Example:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApInt&quot;,
+  &quot;value&quot;: 455
+}
+</code></pre>
+<h3 id="4-apdecimal">4. ApDecimal</h3>
+<p>Represents a high-precision floating-point number. The value is stored in the <code>value</code> property. In a procedure I/O scheme definition, the default value is <code>0</code>.</p>
+<p><em>Example:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApDecimal&quot;,
+  &quot;value&quot;: 3.00123345004
+}
+</code></pre>
+<h3 id="5-apdatetime">5. ApDateTime</h3>
+<p>Represents a date and time value encoded in the ISO 8601 standard. The value is stored in the <code>value</code> property. In a procedure I/O scheme definition, the default value is the current UTC date and time.</p>
+<p><em>Example:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApDateTime&quot;,
+  &quot;value&quot;: &quot;2024-01-24T06:09:19.384957Z&quot;
+}
+</code></pre>
+<h3 id="6-apenum">6. ApEnum</h3>
+<p>Represents an enumeration with a predefined set of string values. It has two specific properties:</p>
+<ul>
+<li><code>supportedCases</code>: An array of strings defining all possible valid values for the enumeration. This property is used only in scheme definitions.</li>
+<li><code>value</code>: A string representing one of the supportedCases.</li>
+</ul>
+<p>When defining a procedure scheme, <code>value</code> is an empty string and <code>supportedCases</code> is populated. When providing a pipeline input, <code>supportedCases</code> is optional, but value must match one of the cases from the procedure's scheme input definition.</p>
+<p><em>Example in procedure scheme definition:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApEnum&quot;,
+  &quot;value&quot;: &quot;&quot;,
+  &quot;supportedCases&quot;: [
+    &quot;GoogleGemini&quot;,
+    &quot;MistralPixtral&quot;,
+    &quot;OpenAiGpt&quot;,
+    &quot;GoogleCloudVision&quot;,
+    &quot;AzureAiVision&quot;
+  ]
+}
+</code></pre>
+<p><em>Example in pipeline input:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApEnum&quot;,
+  &quot;value&quot;: &quot;GoogleGemini&quot;
+}
+</code></pre>
+<h3 id="6-apfile">6. ApFile</h3>
+<p>Represents a file stored in the central FileService. This is the only supported method for passing files between nodes. It has three specific properties:</p>
+<ul>
+<li><code>id</code>: The GUID of the file in the FileService.</li>
+<li><code>contentType</code>: The MIME type of the file (e.g., <code>image/jpeg</code>).</li>
+<li><code>supportedContentTypes</code>: An array of strings defining the MIME types a procedure input can accept. This property is used only in scheme definitions.</li>
+</ul>
+<p>In a procedure scheme definition, <code>contentType</code> is an empty string, and <code>id</code> is an empty GUID (<code>00000000-0000-0000-0000-000000000000</code>). When providing a pipeline input, you must supply a valid <code>id</code> and <code>contentType</code> that matches a supportedContentTypes from the procedure's scheme.</p>
+<p><em>Example in procedure scheme definition:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApFile&quot;,
+  &quot;id&quot;: &quot;00000000-0000-0000-0000-000000000000&quot;,
+  &quot;contentType&quot;: &quot;&quot;,
+  &quot;supportedContentTypes&quot;: [&quot;image/jpeg&quot;, &quot;image/png&quot;, &quot;image/webp&quot;]
+}
+</code></pre>
+<p><em>Example in pipeline input:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApFile&quot;,
+  &quot;id&quot;: &quot;e9ecec8e-bf34-409e-80e4-7cd1ae651c81&quot;,
+  &quot;contentType&quot;: &quot;image/jpeg&quot;
+}
+</code></pre>
+<h3 id="6-aplist">6. ApList</h3>
+<p>Represents a list of values of a common type. The list can contain any other ApElement, including nested ApList and ApObject elements. It has one specific property:</p>
+<ul>
+<li><code>items</code>: A JSON array containing the ApElements in the list.</li>
+</ul>
+<p>In a procedure scheme definition, the <code>items</code> array should contain exactly one element, which serves as a template for the list's type. In a pipeline input, all items within the list must match this template's ApElement type.</p>
+<p><em>Example in procedure scheme definition:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApList&quot;,
+  &quot;items&quot;: [
+    {
+      &quot;type&quot;: &quot;ApString&quot;,
+      &quot;value&quot;: &quot;&quot;
+    }
+  ]
+}
+</code></pre>
+<p><em>Example in pipeline input:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApList&quot;,
+  &quot;items&quot;: [
+    {
+      &quot;type&quot;: &quot;ApString&quot;,
+      &quot;value&quot;: &quot;My value item 1&quot;
+    },
+    {
+      &quot;type&quot;: &quot;ApString&quot;,
+      &quot;value&quot;: &quot;My value item 2&quot;
+    }
+  ]
+}
+</code></pre>
+<h3 id="7-apobject">7. ApObject</h3>
+<p>Represents an object with key-value pairs. Keys are unique string identifiers, and values are any other ApElement. ApObjects can be arbitrarily nested. It has two specific properties:</p>
+<ul>
+<li><code>properties</code>: A JSON object holding the inner properties of the ApObject. Keys are unique strings, and values are ApElements.</li>
+<li><code>nonRequiredProperties</code>: An array of strings used in input schemes to define optional properties.</li>
+</ul>
+<p>For two ApObject schemes to be compatible (e.g., a procedure output and a subsequent procedure input), the output object must contain all required keys from the input object, with matching ApElement types. Keys listed in <code>nonRequiredProperties</code> are not checked during this validation.</p>
+<p><em>Example in procedure scheme definition:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApObject&quot;,
+  &quot;properties&quot;: {
+    &quot;detectorType&quot;: {
+      &quot;type&quot;: &quot;ApEnum&quot;,
+      &quot;value&quot;: &quot;&quot;,
+      &quot;supportedCases&quot;: [
+        &quot;GoogleGemini&quot;,
+        &quot;MistralPixtral&quot;,
+        &quot;OpenAiGpt&quot;,
+        &quot;GoogleCloudVision&quot;,
+        &quot;AzureAiVision&quot;
+      ]
+    },
+    &quot;image&quot;: {
+      &quot;type&quot;: &quot;ApFile&quot;,
+      &quot;id&quot;: &quot;00000000-0000-0000-0000-000000000000&quot;,
+      &quot;contentType&quot;: &quot;&quot;,
+      &quot;supportedContentTypes&quot;: [&quot;image/jpeg&quot;, &quot;image/png&quot;, &quot;image/webp&quot;]
+    }
+  },
+  &quot;nonRequiredProperties&quot;: [&quot;detectorType&quot;]
+}
+</code></pre>
+<p><em>Example in pipeline input:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApObject&quot;,
+  &quot;properties&quot;: {
+    &quot;detectorType&quot;: {
+      &quot;type&quot;: &quot;ApEnum&quot;,
+      &quot;value&quot;: &quot;MistralPixtral&quot;
+    },
+    &quot;image&quot;: {
+      &quot;type&quot;: &quot;ApFile&quot;,
+      &quot;id&quot;: &quot;1eda3a21-bf66-4abd-9bfb-15afc1691eed&quot;,
+      &quot;contentType&quot;: &quot;image/webp&quot;
+    }
+  }
+}
+</code></pre>
+<p><em><strong>Note:</strong> due to mention of <code>detectorType</code> in <code>nonRequiredProperties</code>, this would also be a valid input:</em></p>
+<pre><code class="language-json">{
+  &quot;type&quot;: &quot;ApObject&quot;,
+  &quot;properties&quot;: {
+    &quot;image&quot;: {
+      &quot;type&quot;: &quot;ApFile&quot;,
+      &quot;id&quot;: &quot;1eda3a21-bf66-4abd-9bfb-15afc1691eed&quot;,
+      &quot;contentType&quot;: &quot;image/webp&quot;
+    }
+  }
+}
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../orchestration-runner/" class="btn btn-neutral float-left" title="Orchestration runner"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../running-pipelines/" class="btn btn-neutral float-right" title="Running pipelines">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../orchestration-runner/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../running-pipelines/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

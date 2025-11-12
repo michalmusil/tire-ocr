@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Architecture - AiPipeline</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Architecture";
+        var mkdocs_page_input_path = "architecture.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> AiPipeline
+    </a>
+    <a href="/swagger/index.html">Swagger Documentation</a>
+<div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">Architecture</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#communication-protocols">Communication Protocols</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#core-components">Core Components</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#1-orchestration-runner-aipipelineorchestrationrunner">1. Orchestration Runner (AiPipeline.Orchestration.Runner)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#2-nodes-aipipelineyournodename">2. Nodes (AiPipeline.YourNodeName)</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#3-file-service-aipipelineorchestrationfileservice">3. File Service (AiPipeline.Orchestration.FileService)</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../orchestration-runner/">Orchestration runner</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../ap-scheme/">Ap scheme</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../running-pipelines/">Running pipelines</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../node-creation-2/">Create your own node</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../license/">License</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">AiPipeline</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Architecture</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="aipipeline-platform-architecture-overview">AiPipeline Platform Architecture Overview</h1>
+<p>The AiPipeline platform provides a scalable solution for complex data-processing pipelines through node-to-node communication. The system is built with a decoupled architecture, allowing each node to be deployed independently in either cloud or on-premise environments. The platform is composed of three core components: the Orchestration Runner, the File Service, and the individual Nodes.</p>
+<p>All core components are implemented in .NET 8 (with an exception of Nodes, which may be extended and implemented using any platoform) and follow Clean Architecture, CQRS, and microservice principles. This layered approach ensures a clear separation of concerns between the domain, application, infrastructure, and presentation layers.</p>
+<h2 id="communication-protocols">Communication Protocols</h2>
+<p>To ensure smooth and efficient operation, the AiPipeline platform utilizes different communication technologies tailored to each specific task.</p>
+<ul>
+<li><strong>User-to-System</strong>: The Orchestration Runner exposes a RESTful API, serving as the single public entry point for users to interact with the platform.</li>
+<li><strong>Inter-component Communication (Runner-to-Node &amp; Node-to-Node)</strong>: RabbitMQ is used as a message broker to facilitate the distribution and orchestration of pipelines. The runner initiates a pipeline by sending a message to the first node. Each subsequent node processes the message, sends the result to the next node in the pipeline, and sends a completion notification back to the runner.</li>
+<li><strong>File Handling (Node-to-FileService &amp; Runner-to-FileService)</strong>: For server-to-server communication with the File Service, gRPC is the protocol of choice. Its minimal overhead and high efficiency make it ideal for the transfer of large file data.</li>
+</ul>
+<h2 id="core-components">Core Components</h2>
+<h3 id="1-orchestration-runner-aipipelineorchestrationrunner">1. Orchestration Runner (AiPipeline.Orchestration.Runner)</h3>
+<p>The Orchestration Runner is the central nervous system of the platform. It's a web service that provides the only public-facing API, allowing users to:</p>
+<ul>
+<li>Initiate and run pipelines.</li>
+<li>Analyze pipeline results.</li>
+<li>Manage user accounts and pipeline files.</li>
+</ul>
+<p>Its primary responsibilities include pipeline creation, validation, and mapping the correct sequence of nodes for a given process. All other platform components, including the nodes and the File Service, are hosted privately and are not publicly exposed.</p>
+<h3 id="2-nodes-aipipelineyournodename">2. Nodes (AiPipeline.YourNodeName)</h3>
+<p>A node is an independent service integrated into the AiPipeline platform by implementing a specific set of interfaces (described in <a href="node-creation.md">Create your own node</a>). Each node can have multiple procedures, each with a defined input and output scheme. Users can chain these procedures together using the Orchestration Runner to create complex, long-running pipelines.</p>
+<p>For scalability, the same type of node (same identifier, procedures and interface) can be deployed as multiple duplicates. The Orchestration Runner automatically distributes the workload of running pipelines evenly among these duplicates, which is crucial for handling parallel processing or computationally intensive tasks.</p>
+<h3 id="3-file-service-aipipelineorchestrationfileservice">3. File Service (AiPipeline.Orchestration.FileService)</h3>
+<p>The File Service provides a unified API for nodes to manage files (e.g., images, documents, videos) used within pipelines. It is a private service, accessible only by other components within the platform deployment. This ensures secure handling of sensitive data.</p>
+<p><strong>Important Note</strong>: Only files residing within the File Service can be processed by pipelines. Users can manage their files through the Orchestration Runner's public API.</p>
+<p>The File Service itself is a standalone .NET service that uses a PostgreSQL database to track file records and an S3-compatible storage solution (MinIO) to store the actual file data. Due to its server-to-server communication pattern and focus on large data transfers, it exclusively uses a gRPC API for efficiency.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../orchestration-runner/" class="btn btn-neutral float-right" title="Orchestration runner">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../orchestration-runner/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
