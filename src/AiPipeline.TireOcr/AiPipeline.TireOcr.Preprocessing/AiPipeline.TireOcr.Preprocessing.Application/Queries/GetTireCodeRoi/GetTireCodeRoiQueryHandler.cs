@@ -16,16 +16,23 @@ public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, Pre
     private readonly ITireDetectionService _tireDetectionService;
     private readonly ITextDetectionFacade _textDetectionFacade;
     private readonly IContentTypeResolverService _contentTypeResolverService;
+    private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
     private readonly ILogger<GetTireCodeRoiQueryHandler> _logger;
 
-    public GetTireCodeRoiQueryHandler(IImageManipulationService imageManipulationService,
-        ITireDetectionService tireDetectionService, ITextDetectionFacade textDetectionFacade,
-        IContentTypeResolverService contentTypeResolverService, ILogger<GetTireCodeRoiQueryHandler> logger)
+    public GetTireCodeRoiQueryHandler(
+        IImageManipulationService imageManipulationService,
+        ITireDetectionService tireDetectionService,
+        ITextDetectionFacade textDetectionFacade,
+        IContentTypeResolverService contentTypeResolverService,
+        ITireSidewallExtractionService tireSidewallExtractionService,
+        ILogger<GetTireCodeRoiQueryHandler> logger
+    )
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _textDetectionFacade = textDetectionFacade;
         _contentTypeResolverService = contentTypeResolverService;
+        _tireSidewallExtractionService = tireSidewallExtractionService;
         _logger = logger;
     }
 
@@ -63,80 +70,55 @@ public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, Pre
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var image = new Image(request.ImageData, request.ImageName, originalSize);
 
-        double tireDetectionSeconds = 0;
-        Image? fallbackImage = null;
-        Image? unwrappedImage = null;
-        try
+        // Apply global adjustments to reduce image size and improve contrast
+        var processedImage = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
+        processedImage = _imageManipulationService.ApplyClahe(
+            processedImage,
+            windowSize: new ImageSize(10, 10)
+        );
+
+        // Attempt to detect tire circle (only successful for photos containing the whole tire)
+        var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
+        if (detectedTireResult.IsFailure)
         {
-            var resized = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
-            var withClahe = _imageManipulationService.ApplyClahe(
-                resized,
-                windowSize: new ImageSize(10, 10)
-            );
-            fallbackImage = withClahe;
-
-            var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
-            if (detectedTireResult.IsFailure)
-                // return DataResult<PreprocessedImageDto>.Failure(detectedTireResult.Failures);
-                throw new Exception("Failed to detect tire rim");
-
-            var detectedTire = detectedTireResult.Data!;
-            tireDetectionSeconds = detectedTire.TimeTaken.TotalSeconds;
-            var unwrapped = GetUnwrappedTireStrip(withClahe, detectedTire.RimCircle);
-            var extended = _imageManipulationService.CopyAndAppendImagePortionFromLeft(unwrapped, 0.17);
-            unwrappedImage = extended;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $"Exception during preprocessing: {ex.StackTrace}");
-        }
-
-        if (unwrappedImage is null)
-            return HandleUnsuccessfulPreprocessing(request.OriginalContentType, fallbackImage);
-
-        var textArea = request.RemoveBackground
-            ? await _textDetectionFacade.ExtractTireCodeRoiAndRemoveBg(unwrappedImage)
-            : await _textDetectionFacade.ExtractTireCodeRoi(unwrappedImage);
-        return textArea.Map(
-            onFailure: failures => HandleUnsuccessfulPreprocessing(
-                request.OriginalContentType,
-                fallbackImage,
-                failures
-            ),
-            onSuccess: res =>
+            var failure = detectedTireResult.PrimaryFailure!;
+            switch (failure.Code)
             {
-                var textDetectionSeconds = res.TimeTaken.TotalSeconds;
-                _logger.LogInformation(
-                    $"Preprocessing completed:\nTire detection: {tireDetectionSeconds}s\nText detection: {textDetectionSeconds}s");
+                // NotFound or Invalid result means that the photo doesn't contain the entire tire. Full photo with global adjustments used as fallback in this case. 
+                case 404 or 422:
+                    _logger.LogWarning(
+                        $"Rim detection failed for '{request.ImageName}'.\nReason:'{failure.Message}'\nReturning fallback image version."
+                    );
+                    return DataResult<Image>.Success(processedImage);
+                default:
+                    _logger.LogError(
+                        $"Rim detected failed fatally for '{request.ImageName}'.\nReason:'{failure.Message}'\nPreprocessing failed."
+                    );
+                    return DataResult<Image>.Failure(failure);
+            }
+        }
 
-                return DataResult<Image>.Success(res.BestImage);
+        var fallbackImage = processedImage;
+        var detectedTire = detectedTireResult.Data!;
+
+        // Unwrapping only the tire sidewall portion of the image into a long strip and appending overlap manually from left side to right 
+        processedImage = await _tireSidewallExtractionService
+            .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
+        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
+
+        // Performing the roi extraction
+        var roiExtractionResult = request.RemoveBackground
+            ? await _textDetectionFacade.ExtractTireCodeRoiAndRemoveBg(processedImage)
+            : await _textDetectionFacade.ExtractTireCodeRoi(processedImage);
+
+        return roiExtractionResult.Map(
+            onSuccess: res => DataResult<Image>.Success(res.BestImage),
+            onFailure: failures =>
+            {
+                _logger.LogError(
+                    $"Roi extraction failed for '{request.ImageName}'.\nReason:'{failures.FirstOrDefault()?.Message ?? ""}'\nReturning fallback image version.");
+                return DataResult<Image>.Success(fallbackImage);
             }
         );
-    }
-
-    private Image GetUnwrappedTireStrip(Image image, CircleInImage rimCircle)
-    {
-        var outerTireRadius = rimCircle.Radius * 1.3;
-        var innerTireRadius = rimCircle.Radius * 0.9;
-        return _imageManipulationService.UnwrapRingIntoRectangle(image,
-            rimCircle.Center,
-            innerTireRadius,
-            outerTireRadius
-        );
-    }
-
-    private DataResult<Image> HandleUnsuccessfulPreprocessing(string contentType, Image? image = null,
-        Failure[]? failures = null)
-    {
-        if (image == null)
-        {
-            _logger.LogError("Preprocessing failed with no image to return");
-            return DataResult<Image>.Failure(failures ??
-            [
-                new Failure(500, "Fatal failure during preprocessing")
-            ]);
-        }
-
-        return DataResult<Image>.Success(image);
     }
 }
