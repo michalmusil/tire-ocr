@@ -28,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IImageSlicerService, OpenCvImageSlicerService>();
         services.AddScoped<IImageTextApproximatorService, ImageTextApproximatorService>();
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
+        services.AddScoped<ITireSidewallExtractionService, TireSidewallExtractionService>();
     }
 
     private static void AddFacades(IServiceCollection services)

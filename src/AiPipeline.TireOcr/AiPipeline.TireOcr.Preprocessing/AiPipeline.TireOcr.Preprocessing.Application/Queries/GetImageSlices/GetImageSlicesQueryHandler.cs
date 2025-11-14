@@ -15,16 +15,23 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
     private readonly ITireDetectionService _tireDetectionService;
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly IImageSlicerService _imageSlicerService;
+    private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
     private readonly ILogger<GetImageSlicesQueryHandler> _logger;
 
-    public GetImageSlicesQueryHandler(IImageManipulationService imageManipulationService,
-        ITireDetectionService tireDetectionService, IContentTypeResolverService contentTypeResolverService,
-        IImageSlicerService imageSlicerService, ILogger<GetImageSlicesQueryHandler> logger)
+    public GetImageSlicesQueryHandler(
+        IImageManipulationService imageManipulationService,
+        ITireDetectionService tireDetectionService,
+        IContentTypeResolverService contentTypeResolverService,
+        IImageSlicerService imageSlicerService,
+        ITireSidewallExtractionService tireSidewallExtractionService,
+        ILogger<GetImageSlicesQueryHandler> logger
+    )
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _contentTypeResolverService = contentTypeResolverService;
         _imageSlicerService = imageSlicerService;
+        _tireSidewallExtractionService = tireSidewallExtractionService;
         _logger = logger;
     }
 
@@ -61,62 +68,74 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
                 $"Content type {request.OriginalContentType} is not supported");
 
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
-        var image = new Image(request.ImageData, request.ImageName, originalSize);
+        var processedImage = new Image(request.ImageData, request.ImageName, originalSize);
 
-        var resized = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
-        var withClahe = _imageManipulationService.ApplyClahe(
-            resized,
+        // Apply global adjustments to reduce image size and improve contrast
+        processedImage = _imageManipulationService
+            .ResizeToMaxSideSize(processedImage, 2048);
+        processedImage = _imageManipulationService.ApplyClahe(
+            processedImage,
             windowSize: new ImageSize(10, 10)
         );
 
-        var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(withClahe);
+        // Attempt to detect tire circle (only successful for photos containing the whole tire)
+        var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
         if (detectedTireResult.IsFailure)
-            return DataResult<Image>.Failure(detectedTireResult.Failures);
+        {
+            var failure = detectedTireResult.PrimaryFailure!;
+            switch (failure.Code)
+            {
+                // NotFound or Invalid result means that the photo doesn't contain the entire tire. Full photo with global adjustments used as fallback in this case. 
+                case 404 or 422:
+                    _logger.LogWarning(
+                        $"Rim detection failed for '{request.ImageName}'.\nReason:'{failure.Message}'\nReturning fallback image version."
+                    );
+                    return DataResult<Image>.Success(processedImage);
+                default:
+                    _logger.LogError(
+                        $"Rim detected failed fatally for '{request.ImageName}'.\nReason:'{failure.Message}'\nPreprocessing failed."
+                    );
+                    return DataResult<Image>.Failure(failure);
+            }
+        }
 
+        // Unwrapping only the tire sidewall portion of the image into a long strip 
         var detectedTire = detectedTireResult.Data!;
-        var unwrapped = GetUnwrappedTireStrip(withClahe, detectedTire.RimCircle);
-        var unwrappedExtended = _imageManipulationService.CopyAndAppendImagePortionFromLeft(unwrapped, 0.17);
+        processedImage = await _tireSidewallExtractionService
+            .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
+        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
 
+        // Slicing the strip horizontally to get more acceptable aspect ratio - overlap in slices included
+        var sliceWidth = (decimal)processedImage.Size.Width / (decimal)request.NumberOfSlices;
         var sliceSize = new ImageSize(
-            height: unwrappedExtended.Size.Height,
-            width: (int)Math.Ceiling((decimal)unwrappedExtended.Size.Width / (decimal)request.NumberOfSlices)
+            height: processedImage.Size.Height,
+            width: (int)Math.Ceiling(sliceWidth)
         );
-
         var slicesResult = await _imageSlicerService.SliceImageAdditiveOverlap(
-            image: unwrappedExtended,
+            image: processedImage,
             sliceSize: sliceSize,
             xOverlapRatio: 0.15,
             yOverlapRatio: 0
         );
         if (slicesResult.IsFailure)
             return DataResult<Image>.Failure(slicesResult.Failures);
-
         var slices = slicesResult.Data!.ToList();
         if (!slices.Any())
             return DataResult<Image>.Failure(new Failure(500, "Failed to generate image slices."));
 
+        // Stacking slices on top of each other vertically
         var stackedImage = _imageManipulationService.StackImagesVertically(slices);
         if (stackedImage == null)
             return DataResult<Image>.Failure(
                 new Failure(500, "Failed to compose generated slices vertically.")
             );
 
+        // Applying more preprocessing to improve contrast
         var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
         finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
         finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
 
 
         return DataResult<Image>.Success(finalImage);
-    }
-
-    private Image GetUnwrappedTireStrip(Image image, CircleInImage rimCircle)
-    {
-        var outerTireRadius = rimCircle.Radius * 1.3;
-        var innerTireRadius = rimCircle.Radius * 0.9;
-        return _imageManipulationService.UnwrapRingIntoRectangle(image,
-            rimCircle.Center,
-            innerTireRadius,
-            outerTireRadius
-        );
     }
 }
