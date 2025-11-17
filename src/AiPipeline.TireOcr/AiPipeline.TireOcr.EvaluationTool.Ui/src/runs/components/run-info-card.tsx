@@ -17,6 +17,7 @@ import { Spinner } from "@/core/components/ui/spinner";
 import EditRunDialog from "./edit-run-dialog";
 import type { EvaluationRun } from "../dtos/get-evaluation-run-dto";
 import { Separator } from "@/core/components/ui/separator";
+import EvaluationResultCategoryBadge from "./evaluation-result-category-badge";
 
 type RunInfoCardProps = {
   evaluationRun: EvaluationRun;
@@ -92,6 +93,14 @@ export const RunInfoCard = ({
             value={formatDateTime(evaluationRun.finishedAt)}
           />
           <InfoItem
+            label="Evaluation Category"
+            value={
+              <EvaluationResultCategoryBadge
+                category={evaluationRun.evaluationResultCategory}
+              />
+            }
+          />
+          <InfoItem
             label="Duration"
             value={getDisplayedDurationFromDatetimeBoundaries(
               evaluationRun.startedAt,
@@ -112,11 +121,21 @@ export const RunInfoCard = ({
   );
 };
 
-const InfoItem = ({ label, value }: { label: string; value: string }) => {
+const InfoItem = ({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | React.ReactNode;
+}) => {
   return (
     <div>
       <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      <p className="text-md font-semibold">{value}</p>
+      {typeof value === "string" ? (
+        <p className="text-md font-semibold">{value}</p>
+      ) : (
+        value
+      )}
     </div>
   );
 };

@@ -1,3 +1,4 @@
+import { EvaluationResultCategorySchema } from "@/core/models/evaluation-result-category";
 import { PaginationSchema } from "@/core/models/pagination";
 import { RunConfigurationSchema } from "@/core/models/run-configuration";
 import { z } from "zod";
@@ -40,6 +41,7 @@ export const EvaluationRunSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string().nullish(),
+  evaluationResultCategory: EvaluationResultCategorySchema,
   inputImage: ImageFileSchema,
   startedAt: z.iso.datetime(),
   finishedAt: z.iso.datetime().nullish(),

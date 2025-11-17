@@ -1,5 +1,6 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos.BatchEvaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Services;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
@@ -19,6 +20,8 @@ public class BatchEvaluationService : IBatchEvaluationService
 
         int fullyCorrectResultCount = 0;
         int correctMainParameterCount = 0;
+        int insufficientExtractionCount = 0;
+        int falsePositiveCount = 0;
         int failedPreprocessingCount = 0;
         int failedOcrCount = 0;
         int failedPostprocessingCount = 0;
@@ -37,46 +40,43 @@ public class BatchEvaluationService : IBatchEvaluationService
 
         foreach (var run in batch.EvaluationRuns)
         {
-            if (run.RunFailure is not null)
+            switch (run.GetEvaluationResultCategory())
             {
-                switch (run.RunFailure.Reason)
-                {
-                    case EvaluationRunFailureReason.Preprocessing:
-                        failedPreprocessingCount++;
-                        break;
-                    case EvaluationRunFailureReason.Ocr:
-                        failedOcrCount++;
-                        break;
-                    case EvaluationRunFailureReason.Postprocessing:
-                        failedPostprocessingCount++;
-                        break;
-                    case EvaluationRunFailureReason.Unexpected:
-                        failedUnexpectedCount++;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                continue;
+                case EvaluationResultCategory.NoEvaluation:
+                    break;
+                case EvaluationResultCategory.FullyCorrect:
+                    fullyCorrectResultCount++;
+                    break;
+                case EvaluationResultCategory.CorrectInMainParameters:
+                    correctMainParameterCount++;
+                    break;
+                case EvaluationResultCategory.NoCodeDetectedPreprocessing:
+                    failedPreprocessingCount++;
+                    break;
+                case EvaluationResultCategory.NoCodeDetectedOcr:
+                    failedOcrCount++;
+                    break;
+                case EvaluationResultCategory.NoCodeDetectedPostprocessing:
+                    failedPostprocessingCount++;
+                    break;
+                case EvaluationResultCategory.NoCodeDetectedUnexpected:
+                    failedUnexpectedCount++;
+                    break;
+                case EvaluationResultCategory.InsufficientExtraction:
+                    insufficientExtractionCount++;
+                    break;
+                case EvaluationResultCategory.FalsePositive:
+                    falsePositiveCount++;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             // Successful runs with no evaluation are skipped
-            if (run.Evaluation is null)
+            var evaluation = run.Evaluation;
+            if (evaluation is null)
                 continue;
 
-            var evaluation = run.Evaluation!;
-
-            var isFullyCorrect = evaluation.TotalDistance == 0;
-            var areMainParametersCorrect =
-                evaluation.WidthEvaluation?.Distance == 0 &&
-                evaluation.DiameterEvaluation?.Distance == 0 &&
-                evaluation.AspectRatioEvaluation?.Distance == 0 &&
-                evaluation.ConstructionEvaluation?.Distance == 0;
-
-            if (isFullyCorrect)
-                fullyCorrectResultCount++;
-            else if (areMainParametersCorrect)
-                correctMainParameterCount++;
 
             totalDistances.Add(evaluation.TotalDistance);
             AddParameterEvaluationDistance(evaluation.VehicleClassEvaluation, vehicleClassDistances);
@@ -95,6 +95,8 @@ public class BatchEvaluationService : IBatchEvaluationService
                 TotalCount: totalRuns,
                 FullyCorrectCount: fullyCorrectResultCount,
                 CorrectMainParametersCount: correctMainParameterCount,
+                InsufficientExtractionCount: insufficientExtractionCount,
+                FalsePositiveCount: falsePositiveCount,
                 FailedPreprocessingCount: failedPreprocessingCount,
                 FailedOcrCount: failedOcrCount,
                 FailedPostprocessingCount: failedPostprocessingCount,
