@@ -1,6 +1,7 @@
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun.DbMatching;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun.Ocr;
+using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.EvaluationRun;
 
@@ -8,6 +9,7 @@ public record EvaluationRunDto(
     string Id,
     string Title,
     string? Description,
+    EvaluationResultCategory EvaluationResultCategory,
     ImageInfoDto InputImage,
     DateTime StartedAt,
     DateTime? FinishedAt,
@@ -28,6 +30,7 @@ public record EvaluationRunDto(
             Id: domain.Id.ToString(),
             Title: domain.Title,
             Description: domain.Description,
+            EvaluationResultCategory: domain.GetEvaluationResultCategory(),
             InputImage: ImageInfoDto.FromDomain(domain.InputImage),
             StartedAt: domain.StartedAt,
             FinishedAt: domain.FinishedAt,

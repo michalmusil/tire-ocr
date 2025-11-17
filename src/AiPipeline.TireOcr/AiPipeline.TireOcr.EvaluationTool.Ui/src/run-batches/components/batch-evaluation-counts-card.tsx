@@ -24,12 +24,9 @@ export const BatchEvaluationCountsCard = ({
     countsEvaluation.failedPostprocessingCount +
     countsEvaluation.failedUnexpectedCount;
 
-  const falsePositives =
-    countsEvaluation.totalCount - totalCorrect - totalFailed;
-
   const correctPercentage = (totalCorrect / countsEvaluation.totalCount) * 100;
   const falsePositivePercentage =
-    (falsePositives / countsEvaluation.totalCount) * 100;
+    (countsEvaluation.falsePositiveCount / countsEvaluation.totalCount) * 100;
   const noCodePercentage = (totalFailed / countsEvaluation.totalCount) * 100;
   return (
     <Card>
@@ -44,7 +41,7 @@ export const BatchEvaluationCountsCard = ({
           />
           <HeadingProperty
             label="False positives"
-            value={`${falsePositives}`}
+            value={`${countsEvaluation.falsePositiveCount}`}
             percentage={falsePositivePercentage}
             className="text-red-600"
           />

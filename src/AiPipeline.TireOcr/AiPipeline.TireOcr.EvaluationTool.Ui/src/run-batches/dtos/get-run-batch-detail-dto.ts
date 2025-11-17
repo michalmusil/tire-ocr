@@ -6,6 +6,8 @@ const BatchEvaluationCountsSchema = z.object({
   totalCount: z.number(),
   fullyCorrectCount: z.number(),
   correctMainParametersCount: z.number(),
+  insufficientExtractionCount: z.number(),
+  falsePositiveCount: z.number(),
   failedPreprocessingCount: z.number(),
   failedOcrCount: z.number(),
   failedPostprocessingCount: z.number(),

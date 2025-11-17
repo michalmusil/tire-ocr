@@ -14,6 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/core/components/ui/tooltip";
+import EvaluationResultCategoryBadge from "./evaluation-result-category-badge";
 
 type EvaluationRunsTableProps = {
   runs: EvaluationRun[];
@@ -42,6 +43,7 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
           <TableHead>Duration</TableHead>
           <TableHead>Expected code</TableHead>
           <TableHead>Result/Failure Reason</TableHead>
+          <TableHead>Evaluation Category</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -84,6 +86,11 @@ export const EvaluationRunsTable = ({ runs }: EvaluationRunsTableProps) => {
                     </TooltipContent>
                   </Tooltip>
                 )}
+              </TableCell>
+              <TableCell>
+                <EvaluationResultCategoryBadge
+                  category={run.evaluationResultCategory}
+                />
               </TableCell>
             </TableRow>
           );

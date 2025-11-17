@@ -122,4 +122,64 @@ public class EvaluationRunEntity : TimestampedEntity
         Description = description;
         return Result.Success();
     }
+
+    /// <summary>
+    /// Determines a domain-specific category of the run's evaluation
+    /// </summary>
+    public EvaluationResultCategory GetEvaluationResultCategory()
+    {
+        var postprocessedTireCode = PostprocessingResult?.TireCode;
+        if (RunFailure is not null)
+            return RunFailure.Reason switch
+            {
+                EvaluationRunFailureReason.Preprocessing => EvaluationResultCategory.NoCodeDetectedPreprocessing,
+                EvaluationRunFailureReason.Ocr => EvaluationResultCategory.NoCodeDetectedOcr,
+                EvaluationRunFailureReason.Postprocessing => EvaluationResultCategory.NoCodeDetectedPostprocessing,
+                EvaluationRunFailureReason.Unexpected => EvaluationResultCategory.NoCodeDetectedUnexpected,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        if (postprocessedTireCode is null)
+            return EvaluationResultCategory.NoCodeDetectedUnexpected;
+        if (Evaluation is null)
+            return EvaluationResultCategory.NoEvaluation;
+
+        var mainParametersExtracted = postprocessedTireCode is
+            { Width: not null, Diameter: not null, AspectRatio: not null, Construction: not null };
+        if (!mainParametersExtracted)
+            return EvaluationResultCategory.InsufficientExtraction;
+
+
+        if (Evaluation.TotalDistance == 0)
+            return EvaluationResultCategory.FullyCorrect;
+
+        var mainParametersCorrect = Evaluation.WidthEvaluation?.Distance == 0 &&
+                                    Evaluation.DiameterEvaluation?.Distance == 0 &&
+                                    Evaluation.AspectRatioEvaluation?.Distance == 0 &&
+                                    Evaluation.ConstructionEvaluation?.Distance == 0;
+        var otherParametersNotIncorrect =
+            ParameterNotExtractedOrMatchesExpectedValue(tc => tc.VehicleClass, e => e.VehicleClassEvaluation) &&
+            ParameterNotExtractedOrMatchesExpectedValue(tc => tc.LoadRange, e => e.LoadRangeEvaluation) &&
+            ParameterNotExtractedOrMatchesExpectedValue(tc => tc.LoadIndex, e => e.LoadIndexEvaluation) &&
+            ParameterNotExtractedOrMatchesExpectedValue(tc => tc.LoadIndex2, e => e.LoadIndex2Evaluation) &&
+            ParameterNotExtractedOrMatchesExpectedValue(tc => tc.SpeedRating, e => e.SpeedRatingEvaluation);
+        if(mainParametersCorrect && otherParametersNotIncorrect)
+            return EvaluationResultCategory.CorrectInMainParameters;
+
+        return EvaluationResultCategory.FalsePositive;
+    }
+
+    private bool ParameterNotExtractedOrMatchesExpectedValue(
+        Func<TireCodeValueObject, object?> parameterSelector,
+        Func<EvaluationEntity, ParameterEvaluationValueObject?> evaluationSelector
+    )
+    {
+        var postprocessedTireCode = PostprocessingResult?.TireCode;
+        var evaluation = Evaluation;
+        if (postprocessedTireCode is null || evaluation is null)
+            return false;
+
+        var parameterNotExtracted = parameterSelector(postprocessedTireCode) is null;
+        var parameterMatchesExpectedValue = evaluationSelector(evaluation)?.Distance == 0;
+        return parameterNotExtracted || parameterMatchesExpectedValue;
+    }
 }
