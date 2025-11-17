@@ -24,11 +24,13 @@ type RunInfoCardProps = {
     amount: number;
     currency: string;
   } | null;
-};
+} & React.HTMLAttributes<HTMLDivElement>;
 
 export const RunInfoCard = ({
   evaluationRun,
   estimatedCost,
+  className,
+  ...rest
 }: RunInfoCardProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -48,11 +50,13 @@ export const RunInfoCard = ({
   };
 
   return (
-    <Card>
+    <Card {...rest} className={className}>
       <CardHeader className="flex justify-between">
         <div>
-          <CardTitle className="text-2xl">{evaluationRun.title}</CardTitle>
-          <CardDescription className="whitespace-pre-wrap">
+          <CardTitle className="text-2xl break-all min-w-0">
+            {evaluationRun.title}
+          </CardTitle>
+          <CardDescription className="break-all min-w-0">
             {evaluationRun.description}
           </CardDescription>
         </div>

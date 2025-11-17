@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
-using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;

@@ -7,6 +7,7 @@ import { RunEvaluationCard } from "../components/run-evaluation-card";
 import { RunResultsCard } from "../components/run-results-card";
 import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
 import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
+import RunInputImage from "../components/run-input-image";
 
 const EvaluationRunDetailPage: React.FC = () => {
   const { runId } = useParams<{ runId: string }>();
@@ -26,7 +27,14 @@ const EvaluationRunDetailPage: React.FC = () => {
 
   return (
     <div className="container flex flex-col gap-y-6 py-8">
-      <RunInfoCard evaluationRun={run} estimatedCost={estimatedCost} />
+      <div className="flex flex-col md:flex-row gap-6">
+        <RunInputImage className="flex-1" inputImage={run.inputImage} />
+        <RunInfoCard
+          className="flex-4"
+          evaluationRun={run}
+          estimatedCost={estimatedCost}
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RunConfigCard runConfig={run.runConfig} />
