@@ -155,7 +155,7 @@ const ParameterEvaluationItem = ({
       <span className="text-xs text-muted-foreground">{label}</span>
       <span
         className={`text-sm font-medium ${
-          isExactMatch ? "text-green-600" : ""
+          isExactMatch ? "text-green-600" : "text-red-600"
         }`}
       >
         {value}

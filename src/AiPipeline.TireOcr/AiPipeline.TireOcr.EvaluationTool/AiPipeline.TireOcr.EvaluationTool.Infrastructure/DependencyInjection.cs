@@ -62,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<IContentTypeValidationService, StaticContentTypeValidationService>();
         services.AddScoped<ITireCodeSimilarityEvaluationService, TireCodeSimilarityEvaluationService>();
         services.AddScoped<ICsvParserService, CsvParserService>();
+        services.AddScoped<IBatchCsvExportService, BatchCsvExportService>();
         services.AddScoped<IBatchEvaluationService, BatchEvaluationService>();
         services.AddHttpClient<IImageDownloadService, ImageDownloaderService>();
         services.AddScoped<IAuthService, AuthService>();
@@ -72,7 +73,8 @@ public static class DependencyInjection
             .AddScoped<IEnumToObjectMapper<PreprocessingType, IPreprocessingProcessor>, PreprocessingProcessorMapper>();
         services.AddScoped<IEnumToObjectMapper<OcrType, IOcrProcessor>, OcrProcessorMapper>();
         services
-            .AddScoped<IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor>, PostprocessingProcessorMapper>();
+            .AddScoped<IEnumToObjectMapper<PostprocessingType, IPostprocessingProcessor>,
+                PostprocessingProcessorMapper>();
         services.AddScoped<IEnumToObjectMapper<DbMatchingType, IDbMatchingProcessor>, DbMatchingProcessorMapper>();
     }
 

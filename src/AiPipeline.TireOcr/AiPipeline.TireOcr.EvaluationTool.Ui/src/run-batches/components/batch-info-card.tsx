@@ -17,6 +17,7 @@ import { RunBatchesQueryKey } from "../queries/use-run-batches-query";
 import EditBatchDialog from "./edit-batch-dialog";
 import type { RunBatchDetail } from "../dtos/get-run-batch-detail-dto";
 import { Separator } from "@/core/components/ui/separator";
+import { useExportBatchMutation } from "../mutations/export-batch-mutation";
 
 type BatchInfoCardProps = {
   batch: RunBatchDetail;
@@ -31,12 +32,31 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useDeleteBatchMutation();
+  const exportMutation = useExportBatchMutation();
 
   const onDeleteConfirmed = () => {
     deleteMutation.mutate(batch.id, {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: [RunBatchesQueryKey] });
         navigate("/batches");
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+    });
+  };
+
+  const onExportConfirmed = () => {
+    exportMutation.mutate(batch.id, {
+      onSuccess(data) {
+        // Save the file using a temporary link
+        const url = window.URL.createObjectURL(new Blob([data]));
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", `${batch.id}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
       },
       onError: (error) => {
         console.log(error);
@@ -55,6 +75,19 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
         </div>
         <div className="flex gap-3">
           <EditBatchDialog batch={batch} trigger={<Button>Edit</Button>} />
+          <ConfirmationDialog
+            title="Export"
+            description="Are you sure you want to download a CSV export of this batch?"
+            type="neutral"
+            confirmText="Export"
+            cancelText="Cancel"
+            onConfirm={onExportConfirmed}
+            trigger={
+              <Button variant="outline" disabled={exportMutation.isPending}>
+                {exportMutation.isPending ? <Spinner /> : "Export"}
+              </Button>
+            }
+          />
           <ConfirmationDialog
             title="Delete"
             description="Are you sure you want to permanently delete this batch?"
