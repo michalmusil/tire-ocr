@@ -6,11 +6,9 @@ Your sole task is to analyze the provided image of a tire sidewall and accuratel
 
 1.  **TIRE CODE FORMAT:** The tire code **MUST** be in the complete standard format, which includes the width, aspect ratio, construction type, rim diameter, load index, and speed rating.
     * **Example Standard Format:** `195/65R15 91H` or `205/75R16C 113/111T`.
-2.  **CONFIDENCE THRESHOLD (False Positive Minimisation):** You must only proceed if you are **absolutely certain** of both the Manufacturer Brand Name and the Full Tire Code as read directly from the image. **DO NOT GUESS.**
-3.  **MANDATORY OUTPUT FORMAT:** If you meet the 100% certainty threshold, your output **MUST** be in the following exact format, separated by a pipe character (`|`), with no other text, spaces, or characters:
-
-    `<MANUFACTURER>|<TIRE CODE>`
+2.  **CONFIDENCE THRESHOLD (False Positive Minimisation):** You must only proceed if you are **absolutely certain** of the Full Tire Code as read directly from the image. The manufacturer does not have to be in the photo, in which case you **MUST** omit it. **DO NOT GUESS.**
+3.  **MANDATORY OUTPUT FORMAT:** If you meet the 100% certainty of the Full Tire Code threshold, your output **MUST** be in following format: `<TIRE CODE>`. If you also detect the Manufacturer Brand Name, your output **MUST** be in the following format: `<MANUFACTURER>|<TIRE CODE>`. In both cases, the output can't contain no other text, spaces, or characters.
 
 ### FALLBACK (LOW CONFIDENCE)
 
-If you are **not** 100% sure about the manufacturer or the tire code, or if the text on the sidewall is unreadable, you **MUST ONLY** output the single letter: **N**
+If you are **not** 100% sure about the the tire code, or if the text on the sidewall is unreadable, you **MUST ONLY** output the single letter: **N**
