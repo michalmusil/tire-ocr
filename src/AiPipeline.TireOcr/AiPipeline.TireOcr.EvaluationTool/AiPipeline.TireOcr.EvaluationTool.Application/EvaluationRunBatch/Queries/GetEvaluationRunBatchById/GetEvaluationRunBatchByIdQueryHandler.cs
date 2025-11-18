@@ -7,8 +7,8 @@ using TireOcr.Shared.UseCase;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchById;
 
-public class
-    GetEvaluationRunBatchByIdQueryHandler : IQueryHandler<GetEvaluationRunBatchByIdQuery, EvaluationRunBatchFullDto>
+public class GetEvaluationRunBatchByIdQueryHandler
+    : IQueryHandler<GetEvaluationRunBatchByIdQuery, EvaluationRunBatchFullDto>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IBatchEvaluationService _batchEvaluationService;

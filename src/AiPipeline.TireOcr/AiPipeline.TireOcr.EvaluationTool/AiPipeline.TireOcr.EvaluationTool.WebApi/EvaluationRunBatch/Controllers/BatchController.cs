@@ -5,6 +5,7 @@ using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.UpdateEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchById;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchCsvExport;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchesPaginated;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.GetById;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.GetPaginated;
@@ -67,6 +68,29 @@ public class BatchController : ControllerBase
 
         return result.ToActionResult<EvaluationRunBatchFullDto, GetBatchByIdResponse>(
             onSuccess: dto => new GetBatchByIdResponse(dto)
+        );
+    }
+
+    [HttpGet("{id:guid}/Export")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<IActionResult> GetExportedEvaluationBach([FromRoute] Guid id)
+    {
+        var query = new GetEvaluationRunBatchCsvExportQuery(id);
+        var result = await _mediator.Send(query);
+
+        return result.Map(
+            onSuccess: csvData => File(csvData, "text/csv", fileDownloadName: $"{id.ToString()}.csv"),
+            onFailure: failures =>
+            {
+                var primaryFailure = failures.FirstOrDefault();
+                var otherFailures = failures.Skip(1).ToArray();
+
+                return primaryFailure?.ToActionResult(otherFailures) ??
+                       Problem($"Failed to export batch '{id}'", null, 500);
+            }
         );
     }
 
