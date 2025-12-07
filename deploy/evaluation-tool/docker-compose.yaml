@@ -5,8 +5,13 @@ services:
     volumes:
       - preprocessing-volume:/app/models
     networks:
-      - aipipeline-tireocr-network 
+      - aipipeline-tireocr-network
     environment:
+      OTEL_SERVICE_NAME: "PreprocessingService"
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_Exporter_Headers}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_Exporter_Protocol}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_Resource_Attributes}
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
@@ -17,6 +22,11 @@ services:
     container_name: "OcrService"
     image: "michalmusil/tire-ocr_ocr-service:latest"
     environment:
+      OTEL_SERVICE_NAME: "OcrService"
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_Exporter_Headers}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_Exporter_Protocol}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_Resource_Attributes}
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
@@ -40,6 +50,11 @@ services:
     container_name: "PostprocessingService"
     image: "michalmusil/tire-ocr_postprocessing-service:latest"
     environment:
+      OTEL_SERVICE_NAME: "PostprocessingService"
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_Exporter_Headers}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_Exporter_Protocol}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_Resource_Attributes}
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
@@ -52,6 +67,11 @@ services:
     container_name: "TasyDbMatcherService"
     image: "michalmusil/tire-ocr_tire-db-matcher-service:latest"
     environment:
+      OTEL_SERVICE_NAME: "TasyDbMatcherService"
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_Exporter_Headers}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_Exporter_Protocol}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_Resource_Attributes}
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
@@ -66,6 +86,11 @@ services:
     container_name: "EvaluationTool"
     image: "michalmusil/tire-ocr_evaluation-tool:latest"
     environment:
+      OTEL_SERVICE_NAME: "EvaluationTool"
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_Exporter_Headers}
+      OTEL_EXPORTER_OTLP_PROTOCOL: ${OTEL_Exporter_Protocol}
+      OTEL_RESOURCE_ATTRIBUTES: ${OTEL_Resource_Attributes}
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EXCEPTION_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
@@ -102,4 +127,4 @@ volumes:
     driver: local
 networks:
   aipipeline-tireocr-network:
-    external: true
+    external: false
