@@ -7,5 +7,6 @@ public enum OcrType
     OpenAiGpt = 2,
     GoogleCloudVision = 3,
     AzureAiVision = 4,
-    PaddleOcr = 5
+    PaddleOcr = 5,
+    QwenVl = 6
 }
