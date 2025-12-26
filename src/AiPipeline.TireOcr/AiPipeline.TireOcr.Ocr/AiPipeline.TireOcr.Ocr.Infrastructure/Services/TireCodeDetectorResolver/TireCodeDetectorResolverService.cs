@@ -42,6 +42,13 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
                 _promptRepository,
                 _configuration.GetValue<string>("OllamaModelNames:QwenVl")!
             ),
+            TireCodeDetectorType.InternVl => new OllamaTireCodeDetectorService(
+                _httpClient,
+                _imageConvertorService,
+                _configuration,
+                _promptRepository,
+                _configuration.GetValue<string>("OllamaModelNames:InternVl")!
+            ),
             _ => null
         };
 

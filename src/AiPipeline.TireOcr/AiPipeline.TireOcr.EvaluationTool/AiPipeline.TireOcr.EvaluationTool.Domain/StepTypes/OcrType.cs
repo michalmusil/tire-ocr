@@ -8,5 +8,6 @@ public enum OcrType
     GoogleCloudVision = 3,
     AzureAiVision = 4,
     PaddleOcr = 5,
-    QwenVl = 6
+    QwenVl = 6,
+    InternVl = 7,
 }

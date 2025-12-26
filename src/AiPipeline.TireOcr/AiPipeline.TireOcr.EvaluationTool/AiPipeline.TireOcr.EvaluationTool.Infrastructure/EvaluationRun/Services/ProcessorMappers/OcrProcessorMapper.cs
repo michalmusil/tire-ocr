@@ -29,6 +29,7 @@ public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
             OcrType.AzureAiVision => _remoteServicesProcessor,
             OcrType.PaddleOcr => _remotePaddleProcessor,
             OcrType.QwenVl => _remoteServicesProcessor,
+            OcrType.InternVl => _remoteServicesProcessor,
             _ => null
         };
 
