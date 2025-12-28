@@ -1,4 +1,6 @@
+using System.ClientModel;
 using Microsoft.Extensions.Configuration;
+using OpenAI;
 using OpenAI.Chat;
 using TireOcr.Ocr.Application.Dtos;
 using TireOcr.Ocr.Application.Repositories;
@@ -8,15 +10,20 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
+public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly IConfiguration _configuration;
     private readonly IPromptRepository _promptRepository;
+    private readonly string _modelName;
+    private readonly string _endpointName;
 
-    public OpenAiGptTireCodeDetectorService(IConfiguration configuration, IPromptRepository promptRepository)
+    public RunPodVllmApiTireCodeDetectorService(IConfiguration configuration, IPromptRepository promptRepository,
+        string modelName, string endpointName)
     {
         _configuration = configuration;
         _promptRepository = promptRepository;
+        _modelName = modelName;
+        _endpointName = endpointName;
     }
 
     public async Task<DataResult<OcrResultDto>> DetectAsync(Image image)
@@ -26,7 +33,7 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
             var client = GetChatClient();
             if (client is null)
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
-                    "Failed to retrieve OpenAi endpoint configuration"));
+                    $"Failed to retrieve {_modelName} endpoint configuration"));
 
             var prompt = await _promptRepository.GetMainPromptAsync();
             List<ChatMessage> messages =
@@ -71,7 +78,7 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
         }
         catch (Exception e)
         {
-            var failure = new Failure(500, "Failed to perform Ocr via OpenAi Gpt Tire Code Detector");
+            var failure = new Failure(500,$"Failed to perform Ocr via RunPod vLLM Tire Code Detector with model '{_modelName}'");
             return DataResult<OcrResultDto>.Failure(failure);
         }
     }
@@ -80,8 +87,15 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            var apiKey = _configuration.GetValue<string>("ApiKeys:OpenAi");
-            return new ChatClient("gpt-4o", apiKey);
+            var apiKey = _configuration.GetValue<string>("ApiKeys:RunPod");
+            return new ChatClient(
+                model: _modelName,
+                credential: new ApiKeyCredential(apiKey!),
+                options: new OpenAIClientOptions
+                {
+                    Endpoint = new Uri(_endpointName),
+                }
+            );
         }
         catch
         {

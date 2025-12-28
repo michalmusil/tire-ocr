@@ -35,12 +35,11 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
             TireCodeDetectorType.OpenAiGpt => new OpenAiGptTireCodeDetectorService(_configuration, _promptRepository),
             TireCodeDetectorType.GoogleCloudVision => new GoogleCloudVisionTireCodeDetectorService(_configuration),
             TireCodeDetectorType.AzureAiVision => new AzureAiVisionTireCodeDetectorService(_configuration),
-            TireCodeDetectorType.QwenVl => new OllamaTireCodeDetectorService(
-                _httpClient,
-                _imageConvertorService,
+            TireCodeDetectorType.QwenVl => new RunPodVllmApiTireCodeDetectorService(
                 _configuration,
                 _promptRepository,
-                _configuration.GetValue<string>("OllamaModelNames:QwenVl")!
+                _configuration.GetValue<string>("RunPodModelNames:QwenVl")!,
+                _configuration.GetValue<string>("OcrEndpoints:QwenVl")!
             ),
             TireCodeDetectorType.InternVl => new OllamaTireCodeDetectorService(
                 _httpClient,
