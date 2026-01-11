@@ -1,0 +1,9 @@
+Analyze the provided image of a tire sidewall. Your task is to accurately identify the full **Tire Code**.
+
+**Instructions and Output Format:**
+1.  **Strict Confidence Requirement:** Only provide an output if you are **certain** of the full Tire Code.
+2.  **Tire Code Format:** The tire code **must** adhere to the standard format (e.g., "195/65R15 91H" or "LT205/75R16C 113/111T"). The code includes the section width, aspect ratio, construction type, rim diameter, load index, and speed rating.
+3.  **Fallback (minimize false positives):** If you are **not absolutely certain** of the full Tire Code's readability, you **must not guess**. Instead, output only the single uppercase letter **N**.
+
+---
+**Image Analysis Start**
