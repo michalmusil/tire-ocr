@@ -2,10 +2,10 @@
 
 set -e
 
-PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_preprocessing-service"
-OCR_IMAGE_NAME="michalmusil/tire-ocr_ocr-service"
-OCR_PADDLE_IMAGE_NAME="michalmusil/tire-ocr_ocr-paddle-service"
-POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_postprocessing-service"
+PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_preprocessing-service"
+OCR_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-service"
+OCR_PYTHON_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-python-service"
+POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_postprocessing-service"
 TIRE_DB_MATCHER_IMAGE_NAME="michalmusil/tire-ocr_tire-db-matcher-service"
 EVALUATION_TOOL_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool"
 EVALUATION_TOOL_FE_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool-fe"
@@ -21,9 +21,9 @@ echo "Pushing image for ocr service"
 docker push "${OCR_IMAGE_NAME}:latest"
 echo ""
 
-# OCR PADDLE
-echo "Pushing image for ocr paddle service"
-docker push "${OCR_PADDLE_IMAGE_NAME}:latest"
+# OCR PYTHON
+echo "Pushing image for ocr python service"
+docker push "${OCR_PYTHON_IMAGE_NAME}:latest"
 echo ""
 
 # POSTPROCESSING

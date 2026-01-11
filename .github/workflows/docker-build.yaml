@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - main
+      - eval
   workflow_dispatch:
 
 jobs:

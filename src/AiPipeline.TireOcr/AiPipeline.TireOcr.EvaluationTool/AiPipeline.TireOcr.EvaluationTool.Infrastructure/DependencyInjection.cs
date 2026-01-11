@@ -128,9 +128,9 @@ public static class DependencyInjection
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
-        services.AddHttpClient<OcrRemotePaddleProcessor>(client =>
+        services.AddHttpClient<OcrRemotePythonProcessor>(client =>
             {
-                client.BaseAddress = new("https+http://OcrPaddleService");
+                client.BaseAddress = new("https+http://OcrPythonService");
             })
             .RemoveResilienceHandlers()
             .AddStandardResilienceHandler(opt =>

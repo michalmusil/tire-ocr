@@ -1,7 +1,7 @@
 services:
   PreprocessingService:
     container_name: "PreprocessingService"
-    image: "michalmusil/tire-ocr_preprocessing-service:latest"
+    image: "michalmusil/tire-ocr_eval_preprocessing-service:latest"
     volumes:
       - preprocessing-volume:/app/models
     networks:
@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
   OcrService:
     container_name: "OcrService"
-    image: "michalmusil/tire-ocr_ocr-service:latest"
+    image: "michalmusil/tire-ocr_eval_ocr-service:latest"
     environment:
       OTEL_SERVICE_NAME: "OcrService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -41,14 +41,14 @@ services:
       - aipipeline-tireocr-network
     restart: unless-stopped
   OcrPaddleService:
-    container_name: "OcrPaddleService"
-    image: "michalmusil/tire-ocr_ocr-paddle-service:latest"
+    container_name: "OcrPythonService"
+    image: "michalmusil/tire-ocr_eval_ocr-python-service:latest"
     networks:
       - aipipeline-tireocr-network
     restart: unless-stopped
   PostprocessingService:
     container_name: "PostprocessingService"
-    image: "michalmusil/tire-ocr_postprocessing-service:latest"
+    image: "michalmusil/tire-ocr_eval_postprocessing-service:latest"
     environment:
       OTEL_SERVICE_NAME: "PostprocessingService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
