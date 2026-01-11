@@ -11,19 +11,26 @@ using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRun.Services.Processors.Ocr;
 
-public class OcrRemotePaddleProcessor : IOcrProcessor
+public class OcrRemotePythonProcessor : IOcrProcessor
 {
     private readonly HttpClient _httpClient;
-    private readonly ILogger<OcrRemotePaddleProcessor> _logger;
+    private readonly ILogger<OcrRemotePythonProcessor> _logger;
 
-    public OcrRemotePaddleProcessor(HttpClient httpClient, ILogger<OcrRemotePaddleProcessor> logger)
+    public OcrRemotePythonProcessor(HttpClient httpClient, ILogger<OcrRemotePythonProcessor> logger)
     {
         _httpClient = httpClient;
         _logger = logger;
     }
 
-    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType, PreprocessingType preprocessingType)
+    public async Task<DataResult<OcrResultEntity>> Process(ImageDto image, OcrType ocrType,
+        PreprocessingType preprocessingType)
     {
+        var endpointName = ocrType switch
+        {
+            OcrType.PaddleOcr => "paddle",
+            OcrType.EasyOcr => "easy",
+            _ => throw new ArgumentOutOfRangeException(nameof(ocrType), ocrType, null)
+        };
         try
         {
             using var content = new MultipartFormDataContent();
@@ -39,10 +46,10 @@ public class OcrRemotePaddleProcessor : IOcrProcessor
                     }
                 }
             });
-            if(preprocessingType == PreprocessingType.ExtractAndComposeSlices)
+            if (preprocessingType == PreprocessingType.ExtractAndComposeSlices)
                 content.Add(new StringContent("2"), "number_of_vertical_stacked_slices");
 
-            var res = await _httpClient.PostAsync("/ocr/paddle", content);
+            var res = await _httpClient.PostAsync($"/ocr/{endpointName}", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();
@@ -57,16 +64,17 @@ public class OcrRemotePaddleProcessor : IOcrProcessor
         {
             var statusCode = ex.StatusCode;
             ex.TryGetContentJsonProperty("detail", out var content);
-            var failureMessage = $"Remote PaddleOcr failed: {content ?? "No tire code was detected during Ocr"}";
+            var failureMessage =
+                $"Remote python OCR service '{endpointName}' failed: {content ?? "No tire code was detected during Ocr"}";
 
             _logger.LogError(ex, failureMessage);
             return DataResult<OcrResultEntity>.Failure(new Failure((int)statusCode!, failureMessage));
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error while calling remote PaddleOcr processor.");
+            _logger.LogError(ex, $"Error while calling remote python OCR processor endpoint '{endpointName}'.");
             return DataResult<OcrResultEntity>.Failure(new Failure(500,
-                $"Failed to perform PaddleOcr on image '{image.FileName}' due to unexpected error."));
+                $"Failed to perform python OCR with endpoint '{endpointName}' on image '{image.FileName}' due to unexpected error."));
         }
     }
 }

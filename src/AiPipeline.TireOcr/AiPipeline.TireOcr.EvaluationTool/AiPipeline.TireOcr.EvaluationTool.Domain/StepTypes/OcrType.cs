@@ -10,4 +10,5 @@ public enum OcrType
     PaddleOcr = 5,
     QwenVl = 6,
     InternVl = 7,
+    EasyOcr = 8,
 }

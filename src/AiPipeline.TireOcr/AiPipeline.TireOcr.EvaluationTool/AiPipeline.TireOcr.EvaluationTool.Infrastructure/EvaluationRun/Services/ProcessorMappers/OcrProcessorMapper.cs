@@ -9,13 +9,13 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRun.Service
 public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
 {
     private readonly OcrRemoteServicesProcessor _remoteServicesProcessor;
-    private readonly OcrRemotePaddleProcessor _remotePaddleProcessor;
+    private readonly OcrRemotePythonProcessor _remotePythonProcessor;
 
     public OcrProcessorMapper(OcrRemoteServicesProcessor remoteServicesProcessor,
-        OcrRemotePaddleProcessor remotePaddleProcessor)
+        OcrRemotePythonProcessor remotePythonProcessor)
     {
         _remoteServicesProcessor = remoteServicesProcessor;
-        _remotePaddleProcessor = remotePaddleProcessor;
+        _remotePythonProcessor = remotePythonProcessor;
     }
 
     public DataResult<IOcrProcessor> Map(OcrType input)
@@ -27,9 +27,10 @@ public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
             OcrType.OpenAiGpt => _remoteServicesProcessor,
             OcrType.GoogleCloudVision => _remoteServicesProcessor,
             OcrType.AzureAiVision => _remoteServicesProcessor,
-            OcrType.PaddleOcr => _remotePaddleProcessor,
+            OcrType.PaddleOcr => _remotePythonProcessor,
             OcrType.QwenVl => _remoteServicesProcessor,
             OcrType.InternVl => _remoteServicesProcessor,
+            OcrType.EasyOcr => _remotePythonProcessor,
             _ => null
         };
 
