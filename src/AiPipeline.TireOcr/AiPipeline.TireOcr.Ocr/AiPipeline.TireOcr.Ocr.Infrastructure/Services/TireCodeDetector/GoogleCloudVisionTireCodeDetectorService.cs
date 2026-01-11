@@ -28,15 +28,17 @@ public class GoogleCloudVisionTireCodeDetectorService : ITireCodeDetectorService
             var imageToSend = Google.Cloud.Vision.V1.Image.FromBytes(image.Data);
             var detectedTexts = await client.DetectTextAsync(imageToSend);
 
-            var foundTireCode = detectedTexts
-                .Select(dt => dt.Description)
-                .FirstOrDefault(t => !string.IsNullOrEmpty(t) && t.Contains('/'));
+            var rawResult = string.Join(
+                ' ',
+                detectedTexts.Select(dt => dt.Description)
+            );
 
-            if (foundTireCode is null)
+            var tireCodeFound = rawResult.Contains('/') && rawResult.Any(char.IsDigit);
+            if (!tireCodeFound)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
             var result = new OcrResultDto(
-                DetectedTireCode: foundTireCode,
+                DetectedTireCode: rawResult,
                 DetectedManufacturer: null,
                 new OcrRequestBillingDto(0, 1, BillingUnitType.Transaction)
             );

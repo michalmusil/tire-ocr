@@ -32,17 +32,17 @@ public class AzureAiVisionTireCodeDetectorService : ITireCodeDetectorService
                 VisualFeatures.Read
             );
 
-            var foundTireCode = detectionResult.Value.Read.Blocks
-                .SelectMany(b => b.Lines)
-                .Select(l => l.Text)
-                .Where(s => s.Contains('/') && s.Any(char.IsDigit))
-                .MaxBy(s => s.Length);
-
-            if (foundTireCode is null)
+            var recognizedLines = detectionResult.Value.Read.Blocks
+                .SelectMany(bl => bl.Lines)
+                .Select(l => l.Text);
+            var rawResult = string.Join(' ', recognizedLines);
+            
+            var tireCodeFound = rawResult.Contains('/') && rawResult.Any(char.IsDigit);
+            if (!tireCodeFound)
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
 
             var result = new OcrResultDto(
-                DetectedTireCode: foundTireCode,
+                DetectedTireCode: rawResult,
                 DetectedManufacturer: null,
                 new OcrRequestBillingDto(0, 1, BillingUnitType.Transaction)
             );

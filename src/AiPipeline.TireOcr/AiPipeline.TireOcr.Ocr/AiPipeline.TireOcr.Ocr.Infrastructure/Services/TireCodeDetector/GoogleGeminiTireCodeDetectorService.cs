@@ -120,7 +120,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             },
             generationConfig = new
             {
-                temperature = 0.2
+                temperature = 0.6
             }
         };
         var jsonPayload = JsonConvert.SerializeObject(payload);

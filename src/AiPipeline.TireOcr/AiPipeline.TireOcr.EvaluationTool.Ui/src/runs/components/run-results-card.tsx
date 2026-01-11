@@ -41,7 +41,7 @@ export const RunResultsCard = ({ run }: RunResultsCardProps) => {
           </div>
         )}
 
-        {postprocessedCode && expectedCode && (
+        {postprocessedCode && (
           <>
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -50,11 +50,13 @@ export const RunResultsCard = ({ run }: RunResultsCardProps) => {
                 tireCode={postprocessedCode}
                 highlight={true}
               />
-              <TireCodeDisplay
-                title="Expected Code"
-                tireCode={expectedCode}
-                highlight={false}
-              />
+              {expectedCode && (
+                <TireCodeDisplay
+                  title="Expected Code"
+                  tireCode={expectedCode}
+                  highlight={false}
+                />
+              )}
             </div>
           </>
         )}

@@ -36,10 +36,14 @@ public class OpenRouterApiTireCodeDetectorService : ITireCodeDetectorService
             var prompt = await _promptRepository.GetMainPromptAsync();
             List<ChatMessage> messages =
             [
+                new SystemChatMessage(
+                    ChatMessageContentPart.CreateTextPart(prompt)
+                ),
                 new UserChatMessage(
-                    ChatMessageContentPart.CreateTextPart(prompt),
-                    ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data), image.ContentType,
-                        ChatImageDetailLevel.High)
+                    ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data),
+                        image.ContentType,
+                        ChatImageDetailLevel.High
+                    )
                 )
             ];
             var options = new ChatCompletionOptions
@@ -76,7 +80,7 @@ public class OpenRouterApiTireCodeDetectorService : ITireCodeDetectorService
         }
         catch (Exception e)
         {
-            var failure = new Failure(500,$"Failed to perform Ocr via OpenRouter api with model '{_modelName}'");
+            var failure = new Failure(500, $"Failed to perform Ocr via OpenRouter api with model '{_modelName}'");
             return DataResult<OcrResultDto>.Failure(failure);
         }
     }

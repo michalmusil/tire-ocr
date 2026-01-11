@@ -31,10 +31,14 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
             var prompt = await _promptRepository.GetMainPromptAsync();
             List<ChatMessage> messages =
             [
+                new SystemChatMessage(
+                    ChatMessageContentPart.CreateTextPart(prompt)
+                ),
                 new UserChatMessage(
-                    ChatMessageContentPart.CreateTextPart(prompt),
-                    ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data), image.ContentType,
-                        ChatImageDetailLevel.High)
+                    ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data),
+                        image.ContentType,
+                        ChatImageDetailLevel.High
+                    )
                 )
             ];
             var options = new ChatCompletionOptions
@@ -81,7 +85,7 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
         try
         {
             var apiKey = _configuration.GetValue<string>("ApiKeys:OpenAi");
-            return new ChatClient("gpt-4o", apiKey);
+            return new ChatClient("gpt-4.1", apiKey);
         }
         catch
         {
