@@ -5,8 +5,8 @@ from fastapi import FastAPI
 from src.web_api.endpoints.ocr import router as ocr_router
 
 app: FastAPI = FastAPI(
-    title="PaddleOCR FastAPI Service",
-    description="A REST API for Optical Character Recognition using PaddleOCR.",
+    title="Tire OCR FastAPI Service",
+    description="A REST API for Optical Character Recognition supporting PaddleOCR and EasyOCR.",
     version="1.0.0",
 )
 app.include_router(ocr_router)

@@ -1,81 +1,68 @@
 import io
 import time
+from typing import Optional, Any, List
+import easyocr
+
 import numpy as np
 from PIL import Image
-from paddleocr import PaddleOCR
 from dotenv import load_dotenv
 
-
-from typing import Optional, Any, List
 from src.application.services.ocr_service import OCRResult, OcrService
 
+
 load_dotenv()
-PADDLE_OCR_ENGINE: Optional[PaddleOCR] = None
+EASY_OCR_ENGINE: Optional[easyocr.Reader] = None
 
 
-def get_paddle_ocr_engine() -> PaddleOCR:
-    global PADDLE_OCR_ENGINE
-    if PADDLE_OCR_ENGINE is None:
-        print("PaddleOCR: INITIALIZING")
-        model_name = "PP-OCRv5_mobile_rec"
-        model_dir = "./custom_models/rec/PP-OCRv5_mobile_rec_200e"
-
-        PADDLE_OCR_ENGINE = PaddleOCR(
-            use_doc_orientation_classify=False,
-            use_doc_unwarping=False,
-            lang="en",
-            text_recognition_model_name=model_name,
-            text_recognition_model_dir=model_dir,
-        )
-        print("PaddleOCR: INITIALIZED")
-    return PADDLE_OCR_ENGINE
+def get_easy_ocr_engine() -> easyocr.Reader:
+    global EASY_OCR_ENGINE
+    if EASY_OCR_ENGINE is None:
+        print("EasyOCR: INITIALIZING")
+        EASY_OCR_ENGINE = easyocr.Reader(["en"], gpu=False)
+        print("EasyOCR: INITIALIZED")
+    return EASY_OCR_ENGINE
 
 
-class PaddleOcrService(OcrService):
-    ocr_engine: PaddleOCR
+class EasyOcrService(OcrService):
+    reader: easyocr.Reader
 
     def __init__(self) -> None:
-        self.ocr_engine = get_paddle_ocr_engine()
+        self.reader = get_easy_ocr_engine()
 
     async def perform_tire_ocr(self, image_bytes: bytes) -> OCRResult:
         start_time = time.perf_counter()
-
         try:
             image: Image.Image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
             image_np: np.ndarray = np.array(image)
-            result: Any = self.ocr_engine.predict(image_np)
 
-            detected_text_list: list[str] = []
+            result: Any = self.reader.readtext(image_np, text_threshold=0.3)
+            detected_texts: List[str] = []
+            if isinstance(result, list) and len(result) > 0:
+                for item in result:
+                    if isinstance(item, (list, tuple)) and len(item) >= 2:
+                        text = item[1]
+                        if isinstance(text, str):
+                            detected_texts.append(text)
 
-            result_valid = result and isinstance(result, list) and len(result) > 0
-            if result_valid:
-                for page_result in result:
-                    if not "rec_texts" in page_result:
-                        continue
-                    recognized_texts = page_result["rec_texts"]
-                    detected_text_list.extend(recognized_texts)
-
-            detected_text: str = " ".join(detected_text_list).strip()
+            detected_text: str = " ".join(detected_texts).strip()
             duration = int((time.perf_counter() - start_time) * 1000)
 
             if detected_text:
                 return OCRResult(
                     status="success",
-                    message=f"PaddleOCR was successful.",
+                    message="EasyOCR was successful.",
                     extracted_text=detected_text,
                     duration_ms=duration,
                 )
             else:
                 return OCRResult(
                     status="not_found",
-                    message="PaddleOCR failed to detect any text in the image",
+                    message="Easy OCR failed to detect any text in the image",
                     extracted_text=None,
                     duration_ms=duration,
                 )
         except Exception as e:
-            error_msg: str = (
-                f"An internal error occurred during PaddleOCR processing: {e.__class__.__name__}: {str(e)}"
-            )
+            error_msg = f"An internal error occurred during EasyOCR processing: {e.__class__.__name__}: {str(e)}"
             print(error_msg)
             duration = int((time.perf_counter() - start_time) * 1000)
             return OCRResult(
@@ -94,7 +81,6 @@ class PaddleOcrService(OcrService):
             total_duration_ms += ocr_result.duration_ms
 
             if ocr_result.status == "success" and ocr_result.extracted_text:
-                # Only append if extracted text contains '/' character
                 if "/" in ocr_result.extracted_text:
                     combined_text_parts.append(ocr_result.extracted_text)
             elif ocr_result.status == "error":
@@ -104,6 +90,7 @@ class PaddleOcrService(OcrService):
                     extracted_text=None,
                     duration_ms=total_duration_ms,
                 )
+
         if not combined_text_parts:
             return OCRResult(
                 status="not_found",
