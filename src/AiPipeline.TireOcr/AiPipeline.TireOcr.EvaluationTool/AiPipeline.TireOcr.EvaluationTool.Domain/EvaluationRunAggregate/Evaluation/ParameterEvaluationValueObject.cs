@@ -5,6 +5,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evalua
 public class ParameterEvaluationValueObject : ValueObject
 {
     public required int Distance { get; init; }
+    // public required decimal Cer { get; init; }
     public required decimal EstimatedAccuracy { get; init; }
     protected override IEnumerable<object?> GetEqualityComponents() => [Distance, EstimatedAccuracy];
 }

@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useRunBatchDetailQuery } from "../queries/use-run-batch-detail-query";
 import { BatchInfoCard } from "../components/batch-info-card";
 import { BatchEvaluationCountsCard } from "../components/batch-evaluation-counts-card";
-import { BatchAverageDistancesCard } from "../components/batch-average-distances-card";
+import { BatchAccuracyCard } from "../components/batch-accuracy-card";
 import { BatchEvaluationRunsCard } from "../components/batch-evaluation-runs-card";
 import { BatchAverageTimesCard } from "../components/batch-average-times-card";
 import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
@@ -53,8 +53,9 @@ const EvaluationBatchDetailPage: React.FC = () => {
         countsEvaluation={batchDetail.batchEvaluation.counts}
       />
 
-      <BatchAverageDistancesCard
+      <BatchAccuracyCard
         distances={batchDetail.batchEvaluation.distances}
+        averageCer={batchDetail.batchEvaluation.averageCer}
       />
 
       <BatchEvaluationRunsCard runs={batchDetail.evaluationRuns} />

@@ -23,11 +23,12 @@ export const RunEvaluationCard = ({ evaluation }: RunEvaluationCardProps) => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <MetricItem
               label="Total Distance"
-              value={evaluation.totalDistance.toFixed(2)}
+              value={evaluation.totalDistance.toFixed(0)}
             />
+            <MetricItem label="CER" value={evaluation.totalCer.toFixed(2)} />
             <MetricItem
               label="Full Match Count"
               value={evaluation.fullMatchParameterCount.toString()}
@@ -129,7 +130,7 @@ const ParameterEvaluation = ({
       <p className="text-sm font-semibold">{label}</p>
       <ParameterEvaluationItem
         label="Char edit distance"
-        value={evaluation.distance.toFixed(2)}
+        value={evaluation.distance.toFixed(0)}
         isExactMatch={isExactMatch}
       />
       <ParameterEvaluationItem

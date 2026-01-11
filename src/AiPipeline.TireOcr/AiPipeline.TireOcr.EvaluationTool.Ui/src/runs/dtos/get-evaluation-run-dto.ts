@@ -57,6 +57,7 @@ export const EvaluationRunSchema = z.object({
     .object({
       expectedTireCode: TireCodeSchema,
       totalDistance: z.number(),
+      totalCer: z.number(),
       fullMatchParameterCount: z.number(),
       estimatedAccuracy: z.number(),
       vehicleClassEvaluation: EvaluationResultParameterSchema.nullish(),

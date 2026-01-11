@@ -31,6 +31,7 @@ public record EvaluationRunCsvLineDto(
     decimal? LoadIndexDistance,
     decimal? LoadIndex2Distance,
     decimal? SpeedRatingDistance,
+    decimal? Cer,
     string? FailureMessage
 )
 {
@@ -66,6 +67,7 @@ public record EvaluationRunCsvLineDto(
             LoadIndexDistance: domain.Evaluation?.LoadIndexEvaluation?.Distance,
             LoadIndex2Distance: domain.Evaluation?.LoadIndex2Evaluation?.Distance,
             SpeedRatingDistance: domain.Evaluation?.SpeedRatingEvaluation?.Distance,
+            Cer: domain.Evaluation?.Cer,
             FailureMessage: domain.RunFailure?.Message
         );
     }

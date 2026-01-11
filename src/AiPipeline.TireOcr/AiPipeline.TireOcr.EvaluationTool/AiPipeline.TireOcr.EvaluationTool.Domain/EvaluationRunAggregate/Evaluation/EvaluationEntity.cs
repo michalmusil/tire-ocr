@@ -8,6 +8,7 @@ public class EvaluationEntity : TimestampedEntity
     public Guid RunId { get; private set; }
     public TireCodeValueObject ExpectedTireCode { get; }
     public int TotalDistance { get; }
+    public decimal Cer => ExpectedTireCode.ToString().Length == 0 ? 0 : (decimal)TotalDistance / (decimal)ExpectedTireCode.ToString().Length;
     public int FullMatchParameterCount { get; }
     public decimal EstimatedAccuracy { get; }
     public ParameterEvaluationValueObject? VehicleClassEvaluation { get; }

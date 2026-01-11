@@ -5,6 +5,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.Evalu
 public record EvaluationDto(
     TireCodeDto ExpectedTireCode,
     int TotalDistance,
+    decimal TotalCer,
     int FullMatchParameterCount,
     decimal EstimatedAccuracy,
     ParameterEvaluationDto? VehicleClassEvaluation,
@@ -21,6 +22,7 @@ public record EvaluationDto(
     public static EvaluationDto FromDomain(EvaluationEntity domain) => new EvaluationDto(
         ExpectedTireCode: TireCodeDto.FromDomain(domain.ExpectedTireCode),
         TotalDistance: domain.TotalDistance,
+        TotalCer: domain.Cer,
         FullMatchParameterCount: domain.FullMatchParameterCount,
         EstimatedAccuracy: domain.EstimatedAccuracy,
         VehicleClassEvaluation: domain.VehicleClassEvaluation is not null

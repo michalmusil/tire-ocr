@@ -20,6 +20,8 @@ public class EvaluationEntityConfiguration : IEntityTypeConfiguration<Evaluation
         builder.Property(e => e.TotalDistance)
             .IsRequired();
 
+        builder.Ignore(e => e.Cer);
+        
         builder.Property(e => e.FullMatchParameterCount)
             .IsRequired();
 

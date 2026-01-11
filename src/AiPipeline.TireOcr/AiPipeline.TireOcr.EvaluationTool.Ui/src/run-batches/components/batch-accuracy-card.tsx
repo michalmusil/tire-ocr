@@ -8,32 +8,46 @@ import {
 import { Separator } from "@/core/components/ui/separator";
 import type { BatchEvaluation } from "../dtos/get-run-batch-detail-dto";
 
-type BatchAverageDistancesCardProps = {
+type BatchAccuracyCardProps = {
+  averageCer: BatchEvaluation["averageCer"];
   distances: BatchEvaluation["distances"];
 };
 
-export const BatchAverageDistancesCard = ({
+export const BatchAccuracyCard = ({
+  averageCer,
   distances,
-}: BatchAverageDistancesCardProps) => {
+}: BatchAccuracyCardProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Average Distances</CardTitle>
+        <CardTitle>Accuracy Evaluation</CardTitle>
         <CardDescription>Lower values indicate better accuracy</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          <div className="space-y-2">
-            <p className="text-lg font-semibold text-muted-foreground">
-              Overall Average
-            </p>
-            <p className="text-5xl font-bold">
-              {distances.averageDistance.toFixed(2)}
-            </p>
+          <div className="flex space-x-10">
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-muted-foreground">
+                Char edit distance (Avg.)
+              </p>
+              <p className="text-5xl font-bold">
+                {distances.averageDistance.toFixed(2)}
+              </p>
+            </div>
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-muted-foreground">
+                CER (Avg.)
+              </p>
+              <p className="text-5xl font-bold">{averageCer.toFixed(2)}</p>
+            </div>
           </div>
+
           <Separator />
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <span className="text-md font-semibold text-muted-foreground">
+            Distance per parameter (Avg.)
+          </span>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
             <DistanceMetric
               label="Vehicle Class"
               value={distances.averageVehicleClassDistance.toFixed(2)}

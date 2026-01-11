@@ -5,6 +5,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRun.Dtos.Evalu
 public record ParameterEvaluationDto(
     int Distance,
     decimal EstimatedAccuracy
+    // decimal Cer
 )
 {
     public static ParameterEvaluationDto FromDomain(ParameterEvaluationValueObject domain) =>

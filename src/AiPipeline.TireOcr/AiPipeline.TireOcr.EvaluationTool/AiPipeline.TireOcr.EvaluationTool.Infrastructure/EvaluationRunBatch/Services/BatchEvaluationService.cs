@@ -2,7 +2,6 @@ using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos.Batc
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Services;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
-using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.RunFailure;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using TireOcr.Shared.Result;
 
@@ -37,6 +36,7 @@ public class BatchEvaluationService : IBatchEvaluationService
         List<int> loadIndexDistances = [];
         List<int> loadIndex2Distances = [];
         List<int> speedRatingDistances = [];
+        List<decimal> allCers = [];
 
         foreach (var run in batch.EvaluationRuns)
         {
@@ -79,6 +79,7 @@ public class BatchEvaluationService : IBatchEvaluationService
 
 
             totalDistances.Add(evaluation.TotalDistance);
+            allCers.Add(evaluation.Cer);
             AddParameterEvaluationDistance(evaluation.VehicleClassEvaluation, vehicleClassDistances);
             AddParameterEvaluationDistance(evaluation.WidthEvaluation, widthDistances);
             AddParameterEvaluationDistance(evaluation.DiameterEvaluation, diameterDistances);
@@ -91,6 +92,7 @@ public class BatchEvaluationService : IBatchEvaluationService
         }
 
         var batchEvaluation = new BatchEvaluationDto(
+            AverageCer: allCers.Count == 0 ? 0 : allCers.Average(),
             Counts: new BatchEvaluationCountsDto(
                 TotalCount: totalRuns,
                 FullyCorrectCount: fullyCorrectResultCount,

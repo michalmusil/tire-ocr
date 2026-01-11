@@ -28,6 +28,7 @@ const BatchEvaluationDistancesSchema = z.object({
 });
 
 const BatchEvaluationSchema = z.object({
+  averageCer: z.number(),
   counts: BatchEvaluationCountsSchema,
   distances: BatchEvaluationDistancesSchema,
 });

@@ -81,18 +81,20 @@ public class TireCodeSimilarityEvaluationService : ITireCodeSimilarityEvaluation
         );
     }
 
-    private ParameterEvaluationValueObject? GetParameterMatch(string? parameter1, string? parameter2)
+    private ParameterEvaluationValueObject? GetParameterMatch(string? extracted, string? groundTruth)
     {
-        if (parameter1 is null && parameter2 is null)
+        if (extracted is null && groundTruth is null)
             return null;
-        var levenshtein = new Levenshtein(parameter1 ?? "");
-        var distance = levenshtein.DistanceFrom(parameter2 ?? "");
-        var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, parameter1 ?? "", parameter2 ?? "");
+        var levenshtein = new Levenshtein(extracted ?? "");
+        var distance = levenshtein.DistanceFrom(groundTruth ?? "");
+        var estimatedAccuracy = GetAccuracyForLevenshteinDistance(distance, extracted ?? "", groundTruth ?? "");
+        // var cer = groundTruth is null ? 1.0m : (decimal)distance / (decimal)groundTruth.Length;
 
         return new ParameterEvaluationValueObject
         {
             EstimatedAccuracy = estimatedAccuracy,
-            Distance = distance
+            Distance = distance,
+            // Cer = cer
         };
     }
 
