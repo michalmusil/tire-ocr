@@ -16,7 +16,8 @@ export const OcrTypeSchema = z.enum([
   "AzureAiVision",
   "PaddleOcr",
   "QwenVl",
-  "InternVl",  
+  "InternVl",
+  "EasyOcr",
 ]);
 export type OcrType = z.infer<typeof OcrTypeSchema>;
 

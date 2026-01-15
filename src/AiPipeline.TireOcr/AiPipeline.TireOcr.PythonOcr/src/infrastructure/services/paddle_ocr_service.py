@@ -21,11 +21,11 @@ def get_paddle_ocr_engine() -> PaddleOCR:
         model_dir = "./custom_models/rec/PP-OCRv5_mobile_rec_200e"
 
         PADDLE_OCR_ENGINE = PaddleOCR(
-            use_doc_orientation_classify=False,
-            use_doc_unwarping=False,
+            # use_doc_orientation_classify=False,
+            # use_doc_unwarping=False,
             lang="en",
-            text_recognition_model_name=model_name,
-            text_recognition_model_dir=model_dir,
+            # text_recognition_model_name=model_name,
+            # text_recognition_model_dir=model_dir,
         )
         print("PaddleOCR: INITIALIZED")
     return PADDLE_OCR_ENGINE
