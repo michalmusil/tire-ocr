@@ -50,6 +50,8 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
                 _promptRepository,
                 _configuration.GetValue<string>("OpenRouterModelNames:InternVl")!
             ),
+            TireCodeDetectorType.DeepseekOcr => new DeepseekOcrTireCodeDetectorService(
+                _httpClient, _imageConvertorService, _configuration, _promptRepository),
             _ => null
         };
 

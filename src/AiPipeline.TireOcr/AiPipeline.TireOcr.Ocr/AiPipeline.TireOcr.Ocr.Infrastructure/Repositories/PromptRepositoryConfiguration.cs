@@ -25,6 +25,10 @@ public class PromptRepositoryConfiguration : IPromptRepository
     public Task<string> GetPointsStrictWithLisiContextPromptAsync() =>
         Task.FromResult(GetPromptFromConfiguration("PointsStrictLisiContext"));
 
+    public Task<string> GetSpecializedDeepseekOcrPromptAsync() =>
+        Task.FromResult(GetPromptFromConfiguration("DeepseekOcr"));
+
+
     private string GetPromptFromConfiguration(string promptKey)
     {
         return _configuration.GetValue<string>($"Prompts:{promptKey}")!;

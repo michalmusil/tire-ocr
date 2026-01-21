@@ -8,5 +8,6 @@ public enum TireCodeDetectorType
     GoogleCloudVision = 3,
     AzureAiVision = 4,
     QwenVl = 5,
-    InternVl = 6
+    InternVl = 6,
+    DeepseekOcr = 7,
 }

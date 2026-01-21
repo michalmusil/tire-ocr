@@ -18,6 +18,7 @@ export const OcrTypeSchema = z.enum([
   "QwenVl",
   "InternVl",
   "EasyOcr",
+  "DeepseekOcr",
 ]);
 export type OcrType = z.infer<typeof OcrTypeSchema>;
 

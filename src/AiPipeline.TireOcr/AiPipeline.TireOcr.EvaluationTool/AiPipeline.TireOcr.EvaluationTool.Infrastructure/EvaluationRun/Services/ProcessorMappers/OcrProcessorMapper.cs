@@ -31,6 +31,7 @@ public class OcrProcessorMapper : IEnumToObjectMapper<OcrType, IOcrProcessor>
             OcrType.QwenVl => _remoteServicesProcessor,
             OcrType.InternVl => _remoteServicesProcessor,
             OcrType.EasyOcr => _remotePythonProcessor,
+            OcrType.DeepseekOcr => _remoteServicesProcessor,
             _ => null
         };
 
