@@ -3,11 +3,13 @@ using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
+using YoloDotNet.Enums;
+using YoloDotNet.ExecutionProvider.Cpu;
+using YoloDotNet.Models;
+
 using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 using TireOcr.Shared.Result;
 using YoloDotNet;
-using YoloDotNet.Enums;
-using YoloDotNet.Models;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
 
@@ -32,16 +34,15 @@ public class YoloTextDetectionService : ITextDetectionService
         var model = modelResult.Data!;
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = model.GetAbsolutePath(),
-            ModelType = ModelType.ObjectDetection,
-            Cuda = false,
-            PrimeGpu = false
+            ExecutionProvider = new CpuExecutionProvider(
+                model: model.GetAbsolutePath()
+            ),
+            ImageResize = ImageResize.Proportional,
+            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
         });
 
         using var imageToDetect = SKImage.FromBitmap(SKBitmap.Decode(image.Data));
         var results = yolo.RunObjectDetection(imageToDetect);
-        if (!results.Any(od => od.Confidence >= ConfidenceThreshold))
-            return DataResult<List<CharacterInImage>>.NotFound("Failed to detect text in image");
 
         var detectedCharacters = results
             .Where(od => od.Confidence >= ConfidenceThreshold)

@@ -9,7 +9,7 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 public class ImageTextApproximatorService : IImageTextApproximatorService
 {
     private readonly List<string> _referenceCodes =
-        ["LT215/55R16 91V", "LT245/75R16 120/116Q", "P215/55ZR18 95V", "205/55R16 91V", "215/65ZR17 93W", "215/65ZR15"];
+        ["LT215/55R16 91V", "LT245/75R16 120/116Q", "LT245/75R16C 120/116Q", "245/75R16 120/116Q", "245/75R16C 120/116Q", "P215/55ZR18 95V", "205/55R16 91V", "215/65ZR17 93W"];
 
     private List<string> NormalizedReferenceCodes => _referenceCodes.Select(NormalizeTireCode).ToList();
 

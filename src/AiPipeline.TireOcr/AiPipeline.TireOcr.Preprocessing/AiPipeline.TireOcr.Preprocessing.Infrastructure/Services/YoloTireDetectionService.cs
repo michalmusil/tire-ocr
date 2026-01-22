@@ -10,6 +10,7 @@ using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 using TireOcr.Shared.Result;
 using YoloDotNet;
 using YoloDotNet.Enums;
+using YoloDotNet.ExecutionProvider.Cpu;
 using YoloDotNet.Models;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
@@ -40,10 +41,11 @@ public class YoloTireDetectionService : ITireDetectionService
         var model = modelResult.Data!;
         using var yolo = new Yolo(new YoloOptions
         {
-            OnnxModel = model.GetAbsolutePath(),
-            ModelType = ModelType.Segmentation,
-            Cuda = false,
-            PrimeGpu = false
+            ExecutionProvider = new CpuExecutionProvider(
+                model: model.GetAbsolutePath()
+            ),
+            ImageResize = ImageResize.Proportional,
+            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
         });
 
         // Running through segmentation to get masks for the rim (wheel excl. the tire sidewall) and the entire wheel (incl. tire sidewall)
@@ -94,9 +96,31 @@ public class YoloTireDetectionService : ITireDetectionService
         var width = detectedImage.Width;
 
         var rimMask = new Mat(height, width, MatType.CV_8UC1, Scalar.White);
-        foreach (var pixel in segmentationResult.SegmentedPixels)
+        var bbox = segmentationResult.BoundingBox;
+        var maskData = segmentationResult.BitPackedPixelMask;
+
+        // Iterate through the bounding box only (where the mask exists)
+        for (var y = 0; y < bbox.Height; y++)
         {
-            rimMask.Set(pixel.Y, pixel.X, 0);
+            for (var x = 0; x < bbox.Width; x++)
+            {
+                // Calculate the linear index for this pixel within the bounding box
+                var pixelIndex = y * bbox.Width + x;
+
+                // Find the specific bit in the byte array
+                var byteIndex = pixelIndex >> 3;       // Same as / 8
+                var bitIndex = pixelIndex & 0b0111;    // Same as % 8
+
+                // Check if the bit is set to 1 (meaning it passed the confidence threshold)
+                var isSegmented = (maskData[byteIndex] & (1 << bitIndex)) != 0;
+
+                if (isSegmented)
+                {
+                    // Map local bounding box coordinates back to global image coordinates
+                    // Set to 0 (black)
+                    rimMask.Set(bbox.Top + y, bbox.Left + x, (byte)0);
+                }
+            }
         }
 
         return rimMask;
