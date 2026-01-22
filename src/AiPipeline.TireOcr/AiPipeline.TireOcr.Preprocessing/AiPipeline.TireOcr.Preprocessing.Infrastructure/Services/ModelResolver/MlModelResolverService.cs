@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
 using TireOcr.Preprocessing.Infrastructure.Models;
@@ -13,11 +14,14 @@ public class MlModelResolverService : IMlModelResolverService
     private readonly IMlModelDownloaderService _modelDownloaderService;
     private readonly IConfiguration _configuration;
     private readonly Dictionary<Type, Func<MlModel?>> _factories;
+    private readonly ILogger<MlModelResolverService> _logger;
 
-    public MlModelResolverService(IConfiguration configuration, IMlModelDownloaderService modelDownloaderService)
+    public MlModelResolverService(IConfiguration configuration, IMlModelDownloaderService modelDownloaderService,
+        ILogger<MlModelResolverService> logger)
     {
         _configuration = configuration;
         _modelDownloaderService = modelDownloaderService;
+        _logger = logger;
         _factories = new()
         {
             { typeof(ITireDetectionService), () => GetModel("TireSegmentation") },
@@ -70,12 +74,13 @@ public class MlModelResolverService : IMlModelResolverService
     private async Task<Result> EnsureMlModelLoadedAsync(MlModel model)
     {
         var retryCount = 0;
+        var modelAbsolutePath = model.GetAbsolutePath();
+        if (File.Exists(modelAbsolutePath))
+            return Result.Success();
+        
+        _logger.LogInformation($"Starting download of '{model.Name}' from '{model.DownloadLink}'.");
         while (retryCount <= MaxNumberOfDownloadRetries)
         {
-            var modelAbsolutePath = model.GetAbsolutePath();
-            if (File.Exists(modelAbsolutePath))
-                return Result.Success();
-
             var modelDirectory = Path.GetDirectoryName(modelAbsolutePath);
             if (modelDirectory is null)
                 throw new ApplicationException($"Directory of MlModel {modelAbsolutePath} is not valid.");
@@ -83,10 +88,14 @@ public class MlModelResolverService : IMlModelResolverService
             Directory.CreateDirectory(modelDirectory);
             var downloaded = await _modelDownloaderService.DownloadAsync(model);
             if (downloaded)
+            {
+                _logger.LogInformation($"Downloaded model '{model.Name}' to local storage.");
                 return Result.Success();
+            }
+
             retryCount++;
         }
-
+        _logger.LogError($"Failed to download model '{model.Name}' after {retryCount} retries.");
         return Result.Failure();
     }
 }
