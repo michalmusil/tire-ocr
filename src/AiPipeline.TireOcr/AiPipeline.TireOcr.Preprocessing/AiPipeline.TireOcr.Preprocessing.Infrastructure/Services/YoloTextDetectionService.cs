@@ -6,10 +6,10 @@ using TireOcr.Preprocessing.Infrastructure.Extensions;
 using YoloDotNet.Enums;
 using YoloDotNet.ExecutionProvider.Cpu;
 using YoloDotNet.Models;
-
 using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 using TireOcr.Shared.Result;
 using YoloDotNet;
+using YoloDotNet.Extensions;
 
 namespace TireOcr.Preprocessing.Infrastructure.Services;
 
@@ -42,7 +42,7 @@ public class YoloTextDetectionService : ITextDetectionService
         });
 
         using var imageToDetect = SKImage.FromBitmap(SKBitmap.Decode(image.Data));
-        var results = yolo.RunObjectDetection(imageToDetect);
+        var results = yolo.RunObjectDetection(imageToDetect, confidence: ConfidenceThreshold);
 
         var detectedCharacters = results
             .Where(od => od.Confidence >= ConfidenceThreshold)
@@ -61,7 +61,36 @@ public class YoloTextDetectionService : ITextDetectionService
             })
             .ToList();
 
+        //DrawAndSaveAnnotatedImage(image, imageToDetect, results);
+
         return DataResult<List<CharacterInImage>>.Success(detectedCharacters);
+    }
+
+    private void DrawAndSaveAnnotatedImage(Image originalImage, SKImage image, List<ObjectDetection> results)
+    {
+        using var annotatedBitmap = image.Draw(results, new DetectionDrawingOptions
+        {
+            DrawBoundingBoxes = true,
+            DrawConfidenceScore = false,
+            DrawLabels = true,
+            EnableFontShadow = true,
+            Font = SKTypeface.Default,
+            FontSize = 10,
+            FontColor = SKColors.White,
+            DrawLabelBackground = true,
+            EnableDynamicScaling = true,
+            BorderThickness = 2,
+            BoundingBoxOpacity = 128,
+        });
+
+        var path = Path.Combine(GetAnnotatedModelsStoragePath(), originalImage.Name);
+        annotatedBitmap.Save(path, SKEncodedImageFormat.Jpeg, 80);
+    }
+
+    private string GetAnnotatedModelsStoragePath()
+    {
+        var rootPath = new DirectoryInfo(AppContext.BaseDirectory).GetSolutionDirectory();
+        return Path.Combine(rootPath, "detection_results");
     }
 
     private char GetCharFromLabel(LabelModel label)
