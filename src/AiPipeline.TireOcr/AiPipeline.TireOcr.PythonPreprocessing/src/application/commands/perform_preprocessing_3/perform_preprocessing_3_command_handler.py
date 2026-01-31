@@ -3,7 +3,9 @@ from ..perform_preprocessing_3.perform_preprocessing_3_command import (
 )
 from ...services.image_manipulation_service import ImageManipulationService
 from ...services.rim_detection_service import RimDetectionService
+from ...services.image_segmentation_service import ImageSegmentationService
 from ...dtos.preprocessing_result_dto import PreprocessingResultDto
+import time
 
 
 class PerformPreprocessing3CommandHandler:
@@ -17,6 +19,52 @@ class PerformPreprocessing3CommandHandler:
         self.rim_detection_service = rim_detection_service
         self.image_segmentation_service = image_segmentation_service
 
-    def handle(self, command: PerformPreprocessing3Command) -> PreprocessingResultDto:
-        # TODO: Implement preprocessing logic
-        pass
+    async def handle(
+        self, command: PerformPreprocessing3Command
+    ) -> PreprocessingResultDto:
+        start = time.perf_counter()
+        try:
+            # 1) Resize to max dimension
+            resized_image = (
+                await self.image_manipulation_service.resize_to_max_dimension(
+                    command.image, 2048
+                )
+            )
+
+            # 2) CLAHE
+            clahe_image = await self.image_manipulation_service.perform_clahe(
+                resized_image
+            )
+
+            # 3) Rim detection (may throw if not found)
+            center_x, center_y, radius = await self.rim_detection_service.detect_rim(
+                clahe_image
+            )
+            inner_radius = radius * 0.9
+            outer_radius = radius * 1.3
+
+            # 4) Unwarp tire rim to strip (split and stack)
+            unwarped = await self.image_manipulation_service.unwarp_tire_rim(
+                clahe_image, center_x, center_y, inner_radius, outer_radius
+            )
+
+            # 5) Emphasise characters via segmentation pipeline
+            emphasised = await self.image_segmentation_service.emphasise_characters(
+                unwarped
+            )
+
+            duration_ms = int((time.perf_counter() - start) * 1000)
+            return PreprocessingResultDto(
+                status="success",
+                message="Preprocessing completed successfully",
+                image=emphasised,
+                duration_ms=duration_ms,
+            )
+        except Exception as ex:
+            duration_ms = int((time.perf_counter() - start) * 1000)
+            return PreprocessingResultDto(
+                status="error",
+                message=str(ex),
+                image=command.image,
+                duration_ms=duration_ms,
+            )
