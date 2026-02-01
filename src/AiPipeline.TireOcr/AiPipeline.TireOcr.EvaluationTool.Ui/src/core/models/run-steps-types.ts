@@ -3,7 +3,7 @@ import { z } from "zod";
 export const PreprocessingTypeSchema = z.enum([
   "Resize",
   "ExtractRoi",
-  "ExtractRoiAndRemoveBg",
+  "ExtractRoiAndEnhanceCharacters",
   "ExtractAndComposeSlices",
 ]);
 export type PreprocessingType = z.infer<typeof PreprocessingTypeSchema>;

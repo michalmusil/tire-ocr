@@ -84,7 +84,7 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
             ImageData: imageData,
             ImageName: Path.GetFileName(inputFileReference.Path),
             OriginalContentType: inputFileReference.ContentType,
-            RemoveBackground: false
+            EnhanceCharacters: false
         );
         var result = await _mediator.Send(query);
 

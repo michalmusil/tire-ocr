@@ -106,8 +106,8 @@ public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, Pre
         processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
 
         // Performing the roi extraction
-        var roiExtractionResult = request.RemoveBackground
-            ? await _textDetectionFacade.ExtractTireCodeRoiAndRemoveBg(processedImage)
+        var roiExtractionResult = request.EnhanceCharacters
+            ? await _textDetectionFacade.ExtractTireCodeRoiAndEnhanceCharacters(processedImage)
             : await _textDetectionFacade.ExtractTireCodeRoi(processedImage);
 
         return roiExtractionResult.Map(

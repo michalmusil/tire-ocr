@@ -27,7 +27,7 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
         {
             PreprocessingType.Resize => _resizeProcessor,
             PreprocessingType.ExtractRoi => _roiExtractionProcessor,
-            PreprocessingType.ExtractRoiAndRemoveBg => _roiExtractionProcessor,
+            PreprocessingType.ExtractRoiAndEnhanceCharacters => _roiExtractionProcessor,
             PreprocessingType.ExtractAndComposeSlices => _slicesCompositionProcessor,
             _ => null
         };

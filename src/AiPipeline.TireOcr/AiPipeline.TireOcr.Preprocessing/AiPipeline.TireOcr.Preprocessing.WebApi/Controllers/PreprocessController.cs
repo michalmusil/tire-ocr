@@ -38,7 +38,7 @@ public class PreprocessController : ControllerBase
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
-            RemoveBackground: request.RemoveBackground
+            EnhanceCharacters: request.EnhanceCharacters
         );
         var result = await _mediator.Send(query);
 
@@ -67,7 +67,7 @@ public class PreprocessController : ControllerBase
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
-            RemoveBackground: request.RemoveBackground
+            EnhanceCharacters: request.EnhanceCharacters
         );
         var result = await _mediator.Send(query);
 

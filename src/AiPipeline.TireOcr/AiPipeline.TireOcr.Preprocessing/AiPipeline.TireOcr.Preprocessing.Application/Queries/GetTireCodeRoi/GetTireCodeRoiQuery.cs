@@ -3,5 +3,5 @@ using TireOcr.Shared.UseCase;
 
 namespace TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 
-public record GetTireCodeRoiQuery(byte[] ImageData, string ImageName, string OriginalContentType, bool RemoveBackground)
+public record GetTireCodeRoiQuery(byte[] ImageData, string ImageName, string OriginalContentType, bool EnhanceCharacters)
     : IQuery<PreprocessedImageDto>;
