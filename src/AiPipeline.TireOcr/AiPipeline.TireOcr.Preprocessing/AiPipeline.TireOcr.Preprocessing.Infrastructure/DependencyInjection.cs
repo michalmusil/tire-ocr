@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.AddScoped<IImageTextApproximatorService, ImageTextApproximatorService>();
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();
         services.AddScoped<ITireSidewallExtractionService, TireSidewallExtractionService>();
+        services.AddScoped<ICharacterEnhancementService, CharacterEnhancementService>();
     }
 
     private static void AddFacades(IServiceCollection services)
