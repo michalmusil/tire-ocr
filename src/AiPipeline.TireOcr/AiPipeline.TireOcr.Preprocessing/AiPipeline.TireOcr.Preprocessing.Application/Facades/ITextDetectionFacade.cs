@@ -8,4 +8,5 @@ public interface ITextDetectionFacade
 {
     public Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoi(Image image);
     public Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoiAndRemoveBg(Image image);
+    public Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoiAndEnhanceCharacters(Image image);
 }

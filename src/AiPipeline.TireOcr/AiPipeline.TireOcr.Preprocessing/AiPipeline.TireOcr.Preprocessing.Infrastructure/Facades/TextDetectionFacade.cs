@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Facades;
 using TireOcr.Preprocessing.Application.Services;
@@ -15,15 +14,18 @@ public class TextDetectionFacade : ITextDetectionFacade
     private readonly IImageTextApproximatorService _imageTextApproximatorService;
     private readonly ITextDetectionService _textDetectionService;
     private readonly IImageManipulationService _imageManipulationService;
+    private readonly ICharacterEnhancementService _characterEnhancementService;
 
     public TextDetectionFacade(IImageSlicerService imageSlicerService,
         IImageTextApproximatorService imageTextApproximatorService,
-        ITextDetectionService textDetectionService, IImageManipulationService imageManipulationService)
+        ITextDetectionService textDetectionService, IImageManipulationService imageManipulationService,
+        ICharacterEnhancementService characterEnhancementService)
     {
         _imageSlicerService = imageSlicerService;
         _imageTextApproximatorService = imageTextApproximatorService;
         _textDetectionService = textDetectionService;
         _imageManipulationService = imageManipulationService;
+        _characterEnhancementService = characterEnhancementService;
     }
 
     public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoi(Image image)
@@ -67,6 +69,36 @@ public class TextDetectionFacade : ITextDetectionFacade
                 finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
 
                 return DataResult<ImageWithDetectedTexts>.Success(roiImage with { Image = finalImage });
+            });
+
+        var timeTaken = taskResult.Item1;
+        var resultImage = taskResult.Item2;
+
+        if (resultImage.IsFailure)
+            return DataResult<TextDetectionResultDto>.Failure(resultImage.Failures);
+
+        var result = new TextDetectionResultDto(
+            BestImage: resultImage.Data!.Image,
+            DetectedStringsWithLevenshteinDistance: resultImage.Data!.DetectedStrings,
+            TimeTaken: timeTaken
+        );
+        return DataResult<TextDetectionResultDto>.Success(result);
+    }
+
+    public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoiAndEnhanceCharacters(Image image)
+    {
+        var taskResult = await PerformanceUtils
+            .PerformTimeMeasuredTask(async () =>
+            {
+                var roiResult = await GetRoiOfImage(image);
+                if (roiResult.IsFailure)
+                    return roiResult;
+                var roi = roiResult.Data!;
+                var enhancementResult = await _characterEnhancementService.EnhanceCharactersAsync(roi.Image);
+                if (enhancementResult.IsFailure)
+                    return DataResult<ImageWithDetectedTexts>.Failure(enhancementResult.Failures);
+
+                return DataResult<ImageWithDetectedTexts>.Success(roi with { Image = enhancementResult.Data! });
             });
 
         var timeTaken = taskResult.Item1;
