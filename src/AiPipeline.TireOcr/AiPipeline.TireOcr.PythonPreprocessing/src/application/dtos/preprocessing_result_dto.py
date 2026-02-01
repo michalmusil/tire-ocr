@@ -3,7 +3,7 @@ from typing import Literal
 
 
 class PreprocessingResultDto(BaseModel):
-    status: Literal["success", "error"] = Field(
+    status: Literal["success", "acceptable_failure", "unexpected_error"] = Field(
         ..., description="Status of the preprocessing process."
     )
     message: str = Field(..., description="A human-readable message about the result.")

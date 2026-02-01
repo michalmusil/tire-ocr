@@ -1,7 +1,7 @@
 from fastapi.responses import RedirectResponse
 import uvicorn
 from fastapi import FastAPI
-from src.web_api.endpoints.preprocessing_v3 import router as preprocessing_router
+from src.web_api.endpoints.preprocessing import router as preprocessing_router
 
 
 app: FastAPI = FastAPI(

@@ -14,8 +14,8 @@ def _get_model() -> YOLO:
         return _YOLO_MODEL
     model_path = os.path.abspath(
         os.path.join(
-            os.path.dirname(__file__),
-            "../../../models/tire_segmentation_v5.onnx",
+            os.getcwd(),
+            "models/tire_segmentation_v5.onnx",
         )
     )
     _YOLO_MODEL = YOLO(model_path, task="segment")

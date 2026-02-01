@@ -4,18 +4,6 @@ from src.application.services.image_manipulation_service import ImageManipulatio
 
 
 class CvImageManipulationService(ImageManipulationService):
-    def _ensure_slice_width(self, img: np.ndarray, target_size: int) -> np.ndarray:
-        if img.shape[1] < target_size:
-            cv2.copyMakeBorder(
-                img,
-                0,
-                0,
-                0,
-                target_size - img.shape[1],
-                cv2.BORDER_CONSTANT,
-                value=0,
-            )
-
     async def resize_to_max_dimension(
         self, image_bytes: bytes, max_dimension: int
     ) -> bytes:
@@ -75,9 +63,23 @@ class CvImageManipulationService(ImageManipulationService):
         left = prolonged_result[:, :mid]
         right = prolonged_result[:, mid:]
         larger_width = max(left.shape[1], right.shape[1])
-        self._ensure_slice_width(left, larger_width)
-        self._ensure_slice_width(right, larger_width)
+        left = self._ensure_slice_width(left, larger_width)
+        right = self._ensure_slice_width(right, larger_width)
 
         stacked = np.vstack((left, right))
         _, out_bytes = cv2.imencode(".png", stacked)
         return out_bytes.tobytes()
+
+    def _ensure_slice_width(self, img: np.ndarray, target_size: int) -> np.ndarray:
+        if img.shape[1] >= target_size:
+            return img
+
+        return cv2.copyMakeBorder(
+            img,
+            0,
+            0,
+            0,
+            target_size - img.shape[1],
+            cv2.BORDER_CONSTANT,
+            value=0,
+        )

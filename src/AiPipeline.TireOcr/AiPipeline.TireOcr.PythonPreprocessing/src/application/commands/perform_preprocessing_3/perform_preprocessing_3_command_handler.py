@@ -37,9 +37,18 @@ class PerformPreprocessing3CommandHandler:
             )
 
             # 3) Rim detection (may throw if not found)
-            center_x, center_y, radius = await self.rim_detection_service.detect_rim(
-                clahe_image
-            )
+            try:
+                center_x, center_y, radius = (
+                    await self.rim_detection_service.detect_rim(clahe_image)
+                )
+            except Exception as ex:
+                duration_ms = int((time.perf_counter() - start) * 1000)
+                return PreprocessingResultDto(
+                    status="acceptable_failure",
+                    message=f"Rim detection failed: {str(ex)}",
+                    image=clahe_image,
+                    duration_ms=duration_ms,
+                )
             inner_radius = radius * 0.9
             outer_radius = radius * 1.3
 
@@ -49,9 +58,18 @@ class PerformPreprocessing3CommandHandler:
             )
 
             # 5) Emphasise characters via segmentation pipeline
-            emphasised = await self.image_segmentation_service.emphasise_characters(
-                unwarped
-            )
+            try:
+                emphasised = await self.image_segmentation_service.emphasise_characters_on_text_regions(
+                    unwarped
+                )
+            except Exception as ex:
+                duration_ms = int((time.perf_counter() - start) * 1000)
+                return PreprocessingResultDto(
+                    status="acceptable_failure",
+                    message=f"Character emphasisation failed: {str(ex)}",
+                    image=unwarped,
+                    duration_ms=duration_ms,
+                )
 
             duration_ms = int((time.perf_counter() - start) * 1000)
             return PreprocessingResultDto(
@@ -63,7 +81,7 @@ class PerformPreprocessing3CommandHandler:
         except Exception as ex:
             duration_ms = int((time.perf_counter() - start) * 1000)
             return PreprocessingResultDto(
-                status="error",
+                status="unexpected_error",
                 message=str(ex),
                 image=command.image,
                 duration_ms=duration_ms,
