@@ -42,7 +42,7 @@ public class YoloTireDetectionService : ITireDetectionService
         using var yolo = new Yolo(new YoloOptions
         {
             ExecutionProvider = new CpuExecutionProvider(
-                model: model.GetAbsolutePath()
+                model: model.GetMainFilePath()
             ),
             ImageResize = ImageResize.Proportional,
             SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)

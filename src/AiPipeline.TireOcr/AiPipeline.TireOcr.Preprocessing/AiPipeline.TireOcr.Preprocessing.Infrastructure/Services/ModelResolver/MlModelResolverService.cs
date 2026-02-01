@@ -25,7 +25,8 @@ public class MlModelResolverService : IMlModelResolverService
         _factories = new()
         {
             { typeof(ITireDetectionService), () => GetModel("TireSegmentation") },
-            { typeof(ITextDetectionService), () => GetModel("StripCharacterDetection") }
+            { typeof(ITextDetectionService), () => GetModel("StripCharacterDetection") },
+            { typeof(ICharacterEnhancementService), () => GetModel("CharacterSegmentation") },
         };
     }
 
@@ -74,18 +75,12 @@ public class MlModelResolverService : IMlModelResolverService
     private async Task<Result> EnsureMlModelLoadedAsync(MlModel model)
     {
         var retryCount = 0;
-        var modelAbsolutePath = model.GetAbsolutePath();
-        if (File.Exists(modelAbsolutePath))
+        if (model.Files.All(f => File.Exists(f.GetAbsLocalPath())))
             return Result.Success();
         
-        _logger.LogInformation($"Starting download of '{model.Name}' from '{model.DownloadLink}'.");
+        _logger.LogInformation($"Starting download of '{model.Name}'.");
         while (retryCount <= MaxNumberOfDownloadRetries)
         {
-            var modelDirectory = Path.GetDirectoryName(modelAbsolutePath);
-            if (modelDirectory is null)
-                throw new ApplicationException($"Directory of MlModel {modelAbsolutePath} is not valid.");
-
-            Directory.CreateDirectory(modelDirectory);
             var downloaded = await _modelDownloaderService.DownloadAsync(model);
             if (downloaded)
             {
