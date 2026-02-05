@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetImageSlices;
+namespace TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
 
-public class GetImageSlicesQueryValidator : AbstractValidator<GetImageSlicesQuery>
+public class ExtractImageSlicesCommandValidator : AbstractValidator<ExtractImageSlicesCommand>
 {
-    public GetImageSlicesQueryValidator()
+    public ExtractImageSlicesCommandValidator()
     {
         RuleFor(q => q.ImageName)
             .NotEmpty();

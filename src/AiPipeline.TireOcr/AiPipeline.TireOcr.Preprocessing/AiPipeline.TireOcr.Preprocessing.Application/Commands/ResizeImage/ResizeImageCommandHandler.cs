@@ -5,14 +5,14 @@ using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetResizedImage;
+namespace TireOcr.Preprocessing.Application.Commands.ResizeImage;
 
-public class GetResizedImageQueryHandler : IQueryHandler<GetResizedImageQuery, PreprocessedImageDto>
+public class ResizeImageCommandHandler : ICommandHandler<ResizeImageCommand, PreprocessedImageDto>
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly IContentTypeResolverService _contentTypeResolverService;
 
-    public GetResizedImageQueryHandler(IImageManipulationService imageManipulationService,
+    public ResizeImageCommandHandler(IImageManipulationService imageManipulationService,
         IContentTypeResolverService contentTypeResolverService)
     {
         _imageManipulationService = imageManipulationService;
@@ -20,7 +20,7 @@ public class GetResizedImageQueryHandler : IQueryHandler<GetResizedImageQuery, P
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
-        GetResizedImageQuery request,
+        ResizeImageCommand request,
         CancellationToken cancellationToken
     )
     {
@@ -46,7 +46,7 @@ public class GetResizedImageQueryHandler : IQueryHandler<GetResizedImageQuery, P
         );
     }
 
-    private async Task<DataResult<Image>> PerformResize(GetResizedImageQuery request)
+    private async Task<DataResult<Image>> PerformResize(ResizeImageCommand request)
     {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)

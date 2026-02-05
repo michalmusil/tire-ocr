@@ -1,10 +1,10 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
+using TireOcr.Preprocessing.Application.Commands.ExtractTireCodeRoi;
+using TireOcr.Preprocessing.Application.Commands.ResizeImage;
 using TireOcr.Preprocessing.Application.Dtos;
-using TireOcr.Preprocessing.Application.Queries.GetImageSlices;
-using TireOcr.Preprocessing.Application.Queries.GetResizedImage;
-using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
 using TireOcr.Preprocessing.WebApi.Contracts.Extract;
 using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlicesComposition;
 using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
@@ -34,13 +34,13 @@ public class PreprocessController : ControllerBase
     public async Task<ActionResult<ExtractResponse>> ExtractRoi([FromForm] ExtractRequest request)
     {
         var imageData = await request.Image.ToByteArray();
-        var query = new GetTireCodeRoiQuery(
+        var command = new ExtractTireCodeRoiCommand(
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
             EnhanceCharacters: request.EnhanceCharacters
         );
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(command);
 
         return result.ToActionResult<PreprocessedImageDto, ExtractResponse>(
             onSuccess: dto =>
@@ -63,13 +63,13 @@ public class PreprocessController : ControllerBase
     public async Task<ActionResult> ExtractRoiReturnFile([FromForm] ExtractRequest request)
     {
         var imageData = await request.Image.ToByteArray();
-        var query = new GetTireCodeRoiQuery(
+        var command = new ExtractTireCodeRoiCommand(
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
             EnhanceCharacters: request.EnhanceCharacters
         );
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(command);
 
         return result.Map(
             onSuccess: dto => File(dto.ImageData, dto.ContentType),
@@ -92,13 +92,13 @@ public class PreprocessController : ControllerBase
     public async Task<ActionResult<ResizeToMaxSideResponse>> ResizeToMaxSide([FromForm] ResizeToMaxSideRequest request)
     {
         var imageData = await request.Image.ToByteArray();
-        var query = new GetResizedImageQuery(
+        var command = new ResizeImageCommand(
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
             MaxImageSideDimension: request.MaxSidePixels
         );
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(command);
 
         return result.ToActionResult<PreprocessedImageDto, ResizeToMaxSideResponse>(
             onSuccess: dto =>
@@ -122,13 +122,13 @@ public class PreprocessController : ControllerBase
         [FromForm] ExtractSlicesCompositionRequest compositionRequest)
     {
         var imageData = await compositionRequest.Image.ToByteArray();
-        var query = new GetImageSlicesQuery(
+        var command = new ExtractImageSlicesCommand(
             ImageData: imageData,
             ImageName: compositionRequest.Image.FileName,
             OriginalContentType: compositionRequest.Image.ContentType,
             NumberOfSlices: compositionRequest.NumberOfSlices
         );
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(command);
 
         return result.ToActionResult<PreprocessedImageDto, ExtractSlicesCompositionResponse>(
             onSuccess: dto =>
@@ -152,13 +152,13 @@ public class PreprocessController : ControllerBase
         [FromForm] ExtractSlicesCompositionRequest compositionRequest)
     {
         var imageData = await compositionRequest.Image.ToByteArray();
-        var query = new GetImageSlicesQuery(
+        var command = new ExtractImageSlicesCommand(
             ImageData: imageData,
             ImageName: compositionRequest.Image.FileName,
             OriginalContentType: compositionRequest.Image.ContentType,
             NumberOfSlices: compositionRequest.NumberOfSlices
         );
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(command);
 
         return result.Map(
             onSuccess: dto => File(dto.ImageData, dto.ContentType),

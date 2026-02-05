@@ -7,24 +7,24 @@ using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
+namespace TireOcr.Preprocessing.Application.Commands.ExtractTireCodeRoi;
 
-public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, PreprocessedImageDto>
+public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeRoiCommand, PreprocessedImageDto>
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
     private readonly ITextDetectionFacade _textDetectionFacade;
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
-    private readonly ILogger<GetTireCodeRoiQueryHandler> _logger;
+    private readonly ILogger<ExtractTireCodeRoiCommandHandler> _logger;
 
-    public GetTireCodeRoiQueryHandler(
+    public ExtractTireCodeRoiCommandHandler(
         IImageManipulationService imageManipulationService,
         ITireDetectionService tireDetectionService,
         ITextDetectionFacade textDetectionFacade,
         IContentTypeResolverService contentTypeResolverService,
         ITireSidewallExtractionService tireSidewallExtractionService,
-        ILogger<GetTireCodeRoiQueryHandler> logger
+        ILogger<ExtractTireCodeRoiCommandHandler> logger
     )
     {
         _imageManipulationService = imageManipulationService;
@@ -36,7 +36,7 @@ public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, Pre
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
-        GetTireCodeRoiQuery request,
+        ExtractTireCodeRoiCommand request,
         CancellationToken cancellationToken
     )
     {
@@ -59,7 +59,7 @@ public class GetTireCodeRoiQueryHandler : IQueryHandler<GetTireCodeRoiQuery, Pre
         return DataResult<PreprocessedImageDto>.Success(resultDto);
     }
 
-    private async Task<DataResult<Image>> PerformPreprocessing(GetTireCodeRoiQuery request)
+    private async Task<DataResult<Image>> PerformPreprocessing(ExtractTireCodeRoiCommand request)
     {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)

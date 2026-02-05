@@ -1,30 +1,29 @@
 using Microsoft.Extensions.Logging;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Services;
-using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Shared.Extensions;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetImageSlices;
+namespace TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
 
-public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, PreprocessedImageDto>
+public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlicesCommand, PreprocessedImageDto>
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly IImageSlicerService _imageSlicerService;
     private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
-    private readonly ILogger<GetImageSlicesQueryHandler> _logger;
+    private readonly ILogger<ExtractImageSlicesCommandHandler> _logger;
 
-    public GetImageSlicesQueryHandler(
+    public ExtractImageSlicesCommandHandler(
         IImageManipulationService imageManipulationService,
         ITireDetectionService tireDetectionService,
         IContentTypeResolverService contentTypeResolverService,
         IImageSlicerService imageSlicerService,
         ITireSidewallExtractionService tireSidewallExtractionService,
-        ILogger<GetImageSlicesQueryHandler> logger
+        ILogger<ExtractImageSlicesCommandHandler> logger
     )
     {
         _imageManipulationService = imageManipulationService;
@@ -36,7 +35,7 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
     }
 
     public async Task<DataResult<PreprocessedImageDto>> Handle(
-        GetImageSlicesQuery request,
+        ExtractImageSlicesCommand request,
         CancellationToken cancellationToken
     )
     {
@@ -60,7 +59,7 @@ public class GetImageSlicesQueryHandler : IQueryHandler<GetImageSlicesQuery, Pre
         return DataResult<PreprocessedImageDto>.Success(result);
     }
 
-    private async Task<DataResult<Image>> PerformSlicingAndComposition(GetImageSlicesQuery request)
+    private async Task<DataResult<Image>> PerformSlicingAndComposition(ExtractImageSlicesCommand request)
     {
         var contentTypeSupported = _contentTypeResolverService.IsContentTypeSupported(request.OriginalContentType);
         if (!contentTypeSupported)

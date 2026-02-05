@@ -8,7 +8,7 @@ using AiPipeline.Orchestration.Shared.Nodes.Services.FileReferenceUploader;
 using AiPipeline.TireOcr.Shared.Models;
 using JasperFx.Core;
 using MediatR;
-using TireOcr.Preprocessing.Application.Queries.GetTireCodeRoi;
+using TireOcr.Preprocessing.Application.Commands.ExtractTireCodeRoi;
 using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.Preprocessing.Messaging.Procedures;
@@ -80,7 +80,7 @@ public class PerformTireImagePreprocessingProcedure : IProcedure
             return DataResult<IApElement>.Failure(imageDataResult.Failures);
 
         var imageData = await imageDataResult.Data!.ReadAllBytesAsync();
-        var query = new GetTireCodeRoiQuery(
+        var query = new ExtractTireCodeRoiCommand(
             ImageData: imageData,
             ImageName: Path.GetFileName(inputFileReference.Path),
             OriginalContentType: inputFileReference.ContentType,

@@ -1,10 +1,10 @@
 using FluentValidation;
 
-namespace TireOcr.Preprocessing.Application.Queries.GetResizedImage;
+namespace TireOcr.Preprocessing.Application.Commands.ResizeImage;
 
-public class GetResizedImageQueryValidator : AbstractValidator<GetResizedImageQuery>
+public class ResizeImageCommandValidator : AbstractValidator<ResizeImageCommand>
 {
-    public GetResizedImageQueryValidator()
+    public ResizeImageCommandValidator()
     {
         RuleFor(q => q.ImageName)
             .NotEmpty();
