@@ -16,7 +16,8 @@ public interface IImageManipulationService
     public Image ApplyGausianBlur(Image image, int kernelWidth = 5, int kernelHeight = 5, int sigmaX = 0,
         int sigmaY = 0);
 
-    public Image ApplyEdgeDetection(Image image, double treshold1 = 100, double treshold2 = 200);
+    public Image ApplyCannyEdgeDetection(Image image, double treshold1 = 100, double treshold2 = 200);
+    public Image ApplySobelEdgeDetection(Image image, bool preBlur);
     public Image ApplySharpening(Image image, float strength = 5);
 
     public Image ApplyAdaptiveTreshold(Image image, int value = 255, int blockSize = 11, double c = 0);

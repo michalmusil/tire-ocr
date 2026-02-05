@@ -99,7 +99,7 @@ public class OpenCvImageManipulationService : IImageManipulationService
         return blurredImage.ToDomain(image.Name);
     }
 
-    public Image ApplyEdgeDetection(Image image, double treshold1 = 100, double treshold2 = 200)
+    public Image ApplyCannyEdgeDetection(Image image, double treshold1 = 100, double treshold2 = 200)
     {
         using var inputImage = image.ToCv2();
         using var edgesImage = new Mat();
@@ -107,6 +107,30 @@ public class OpenCvImageManipulationService : IImageManipulationService
         Cv2.Canny(inputImage, edgesImage, treshold1, treshold2);
 
         return edgesImage.ToDomain(image.Name);
+    }
+
+    public Image ApplySobelEdgeDetection(Image image, bool preBlur)
+    {
+        using var inputImage = ApplyGrayscale(image).ToCv2();
+        if (preBlur)
+        {
+            Cv2.GaussianBlur(inputImage, inputImage, new Size(3, 3), 0);
+        }
+
+        using var gradX = new Mat();
+        using var gradY = new Mat();
+        Cv2.Sobel(inputImage, gradX, MatType.CV_16S, 1, 0, ksize: 3);
+        Cv2.Sobel(inputImage, gradY, MatType.CV_16S, 0, 1, ksize: 3);
+
+        using var absX = new Mat();
+        using var absY = new Mat();
+        Cv2.ConvertScaleAbs(gradX, absX);
+        Cv2.ConvertScaleAbs(gradY, absY);
+
+        using var result = new Mat();
+        Cv2.AddWeighted(absX, 0.5, absY, 0.5, 0, result);
+
+        return result.ToDomain(image.Name);
     }
 
     public Image ApplySharpening(Image image, float strength = 5)
