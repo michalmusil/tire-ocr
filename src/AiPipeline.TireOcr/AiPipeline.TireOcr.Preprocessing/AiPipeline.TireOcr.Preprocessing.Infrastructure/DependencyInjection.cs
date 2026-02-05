@@ -34,6 +34,6 @@ public static class DependencyInjection
 
     private static void AddFacades(IServiceCollection services)
     {
-        services.AddScoped<ITextDetectionFacade, TextDetectionFacade>();
+        services.AddScoped<IRoiExtractionFacade, RoiExtractionFacade>();
     }
 }

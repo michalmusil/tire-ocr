@@ -8,7 +8,7 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Preprocessing.Infrastructure.Facades;
 
-public class TextDetectionFacade : ITextDetectionFacade
+public class RoiExtractionFacade : IRoiExtractionFacade
 {
     private readonly IImageSlicerService _imageSlicerService;
     private readonly IImageTextApproximatorService _imageTextApproximatorService;
@@ -16,7 +16,7 @@ public class TextDetectionFacade : ITextDetectionFacade
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ICharacterEnhancementService _characterEnhancementService;
 
-    public TextDetectionFacade(IImageSlicerService imageSlicerService,
+    public RoiExtractionFacade(IImageSlicerService imageSlicerService,
         IImageTextApproximatorService imageTextApproximatorService,
         ITextDetectionService textDetectionService, IImageManipulationService imageManipulationService,
         ICharacterEnhancementService characterEnhancementService)

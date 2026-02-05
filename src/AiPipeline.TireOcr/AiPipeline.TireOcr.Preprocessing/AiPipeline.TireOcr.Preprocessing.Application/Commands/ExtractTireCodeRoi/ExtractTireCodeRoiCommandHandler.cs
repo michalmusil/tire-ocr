@@ -13,7 +13,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
 {
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ITireDetectionService _tireDetectionService;
-    private readonly ITextDetectionFacade _textDetectionFacade;
+    private readonly IRoiExtractionFacade _roiExtractionFacade;
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
     private readonly ILogger<ExtractTireCodeRoiCommandHandler> _logger;
@@ -21,7 +21,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
     public ExtractTireCodeRoiCommandHandler(
         IImageManipulationService imageManipulationService,
         ITireDetectionService tireDetectionService,
-        ITextDetectionFacade textDetectionFacade,
+        IRoiExtractionFacade roiExtractionFacade,
         IContentTypeResolverService contentTypeResolverService,
         ITireSidewallExtractionService tireSidewallExtractionService,
         ILogger<ExtractTireCodeRoiCommandHandler> logger
@@ -29,7 +29,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
-        _textDetectionFacade = textDetectionFacade;
+        _roiExtractionFacade = roiExtractionFacade;
         _contentTypeResolverService = contentTypeResolverService;
         _tireSidewallExtractionService = tireSidewallExtractionService;
         _logger = logger;
@@ -107,8 +107,8 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
 
         // Performing the roi extraction
         var roiExtractionResult = request.EnhanceCharacters
-            ? await _textDetectionFacade.ExtractTireCodeRoiAndEnhanceCharacters(processedImage)
-            : await _textDetectionFacade.ExtractTireCodeRoi(processedImage);
+            ? await _roiExtractionFacade.ExtractTireCodeRoiAndEnhanceCharacters(processedImage)
+            : await _roiExtractionFacade.ExtractTireCodeRoi(processedImage);
 
         return roiExtractionResult.Map(
             onSuccess: res => DataResult<Image>.Success(res.BestImage),

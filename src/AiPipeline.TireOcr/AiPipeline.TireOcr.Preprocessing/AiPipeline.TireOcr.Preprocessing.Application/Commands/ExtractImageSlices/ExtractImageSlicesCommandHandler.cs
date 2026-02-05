@@ -128,11 +128,14 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
             return DataResult<Image>.Failure(
                 new Failure(500, "Failed to compose generated slices vertically.")
             );
-
+        
         // Applying more preprocessing to improve contrast
         var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
         finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
         finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
+        
+        if(request.ExtractEdges)
+            finalImage = _imageManipulationService.ApplySobelEdgeDetection(finalImage, preBlur: false);
 
 
         return DataResult<Image>.Success(finalImage);

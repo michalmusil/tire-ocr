@@ -13,9 +13,11 @@ namespace TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
 /// <param name="ImageName">Original name of the tire image</param>
 /// <param name="OriginalContentType">Content type of the tire image</param>
 /// <param name="NumberOfSlices">How many times should the strip be sliced horizontally</param>
+/// <param name="ExtractEdges">If true, a binary version highlighting edges of the image is returned</param>
 public record ExtractImageSlicesCommand(
     byte[] ImageData,
     string ImageName,
     string OriginalContentType,
-    int NumberOfSlices)
+    int NumberOfSlices,
+    bool ExtractEdges)
     : ICommand<PreprocessedImageDto>;

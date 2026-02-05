@@ -154,7 +154,8 @@ public class PreprocessController : ControllerBase
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
-            NumberOfSlices: request.NumberOfSlices
+            NumberOfSlices: request.NumberOfSlices,
+            ExtractEdges: request.ExtractEdges
         );
         var result = await _mediator.Send(command);
 
@@ -184,7 +185,8 @@ public class PreprocessController : ControllerBase
             ImageData: imageData,
             ImageName: request.Image.FileName,
             OriginalContentType: request.Image.ContentType,
-            NumberOfSlices: request.NumberOfSlices
+            NumberOfSlices: request.NumberOfSlices,
+            request.ExtractEdges
         );
         var result = await _mediator.Send(command);
 
