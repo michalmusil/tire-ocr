@@ -43,7 +43,7 @@ public class PreprocessingSlicesCompositionProcessor : IPreprocessingProcessor
             });
             content.Add(new StringContent("2"), "NumberOfSlices");
 
-            var res = await _remoteProcessorClient.PostAsync("/api/v1/Preprocess/ExtractSlicesComposition", content);
+            var res = await _remoteProcessorClient.PostAsync("/api/v1/Preprocess/ExtractSlices", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();

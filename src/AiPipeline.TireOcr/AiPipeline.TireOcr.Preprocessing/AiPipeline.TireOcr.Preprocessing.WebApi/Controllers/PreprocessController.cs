@@ -5,8 +5,8 @@ using TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
 using TireOcr.Preprocessing.Application.Commands.ExtractTireCodeRoi;
 using TireOcr.Preprocessing.Application.Commands.ResizeImage;
 using TireOcr.Preprocessing.Application.Dtos;
-using TireOcr.Preprocessing.WebApi.Contracts.Extract;
-using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlicesComposition;
+using TireOcr.Preprocessing.WebApi.Contracts.ExtractRoi;
+using TireOcr.Preprocessing.WebApi.Contracts.ExtractSlices;
 using TireOcr.Preprocessing.WebApi.Contracts.ResizeToMaxSide;
 using TireOcr.Preprocessing.WebApi.Extensions;
 using TireOcr.Shared.Result;
@@ -31,22 +31,22 @@ public class PreprocessController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<ExtractResponse>> ExtractRoi([FromForm] ExtractRequest request)
+    public async Task<ActionResult<ExtractRoiResponse>> ExtractRoi([FromForm] ExtractRoiRequest roiRequest)
     {
-        var imageData = await request.Image.ToByteArray();
+        var imageData = await roiRequest.Image.ToByteArray();
         var command = new ExtractTireCodeRoiCommand(
             ImageData: imageData,
-            ImageName: request.Image.FileName,
-            OriginalContentType: request.Image.ContentType,
-            EnhanceCharacters: request.EnhanceCharacters
+            ImageName: roiRequest.Image.FileName,
+            OriginalContentType: roiRequest.Image.ContentType,
+            EnhanceCharacters: roiRequest.EnhanceCharacters
         );
         var result = await _mediator.Send(command);
 
-        return result.ToActionResult<PreprocessedImageDto, ExtractResponse>(
+        return result.ToActionResult<PreprocessedImageDto, ExtractRoiResponse>(
             onSuccess: dto =>
             {
                 var base64Data = Convert.ToBase64String(dto.ImageData);
-                var response = new ExtractResponse(
+                var response = new ExtractRoiResponse(
                     FileName: dto.Name,
                     ContentType: dto.ContentType,
                     Base64ImageData: base64Data,
@@ -56,18 +56,18 @@ public class PreprocessController : ControllerBase
             });
     }
 
-    [HttpPost("ExtractRoiReturnFile")]
+    [HttpPost("ExtractRoi/File")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> ExtractRoiReturnFile([FromForm] ExtractRequest request)
+    public async Task<ActionResult> ExtractRoiReturnFile([FromForm] ExtractRoiRequest roiRequest)
     {
-        var imageData = await request.Image.ToByteArray();
+        var imageData = await roiRequest.Image.ToByteArray();
         var command = new ExtractTireCodeRoiCommand(
             ImageData: imageData,
-            ImageName: request.Image.FileName,
-            OriginalContentType: request.Image.ContentType,
-            EnhanceCharacters: request.EnhanceCharacters
+            ImageName: roiRequest.Image.FileName,
+            OriginalContentType: roiRequest.Image.ContentType,
+            EnhanceCharacters: roiRequest.EnhanceCharacters
         );
         var result = await _mediator.Send(command);
 
@@ -114,27 +114,55 @@ public class PreprocessController : ControllerBase
             });
     }
 
-    [HttpPost("ExtractSlicesComposition")]
+    [HttpPost("ResizeToMaxSide/File")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult<ExtractSlicesCompositionResponse>> ExtractSlicesComposition(
-        [FromForm] ExtractSlicesCompositionRequest compositionRequest)
+    public async Task<ActionResult> ResizeToMaxSideReturnFile([FromForm] ResizeToMaxSideRequest request)
     {
-        var imageData = await compositionRequest.Image.ToByteArray();
-        var command = new ExtractImageSlicesCommand(
+        var imageData = await request.Image.ToByteArray();
+        var command = new ResizeImageCommand(
             ImageData: imageData,
-            ImageName: compositionRequest.Image.FileName,
-            OriginalContentType: compositionRequest.Image.ContentType,
-            NumberOfSlices: compositionRequest.NumberOfSlices
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            MaxImageSideDimension: request.MaxSidePixels
         );
         var result = await _mediator.Send(command);
 
-        return result.ToActionResult<PreprocessedImageDto, ExtractSlicesCompositionResponse>(
+        return result.Map(
+            onSuccess: dto => File(dto.ImageData, dto.ContentType),
+            onFailure: failures =>
+            {
+                var primaryFailure = failures.FirstOrDefault();
+                var otherFailures = failures.Skip(1).ToArray();
+
+                return primaryFailure?.ToActionResult(otherFailures) ??
+                       Problem("Failed to preprocess image", null, 500);
+            }
+        );
+    }
+
+    [HttpPost("ExtractSlices")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ExtractSlicesResponse>> ExtractSlices(
+        [FromForm] ExtractSlicesRequest request)
+    {
+        var imageData = await request.Image.ToByteArray();
+        var command = new ExtractImageSlicesCommand(
+            ImageData: imageData,
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            NumberOfSlices: request.NumberOfSlices
+        );
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult<PreprocessedImageDto, ExtractSlicesResponse>(
             onSuccess: dto =>
             {
                 var base64Data = Convert.ToBase64String(dto.ImageData);
-                var response = new ExtractSlicesCompositionResponse(
+                var response = new ExtractSlicesResponse(
                     FileName: dto.Name,
                     ContentType: dto.ContentType,
                     Base64ImageData: base64Data,
@@ -144,19 +172,19 @@ public class PreprocessController : ControllerBase
             });
     }
 
-    [HttpPost("ExtractSlicesCompositionReturnFile")]
+    [HttpPost("ExtractSlices/File")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
-    public async Task<ActionResult> ExtractSlicesCompositionReturnFile(
-        [FromForm] ExtractSlicesCompositionRequest compositionRequest)
+    public async Task<ActionResult> ExtractSlicesReturnFile(
+        [FromForm] ExtractSlicesRequest request)
     {
-        var imageData = await compositionRequest.Image.ToByteArray();
+        var imageData = await request.Image.ToByteArray();
         var command = new ExtractImageSlicesCommand(
             ImageData: imageData,
-            ImageName: compositionRequest.Image.FileName,
-            OriginalContentType: compositionRequest.Image.ContentType,
-            NumberOfSlices: compositionRequest.NumberOfSlices
+            ImageName: request.Image.FileName,
+            OriginalContentType: request.Image.ContentType,
+            NumberOfSlices: request.NumberOfSlices
         );
         var result = await _mediator.Send(command);
 

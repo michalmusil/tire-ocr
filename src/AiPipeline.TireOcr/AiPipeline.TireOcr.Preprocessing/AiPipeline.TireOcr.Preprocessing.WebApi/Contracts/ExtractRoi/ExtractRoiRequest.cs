@@ -1,9 +1,9 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace TireOcr.Preprocessing.WebApi.Contracts.Extract;
+namespace TireOcr.Preprocessing.WebApi.Contracts.ExtractRoi;
 
-public record ExtractRequest(
+public record ExtractRoiRequest(
     [Required] IFormFile Image,
     [DefaultValue(false)] bool EnhanceCharacters
 );

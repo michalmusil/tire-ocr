@@ -38,7 +38,7 @@ public class PreprocessingClient : IPreprocessingClient
             });
             content.Add(new StringContent("2"), "NumberOfSlices");
 
-            var res = await _httpClient.PostAsync("/api/v1/Preprocess/ExtractSlicesCompositionReturnFile", content);
+            var res = await _httpClient.PostAsync("/api/v1/Preprocess/ExtractSlices/File", content);
             if (!res.IsSuccessStatusCode)
             {
                 var errorContent = await res.Content.ReadAsStringAsync();

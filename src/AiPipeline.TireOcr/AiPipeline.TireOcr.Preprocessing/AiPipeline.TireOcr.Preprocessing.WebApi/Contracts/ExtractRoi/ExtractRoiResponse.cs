@@ -1,6 +1,6 @@
-namespace TireOcr.Preprocessing.WebApi.Contracts.Extract;
+namespace TireOcr.Preprocessing.WebApi.Contracts.ExtractRoi;
 
-public record ExtractResponse(
+public record ExtractRoiResponse(
     string FileName,
     string ContentType,
     string Base64ImageData,
