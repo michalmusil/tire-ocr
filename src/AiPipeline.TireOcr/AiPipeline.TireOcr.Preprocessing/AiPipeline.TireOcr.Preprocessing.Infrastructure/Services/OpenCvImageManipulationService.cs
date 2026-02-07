@@ -55,7 +55,7 @@ public class OpenCvImageManipulationService : IImageManipulationService
 
     public Image ApplyClahe(Image image, double clipLimit = 40.0, ImageSize? windowSize = null)
     {
-        Size? tileGridSize = windowSize is null ? null : new Size(windowSize.Width, windowSize.Height);
+        Size? tileGridSize = windowSize is null ? new Size(5, 5) : new Size(windowSize.Width, windowSize.Height);
         using var clahe = Cv2.CreateCLAHE(clipLimit, tileGridSize);
 
         using var input = image.ToCv2().CvtColor(ColorConversionCodes.BGR2GRAY);
@@ -84,6 +84,15 @@ public class OpenCvImageManipulationService : IImageManipulationService
 
 
         return filteredImage.ToDomain(image.Name);
+    }
+
+    public Image AddImagesWeighted(Image image1, double alpha, Image image2, double beta)
+    {
+        using var img1 = image1.ToCv2();
+        using var img2 = image2.ToCv2();
+        using var result = new Mat();
+        Cv2.AddWeighted(img1, alpha, img2, beta, 0, result);
+        return result.ToDomain(image1.Name);
     }
 
     public Image ApplyGausianBlur(Image image, int kernelWidth = 5, int kernelHeight = 5, int sigmaX = 0,

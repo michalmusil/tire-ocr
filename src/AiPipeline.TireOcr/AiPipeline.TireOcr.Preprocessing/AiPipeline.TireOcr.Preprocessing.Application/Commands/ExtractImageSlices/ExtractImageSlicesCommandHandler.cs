@@ -93,11 +93,8 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                     return DataResult<Image>.Failure(failure);
             }
         }
-        
-        processedImage = _imageManipulationService.ApplyClahe(
-            processedImage,
-            windowSize: new ImageSize(10, 10)
-        );
+
+        processedImage = _imageManipulationService.ApplyClahe(processedImage);
         var detectedTire = detectedTireResult.Data!;
 
         // Unwrapping only the tire sidewall portion of the image into a long strip 
@@ -129,14 +126,14 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
             return DataResult<Image>.Failure(
                 new Failure(500, "Failed to compose generated slices vertically.")
             );
-        
+
         // Applying more processing to improve contrast
         var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
         finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
         finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
-        
+
         // If requested, extract only the image edges
-        if(request.ExtractEdges)
+        if (request.ExtractEdges)
             finalImage = _imageManipulationService.ApplySobelEdgeDetection(finalImage, preBlur: false);
 
 

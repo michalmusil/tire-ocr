@@ -12,6 +12,7 @@ public interface IImageManipulationService
     public Image ApplyClahe(Image image, double clipLimit = 40.0, ImageSize? windowSize = null);
     public Image ApplyNormalization(Image image, int minValue = 0, int maxValue = 255);
     public Image ApplyBilateralFilter(Image image, int d, double sigmaColor, double sigmaSpace);
+    public Image AddImagesWeighted(Image image1, double alpha, Image image2, double beta);
 
     public Image ApplyGausianBlur(Image image, int kernelWidth = 5, int kernelHeight = 5, int sigmaX = 0,
         int sigmaY = 0);

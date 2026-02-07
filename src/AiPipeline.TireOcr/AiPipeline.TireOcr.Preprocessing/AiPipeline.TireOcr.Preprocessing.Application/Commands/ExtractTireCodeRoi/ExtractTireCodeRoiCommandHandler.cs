@@ -93,10 +93,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
             }
         }
 
-        processedImage = _imageManipulationService.ApplyClahe(
-            processedImage,
-            windowSize: new ImageSize(10, 10)
-        );
+        processedImage = _imageManipulationService.ApplyClahe(processedImage);
         var fallbackImage = processedImage;
         var detectedTire = detectedTireResult.Data!;
 
