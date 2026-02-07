@@ -71,10 +71,6 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
 
         // Apply global adjustments to reduce image size and improve contrast
         var processedImage = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
-        processedImage = _imageManipulationService.ApplyClahe(
-            processedImage,
-            windowSize: new ImageSize(10, 10)
-        );
 
         // Attempt to detect tire circle (only successful for photos containing the whole tire)
         var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
@@ -97,6 +93,10 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
             }
         }
 
+        processedImage = _imageManipulationService.ApplyClahe(
+            processedImage,
+            windowSize: new ImageSize(10, 10)
+        );
         var fallbackImage = processedImage;
         var detectedTire = detectedTireResult.Data!;
 
@@ -104,6 +104,12 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
         processedImage = await _tireSidewallExtractionService
             .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
         processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
+
+        // Applying more processing to improve contrast
+        processedImage = _imageManipulationService.ApplyClahe(processedImage);
+        processedImage =
+            _imageManipulationService.ApplyBilateralFilter(processedImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
+        processedImage = _imageManipulationService.ApplyBitwiseNot(processedImage);
 
         // Performing the roi extraction
         var roiExtractionResult = request.EnhanceCharacters
