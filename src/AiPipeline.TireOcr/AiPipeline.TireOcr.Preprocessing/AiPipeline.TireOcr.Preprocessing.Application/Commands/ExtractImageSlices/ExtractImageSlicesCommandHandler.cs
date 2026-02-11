@@ -93,8 +93,6 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                     return DataResult<Image>.Failure(failure);
             }
         }
-
-        processedImage = _imageManipulationService.ApplyClahe(processedImage);
         var detectedTire = detectedTireResult.Data!;
 
         // Unwrapping only the tire sidewall portion of the image into a long strip 

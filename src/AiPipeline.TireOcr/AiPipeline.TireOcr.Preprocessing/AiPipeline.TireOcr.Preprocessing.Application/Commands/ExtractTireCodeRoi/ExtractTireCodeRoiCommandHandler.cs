@@ -92,8 +92,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
                     return DataResult<Image>.Failure(failure);
             }
         }
-
-        processedImage = _imageManipulationService.ApplyClahe(processedImage);
+        
         var fallbackImage = processedImage;
         var detectedTire = detectedTireResult.Data!;
 
