@@ -58,6 +58,31 @@ public class TireCodeValueObject : ValueObject
         builder.Append(SpeedRating);
         return builder.ToString();
     }
+    
+    public int GetNonNullParameterCount()
+    {
+        var nonNullParameters = 0;
+        if (VehicleClass is not null)
+            nonNullParameters ++;
+        if (Width is not null)
+            nonNullParameters ++;
+        if (AspectRatio is not null)
+            nonNullParameters ++;
+        if (Construction is not null)
+            nonNullParameters ++;
+        if (Diameter is not null)
+            nonNullParameters ++;
+        if (LoadRange is not null)
+            nonNullParameters ++;
+        if (LoadIndex is not null)
+            nonNullParameters ++;
+        if (LoadIndex2 is not null)
+            nonNullParameters ++;
+        if (SpeedRating is not null)
+            nonNullParameters ++;
+        
+        return nonNullParameters;
+    }
 
     /// <summary>
     /// Extracts tire code from a predefined label string. Label string is a modified classic tire code (e.g.

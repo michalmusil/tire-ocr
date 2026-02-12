@@ -22,7 +22,8 @@ export const BatchEvaluationCountsCard = ({
     countsEvaluation.failedPreprocessingCount +
     countsEvaluation.failedOcrCount +
     countsEvaluation.failedPostprocessingCount +
-    countsEvaluation.failedUnexpectedCount;
+    countsEvaluation.failedUnexpectedCount +
+    countsEvaluation.insufficientExtractionCount;
 
   const correctPercentage = (totalCorrect / countsEvaluation.totalCount) * 100;
   const falsePositivePercentage =
@@ -67,6 +68,11 @@ export const BatchEvaluationCountsCard = ({
                 {
                   label: "postprocessing",
                   value: `${countsEvaluation.failedPostprocessingCount}`,
+                  colorClass: "text-orange-600",
+                },
+                {
+                  label: "insufficient extraction",
+                  value: `${countsEvaluation.insufficientExtractionCount}`,
                   colorClass: "text-orange-600",
                 },
                 {

@@ -2,12 +2,13 @@ import { useParams } from "react-router-dom";
 import { useRunBatchDetailQuery } from "../queries/use-run-batch-detail-query";
 import { BatchInfoCard } from "../components/batch-info-card";
 import { BatchEvaluationCountsCard } from "../components/batch-evaluation-counts-card";
-import { BatchAccuracyCard } from "../components/batch-accuracy-card";
+import { BatchDistancesCard } from "../components/batch-distances-card";
 import { BatchEvaluationRunsCard } from "../components/batch-evaluation-runs-card";
 import { BatchAverageTimesCard } from "../components/batch-average-times-card";
 import SpinnerFullpage from "@/core/components/placeholders/spinner-fullpage";
 import ErrorFullpage from "@/core/components/placeholders/error-fullpage";
 import { RunConfigCard } from "@/core/components/run-config-card";
+import { BatchMetricsCard } from "../components/batch-metrics-card";
 
 const EvaluationBatchDetailPage: React.FC = () => {
   const { batchId } = useParams<{ batchId: string }>();
@@ -25,7 +26,7 @@ const EvaluationBatchDetailPage: React.FC = () => {
 
   const totalCost = batchDetail.evaluationRuns.reduce(
     (total, run) => total + (run.ocrResult?.estimatedCosts?.estimatedCost ?? 0),
-    0
+    0,
   );
   const totalCostCurrency =
     batchDetail.evaluationRuns[0]?.ocrResult?.estimatedCosts
@@ -49,14 +50,13 @@ const EvaluationBatchDetailPage: React.FC = () => {
         <BatchAverageTimesCard batchDetail={batchDetail} />
       </div>
 
+      <BatchMetricsCard metrics={batchDetail.batchEvaluation.statistics} />
+
       <BatchEvaluationCountsCard
         countsEvaluation={batchDetail.batchEvaluation.counts}
       />
 
-      <BatchAccuracyCard
-        distances={batchDetail.batchEvaluation.distances}
-        averageCer={batchDetail.batchEvaluation.averageCer}
-      />
+      <BatchDistancesCard distances={batchDetail.batchEvaluation.distances} />
 
       <BatchEvaluationRunsCard runs={batchDetail.evaluationRuns} />
     </div>
