@@ -4,5 +4,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos.
 
 public record IncalculableInputsDto(
     decimal? AnnualFixedCostUsd,
+    int? ExpectedAnnualInferences,
     EvaluationRunBatchEntity? InferenceStabilityRelative
 );

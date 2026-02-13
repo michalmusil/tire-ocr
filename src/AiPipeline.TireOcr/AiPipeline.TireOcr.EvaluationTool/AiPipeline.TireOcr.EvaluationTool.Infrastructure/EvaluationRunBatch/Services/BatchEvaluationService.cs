@@ -109,6 +109,9 @@ public class BatchEvaluationService : IBatchEvaluationService
             ? null
             : await CalculateInferenceStabilityAsync(batch, inputs.InferenceStabilityRelative);
 
+        var averageInferenceCost = allInferenceCosts.Average();
+        var estimatedAnnualCost = inputs is null ? null : CalculateEstimatedAnnualCost(inputs, averageInferenceCost);
+
         var batchEvaluation = new BatchEvaluationDto(
             Counts: new BatchEvaluationCountsDto(
                 TotalCount: totalRuns,
@@ -137,10 +140,10 @@ public class BatchEvaluationService : IBatchEvaluationService
                 ParameterSuccessRate: allParameterSuccessRates.Average(),
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
                 AverageCer: allCers.Average(),
-                AverageInferenceCost: allInferenceCosts.Average(),
+                AverageInferenceCost: averageInferenceCost,
                 AverageLatencyMs: allDurationsWithoutTraffic.Average(),
                 InferenceStability: inferenceStability,
-                EstimatedAnnualCostUsd: 0
+                EstimatedAnnualCostUsd: estimatedAnnualCost
             )
         );
 
@@ -187,6 +190,17 @@ public class BatchEvaluationService : IBatchEvaluationService
             });
 
         return scores.Average();
+    }
+
+    private decimal? CalculateEstimatedAnnualCost(IncalculableInputsDto inputs, decimal averageInferenceCost)
+    {
+        var estimation = 0m;
+        if (inputs.AnnualFixedCostUsd is { } fixedCostUsd)
+            estimation += fixedCostUsd;
+        if (inputs.ExpectedAnnualInferences is { } expectedInferenceCount)
+            estimation += expectedInferenceCount * averageInferenceCost;
+
+        return estimation;
     }
 
     private SuccessDependentStats? CalculateStatsOfEvaluationRun(EvaluationRunEntity run)
