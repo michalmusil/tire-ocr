@@ -32,23 +32,21 @@ public class BatchCsvExportService : IBatchCsvExportService
         await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
 
         var metrics = batchEvaluationDto.Metrics;
-        csvWriter.WriteRecord(
-            new EvaluationMetricCsvLineDto("Parameter Success Rate [ratio]", "PSR", metrics.ParameterSuccessRate));
-        csvWriter.WriteRecord(
-            new EvaluationMetricCsvLineDto("Average Latency [ms]", "AL", metrics.AverageLatencyMs));
-        csvWriter.WriteRecord(
-            new EvaluationMetricCsvLineDto("False Positive Rate [ratio]", "FPR", metrics.FalsePositiveRate));
-        csvWriter.WriteRecord(
-            new EvaluationMetricCsvLineDto("Character Error Rate [ratio]", "CER", metrics.AverageCer));
-
+        var records = new List<EvaluationMetricCsvLineDto>
+        {
+            new("Parameter Success Rate [ratio]", "PSR", metrics.ParameterSuccessRate),
+            new("Average Latency [ms]", "AL", metrics.AverageLatencyMs),
+            new("False Positive Rate [ratio]", "FPR", metrics.FalsePositiveRate),
+            new("Character Error Rate [ratio]", "CER", metrics.AverageCer)
+        };
         if (metrics.InferenceStability is { } inferenceStability)
-            csvWriter.WriteRecord(
-                new EvaluationMetricCsvLineDto("InferenceStability [ratio]", "IS", inferenceStability));
+            records.Add(new EvaluationMetricCsvLineDto("InferenceStability [ratio]", "IS", inferenceStability));
         if (metrics.EstimatedAnnualCostUsd is { } estimatedAnnualCostUsd)
-            csvWriter.WriteRecord(
-                new EvaluationMetricCsvLineDto("Estimated Annual Cost [USD]", "EAC", estimatedAnnualCostUsd));
+            records.Add(new EvaluationMetricCsvLineDto("Estimated Annual Cost [USD]", "EAC", estimatedAnnualCostUsd));
+
+        await csvWriter.WriteRecordsAsync(records);
         await streamWriter.FlushAsync();
-        
+
         return DataResult<byte[]>.Success(outputStream.ToArray());
     }
 }
