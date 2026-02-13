@@ -45,7 +45,7 @@ public class PerformTireImageOcrQueryHandler : IQueryHandler<PerformTireImageOcr
                 );
                 return DataResult<OcrWithBillingDto>.Success(withDuration);
             },
-            onFailure: failures => DataResult<OcrWithBillingDto>.Failure(failures)
+            onFailure: DataResult<OcrWithBillingDto>.Failure
         );
     }
 

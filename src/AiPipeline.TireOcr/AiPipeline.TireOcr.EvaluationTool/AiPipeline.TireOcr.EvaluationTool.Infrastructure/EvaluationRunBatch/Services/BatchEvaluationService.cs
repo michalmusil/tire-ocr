@@ -110,7 +110,9 @@ public class BatchEvaluationService : IBatchEvaluationService
             : await CalculateInferenceStabilityAsync(batch, inputs.InferenceStabilityRelative);
 
         var averageInferenceCost = allInferenceCosts.Average();
-        var estimatedAnnualCost = inputs is null ? null : CalculateEstimatedAnnualCost(inputs, averageInferenceCost);
+        var estimatedAnnualCost = inputs?.AnnualFixedCostUsd is null && inputs?.ExpectedAnnualInferences is null
+            ? null
+            : CalculateEstimatedAnnualCost(inputs, averageInferenceCost);
 
         var batchEvaluation = new BatchEvaluationDto(
             Counts: new BatchEvaluationCountsDto(

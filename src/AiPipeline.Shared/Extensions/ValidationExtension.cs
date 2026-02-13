@@ -22,12 +22,4 @@ public static class ValidationExtension
             .Must(s => Guid.TryParse(s, out _))
             .WithMessage((_, s) => $"{s} is not a valid GUID.");
     }
-
-    public static IRuleBuilderOptions<T, string?> IsGuidOrNull<T>(
-        this IRuleBuilder<T, string?> ruleBuilder)
-    {
-        return ruleBuilder
-            .Must(s => s is null || Guid.TryParse(s, out _))
-            .WithMessage((_, s) => $"{s} is not a valid GUID.");
-    }
 }

@@ -17,7 +17,8 @@ import { RunBatchesQueryKey } from "../queries/use-run-batches-query";
 import EditBatchDialog from "./edit-batch-dialog";
 import type { RunBatchDetail } from "../dtos/get-run-batch-detail-dto";
 import { Separator } from "@/core/components/ui/separator";
-import { useExportBatchMutation } from "../mutations/export-batch-mutation";
+import { useExportRawBatchMutation } from "../mutations/export-raw-batch-mutation";
+import ExportBatchDialog from "./export-batch-dialog";
 
 type BatchInfoCardProps = {
   batch: RunBatchDetail;
@@ -32,7 +33,7 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useDeleteBatchMutation();
-  const exportMutation = useExportBatchMutation();
+  const exportMutation = useExportRawBatchMutation();
 
   const onDeleteConfirmed = () => {
     deleteMutation.mutate(batch.id, {
@@ -75,13 +76,8 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
         </div>
         <div className="flex gap-3">
           <EditBatchDialog batch={batch} trigger={<Button>Edit</Button>} />
-          <ConfirmationDialog
-            title="Export"
-            description="Are you sure you want to download a CSV export of this batch?"
-            type="neutral"
-            confirmText="Export"
-            cancelText="Cancel"
-            onConfirm={onExportConfirmed}
+          <ExportBatchDialog
+            batchId={batch.id}
             trigger={
               <Button variant="outline" disabled={exportMutation.isPending}>
                 {exportMutation.isPending ? <Spinner /> : "Export"}
@@ -118,7 +114,7 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
             label="Duration"
             value={getDisplayedDurationFromDatetimeBoundaries(
               batch.startedAt,
-              batch.finishedAt
+              batch.finishedAt,
             )}
           />
           {totalCost && (

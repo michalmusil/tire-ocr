@@ -25,7 +25,7 @@ const FormInput = <T extends FieldValues>({
       render={({ field, fieldState }) => (
         <>
           <label>
-            {label}
+            <span className="text-muted-foreground">{label}</span>
             <Input
               onChange={(e) => {
                 if (name === "") return;
