@@ -6,5 +6,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Servi
 
 public interface IBatchEvaluationService
 {
-    public Task<DataResult<BatchEvaluationDto>> EvaluateBatch(EvaluationRunBatchEntity batch);
+    public Task<DataResult<BatchEvaluationDto>> EvaluateBatch(EvaluationRunBatchEntity batch,
+        IncalculableInputsDto? inputs = null);
 }

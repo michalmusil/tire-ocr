@@ -50,7 +50,7 @@ const EvaluationBatchDetailPage: React.FC = () => {
         <BatchAverageTimesCard batchDetail={batchDetail} />
       </div>
 
-      <BatchMetricsCard metrics={batchDetail.batchEvaluation.statistics} />
+      <BatchMetricsCard metrics={batchDetail.batchEvaluation.metrics} />
 
       <BatchEvaluationCountsCard
         countsEvaluation={batchDetail.batchEvaluation.counts}

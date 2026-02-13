@@ -27,7 +27,7 @@ const BatchEvaluationDistancesSchema = z.object({
   averageSpeedRatingDistance: z.number(),
 });
 
-const BatchEvaluationStatisticsSchema = z.object({
+const BatchEvaluationMetricsSchema = z.object({
   parameterSuccessRate: z.number(),
   falsePositiveRate: z.number(),
   averageCer: z.number(),
@@ -36,7 +36,7 @@ const BatchEvaluationStatisticsSchema = z.object({
 });
 
 const BatchEvaluationSchema = z.object({
-  statistics: BatchEvaluationStatisticsSchema,
+  metrics: BatchEvaluationMetricsSchema,
   counts: BatchEvaluationCountsSchema,
   distances: BatchEvaluationDistancesSchema,
 });

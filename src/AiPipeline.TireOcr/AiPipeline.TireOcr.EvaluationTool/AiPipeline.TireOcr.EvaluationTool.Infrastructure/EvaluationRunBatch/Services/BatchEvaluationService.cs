@@ -1,7 +1,7 @@
+using System.Collections.Concurrent;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos.BatchEvaluation;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Services;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate;
-using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunAggregate.Evaluation;
 using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using TireOcr.Shared.Result;
 
@@ -9,7 +9,8 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRunBatch.Se
 
 public class BatchEvaluationService : IBatchEvaluationService
 {
-    public async Task<DataResult<BatchEvaluationDto>> EvaluateBatch(EvaluationRunBatchEntity batch)
+    public async Task<DataResult<BatchEvaluationDto>> EvaluateBatch(EvaluationRunBatchEntity batch,
+        IncalculableInputsDto? inputs = null)
     {
         if (batch.EvaluationRuns.Count < 1)
             return DataResult<BatchEvaluationDto>.Invalid(
@@ -79,7 +80,12 @@ public class BatchEvaluationService : IBatchEvaluationService
 
             var stats = CalculateStatsOfEvaluationRun(run);
             if (stats is null)
+            {
+                // Corrective measure: PSR includes non-successful inferences
+                if (run.GetEvaluationResultCategory() is not EvaluationResultCategory.NoEvaluation)
+                    allParameterSuccessRates.Add(0);
                 continue;
+            }
 
             totalDistances.Add(stats.TotalDistance);
             AddDistanceIfNotNull(stats.VehicleClassDistance, vehicleClassDistances);
@@ -98,6 +104,10 @@ public class BatchEvaluationService : IBatchEvaluationService
             if (stats.TotalDurationWithoutTraffic is not null)
                 allDurationsWithoutTraffic.Add(stats.TotalDurationWithoutTraffic.Value);
         }
+
+        decimal? inferenceStability = inputs?.InferenceStabilityRelative is null
+            ? null
+            : await CalculateInferenceStabilityAsync(batch, inputs.InferenceStabilityRelative);
 
         var batchEvaluation = new BatchEvaluationDto(
             Counts: new BatchEvaluationCountsDto(
@@ -123,12 +133,14 @@ public class BatchEvaluationService : IBatchEvaluationService
                 AverageLoadIndex2Distance: GetAverageDistance(loadIndex2Distances),
                 AverageSpeedRatingDistance: GetAverageDistance(speedRatingDistances)
             ),
-            Statistics: new BatchEvaluationStatisticsDto(
+            Metrics: new BatchEvaluationMetricsDto(
                 ParameterSuccessRate: allParameterSuccessRates.Average(),
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
                 AverageCer: allCers.Average(),
                 AverageInferenceCost: allInferenceCosts.Average(),
-                AverageLatencyMs: allDurationsWithoutTraffic.Average()
+                AverageLatencyMs: allDurationsWithoutTraffic.Average(),
+                InferenceStability: inferenceStability,
+                EstimatedAnnualCostUsd: 0
             )
         );
 
@@ -149,7 +161,35 @@ public class BatchEvaluationService : IBatchEvaluationService
         return distances.Average();
     }
 
-    private RunStatCalculation? CalculateStatsOfEvaluationRun(EvaluationRunEntity run)
+    private async Task<decimal> CalculateInferenceStabilityAsync(EvaluationRunBatchEntity batch1,
+        EvaluationRunBatchEntity batch2)
+    {
+        var scores = new ConcurrentBag<decimal>();
+        var batch2Dict = batch2.EvaluationRuns.ToDictionary(e => e.InputImage.FileName, e => e);
+        await Parallel.ForEachAsync(batch1.EvaluationRuns,
+            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+            async (r1, token) =>
+            {
+                batch2Dict.TryGetValue(r1.InputImage.FileName, out var r2);
+                if (r2 is null)
+                {
+                    scores.Add(0);
+                    return;
+                }
+
+                var categoriesMatch = r1.GetEvaluationResultCategory().Equals(r2.GetEvaluationResultCategory());
+                var resultsMatch = r1.PostprocessingResult?.TireCode.RawCode.Equals(
+                    r2.PostprocessingResult?.TireCode.RawCode, StringComparison.OrdinalIgnoreCase) ?? false;
+                var bothResultsMissing = r1.PostprocessingResult is null && r2.PostprocessingResult is null;
+
+                var stability = categoriesMatch && (resultsMatch || bothResultsMissing) ? 1 : 0;
+                scores.Add(stability);
+            });
+
+        return scores.Average();
+    }
+
+    private SuccessDependentStats? CalculateStatsOfEvaluationRun(EvaluationRunEntity run)
     {
         if (run.Evaluation is null || run.PostprocessingResult is null)
             return null;
@@ -168,12 +208,12 @@ public class BatchEvaluationService : IBatchEvaluationService
         if (category is EvaluationResultCategory.CorrectInMainParameters or EvaluationResultCategory.FullyCorrect
             or EvaluationResultCategory.FalsePositive or EvaluationResultCategory.InsufficientExtraction)
             durationWithoutTrafic = 0
-                + (run.PreprocessingResult?.DurationMs ?? 0L)
-                + (run.OcrResult?.DurationMs ?? 0L)
-                + (run.PostprocessingResult?.DurationMs ?? 0L);
+                                    + (run.PreprocessingResult?.DurationMs ?? 0L)
+                                    + (run.OcrResult?.DurationMs ?? 0L)
+                                    + (run.PostprocessingResult?.DurationMs ?? 0L);
 
 
-        return new RunStatCalculation(
+        return new SuccessDependentStats(
             TotalDistance: run.Evaluation.TotalDistance,
             VehicleClassDistance: run.Evaluation.VehicleClassEvaluation?.Distance,
             WidthDistance: run.Evaluation.WidthEvaluation?.Distance,
@@ -191,7 +231,7 @@ public class BatchEvaluationService : IBatchEvaluationService
         );
     }
 
-    private record RunStatCalculation(
+    private record SuccessDependentStats(
         int TotalDistance,
         int? VehicleClassDistance,
         int? WidthDistance,

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 
 type BatchMetricsCardProps = {
-  metrics: BatchEvaluation["statistics"];
+  metrics: BatchEvaluation["metrics"];
 };
 
 export const BatchMetricsCard = ({ metrics }: BatchMetricsCardProps) => {
