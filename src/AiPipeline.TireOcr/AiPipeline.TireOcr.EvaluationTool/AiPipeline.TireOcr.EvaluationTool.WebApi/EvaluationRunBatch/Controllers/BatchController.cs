@@ -4,8 +4,8 @@ using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.RunEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Commands.UpdateEvaluationBatch;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos;
+using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationBatchRawCsvExport;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchById;
-using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchCsvExport;
 using AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchesPaginated;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.GetById;
 using AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.Batch.GetPaginated;
@@ -78,7 +78,7 @@ public class BatchController : ControllerBase
     [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
     public async Task<IActionResult> GetExportedEvaluationBach([FromRoute] Guid id)
     {
-        var query = new GetEvaluationRunBatchCsvExportQuery(id);
+        var query = new GetEvaluationBatchRawCsvExportQuery(id);
         var result = await _mediator.Send(query);
 
         return result.Map(

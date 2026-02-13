@@ -14,12 +14,20 @@ public static class ValidationExtension
             .Must(p => p.PageSize <= 100)
             .WithMessage("Page size can't exceed 100");
     }
-    
+
     public static IRuleBuilderOptions<T, string> IsGuid<T>(
         this IRuleBuilder<T, string> ruleBuilder)
     {
         return ruleBuilder
-            .Must(s => Guid.TryParse(s, out var x))
+            .Must(s => Guid.TryParse(s, out _))
+            .WithMessage((_, s) => $"{s} is not a valid GUID.");
+    }
+
+    public static IRuleBuilderOptions<T, string?> IsGuidOrNull<T>(
+        this IRuleBuilder<T, string?> ruleBuilder)
+    {
+        return ruleBuilder
+            .Must(s => s is null || Guid.TryParse(s, out _))
             .WithMessage((_, s) => $"{s} is not a valid GUID.");
     }
 }

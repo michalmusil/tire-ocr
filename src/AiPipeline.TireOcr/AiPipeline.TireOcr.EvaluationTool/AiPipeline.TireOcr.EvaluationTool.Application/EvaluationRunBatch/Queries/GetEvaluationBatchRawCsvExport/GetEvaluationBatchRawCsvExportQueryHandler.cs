@@ -4,21 +4,21 @@ using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
 using TireOcr.Shared.Result;
 using TireOcr.Shared.UseCase;
 
-namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationRunBatchCsvExport;
+namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queries.GetEvaluationBatchRawCsvExport;
 
-public class GetEvaluationRunBatchCsvExportQueryHandler : IQueryHandler<GetEvaluationRunBatchCsvExportQuery, byte[]>
+public class GetEvaluationBatchRawCsvExportQueryHandler : IQueryHandler<GetEvaluationBatchRawCsvExportQuery, byte[]>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IBatchCsvExportService _batchCsvExportService;
 
-    public GetEvaluationRunBatchCsvExportQueryHandler(IUnitOfWork unitOfWork,
+    public GetEvaluationBatchRawCsvExportQueryHandler(IUnitOfWork unitOfWork,
         IBatchCsvExportService batchCsvExportService)
     {
         _unitOfWork = unitOfWork;
         _batchCsvExportService = batchCsvExportService;
     }
 
-    public async Task<DataResult<byte[]>> Handle(GetEvaluationRunBatchCsvExportQuery request,
+    public async Task<DataResult<byte[]>> Handle(GetEvaluationBatchRawCsvExportQuery request,
         CancellationToken cancellationToken)
     {
         var batch = await _unitOfWork.EvaluationRunBatchRepository.GetEvaluationRunBatchByIdAsync(id: request.Id);
@@ -34,7 +34,7 @@ public class GetEvaluationRunBatchCsvExportQueryHandler : IQueryHandler<GetEvalu
             evaluationRuns: runs.ToList()
         );
 
-        var csvContent = await _batchCsvExportService.ExportBatch(batchWithRuns);
+        var csvContent = await _batchCsvExportService.ExportRawBatch(batchWithRuns);
         return csvContent.Map(
             onFailure: DataResult<byte[]>.Failure,
             onSuccess: DataResult<byte[]>.Success
