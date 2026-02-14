@@ -13,6 +13,7 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
 public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
 {
+    private const int Seed = 42;
     private readonly HttpClient _httpClient;
     private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
@@ -43,7 +44,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             var responseContent = await response.Content.ReadAsStringAsync();
             var responseDto = JsonConvert.DeserializeObject<GoogleGeminiResponseDto>(responseContent);
 
-            var foundTireCode = responseDto.ContentCandidates
+            var foundTireCode = responseDto?.ContentCandidates
                 .SelectMany(c => c.Content.Parts)
                 .FirstOrDefault(p => !string.IsNullOrEmpty(p.Text) && p.Text.Contains('/'))
                 ?.Text;
@@ -65,7 +66,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                 DetectedTireCode: foundTireCode,
                 DetectedManufacturer: foundManufacturer,
                 new OcrRequestBillingDto(
-                    responseDto.UsageMetadata.PromptTokenCount,
+                    responseDto!.UsageMetadata.PromptTokenCount,
                     responseDto.UsageMetadata.CandidatesTokenCount,
                     BillingUnitType.Token
                 )
@@ -83,8 +84,8 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            var endpoint = _configuration.GetValue<string>("OcrEndpoints:GeminiFineTuned");
-            var key = _configuration.GetValue<string>("ApiKeys:GeminiFineTuned");
+            var endpoint = _configuration.GetValue<string>("OcrEndpoints:Gemini");
+            var key = _configuration.GetValue<string>("ApiKeys:Gemini");
 
             return $"{endpoint}?key={key}";
         }
@@ -96,7 +97,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
 
     private async Task<StringContent> GetPromptJsonBody(Image image)
     {
-        var prompt = await _promptRepository.GetMainPromptAsync();
+        var prompt = await _promptRepository.GetMainPromptAsync(useRandomPrefix: true);
         var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
@@ -128,7 +129,9 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             },
             generationConfig = new
             {
-                temperature = 0.6
+                temperature = 0.0,
+                seed = Seed,
+                mediaResolution = "MEDIA_RESOLUTION_HIGH"
             }
         };
         var jsonPayload = JsonConvert.SerializeObject(payload);

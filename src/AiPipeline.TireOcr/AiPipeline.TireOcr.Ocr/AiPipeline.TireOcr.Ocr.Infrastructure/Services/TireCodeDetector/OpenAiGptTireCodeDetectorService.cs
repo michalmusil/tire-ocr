@@ -11,6 +11,7 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
 public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
 {
+    private const long Seed = 42;
     private readonly IConfiguration _configuration;
     private readonly IPromptRepository _promptRepository;
     private readonly ILogger<OpenAiGptTireCodeDetectorService> _logger;
@@ -32,7 +33,7 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     "Failed to retrieve OpenAi endpoint configuration"));
 
-            var prompt = await _promptRepository.GetMainPromptAsync();
+            var prompt = await _promptRepository.GetMainPromptAsync(useRandomPrefix: true);
             List<ChatMessage> messages =
             [
                 new SystemChatMessage(
@@ -47,7 +48,10 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
             ];
             var options = new ChatCompletionOptions
             {
-                Temperature = 0.6f
+                Temperature = 0.0f,
+#pragma warning disable OPENAI001
+                Seed = Seed
+#pragma warning restore OPENAI001
             };
             _logger.LogInformation("Start ocr via OpenAi Gpt Tire Code Detector");
             var completion = await client.CompleteChatAsync(messages, options);
@@ -60,7 +64,8 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
 
             if (foundTireCode is null)
             {
-                _logger.LogWarning($"OpenAi: No tire code detected, finish reason: '{completion.Value.FinishReason}', refusal: '{completion.Value.Refusal}'");
+                _logger.LogWarning(
+                    $"OpenAi: No tire code detected, finish reason: '{completion.Value.FinishReason}', refusal: '{completion.Value.Refusal}'");
                 return DataResult<OcrResultDto>.NotFound("No tire code detected");
             }
 

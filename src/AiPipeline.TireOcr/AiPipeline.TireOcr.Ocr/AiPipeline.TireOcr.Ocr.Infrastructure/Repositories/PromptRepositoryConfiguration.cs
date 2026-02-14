@@ -12,7 +12,13 @@ public class PromptRepositoryConfiguration : IPromptRepository
         _configuration = configuration;
     }
 
-    public Task<string> GetMainPromptAsync() => GetPointsStrictPromptAsync();
+    public async Task<string> GetMainPromptAsync(bool useRandomPrefix = false)
+    {
+        var prompt = await GetOcrEnginePromptAsync();
+        if (useRandomPrefix)
+            prompt = PrependRandomString(prompt);
+        return prompt;
+    }
 
     public Task<string> GetBasePromptAsync() => Task.FromResult(GetPromptFromConfiguration("Base"));
 
@@ -28,9 +34,18 @@ public class PromptRepositoryConfiguration : IPromptRepository
     public Task<string> GetSpecializedDeepseekOcrPromptAsync() =>
         Task.FromResult(GetPromptFromConfiguration("DeepseekOcr"));
 
+    public Task<string> GetOcrEnginePromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngine"));
+
 
     private string GetPromptFromConfiguration(string promptKey)
     {
         return _configuration.GetValue<string>($"Prompts:{promptKey}")!;
+    }
+
+    private string PrependRandomString(string prompt)
+    {
+        var randomNumber = new Random().Next(100000000, 999999999);
+        var randomString = $"[Request ID: {randomNumber}]: {prompt}";
+        return randomString;
     }
 }
