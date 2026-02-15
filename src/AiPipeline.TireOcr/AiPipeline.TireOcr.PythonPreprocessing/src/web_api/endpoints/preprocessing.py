@@ -1,38 +1,34 @@
-from fastapi import APIRouter, File, UploadFile, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 import base64
 
-from src.application.services import image_manipulation_service
+from src.dependencies import get_perform_preprocessing_3_command_handler
+
 from ...application.commands.perform_preprocessing_3.perform_preprocessing_3_command import (
     PerformPreprocessing3Command,
 )
 from ...application.commands.perform_preprocessing_3.perform_preprocessing_3_command_handler import (
     PerformPreprocessing3CommandHandler,
 )
-from ...infrastructure.services.image_manipulation_service_impl import (
-    CvImageManipulationService,
-)
-from ...infrastructure.services.rim_detection_service_impl import (
-    RimDetectionServiceImpl,
-)
-from ...infrastructure.services.image_segmentation_service_impl import (
-    ImageSegmentationServiceImpl,
-)
 
 router = APIRouter(prefix="/preprocessing", tags=["Preprocessing"])
 
 
 @router.post("/v3/file")
-async def preprocessing_v3_file(image: UploadFile = File(...)):
+# add annotation for UploadFile
+async def preprocessing_v3_file(
+    image: Annotated[
+        UploadFile, File(description="Image file to perform the preprocessing on.")
+    ],
+    handler: Annotated[
+        PerformPreprocessing3CommandHandler,
+        Depends(get_perform_preprocessing_3_command_handler),
+    ],
+):
     try:
         image_bytes = await image.read()
         command = PerformPreprocessing3Command(image=image_bytes)
-
-        handler = PerformPreprocessing3CommandHandler(
-            image_manipulation_service=CvImageManipulationService(),
-            rim_detection_service=RimDetectionServiceImpl(),
-            image_segmentation_service=ImageSegmentationServiceImpl(),
-        )
         result = await handler.handle(command)
 
         if result.status == "error":
@@ -51,16 +47,18 @@ async def preprocessing_v3_file(image: UploadFile = File(...)):
 
 
 @router.post("/v3")
-async def preprocessing_v3_file_json(image: UploadFile = File(...)):
+async def preprocessing_v3_file_json(
+    image: Annotated[
+        UploadFile, File(description="Image file to perform the preprocessing on.")
+    ],
+    handler: Annotated[
+        PerformPreprocessing3CommandHandler,
+        Depends(get_perform_preprocessing_3_command_handler),
+    ],
+):
     try:
         image_bytes = await image.read()
         command = PerformPreprocessing3Command(image=image_bytes)
-
-        handler = PerformPreprocessing3CommandHandler(
-            image_manipulation_service=CvImageManipulationService(),
-            rim_detection_service=RimDetectionServiceImpl(),
-            image_segmentation_service=ImageSegmentationServiceImpl(),
-        )
         result = await handler.handle(command)
 
         if result.status == "error":

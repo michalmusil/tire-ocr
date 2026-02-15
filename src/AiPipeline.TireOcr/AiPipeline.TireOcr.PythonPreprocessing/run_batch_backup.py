@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from ...application.services.image_segmentation_service import ImageSegmentationService
+from src.application.services.image_segmentation_service import ImageSegmentationService
 from paddleocr import TextDetection
 from typing import Optional, List, Tuple
 import onnxruntime as ort

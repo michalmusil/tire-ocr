@@ -3,7 +3,7 @@ import numpy as np
 from src.application.services.image_manipulation_service import ImageManipulationService
 
 
-class CvImageManipulationService(ImageManipulationService):
+class ImageManipulationServiceImpl(ImageManipulationService):
     async def resize_to_max_dimension(
         self, image_bytes: bytes, max_dimension: int
     ) -> bytes:
