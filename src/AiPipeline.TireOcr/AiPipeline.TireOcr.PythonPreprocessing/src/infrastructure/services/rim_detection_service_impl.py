@@ -23,18 +23,20 @@ def _get_model() -> YOLO:
 
 
 class RimDetectionServiceImpl(RimDetectionService):
-    async def detect_rim(self, image_bytes: bytes) -> tuple[int, int, float]:
+    def __init__(self) -> None:
+        self.model = _get_model()
+
+    def detect_rim(self, image_bytes: bytes) -> tuple[int, int, float]:
         # Decode image
         np_arr = np.frombuffer(image_bytes, np.uint8)
         img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         if img is None:
             raise ValueError("Invalid image data")
 
-        # Lazy-load YOLO ONNX segmentation model once
-        model = _get_model()
-
         # Run segmentation (model is a segmentation ONNX; no need to pass task here)
-        results = model.predict(img, imgsz=640, conf=0.25, verbose=False, device="cpu")
+        results = self.model.predict(
+            img, imgsz=640, conf=0.25, verbose=False, device="cpu"
+        )
         if not results:
             raise ValueError("No rim detected")
 
@@ -42,7 +44,7 @@ class RimDetectionServiceImpl(RimDetectionService):
         if res.masks is None or res.boxes is None:
             raise ValueError("No rim detected")
 
-        names = model.names  # dict: {class_id: class_name}
+        names = self.model.names  # dict: {class_id: class_name}
         boxes = res.boxes
         masks = res.masks
 
