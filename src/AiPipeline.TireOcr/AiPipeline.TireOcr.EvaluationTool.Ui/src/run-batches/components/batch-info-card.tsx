@@ -47,24 +47,6 @@ export const BatchInfoCard = ({ batch, totalCost }: BatchInfoCardProps) => {
     });
   };
 
-  const onExportConfirmed = () => {
-    exportMutation.mutate(batch.id, {
-      onSuccess(data) {
-        // Save the file using a temporary link
-        const url = window.URL.createObjectURL(new Blob([data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", `${batch.id}.csv`);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-      },
-      onError: (error) => {
-        console.log(error);
-      },
-    });
-  };
-
   return (
     <Card>
       <CardHeader className="flex justify-between">
