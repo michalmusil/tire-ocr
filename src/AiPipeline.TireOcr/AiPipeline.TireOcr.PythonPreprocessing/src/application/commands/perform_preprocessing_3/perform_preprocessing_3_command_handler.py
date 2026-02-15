@@ -75,8 +75,8 @@ class PerformPreprocessing3CommandHandler:
 
             # 6) Emphasise characters via segmentation pipeline
             try:
-                emphasised = await self.image_segmentation_service.emphasise_characters_on_text_regions(
-                    processed_image
+                emphasised = await self.image_segmentation_service.compose_emphasised_text_region_mosaic(
+                    processed_image, False
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)

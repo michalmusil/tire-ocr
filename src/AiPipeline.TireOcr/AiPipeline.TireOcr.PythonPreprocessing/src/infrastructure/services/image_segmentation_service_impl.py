@@ -1,11 +1,13 @@
 import cv2
 import numpy as np
 from ...application.services.image_segmentation_service import ImageSegmentationService
+from ...application.services.image_manipulation_service import ImageManipulationService
 from paddleocr import TextDetection
 from typing import Optional, List, Tuple
 import onnxruntime as ort
 from imutils import perspective
 import os
+import rpack
 
 _TEXT_DETECTION_ENGINE: Optional[TextDetection] = None
 
@@ -48,7 +50,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             raise ValueError("Failed to decode image")
 
         detector = get_text_detection_engine()
-        polys = self._parse_text_polygons(detector, img)
+        polys = await self._parse_text_polygons(detector, img)
         if not polys:
             raise ValueError("No text polygons found")
 
@@ -64,7 +66,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             if warped.size == 0:
                 continue
 
-            bin_mask_warped = self._run_unet_letterbox_to_roi_mask(
+            bin_mask_warped = await self._run_unet_letterbox_to_roi_mask(
                 session, input_name, warped
             )
             Minv = self._compute_inverse_homography(pts, warped.shape)
@@ -79,7 +81,88 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
         _, out_bytes = cv2.imencode(".png", enhanced)
         return out_bytes.tobytes()
 
-    def _parse_text_polygons(
+    async def compose_emphasised_text_region_mosaic(
+        self, image_bytes: bytes, emphasise_characters: bool
+    ) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        if img is None:
+            raise ValueError("Failed to decode image")
+
+        detector = get_text_detection_engine()
+        polys = await self._parse_text_polygons(detector, img)
+        if not polys:
+            raise ValueError("No text polygons found")
+
+        gray = img
+
+        session, input_name = _get_unet_session()
+
+        enhanced_slices: List[np.ndarray] = []
+        rects: List[Tuple[int, int]] = []
+
+        for poly in polys:
+            pts = self._normalize_quad(poly)
+            warped = self._warp_text_region(gray, pts)
+
+            if not emphasise_characters:
+                enhanced_slices.append(warped)
+                rects.append((warped.shape[1], warped.shape[0]))
+                continue
+
+            if warped.size == 0:
+                continue
+
+            bin_mask_warped = await self._run_unet_letterbox_to_roi_mask(
+                session, input_name, warped
+            )
+
+            # Apply Gaussian blur to warped image before Sobel (for edge detection only)
+            warped_blur = cv2.GaussianBlur(warped, (3, 3), 0)
+
+            # Sobel edge detection on the blurred warped region (hard-coded here)
+            grad_x = cv2.Sobel(warped_blur, cv2.CV_16S, 1, 0, ksize=3)
+            grad_y = cv2.Sobel(warped_blur, cv2.CV_16S, 0, 1, ksize=3)
+            abs_x = cv2.convertScaleAbs(grad_x)
+            abs_y = cv2.convertScaleAbs(grad_y)
+            sobel_edges = cv2.addWeighted(abs_x, 0.5, abs_y, 0.5, 0)
+
+            # Blur the mask to soften edges and convert to soft mask in [0,1]
+            mask_blur = cv2.GaussianBlur(bin_mask_warped, (15, 15), 0)
+            soft_mask = mask_blur.astype(np.float32) / 255.0
+
+            # Apply highlighted edges only in the area of mask:
+            # result = edges * softMask + warped * (1 - softMask)
+            sobel_f = sobel_edges.astype(np.float32)
+            warped_f = warped.astype(np.float32)
+
+            sharpened_part = sobel_f * soft_mask
+            original_part = warped_f * (1.0 - soft_mask)
+            blended = sharpened_part + original_part
+            blended = np.clip(blended, 0, 255).astype(np.uint8)
+
+            h, w = blended.shape[:2]
+            enhanced_slices.append(blended)
+            rects.append((w, h))
+
+        if not enhanced_slices:
+            raise ValueError("No valid text regions for mosaic")
+
+        # Use rpack to pack the enhanced slices into a mosaic
+        positions = rpack.pack(rects)
+
+        # Determine overall mosaic size using rpack.bbox_size
+        max_w, max_h = rpack.bbox_size(rects, positions)
+
+        mosaic = np.full((max_h, max_w), 0, dtype=np.uint8)
+
+        for slice_img, (w, h), (x, y) in zip(enhanced_slices, rects, positions):
+            mosaic[y : y + h, x : x + w] = slice_img
+
+        _, out_bytes = cv2.imencode(".png", mosaic)
+        return out_bytes.tobytes()
+
+    async def _parse_text_polygons(
         self, detector: TextDetection, img: np.ndarray
     ) -> List[np.ndarray]:
         try:
@@ -103,7 +186,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
     def _normalize_quad(self, poly: np.ndarray) -> np.ndarray:
         return poly.reshape(4, 2).astype("float32")
 
-    def _warp_text_region(self, gray: np.ndarray, pts: np.ndarray) -> np.ndarray:
+    def _warp_text_region(self, gray, pts):
         return perspective.four_point_transform(gray, pts)
 
     def _compute_inverse_homography(
@@ -161,7 +244,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
         canvas[dy : dy + nh, dx : dx + nw] = resized
         return canvas, (nw, nh), (dx, dy)
 
-    def _run_unet_letterbox_to_roi_mask(
+    async def _run_unet_letterbox_to_roi_mask(
         self, session: ort.InferenceSession, input_name: str, roi_gray: np.ndarray
     ) -> np.ndarray:
         # Preprocess

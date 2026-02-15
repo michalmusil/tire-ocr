@@ -44,9 +44,15 @@ class CvImageManipulationService(ImageManipulationService):
 
     async def perform_sobel_edge_detection(self, image_bytes: bytes) -> bytes:
         np_arr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        edges = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
-        _, out_bytes = cv2.imencode(".png", edges)
+        gray_image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+
+        grad_x = cv2.Sobel(gray_image, cv2.CV_16S, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(gray_image, cv2.CV_16S, 0, 1, ksize=3)
+        abs_x = cv2.convertScaleAbs(grad_x)
+        abs_y = cv2.convertScaleAbs(grad_y)
+        result = cv2.addWeighted(abs_x, 0.5, abs_y, 0.5, 0)
+
+        _, out_bytes = cv2.imencode(".png", result)
         return out_bytes.tobytes()
 
     async def copy_and_append_image_portion_from_left(

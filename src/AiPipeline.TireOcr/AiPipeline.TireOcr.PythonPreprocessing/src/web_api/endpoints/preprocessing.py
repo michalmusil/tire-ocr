@@ -1,6 +1,8 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 import base64
+
+from src.application.services import image_manipulation_service
 from ...application.commands.perform_preprocessing_3.perform_preprocessing_3_command import (
     PerformPreprocessing3Command,
 )
