@@ -11,12 +11,12 @@ using TireOcr.Shared.Result;
 
 namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.EvaluationRun.Services.Processors.Preprocessing;
 
-public class PreprocessingSlicesCharacterEnhancementProcessor : IPreprocessingProcessor
+public class PreprocessingTextExtractionMosaicProcessor : IPreprocessingProcessor
 {
     private readonly HttpClient _remoteProcessorClient;
     private readonly ILogger<PreprocessingResizeProcessor> _logger;
 
-    public PreprocessingSlicesCharacterEnhancementProcessor(HttpClient remoteProcessorClient,
+    public PreprocessingTextExtractionMosaicProcessor(HttpClient remoteProcessorClient,
         ILogger<PreprocessingResizeProcessor> logger)
     {
         _remoteProcessorClient = remoteProcessorClient;

@@ -116,7 +116,7 @@ public static class DependencyInjection
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
-        services.AddHttpClient<PreprocessingSlicesCharacterEnhancementProcessor>(client =>
+        services.AddHttpClient<PreprocessingTextExtractionMosaicProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://PreprocessingPythonService");
             })

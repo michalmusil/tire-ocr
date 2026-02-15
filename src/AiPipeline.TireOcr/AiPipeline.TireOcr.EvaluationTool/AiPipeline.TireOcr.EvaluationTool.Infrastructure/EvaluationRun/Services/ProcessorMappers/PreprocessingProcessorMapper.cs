@@ -11,17 +11,17 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
     private readonly PreprocessingResizeProcessor _resizeProcessor;
     private readonly PreprocessingRoiExtractionProcessor _roiExtractionProcessor;
     private readonly PreprocessingSlicesCompositionProcessor _slicesCompositionProcessor;
-    private readonly PreprocessingSlicesCharacterEnhancementProcessor _slicesCharacterEnhancementProcessor;
+    private readonly PreprocessingTextExtractionMosaicProcessor _textExtractionMosaicProcessor;
 
     public PreprocessingProcessorMapper(PreprocessingResizeProcessor resizeProcessor,
         PreprocessingRoiExtractionProcessor roiExtractionProcessor,
         PreprocessingSlicesCompositionProcessor slicesCompositionProcessor,
-        PreprocessingSlicesCharacterEnhancementProcessor slicesCharacterEnhancementProcessor)
+        PreprocessingTextExtractionMosaicProcessor textExtractionMosaicProcessor)
     {
         _resizeProcessor = resizeProcessor;
         _roiExtractionProcessor = roiExtractionProcessor;
         _slicesCompositionProcessor = slicesCompositionProcessor;
-        _slicesCharacterEnhancementProcessor = slicesCharacterEnhancementProcessor;
+        _textExtractionMosaicProcessor = textExtractionMosaicProcessor;
     }
 
     public DataResult<IPreprocessingProcessor> Map(PreprocessingType input)
@@ -32,7 +32,7 @@ public class PreprocessingProcessorMapper : IEnumToObjectMapper<PreprocessingTyp
             PreprocessingType.ExtractRoi => _roiExtractionProcessor,
             PreprocessingType.ExtractRoiAndEnhanceCharacters => _roiExtractionProcessor,
             PreprocessingType.ExtractAndComposeSlices => _slicesCompositionProcessor,
-            PreprocessingType.ExtractAndComposeSlicesEnhanceCharacters => _slicesCharacterEnhancementProcessor,
+            PreprocessingType.ExtractTextsIntoMosaic => _textExtractionMosaicProcessor,
             _ => null
         };
         if (processor == null)

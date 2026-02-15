@@ -5,7 +5,7 @@ export const PreprocessingTypeSchema = z.enum([
   "ExtractRoi",
   "ExtractRoiAndEnhanceCharacters",
   "ExtractAndComposeSlices", 
-  "ExtractAndComposeSlicesEnhanceCharacters",
+  "ExtractTextsIntoMosaic",
 ]);
 export type PreprocessingType = z.infer<typeof PreprocessingTypeSchema>;
 
