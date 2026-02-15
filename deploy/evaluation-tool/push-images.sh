@@ -3,6 +3,7 @@
 set -e
 
 PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_preprocessing-service"
+PREPROCESSING_PYTHON_IMAGE_NAME="michalmusil/tire-ocr_eval_preprocessing-python-service"
 OCR_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-service"
 OCR_PYTHON_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-python-service"
 POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_postprocessing-service"
@@ -15,6 +16,10 @@ echo "Pushing image for preprocessing service"
 docker push "${PREPROCESSING_IMAGE_NAME}:latest"
 echo ""
 
+# PREPROCESSING PYTHON
+echo "Pushing image for preprocessing python service"
+docker push "${PREPROCESSING_PYTHON_IMAGE_NAME}:latest"
+echo ""
 
 # OCR
 echo "Pushing image for ocr service"

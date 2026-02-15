@@ -18,6 +18,12 @@ services:
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
     restart: unless-stopped
+  PreprocessingPythonService:
+    container_name: "PreprocessingPythonService"
+    image: "michalmusil/tire-ocr_eval_preprocessing-python-service:latest"
+    networks:
+      - aipipeline-tireocr-network
+    restart: unless-stopped
   OcrService:
     container_name: "OcrService"
     image: "michalmusil/tire-ocr_eval_ocr-service:latest"

@@ -3,6 +3,7 @@
 set -e
 
 PREPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_preprocessing-service"
+PREPROCESSING_PYTHON_IMAGE_NAME="michalmusil/tire-ocr_eval_preprocessing-python-service"
 OCR_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-service"
 OCR_PYTHON_IMAGE_NAME="michalmusil/tire-ocr_eval_ocr-python-service"
 POSTPROCESSING_IMAGE_NAME="michalmusil/tire-ocr_eval_postprocessing-service"
@@ -14,6 +15,14 @@ EVALUATION_TOOL_FE_IMAGE_NAME="michalmusil/tire-ocr_evaluation-tool-fe"
 echo "Building image for preprocessing service"
 docker build --platform linux/amd64 -t "${PREPROCESSING_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.Preprocessing/AiPipeline.TireOcr.Preprocessing.WebApi/Dockerfile .
 echo "Successfully built ${PREPROCESSING_IMAGE_NAME}"
+echo ""
+
+# PREPROCESSING_PYTHON
+echo "Building image for preprocessing python service"
+docker buildx create --use --name mybuilder
+docker buildx inspect --bootstrap
+docker build --platform linux/amd64 -t "${PREPROCESSING_PYTHON_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.PythonPreprocessing/Dockerfile .
+echo "Successfully built ${PREPROCESSING_PYTHON_IMAGE_NAME}"
 echo ""
 
 # OCR
