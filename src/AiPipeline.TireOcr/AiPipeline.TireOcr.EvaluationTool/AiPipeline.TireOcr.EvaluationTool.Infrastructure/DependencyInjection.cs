@@ -116,6 +116,18 @@ public static class DependencyInjection
                 opt.TotalRequestTimeout.Timeout = timeout;
                 opt.CircuitBreaker.SamplingDuration = 2 * timeout;
             });
+        services.AddHttpClient<PreprocessingSlicesCharacterEnhancementProcessor>(client =>
+            {
+                client.BaseAddress = new("https+http://PreprocessingPythonService");
+            })
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(60);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
         services.AddHttpClient<OcrRemoteServicesProcessor>(client =>
             {
                 client.BaseAddress = new("https+http://OcrService");
