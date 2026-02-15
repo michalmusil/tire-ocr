@@ -74,6 +74,11 @@ var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_W
 //     .WithReference(tireDbMatcherService)
 //     .WaitFor(tireDbMatcherService);
 
+var pythonPreprocessingService = builder.AddUvicornApp("PreprocessingPythonService",
+        "../AiPipeline.TireOcr/AiPipeline.TireOcr.PythonPreprocessing", "main:app")
+    .WithPip()
+    .WithExternalHttpEndpoints();
+
 var pythonOcrService = builder.AddUvicornApp("OcrPythonService",
         "../AiPipeline.TireOcr/AiPipeline.TireOcr.PythonOcr", "main:app")
     .WithPip()
@@ -90,7 +95,9 @@ var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi
     .WithReference(tireDbMatcherService)
     .WaitFor(tireDbMatcherService)
     .WithReference(pythonOcrService)
-    .WaitFor(pythonOcrService);
+    .WaitFor(pythonOcrService)
+    .WithReference(pythonPreprocessingService)
+    .WaitFor(pythonPreprocessingService);
 
 var frontend = builder.AddViteApp("Frontend", "../AiPipeline.TireOcr/AiPipeline.TireOcr.EvaluationTool.Ui")
     .WithNpm()

@@ -13,6 +13,30 @@ class ImageManipulationService(ABC):
         pass
 
     @abstractmethod
+    async def perform_bilateral_filter(self, image_bytes: bytes) -> bytes:
+        pass
+
+    @abstractmethod
+    async def perform_bitwise_not(self, image_bytes: bytes) -> bytes:
+        pass
+
+    @abstractmethod
+    async def perform_sobel_edge_detection(self, image_bytes: bytes) -> bytes:
+        pass
+
+    @abstractmethod
+    async def copy_and_append_image_portion_from_left(
+        self, image_bytes: bytes, append_width_ratio: float
+    ) -> bytes:
+        pass
+
+    @abstractmethod
+    async def slice_and_stack(
+        self, image_bytes: bytes, number_of_horizontal_slices: int
+    ) -> bytes:
+        pass
+
+    @abstractmethod
     async def unwarp_tire_rim(
         self,
         image_bytes: bytes,

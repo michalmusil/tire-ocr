@@ -22,10 +22,71 @@ class CvImageManipulationService(ImageManipulationService):
         np_arr = np.frombuffer(image_bytes, np.uint8)
         img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        clahe = cv2.createCLAHE(clipLimit=40, tileGridSize=(8, 8))
+        clahe = cv2.createCLAHE(clipLimit=40, tileGridSize=(5, 5))
         cl = clahe.apply(gray)
 
         _, out_bytes = cv2.imencode(".png", cl)
+        return out_bytes.tobytes()
+
+    async def perform_bilateral_filter(self, image_bytes: bytes) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        filtered = cv2.bilateralFilter(img, 5, 40, 40)
+        _, out_bytes = cv2.imencode(".png", filtered)
+        return out_bytes.tobytes()
+
+    async def perform_bitwise_not(self, image_bytes: bytes) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        inverted = cv2.bitwise_not(img)
+        _, out_bytes = cv2.imencode(".png", inverted)
+        return out_bytes.tobytes()
+
+    async def perform_sobel_edge_detection(self, image_bytes: bytes) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        edges = cv2.Sobel(img, cv2.CV_8U, 1, 0, ksize=3)
+        _, out_bytes = cv2.imencode(".png", edges)
+        return out_bytes.tobytes()
+
+    async def copy_and_append_image_portion_from_left(
+        self, image_bytes: bytes, append_width_ratio: float
+    ) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        height, width = image.shape[:2]
+        appendix_width = int(width * append_width_ratio)
+
+        if appendix_width <= 0:
+            raise ValueError(
+                "Image size and append_width_ratio must result in a width > 0"
+            )
+
+        left_slice = image[:, : int(appendix_width)]
+        prolonged_result = cv2.hconcat([image, left_slice])
+
+        _, out_bytes = cv2.imencode(".png", prolonged_result)
+        return out_bytes.tobytes()
+
+    async def slice_and_stack(
+        self, image_bytes: bytes, number_of_horizontal_slices: int
+    ) -> bytes:
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        if number_of_horizontal_slices <= 0:
+            raise ValueError("Number of slices (n) must be greater than 0")
+
+        h, w = image.shape
+        mid = w // 2
+        left = image[:, :mid]
+        right = image[:, mid:]
+        larger_width = max(left.shape[1], right.shape[1])
+        left = self._ensure_slice_width(left, larger_width)
+        right = self._ensure_slice_width(right, larger_width)
+
+        stacked = np.vstack((left, right))
+
+        _, out_bytes = cv2.imencode(".png", stacked)
         return out_bytes.tobytes()
 
     async def unwarp_tire_rim(
@@ -55,19 +116,7 @@ class CvImageManipulationService(ImageManipulationService):
         cropped_result = polar[:, cropped_width - tire_thickness :]
         rotated_result = cv2.rotate(cropped_result, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
-        left_slice = rotated_result[:, : int(rotated_result.shape[1] * 0.17)]
-        prolonged_result = cv2.hconcat([rotated_result, left_slice])
-
-        h, w, _ = prolonged_result.shape
-        mid = w // 2
-        left = prolonged_result[:, :mid]
-        right = prolonged_result[:, mid:]
-        larger_width = max(left.shape[1], right.shape[1])
-        left = self._ensure_slice_width(left, larger_width)
-        right = self._ensure_slice_width(right, larger_width)
-
-        stacked = np.vstack((left, right))
-        _, out_bytes = cv2.imencode(".png", stacked)
+        _, out_bytes = cv2.imencode(".png", rotated_result)
         return out_bytes.tobytes()
 
     def _ensure_slice_width(self, img: np.ndarray, target_size: int) -> np.ndarray:
