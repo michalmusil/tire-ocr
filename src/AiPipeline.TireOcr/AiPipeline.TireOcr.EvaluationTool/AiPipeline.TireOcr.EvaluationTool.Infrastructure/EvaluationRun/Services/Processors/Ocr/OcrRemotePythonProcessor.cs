@@ -46,8 +46,8 @@ public class OcrRemotePythonProcessor : IOcrProcessor
                     }
                 }
             });
-            // if (preprocessingType == PreprocessingType.ExtractAndComposeSlices)
-            //     content.Add(new StringContent("2"), "number_of_vertical_stacked_slices");
+            if (preprocessingType is PreprocessingType.ExtractAndComposeSlices)
+                content.Add(new StringContent("2"), "number_of_vertical_stacked_slices");
 
             var res = await _httpClient.PostAsync($"/ocr/{endpointName}", content);
             if (!res.IsSuccessStatusCode)

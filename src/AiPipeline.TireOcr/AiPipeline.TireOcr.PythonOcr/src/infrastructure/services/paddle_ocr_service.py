@@ -1,16 +1,19 @@
 import io
 import time
+from fastapi.concurrency import run_in_threadpool
 import numpy as np
 from PIL import Image
 from paddleocr import PaddleOCR
 from dotenv import load_dotenv
+import threading
 
-
-from typing import Optional, Any, List
+from typing import Optional, List
+from src.application.services.image_slicer_service import ImageSlicerService
 from src.application.services.ocr_service import OCRResult, OcrService
 
 load_dotenv()
 PADDLE_OCR_ENGINE: Optional[PaddleOCR] = None
+paddle_lock = threading.Lock()
 
 
 def get_paddle_ocr_engine() -> PaddleOCR:
@@ -35,28 +38,31 @@ def get_paddle_ocr_engine() -> PaddleOCR:
 class PaddleOcrService(OcrService):
     ocr_engine: PaddleOCR
 
-    def __init__(self) -> None:
+    def __init__(self, image_slicer_service: ImageSlicerService) -> None:
         self.ocr_engine = get_paddle_ocr_engine()
+        self.image_slicer_service = image_slicer_service
 
-    async def perform_tire_ocr(self, image_bytes: bytes) -> OCRResult:
+    async def perform_tire_ocr(
+        self, image_bytes: bytes, number_of_vertical_stacked_slices: int | None = None
+    ) -> OCRResult:
         start_time = time.perf_counter()
 
         try:
-            image: Image.Image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            image_np: np.ndarray = np.array(image)
-            result: Any = self.ocr_engine.predict(image_np)
+            image_slices: List[bytes] = []
+            if number_of_vertical_stacked_slices is not None:
+                image_slices = self.image_slicer_service.slice_image_vertically(
+                    image_bytes, number_of_vertical_stacked_slices
+                )
+            else:
+                image_slices.append(image_bytes)
 
-            detected_text_list: list[str] = []
+            combined_texts: list[str] = []
 
-            result_valid = result and isinstance(result, list) and len(result) > 0
-            if result_valid:
-                for page_result in result:
-                    if not "rec_texts" in page_result:
-                        continue
-                    recognized_texts = page_result["rec_texts"]
-                    detected_text_list.extend(recognized_texts)
+            for image_slice in image_slices:
+                result = await run_in_threadpool(self.run_inference, image_slice)
+                combined_texts.extend(result)
 
-            detected_text: str = " ".join(detected_text_list).strip()
+            detected_text: str = " ".join(combined_texts).strip()
             duration = int((time.perf_counter() - start_time) * 1000)
 
             if detected_text:
@@ -86,38 +92,28 @@ class PaddleOcrService(OcrService):
                 duration_ms=duration,
             )
 
-    async def perform_tire_ocr_on_slices(self, image_slices: List[bytes]) -> OCRResult:
-        combined_text_parts: List[str] = []
-        total_duration_ms = 0
+    def run_inference(self, image_bytes: bytes) -> List[str]:
+        processing_start_time = time.perf_counter()
 
-        for i, slice_bytes in enumerate(image_slices):
-            ocr_result: OCRResult = await self.perform_tire_ocr(slice_bytes)
-            total_duration_ms += ocr_result.duration_ms
+        print("Starting PaddleOCR of image")
+        image_np: np.ndarray
+        with Image.open(io.BytesIO(image_bytes)) as image:
+            rgb = image.convert("RGB")
+            image_np = np.array(rgb)
+        with paddle_lock:
+            result = self.ocr_engine.predict(image_np)
 
-            if ocr_result.status == "success" and ocr_result.extracted_text:
-                # Only append if extracted text contains '/' character
-                if "/" in ocr_result.extracted_text:
-                    combined_text_parts.append(ocr_result.extracted_text)
-            elif ocr_result.status == "error":
-                return OCRResult(
-                    status="error",
-                    message=f"Tire OCR failed on slice {i}: {ocr_result.message}",
-                    extracted_text=None,
-                    duration_ms=total_duration_ms,
-                )
-        if not combined_text_parts:
-            return OCRResult(
-                status="not_found",
-                message="Tire OCR failed to detect any text in any of the image slices",
-                extracted_text=None,
-                duration_ms=total_duration_ms,
-            )
-
-        combined_text = " ".join(combined_text_parts)
-
-        return OCRResult(
-            status="success",
-            message=f"Tire OCR was successful on {len(combined_text_parts)} out of {len(image_slices)} slices.",
-            extracted_text=combined_text,
-            duration_ms=total_duration_ms,
+        processing_end_time = time.perf_counter()
+        print(
+            f"Finished PaddleOCR of image. Time: {processing_end_time - processing_start_time}"
         )
+
+        detected_text_list: list[str] = []
+        result_valid = result and isinstance(result, list) and len(result) > 0
+        if result_valid:
+            for page_result in result:
+                if not "rec_texts" in page_result:
+                    continue
+                recognized_texts = page_result["rec_texts"]
+                detected_text_list.extend(recognized_texts)
+        return detected_text_list

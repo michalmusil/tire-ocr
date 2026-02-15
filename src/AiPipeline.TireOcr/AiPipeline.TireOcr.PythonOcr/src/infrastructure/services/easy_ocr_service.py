@@ -2,16 +2,20 @@ import io
 import time
 from typing import Optional, Any, List
 import easyocr
+import threading
 
+from fastapi.concurrency import run_in_threadpool
 import numpy as np
 from PIL import Image
 from dotenv import load_dotenv
 
+from src.application.services.image_slicer_service import ImageSlicerService
 from src.application.services.ocr_service import OCRResult, OcrService
 
 
 load_dotenv()
 EASY_OCR_ENGINE: Optional[easyocr.Reader] = None
+easy_ocr_lock = threading.Lock()
 
 
 def get_easy_ocr_engine() -> easyocr.Reader:
@@ -26,25 +30,29 @@ def get_easy_ocr_engine() -> easyocr.Reader:
 class EasyOcrService(OcrService):
     reader: easyocr.Reader
 
-    def __init__(self) -> None:
+    def __init__(self, image_slicer_service: ImageSlicerService) -> None:
         self.reader = get_easy_ocr_engine()
+        self.image_slicer_service = image_slicer_service
 
-    async def perform_tire_ocr(self, image_bytes: bytes) -> OCRResult:
+    async def perform_tire_ocr(
+        self, image_bytes: bytes, number_of_vertical_stacked_slices: int | None = None
+    ) -> OCRResult:
         start_time = time.perf_counter()
         try:
-            image: Image.Image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-            image_np: np.ndarray = np.array(image)
+            image_slices: List[bytes] = []
+            if number_of_vertical_stacked_slices is not None:
+                image_slices = self.image_slicer_service.slice_image_vertically(
+                    image_bytes, number_of_vertical_stacked_slices
+                )
+            else:
+                image_slices.append(image_bytes)
 
-            result: Any = self.reader.readtext(image_np, text_threshold=0.3)
-            detected_texts: List[str] = []
-            if isinstance(result, list) and len(result) > 0:
-                for item in result:
-                    if isinstance(item, (list, tuple)) and len(item) >= 2:
-                        text = item[1]
-                        if isinstance(text, str):
-                            detected_texts.append(text)
+            combined_texts: List[str] = []
+            for image_slice in image_slices:
+                result = await run_in_threadpool(self.run_inference, image_slice)
+                combined_texts.extend(result)
 
-            detected_text: str = " ".join(detected_texts).strip()
+            detected_text: str = " ".join(combined_texts).strip()
             duration = int((time.perf_counter() - start_time) * 1000)
 
             if detected_text:
@@ -72,38 +80,28 @@ class EasyOcrService(OcrService):
                 duration_ms=duration,
             )
 
-    async def perform_tire_ocr_on_slices(self, image_slices: List[bytes]) -> OCRResult:
-        combined_text_parts: List[str] = []
-        total_duration_ms = 0
+    def run_inference(self, image_bytes: bytes) -> List[str]:
+        processing_start_time = time.perf_counter()
 
-        for i, slice_bytes in enumerate(image_slices):
-            ocr_result: OCRResult = await self.perform_tire_ocr(slice_bytes)
-            total_duration_ms += ocr_result.duration_ms
+        print("Starting EasyOCR of image")
+        image_np: np.ndarray
+        with Image.open(io.BytesIO(image_bytes)) as image:
+            rgb = image.convert("RGB")
+            image_np = np.array(rgb)
+        with easy_ocr_lock:
+            result = self.reader.readtext(image_np, text_threshold=0.3)
 
-            if ocr_result.status == "success" and ocr_result.extracted_text:
-                if "/" in ocr_result.extracted_text:
-                    combined_text_parts.append(ocr_result.extracted_text)
-            elif ocr_result.status == "error":
-                return OCRResult(
-                    status="error",
-                    message=f"Tire OCR failed on slice {i}: {ocr_result.message}",
-                    extracted_text=None,
-                    duration_ms=total_duration_ms,
-                )
-
-        if not combined_text_parts:
-            return OCRResult(
-                status="not_found",
-                message="Tire OCR failed to detect any text in any of the image slices",
-                extracted_text=None,
-                duration_ms=total_duration_ms,
-            )
-
-        combined_text = " ".join(combined_text_parts)
-
-        return OCRResult(
-            status="success",
-            message=f"Tire OCR was successful on {len(combined_text_parts)} out of {len(image_slices)} slices.",
-            extracted_text=combined_text,
-            duration_ms=total_duration_ms,
+        processing_end_time = time.perf_counter()
+        print(
+            f"Finished EasyOCR of image. Time: {processing_end_time - processing_start_time}"
         )
+
+        detected_texts: List[str] = []
+        if isinstance(result, list) and len(result) > 0:
+            for item in result:
+                if isinstance(item, (list, tuple)) and len(item) >= 2:
+                    text = item[1]
+                    if isinstance(text, str):
+                        detected_texts.append(text)
+        return detected_texts
+
