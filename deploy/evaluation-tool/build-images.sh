@@ -33,7 +33,7 @@ echo ""
 
 # OCR_PYTHON
 echo "Building image for ocr python service"
-docker buildx create --use --name mybuilder
+#docker buildx create --use --name mybuilder
 docker buildx inspect --bootstrap
 docker build --platform linux/amd64 -t "${OCR_PYTHON_IMAGE_NAME}:latest" -f src/AiPipeline.TireOcr/AiPipeline.TireOcr.PythonOcr/Dockerfile .
 echo "Successfully built ${OCR_PADDLE_IMAGE_NAME}"

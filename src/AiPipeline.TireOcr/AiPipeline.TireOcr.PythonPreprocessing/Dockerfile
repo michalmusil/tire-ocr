@@ -46,7 +46,7 @@ COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PythonPreprocessing/src ./src
 EXPOSE 10200
 
 # Pre-download PaddleOCR models during the build
-RUN python -c "from paddleocr import TextDetection; TextDetection(model_name="PP-OCRv5_server_det")"
+RUN python -c "from paddleocr import TextDetection; TextDetection(model_name='PP-OCRv5_server_det')"
 
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10200"]
 
