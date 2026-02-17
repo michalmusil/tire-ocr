@@ -110,6 +110,7 @@ services:
       services__PostprocessingService__http__0: "http://PostprocessingService:8080"
       services__TasyDbMatcherService__http__0: "http://TasyDbMatcherService:8080"
       services__OcrPythonService__http__0: "http://OcrPythonService:10100"
+      services__PreprocessingPythonService__http__0: "http://PreprocessingPythonService:10200"
       ConnectionStrings__AiPipelineEvaluationToolDb: ${ConnectionStrings_AiPipelineEvaluationToolDb}
       Jwt__Secret: ${EvaluationTool_JwtSecret}
     ports:
