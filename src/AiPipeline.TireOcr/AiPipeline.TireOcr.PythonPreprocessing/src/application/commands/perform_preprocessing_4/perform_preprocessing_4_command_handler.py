@@ -6,8 +6,8 @@ from src.application.constants.preprocessing_constants import (
     TIRE_OUTER_RADIUS_RATIO,
     TIRE_STRIP_PROLONG_WIDTH_RATIO,
 )
-from ..perform_preprocessing_3.perform_preprocessing_3_command import (
-    PerformPreprocessing3Command,
+from src.application.commands.perform_preprocessing_4.perform_preprocessing_4_command import (
+    PerformPreprocessing4Command,
 )
 from ...services.image_manipulation_service import ImageManipulationService
 from ...services.rim_detection_service import RimDetectionService
@@ -16,7 +16,7 @@ from ...dtos.preprocessing_result_dto import PreprocessingResultDto
 import time
 
 
-class PerformPreprocessing3CommandHandler:
+class PerformPreprocessing4CommandHandler:
     def __init__(
         self,
         image_manipulation_service: ImageManipulationService,
@@ -28,7 +28,7 @@ class PerformPreprocessing3CommandHandler:
         self.image_segmentation_service = image_segmentation_service
 
     async def handle(
-        self, command: PerformPreprocessing3Command
+        self, command: PerformPreprocessing4Command
     ) -> PreprocessingResultDto:
         start = time.perf_counter()
         try:
@@ -84,9 +84,8 @@ class PerformPreprocessing3CommandHandler:
             # 6) Emphasise characters via segmentation pipeline
             try:
                 emphasised = await run_in_threadpool(
-                    self.image_segmentation_service.compose_emphasised_text_region_mosaic,
+                    self.image_segmentation_service.emphasise_characters_on_text_regions,
                     processed_image,
-                    False,
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)

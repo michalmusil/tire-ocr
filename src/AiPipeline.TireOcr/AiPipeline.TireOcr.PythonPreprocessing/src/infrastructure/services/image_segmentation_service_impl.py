@@ -44,45 +44,52 @@ def _get_unet_session() -> Tuple[ort.InferenceSession, str]:
 
 class ImageSegmentationServiceImpl(ImageSegmentationService):
     def emphasise_characters_on_text_regions(self, image_bytes: bytes) -> bytes:
-        raise NotImplementedError(
-            "Emphasise characters on text regions is currently disabled"
-        )
-        # np_arr = np.frombuffer(image_bytes, np.uint8)
-        # img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        # if img is None:
-        #     raise ValueError("Failed to decode image")
+        # return image_bytes
+        np_arr = np.frombuffer(image_bytes, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
+        if img is None:
+            raise ValueError("Failed to decode image")
+        detector = get_text_detection_engine()
+        polys = self._parse_text_polygons(detector, img)
+        if not polys:
+            raise ValueError("No text polygons found")
 
-        # detector = get_text_detection_engine()
-        # polys = self._parse_text_polygons(detector, img)
-        # if not polys:
-        #     raise ValueError("No text polygons found")
+        final = img.copy()
+        blurred_img = cv2.GaussianBlur(img, (3, 3), 0)
+        sobel_img = self._apply_sobel(blurred_img, erode=True)
+        # Threshold the lower values of sobel image to remove ghosts
+        _, sobel_img = cv2.threshold(sobel_img, 80, 255, cv2.THRESH_TOZERO)
 
-        # gray = img
-        # enhanced = self._init_enhanced_canvas(img)
+        # combined = cv2.addWeighted(sobel_img, 0.5, img, 0.5, 0)
 
-        # session, input_name = _get_unet_session()
-        # H, W = gray.shape[:2]
-
-        # for poly in polys:
-        #     pts = self._normalize_quad(poly)
-        #     warped = self._warp_text_region(gray, pts)
-        #     if warped.size == 0:
-        #         continue
-
-        #     bin_mask_warped = self._run_unet_letterbox_to_roi_mask(
-        #         session, input_name, warped
-        #     )
-        #     Minv = self._compute_inverse_homography(pts, warped.shape)
-        #     mask_full = self._inverse_warp_mask(bin_mask_warped, Minv, (W, H))
-        #     # dilate more to capture more of the character area
-        #     mask_full = cv2.dilate(mask_full, np.ones((3, 3), np.uint8), iterations=5)
-        #     # First: apply overlay darkening/lightening
-        #     self._apply_mask(enhanced, gray, mask_full, base_alpha=0.5)
-        #     # Then: apply CLAHE contrast enhancement only within masked regions on the composed image
-        #     self._postprocess(enhanced, mask_full, clip_limit=40, tile_grid=(8, 8))
-
-        # _, out_bytes = cv2.imencode(".png", enhanced)
+        # _, out_bytes = cv2.imencode(".png", combined)
         # return out_bytes.tobytes()
+
+        session, input_name = _get_unet_session()
+        H, W = img.shape[:2]
+
+        for poly in polys:
+            pts = self._normalize_quad(poly)
+            warped = self._warp_text_region(img, pts)
+            if warped.size == 0:
+                continue
+
+            bin_mask_warped = self._run_unet_letterbox_to_roi_mask(
+                session, input_name, warped
+            )
+            Minv = self._compute_inverse_homography(pts, warped.shape)
+            mask_full = self._inverse_warp_mask(bin_mask_warped, Minv, (W, H))
+            # blur the mask to remove sharp edges
+            mask_full = cv2.GaussianBlur(mask_full, (15, 15), 0)
+            # convert mask to higher dimension
+            mask_full = mask_full.astype(np.float32) / 255.0
+            # apply the mask to the image
+            final = self._blend_within_mask_region(sobel_img, final, mask_full)
+            # Then: apply CLAHE contrast enhancement only within masked regions on the composed image
+            # self._postprocess(final, mask_full, clip_limit=40, tile_grid=(8, 8))
+
+        _, out_bytes = cv2.imencode(".png", final)
+        return out_bytes.tobytes()
 
     def compose_emphasised_text_region_mosaic(
         self, image_bytes: bytes, emphasise_characters: bool
@@ -124,13 +131,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
 
             # Apply Gaussian blur to warped image before Sobel (for edge detection only)
             warped_blur = cv2.GaussianBlur(warped, (3, 3), 0)
-
-            # Sobel edge detection on the blurred warped region (hard-coded here)
-            grad_x = cv2.Sobel(warped_blur, cv2.CV_16S, 1, 0, ksize=3)
-            grad_y = cv2.Sobel(warped_blur, cv2.CV_16S, 0, 1, ksize=3)
-            abs_x = cv2.convertScaleAbs(grad_x)
-            abs_y = cv2.convertScaleAbs(grad_y)
-            sobel_edges = cv2.addWeighted(abs_x, 0.5, abs_y, 0.5, 0)
+            sobel_edges = self._apply_sobel(warped_blur)
 
             # Blur the mask to soften edges and convert to soft mask in [0,1]
             mask_blur = cv2.GaussianBlur(bin_mask_warped, (15, 15), 0)
@@ -138,13 +139,7 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
 
             # Apply highlighted edges only in the area of mask:
             # result = edges * softMask + warped * (1 - softMask)
-            sobel_f = sobel_edges.astype(np.float32)
-            warped_f = warped.astype(np.float32)
-
-            sharpened_part = sobel_f * soft_mask
-            original_part = warped_f * (1.0 - soft_mask)
-            blended = sharpened_part + original_part
-            blended = np.clip(blended, 0, 255).astype(np.uint8)
+            blended = self._blend_within_mask_region(sobel_edges, warped, soft_mask)
 
             h, w = blended.shape[:2]
             enhanced_slices.append(blended)
@@ -167,6 +162,26 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
 
         _, out_bytes = cv2.imencode(".png", mosaic)
         return out_bytes.tobytes()
+
+    def _apply_sobel(self, src, erode: bool = False):
+        grad_x = cv2.Sobel(src, cv2.CV_16S, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(src, cv2.CV_16S, 0, 1, ksize=3)
+        abs_x = cv2.convertScaleAbs(grad_x)
+        abs_y = cv2.convertScaleAbs(grad_y)
+        final = cv2.addWeighted(abs_x, 0.5, abs_y, 0.5, 0)
+        if erode:
+            final = cv2.erode(final, (3, 3), iterations=1)
+        return final
+
+    def _blend_within_mask_region(self, src1, src2, mask):
+        src1_f = src1.astype(np.float32)
+        src2_f = src2.astype(np.float32)
+
+        sharpened_part = src1_f * mask
+        original_part = src2_f * (1.0 - mask)
+        blended = sharpened_part + original_part
+        blended = np.clip(blended, 0, 255).astype(np.uint8)
+        return blended
 
     def _parse_text_polygons(
         self, detector: TextDetection, img: np.ndarray
@@ -191,89 +206,59 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
     def _warp_text_region(self, gray, pts):
         return perspective.four_point_transform(gray, pts)
 
-    # def _init_enhanced_canvas(self, img: np.ndarray) -> np.ndarray:
-    #     enhanced = np.full(img.shape, 0, dtype=np.uint8)
-    #     return enhanced
+    def _compute_inverse_homography(
+        self, pts: np.ndarray, warped_shape: Tuple[int, int]
+    ) -> np.ndarray:
+        h_warp, w_warp = warped_shape[:2]
+        dst = np.array(
+            [[0, 0], [w_warp - 1, 0], [w_warp - 1, h_warp - 1], [0, h_warp - 1]],
+            dtype=np.float32,
+        )
+        ordered_pts = perspective.order_points(pts)
+        return cv2.getPerspectiveTransform(dst, ordered_pts.astype(np.float32))
 
-    # def _compute_inverse_homography(
-    #     self, pts: np.ndarray, warped_shape: Tuple[int, int]
-    # ) -> np.ndarray:
-    #     h_warp, w_warp = warped_shape[:2]
-    #     dst = np.array(
-    #         [[0, 0], [w_warp - 1, 0], [w_warp - 1, h_warp - 1], [0, h_warp - 1]],
-    #         dtype=np.float32,
-    #     )
-    #     ordered_pts = perspective.order_points(pts)
-    #     return cv2.getPerspectiveTransform(dst, ordered_pts.astype(np.float32))
+    def _inverse_warp_mask(
+        self, bin_mask_warped: np.ndarray, Minv: np.ndarray, size_wh: Tuple[int, int]
+    ) -> np.ndarray:
+        W, H = size_wh
+        return cv2.warpPerspective(
+            bin_mask_warped, Minv, (W, H), flags=cv2.INTER_NEAREST
+        )
 
-    # def _inverse_warp_mask(
-    #     self, bin_mask_warped: np.ndarray, Minv: np.ndarray, size_wh: Tuple[int, int]
-    # ) -> np.ndarray:
-    #     W, H = size_wh
-    #     return cv2.warpPerspective(
-    #         bin_mask_warped, Minv, (W, H), flags=cv2.INTER_NEAREST
-    #     )
+    def _letterbox_resize_gray(self, image: np.ndarray, target_w: int, target_h: int):
+        ih, iw = image.shape[:2]
+        scale = min(target_w / iw, target_h / ih)
+        nw, nh = int(iw * scale), int(ih * scale)
+        resized = cv2.resize(image, (nw, nh), interpolation=cv2.INTER_AREA)
+        canvas = np.zeros((target_h, target_w), dtype=np.uint8)
+        dx, dy = (target_w - nw) // 2, (target_h - nh) // 2
+        canvas[dy : dy + nh, dx : dx + nw] = resized
+        return canvas, (nw, nh), (dx, dy)
 
-    # def _postprocess(
-    #     self,
-    #     enhanced: np.ndarray,
-    #     mask_full: np.ndarray,
-    #     clip_limit: float = 10.0,
-    #     tile_grid: Tuple[int, int] = (8, 8),
-    # ) -> None:
-    #     # Apply CLAHE to the current composed grayscale image and replace only in masked regions
-    #     clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid)
-    #     enhanced_eq = clahe.apply(enhanced)
-    #     region = mask_full > 0
-    #     enhanced[region] = enhanced_eq[region]
+    def _run_unet_letterbox_to_roi_mask(
+        self, session: ort.InferenceSession, input_name: str, roi_gray: np.ndarray
+    ) -> np.ndarray:
+        # Preprocess
+        canvas, (nw, nh), (dx, dy) = self._letterbox_resize_gray(
+            roi_gray, _UNET_TARGET_W, _UNET_TARGET_H
+        )
+        blob = canvas.astype(np.float32) / 255.0
+        blob = blob[np.newaxis, np.newaxis, :, :]
 
-    # def _apply_mask(
-    #     self,
-    #     enhanced: np.ndarray,
-    #     gray: np.ndarray,
-    #     mask_full: np.ndarray,
-    #     base_alpha: float = 0.6,
-    # ) -> None:
-    #     # Create grayscale overlay (blend with white) only within mask
-    #     white_layer = np.full_like(gray, 255)
-    #     overlay = cv2.addWeighted(gray, base_alpha, white_layer, 1.0 - base_alpha, 0)
-    #     region = mask_full > 0
-    #     enhanced[region] = overlay[region]
+        # Infer
+        outputs = session.run(None, {input_name: blob})
+        out_mask = outputs[0][0][0]  # HxW (target)
 
-    # def _letterbox_resize_gray(self, image: np.ndarray, target_w: int, target_h: int):
-    #     ih, iw = image.shape[:2]
-    #     scale = min(target_w / iw, target_h / ih)
-    #     nw, nh = int(iw * scale), int(ih * scale)
-    #     resized = cv2.resize(image, (nw, nh), interpolation=cv2.INTER_AREA)
-    #     canvas = np.zeros((target_h, target_w), dtype=np.uint8)
-    #     dx, dy = (target_w - nw) // 2, (target_h - nh) // 2
-    #     canvas[dy : dy + nh, dx : dx + nw] = resized
-    #     return canvas, (nw, nh), (dx, dy)
+        # Binary mask
+        bin_mask = (out_mask > 0.25).astype(np.uint8) * 255  # 0/255
 
-    # def _run_unet_letterbox_to_roi_mask(
-    #     self, session: ort.InferenceSession, input_name: str, roi_gray: np.ndarray
-    # ) -> np.ndarray:
-    #     # Preprocess
-    #     canvas, (nw, nh), (dx, dy) = self._letterbox_resize_gray(
-    #         roi_gray, _UNET_TARGET_W, _UNET_TARGET_H
-    #     )
-    #     blob = canvas.astype(np.float32) / 255.0
-    #     blob = blob[np.newaxis, np.newaxis, :, :]
+        # Crop valid region (remove letterbox padding) back to model-resized ROI
+        cropped = bin_mask[dy : dy + nh, dx : dx + nw]
 
-    #     # Infer
-    #     outputs = session.run(None, {input_name: blob})
-    #     out_mask = outputs[0][0][0]  # HxW (target)
-
-    #     # Binary mask
-    #     bin_mask = (out_mask > 0.25).astype(np.uint8) * 255  # 0/255
-
-    #     # Crop valid region (remove letterbox padding) back to model-resized ROI
-    #     cropped = bin_mask[dy : dy + nh, dx : dx + nw]
-
-    #     # Resize back to the original ROI size
-    #     mask_resized = cv2.resize(
-    #         cropped,
-    #         (roi_gray.shape[1], roi_gray.shape[0]),
-    #         interpolation=cv2.INTER_NEAREST,
-    #     )
-    #     return mask_resized
+        # Resize back to the original ROI size
+        mask_resized = cv2.resize(
+            cropped,
+            (roi_gray.shape[1], roi_gray.shape[0]),
+            interpolation=cv2.INTER_NEAREST,
+        )
+        return mask_resized
