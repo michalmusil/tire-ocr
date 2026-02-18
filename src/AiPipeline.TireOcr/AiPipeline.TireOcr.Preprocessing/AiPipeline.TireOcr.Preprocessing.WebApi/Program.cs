@@ -6,7 +6,7 @@ using TireOcr.Preprocessing.WebApi;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddInfrastructure()
     .AddPresentation();
 

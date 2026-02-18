@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Facades;
+using TireOcr.Preprocessing.Application.Options;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Shared.Extensions;
@@ -16,6 +18,7 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
     private readonly IRoiExtractionFacade _roiExtractionFacade;
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
+    private readonly ImageProcessingOptions _imageProcessingOptions;
     private readonly ILogger<ExtractTireCodeRoiCommandHandler> _logger;
 
     public ExtractTireCodeRoiCommandHandler(
@@ -24,14 +27,15 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
         IRoiExtractionFacade roiExtractionFacade,
         IContentTypeResolverService contentTypeResolverService,
         ITireSidewallExtractionService tireSidewallExtractionService,
-        ILogger<ExtractTireCodeRoiCommandHandler> logger
-    )
+        IOptions<ImageProcessingOptions> imageProcessingOptions,
+        ILogger<ExtractTireCodeRoiCommandHandler> logger)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _roiExtractionFacade = roiExtractionFacade;
         _contentTypeResolverService = contentTypeResolverService;
         _tireSidewallExtractionService = tireSidewallExtractionService;
+        _imageProcessingOptions = imageProcessingOptions.Value;
         _logger = logger;
     }
 
@@ -92,14 +96,17 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
                     return DataResult<Image>.Failure(failure);
             }
         }
-        
+
         var fallbackImage = processedImage;
         var detectedTire = detectedTireResult.Data!;
 
         // Unwrapping only the tire sidewall portion of the image into a long strip and appending overlap manually from left side to right 
         processedImage = await _tireSidewallExtractionService
             .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
-        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
+        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(
+            processedImage,
+            _imageProcessingOptions.TireStripProlongWidthRatio
+        );
 
         // Applying more processing to improve contrast
         processedImage = _imageManipulationService.ApplyClahe(processedImage);

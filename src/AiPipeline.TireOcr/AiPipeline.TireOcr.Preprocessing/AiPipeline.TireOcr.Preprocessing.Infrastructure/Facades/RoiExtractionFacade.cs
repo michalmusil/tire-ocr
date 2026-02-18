@@ -1,5 +1,7 @@
+using Microsoft.Extensions.Options;
 using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Facades;
+using TireOcr.Preprocessing.Application.Options;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
@@ -15,17 +17,20 @@ public class RoiExtractionFacade : IRoiExtractionFacade
     private readonly ITextDetectionService _textDetectionService;
     private readonly IImageManipulationService _imageManipulationService;
     private readonly ICharacterEnhancementService _characterEnhancementService;
+    private readonly ImageProcessingOptions _imageProcessingOptions;
 
     public RoiExtractionFacade(IImageSlicerService imageSlicerService,
         IImageTextApproximatorService imageTextApproximatorService,
         ITextDetectionService textDetectionService, IImageManipulationService imageManipulationService,
-        ICharacterEnhancementService characterEnhancementService)
+        ICharacterEnhancementService characterEnhancementService,
+        IOptions<ImageProcessingOptions> imageProcessingOptions)
     {
         _imageSlicerService = imageSlicerService;
         _imageTextApproximatorService = imageTextApproximatorService;
         _textDetectionService = textDetectionService;
         _imageManipulationService = imageManipulationService;
         _characterEnhancementService = characterEnhancementService;
+        _imageProcessingOptions = imageProcessingOptions.Value;
     }
 
     public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoi(Image image)
@@ -119,9 +124,15 @@ public class RoiExtractionFacade : IRoiExtractionFacade
     {
         var sliceSize = new ImageSize(
             image.Size.Height,
-            (int)(image.Size.Width * 0.17)
+            (int)(image.Size.Width * _imageProcessingOptions.NormSliceWidthPortion)
         );
-        var slicesResult = await _imageSlicerService.SliceImageNormalOverlap(image, sliceSize, 0.3, 0);
+        var slicesResult =
+            await _imageSlicerService.SliceImageNormalOverlap(
+                image,
+                sliceSize,
+                _imageProcessingOptions.NormSliceOverlapRatio,
+                0
+            );
         if (slicesResult.IsFailure)
             return DataResult<ImageWithDetectedTexts>.Failure(slicesResult.Failures);
 

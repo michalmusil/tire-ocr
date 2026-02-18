@@ -6,7 +6,7 @@ using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services
-    .AddApplication()
+    .AddApplication(builder.Configuration)
     .AddInfrastructure()
     .AddPresentation(builder.Host, builder.Configuration);
 

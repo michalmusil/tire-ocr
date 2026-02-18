@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using TireOcr.Preprocessing.Application.Dtos;
+using TireOcr.Preprocessing.Application.Options;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Shared.Extensions;
@@ -15,6 +17,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
     private readonly IContentTypeResolverService _contentTypeResolverService;
     private readonly IImageSlicerService _imageSlicerService;
     private readonly ITireSidewallExtractionService _tireSidewallExtractionService;
+    private readonly ImageProcessingOptions _imageProcessingOptions;
     private readonly ILogger<ExtractImageSlicesCommandHandler> _logger;
 
     public ExtractImageSlicesCommandHandler(
@@ -23,14 +26,15 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         IContentTypeResolverService contentTypeResolverService,
         IImageSlicerService imageSlicerService,
         ITireSidewallExtractionService tireSidewallExtractionService,
-        ILogger<ExtractImageSlicesCommandHandler> logger
-    )
+        IOptions<ImageProcessingOptions> imageProcessingOptions,
+        ILogger<ExtractImageSlicesCommandHandler> logger)
     {
         _imageManipulationService = imageManipulationService;
         _tireDetectionService = tireDetectionService;
         _contentTypeResolverService = contentTypeResolverService;
         _imageSlicerService = imageSlicerService;
         _tireSidewallExtractionService = tireSidewallExtractionService;
+        _imageProcessingOptions = imageProcessingOptions.Value;
         _logger = logger;
     }
 
@@ -71,7 +75,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
 
         // Reduce image size
         processedImage = _imageManipulationService
-            .ResizeToMaxSideSize(processedImage, 2048);
+            .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxOutputImageSize);
 
         // Attempt to detect tire circle (only successful for photos containing the whole tire)
         var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
@@ -93,12 +97,16 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                     return DataResult<Image>.Failure(failure);
             }
         }
+
         var detectedTire = detectedTireResult.Data!;
 
         // Unwrapping only the tire sidewall portion of the image into a long strip 
         processedImage = await _tireSidewallExtractionService
             .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
-        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(processedImage, 0.17);
+        processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(
+            processedImage,
+            _imageProcessingOptions.TireStripProlongWidthRatio
+        );
 
         // Slicing the strip horizontally to get more acceptable aspect ratio - overlap in slices included
         var sliceWidth = (decimal)processedImage.Size.Width / (decimal)request.NumberOfSlices;
@@ -109,7 +117,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         var slicesResult = await _imageSlicerService.SliceImageAdditiveOverlap(
             image: processedImage,
             sliceSize: sliceSize,
-            xOverlapRatio: 0.15,
+            xOverlapRatio: _imageProcessingOptions.AdditiveSliceOverlapRatio,
             yOverlapRatio: 0
         );
         if (slicesResult.IsFailure)
