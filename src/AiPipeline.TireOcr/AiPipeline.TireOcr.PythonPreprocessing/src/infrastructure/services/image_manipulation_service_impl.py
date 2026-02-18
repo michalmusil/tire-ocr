@@ -74,27 +74,6 @@ class ImageManipulationServiceImpl(ImageManipulationService):
         _, out_bytes = cv2.imencode(".png", prolonged_result)
         return out_bytes.tobytes()
 
-    async def slice_and_stack(
-        self, image_bytes: bytes, number_of_horizontal_slices: int
-    ) -> bytes:
-        np_arr = np.frombuffer(image_bytes, np.uint8)
-        image = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        if number_of_horizontal_slices <= 0:
-            raise ValueError("Number of slices (n) must be greater than 0")
-
-        h, w = image.shape
-        mid = w // 2
-        left = image[:, :mid]
-        right = image[:, mid:]
-        larger_width = max(left.shape[1], right.shape[1])
-        left = self._ensure_slice_width(left, larger_width)
-        right = self._ensure_slice_width(right, larger_width)
-
-        stacked = np.vstack((left, right))
-
-        _, out_bytes = cv2.imencode(".png", stacked)
-        return out_bytes.tobytes()
-
     async def unwarp_tire_rim(
         self,
         image_bytes: bytes,
@@ -124,17 +103,3 @@ class ImageManipulationServiceImpl(ImageManipulationService):
 
         _, out_bytes = cv2.imencode(".png", rotated_result)
         return out_bytes.tobytes()
-
-    def _ensure_slice_width(self, img: np.ndarray, target_size: int) -> np.ndarray:
-        if img.shape[1] >= target_size:
-            return img
-
-        return cv2.copyMakeBorder(
-            img,
-            0,
-            0,
-            0,
-            target_size - img.shape[1],
-            cv2.BORDER_CONSTANT,
-            value=0,
-        )

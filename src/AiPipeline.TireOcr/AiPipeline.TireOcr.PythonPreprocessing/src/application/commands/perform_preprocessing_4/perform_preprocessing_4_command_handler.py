@@ -1,7 +1,11 @@
 from fastapi.concurrency import run_in_threadpool
+import numpy as np
+import cv2
+import math
 
 from src.application.constants.preprocessing_constants import (
     MAX_IMAGE_SIDE,
+    SLICE_HORIZONTAL_OVERLAP_RATIO,
     TIRE_INNER_RADIUS_RATIO,
     TIRE_OUTER_RADIUS_RATIO,
     TIRE_STRIP_PROLONG_WIDTH_RATIO,
@@ -9,6 +13,7 @@ from src.application.constants.preprocessing_constants import (
 from src.application.commands.perform_preprocessing_4.perform_preprocessing_4_command import (
     PerformPreprocessing4Command,
 )
+from src.application.services.image_slicer_service import ImageSlicerService
 from ...services.image_manipulation_service import ImageManipulationService
 from ...services.rim_detection_service import RimDetectionService
 from ...services.image_segmentation_service import ImageSegmentationService
@@ -22,10 +27,12 @@ class PerformPreprocessing4CommandHandler:
         image_manipulation_service: ImageManipulationService,
         rim_detection_service: RimDetectionService,
         image_segmentation_service: ImageSegmentationService,
+        image_slicer_service: ImageSlicerService,
     ):
         self.image_manipulation_service = image_manipulation_service
         self.rim_detection_service = rim_detection_service
         self.image_segmentation_service = image_segmentation_service
+        self.image_slicer_service = image_slicer_service
 
     async def handle(
         self, command: PerformPreprocessing4Command
@@ -64,9 +71,16 @@ class PerformPreprocessing4CommandHandler:
             processed_image = await self.image_manipulation_service.copy_and_append_image_portion_from_left(
                 unwarped, TIRE_STRIP_PROLONG_WIDTH_RATIO
             )
-            processed_image = await self.image_manipulation_service.slice_and_stack(
-                processed_image, 2
+            temp_arr = np.frombuffer(processed_image, np.uint8)
+            decoded = cv2.imdecode(temp_arr, cv2.IMREAD_GRAYSCALE)
+            h, w = decoded.shape
+            slices = self.image_slicer_service.slice_image_with_additive_overlap(
+                processed_image,
+                (math.ceil(w / 2), h),
+                SLICE_HORIZONTAL_OVERLAP_RATIO,
+                0,
             )
+            processed_image = self.image_slicer_service.stack_images_vertically(slices)
 
             # 5) Global properties enhancement
             processed_image = await self.image_manipulation_service.perform_clahe(
@@ -92,7 +106,7 @@ class PerformPreprocessing4CommandHandler:
                 return PreprocessingResultDto(
                     status="acceptable_failure",
                     message=f"Character emphasisation failed: {str(ex)}",
-                    image=emphasised,
+                    image=processed_image,
                     duration_ms=duration_ms,
                 )
 

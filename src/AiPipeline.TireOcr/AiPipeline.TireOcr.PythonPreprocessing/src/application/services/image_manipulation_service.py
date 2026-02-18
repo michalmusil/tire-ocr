@@ -31,12 +31,6 @@ class ImageManipulationService(ABC):
         pass
 
     @abstractmethod
-    async def slice_and_stack(
-        self, image_bytes: bytes, number_of_horizontal_slices: int
-    ) -> bytes:
-        pass
-
-    @abstractmethod
     async def unwarp_tire_rim(
         self,
         image_bytes: bytes,

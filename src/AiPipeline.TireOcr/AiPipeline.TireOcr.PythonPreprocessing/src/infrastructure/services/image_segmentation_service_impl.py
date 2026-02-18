@@ -44,7 +44,6 @@ def _get_unet_session() -> Tuple[ort.InferenceSession, str]:
 
 class ImageSegmentationServiceImpl(ImageSegmentationService):
     def emphasise_characters_on_text_regions(self, image_bytes: bytes) -> bytes:
-        # return image_bytes
         np_arr = np.frombuffer(image_bytes, np.uint8)
         img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
         if img is None:

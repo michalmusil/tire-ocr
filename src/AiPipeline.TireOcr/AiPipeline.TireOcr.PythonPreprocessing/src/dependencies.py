@@ -6,6 +6,7 @@ from src.application.commands.perform_preprocessing_4.perform_preprocessing_4_co
 )
 from src.application.services.image_manipulation_service import ImageManipulationService
 from src.application.services.image_segmentation_service import ImageSegmentationService
+from src.application.services.image_slicer_service import ImageSlicerService
 from src.application.services.rim_detection_service import RimDetectionService
 from src.infrastructure.services.image_manipulation_service_impl import (
     ImageManipulationServiceImpl,
@@ -13,6 +14,7 @@ from src.infrastructure.services.image_manipulation_service_impl import (
 from src.infrastructure.services.image_segmentation_service_impl import (
     ImageSegmentationServiceImpl,
 )
+from src.infrastructure.services.image_slicer_service_impl import ImageSlicerServiceImpl
 from src.infrastructure.services.rim_detection_service_impl import (
     RimDetectionServiceImpl,
 )
@@ -25,6 +27,7 @@ _image_segmentation_service_instance: ImageSegmentationService = (
     ImageSegmentationServiceImpl()
 )
 _rim_detection_service_instance: RimDetectionService = RimDetectionServiceImpl()
+_image_slicer_service_instance: ImageSlicerService = ImageSlicerServiceImpl()
 
 
 def get_image_manipulation_service() -> ImageManipulationService:
@@ -46,6 +49,7 @@ _perform_preprocessing_3_command_handler_instance: (
     _image_manipulation_service_instance,
     _rim_detection_service_instance,
     _image_segmentation_service_instance,
+    _image_slicer_service_instance,
 )
 
 _perform_preprocessing_4_command_handler_instance: (
@@ -54,6 +58,7 @@ _perform_preprocessing_4_command_handler_instance: (
     _image_manipulation_service_instance,
     _rim_detection_service_instance,
     _image_segmentation_service_instance,
+    _image_slicer_service_instance,
 )
 
 
