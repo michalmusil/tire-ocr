@@ -69,7 +69,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var processedImage = new Image(request.ImageData, request.ImageName, originalSize);
 
-        // Apply global adjustments to reduce image size and improve contrast
+        // Reduce image size
         processedImage = _imageManipulationService
             .ResizeToMaxSideSize(processedImage, 2048);
 

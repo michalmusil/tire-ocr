@@ -28,10 +28,10 @@ public interface IImageSlicerService
     /// height is less than image height. Each slice has the dimension of the specified sliceSize, or less (the last
     /// slice usually has to be smaller, unless the sliceSize dimension is an equal division of the image dimension).
     ///
-    /// In this method as opposed to the 'SliceImage', the overlap is added to the slices sides - meaning if I for example
-    /// provide x overlap of 0.2 and y overlap of 0.1, each slice will be enlarged by 20% of its width on left and right
-    /// and 10% of its height on top and bottom. The overlap is not added in case it would overflow the original image
-    /// dimension. 
+    /// In this method as opposed to the 'SliceImageNormalOverlap', the overlap is added to the slices sides - meaning
+    /// if I for example provide x overlap of 0.2 and y overlap of 0.1, each slice will be enlarged by 20% of its width
+    /// on left and right and 10% of its height on top and bottom. The overlap is not added in case it would overflow
+    /// the original image dimension. 
     /// </summary>
     public Task<DataResult<IEnumerable<Image>>> SliceImageAdditiveOverlap(
         Image image,
