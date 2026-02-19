@@ -1,9 +1,11 @@
 from fastapi.concurrency import run_in_threadpool
 import numpy as np
+import math
 import cv2
 
 from src.application.constants.preprocessing_constants import (
-    MAX_IMAGE_SIDE,
+    MAX_INPUT_IMAGE_SIDE,
+    MAX_OUTPUT_IMAGE_SIDE,
     SLICE_HORIZONTAL_OVERLAP_RATIO,
     TIRE_INNER_RADIUS_RATIO,
     TIRE_OUTER_RADIUS_RATIO,
@@ -43,9 +45,9 @@ class PerformPreprocessing3CommandHandler:
             if color_image is None:
                 raise ValueError("Failed to decode input image")
 
-            # 1) Resize to max dimension
+            # 1) Prevent enormous images
             resized_image = self.image_manipulation_service.resize_to_max_dimension(
-                color_image, MAX_IMAGE_SIDE
+                color_image, MAX_INPUT_IMAGE_SIDE
             )
 
             # 2) Rim detection (may throw if not found)
@@ -55,9 +57,11 @@ class PerformPreprocessing3CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
-                # Encode resized image back to bytes for DTO
+                final_resized = self.image_manipulation_service.resize_to_max_dimension(
+                    resized_image, MAX_OUTPUT_IMAGE_SIDE
+                )
                 resized_bytes = self.image_manipulation_service.image_to_bytes(
-                    resized_image
+                    final_resized
                 )
                 return PreprocessingResultDto(
                     status="acceptable_failure",
@@ -86,7 +90,10 @@ class PerformPreprocessing3CommandHandler:
             )
             h, w = processed_image.shape
             slices = self.image_slicer_service.slice_image_with_additive_overlap(
-                processed_image, (w // 2, h), SLICE_HORIZONTAL_OVERLAP_RATIO, 0
+                processed_image,
+                (math.ceil(w / 2), h),
+                SLICE_HORIZONTAL_OVERLAP_RATIO,
+                0,
             )
             processed_image = self.image_slicer_service.stack_images_vertically(slices)
 
@@ -111,8 +118,13 @@ class PerformPreprocessing3CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
+                resized_processed = (
+                    self.image_manipulation_service.resize_to_max_dimension(
+                        processed_image, MAX_OUTPUT_IMAGE_SIDE
+                    )
+                )
                 processed_bytes = self.image_manipulation_service.image_to_bytes(
-                    processed_image
+                    resized_processed
                 )
                 return PreprocessingResultDto(
                     status="acceptable_failure",
@@ -121,9 +133,13 @@ class PerformPreprocessing3CommandHandler:
                     duration_ms=duration_ms,
                 )
 
-            # Encode emphasised image to bytes for DTO
+            emphasised_resized = (
+                self.image_manipulation_service.resize_to_max_dimension(
+                    emphasised, MAX_OUTPUT_IMAGE_SIDE
+                )
+            )
             emphasised_bytes = self.image_manipulation_service.image_to_bytes(
-                emphasised
+                emphasised_resized
             )
 
             duration_ms = int((time.perf_counter() - start) * 1000)

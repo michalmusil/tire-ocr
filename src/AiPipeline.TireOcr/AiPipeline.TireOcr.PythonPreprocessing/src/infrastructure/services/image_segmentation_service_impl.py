@@ -57,12 +57,8 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
         blurred_img = cv2.GaussianBlur(img, (3, 3), 0)
         sobel_img = self._apply_sobel(blurred_img, erode=True)
         # Threshold the lower values of sobel image to remove ghosts
-        _, sobel_img = cv2.threshold(sobel_img, 80, 255, cv2.THRESH_TOZERO)
+        _, sobel_img = cv2.threshold(sobel_img, 80, 255, cv2.THRESH_BINARY)
 
-        # combined = cv2.addWeighted(sobel_img, 0.5, img, 0.5, 0)
-
-        # _, out_bytes = cv2.imencode(".png", combined)
-        # return out_bytes.tobytes()
         session, input_name = _get_unet_session()
         H, W = img.shape[:2]
 
@@ -83,8 +79,6 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             mask_full = mask_full.astype(np.float32) / 255.0
             # apply the mask to the image
             final = self._blend_within_mask_region(sobel_img, final, mask_full)
-            # Then: apply CLAHE contrast enhancement only within masked regions on the composed image
-            # self._postprocess(final, mask_full, clip_limit=40, tile_grid=(8, 8))
         return final
 
     def compose_emphasised_text_region_mosaic(
@@ -160,6 +154,22 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         return image
 
+    # def remove_small_blobs(self, img, min_size=5):
+    #     # Find all disconnected white patches
+    #     nb_components, output, stats, centroids = cv2.connectedComponentsWithStats(
+    #         img, connectivity=8
+    #     )
+
+    #     # Get the area of each component (index 4 in stats)
+    #     sizes = stats[1:, -1]
+    #     new_img = np.zeros((output.shape), dtype=np.uint8)
+
+    #     for i in range(0, nb_components - 1):
+    #         if sizes[i] >= min_size:
+    #             new_img[output == i + 1] = 255
+
+    #     return new_img
+
     def _apply_sobel(self, src, erode: bool = False):
         grad_x = cv2.Sobel(src, cv2.CV_16S, 1, 0, ksize=3)
         grad_y = cv2.Sobel(src, cv2.CV_16S, 0, 1, ksize=3)
@@ -170,12 +180,12 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             final = cv2.erode(final, (3, 3), iterations=1)
         return final
 
-    def _blend_within_mask_region(self, src1, src2, mask):
-        src1_f = src1.astype(np.float32)
-        src2_f = src2.astype(np.float32)
+    def _blend_within_mask_region(self, sobel_edges, source, mask):
+        sobel_f = sobel_edges.astype(np.float32)
+        source_f = source.astype(np.float32)
 
-        sharpened_part = src1_f * mask
-        original_part = src2_f * (1.0 - mask)
+        sharpened_part = sobel_f * mask
+        original_part = source_f * (1.0 - mask)
         blended = sharpened_part + original_part
         blended = np.clip(blended, 0, 255).astype(np.uint8)
         return blended

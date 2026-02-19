@@ -4,7 +4,8 @@ import cv2
 import math
 
 from src.application.constants.preprocessing_constants import (
-    MAX_IMAGE_SIDE,
+    MAX_INPUT_IMAGE_SIDE,
+    MAX_OUTPUT_IMAGE_SIDE,
     SLICE_HORIZONTAL_OVERLAP_RATIO,
     TIRE_INNER_RADIUS_RATIO,
     TIRE_OUTER_RADIUS_RATIO,
@@ -44,9 +45,9 @@ class PerformPreprocessing4CommandHandler:
             if color_image is None:
                 raise ValueError("Failed to decode input image")
 
-            # 1) Resize to max dimension
+            # 1) Prevent enormous images
             resized_image = self.image_manipulation_service.resize_to_max_dimension(
-                color_image, MAX_IMAGE_SIDE
+                color_image, MAX_INPUT_IMAGE_SIDE
             )
 
             # 2) Rim detection (may throw if not found)
@@ -56,8 +57,11 @@ class PerformPreprocessing4CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
+                final_resized = self.image_manipulation_service.resize_to_max_dimension(
+                    resized_image, MAX_OUTPUT_IMAGE_SIDE
+                )
                 resized_bytes = self.image_manipulation_service.image_to_bytes(
-                    resized_image
+                    final_resized
                 )
                 return PreprocessingResultDto(
                     status="acceptable_failure",
@@ -113,9 +117,13 @@ class PerformPreprocessing4CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
-                # Encode last processed image to bytes for DTO
+                resized_processed = (
+                    self.image_manipulation_service.resize_to_max_dimension(
+                        processed_image, MAX_OUTPUT_IMAGE_SIDE
+                    )
+                )
                 processed_bytes = self.image_manipulation_service.image_to_bytes(
-                    processed_image
+                    resized_processed
                 )
                 return PreprocessingResultDto(
                     status="acceptable_failure",
@@ -124,9 +132,13 @@ class PerformPreprocessing4CommandHandler:
                     duration_ms=duration_ms,
                 )
 
-            # Encode emphasised image to bytes for DTO
+            emphasised_resized = (
+                self.image_manipulation_service.resize_to_max_dimension(
+                    emphasised, MAX_OUTPUT_IMAGE_SIDE
+                )
+            )
             emphasised_bytes = self.image_manipulation_service.image_to_bytes(
-                emphasised
+                emphasised_resized
             )
 
             duration_ms = int((time.perf_counter() - start) * 1000)
