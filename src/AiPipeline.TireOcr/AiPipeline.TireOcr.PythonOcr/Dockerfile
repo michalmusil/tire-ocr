@@ -46,7 +46,7 @@ COPY src/AiPipeline.TireOcr/AiPipeline.TireOcr.PythonOcr/src ./src
 EXPOSE 10100
 
 # Pre-download PaddleOCR models during the build
-RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_textline_orientation=True, lang='en')"
+RUN python -c "from paddleocr import PaddleOCR; PaddleOCR(use_textline_orientation=True, lang='en', text_recognition_model_name='PP-OCRv5_mobile_rec')"
 
 ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10100"]
 
