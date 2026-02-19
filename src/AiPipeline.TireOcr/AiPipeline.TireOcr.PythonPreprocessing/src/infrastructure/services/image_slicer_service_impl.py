@@ -8,11 +8,11 @@ from src.application.services.image_slicer_service import ImageSlicerService
 class ImageSlicerServiceImpl(ImageSlicerService):
     def slice_image_with_additive_overlap(
         self,
-        image_bytes: bytes,
+        image: np.ndarray,
         slice_size: Tuple[int, int],
         x_overlap_ratio: float,
         y_overlap_ratio: float,
-    ) -> Optional[List[bytes]]:
+    ) -> Optional[List[np.ndarray]]:
         """
         Slices an image into smaller parts with additive overlap based on a byte array input.
 
@@ -26,11 +26,10 @@ class ImageSlicerServiceImpl(ImageSlicerService):
             A list of byte arrays for each slice, or None if an error occurs.
         """
         try:
-            nparr = np.frombuffer(image_bytes, np.uint8)
-            input_image = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)
-
-            if input_image is None:
-                raise ValueError("Could not decode image from bytes.")
+            if image.ndim == 3:
+                input_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            else:
+                input_image = image
 
             height, width = input_image.shape
             slice_w, slice_h = slice_size
@@ -40,8 +39,7 @@ class ImageSlicerServiceImpl(ImageSlicerService):
 
             starting_xs = np.arange(0, width, slice_w)
             starting_ys = np.arange(0, height, slice_h)
-
-            result_slices = []
+            result_slices: List[np.ndarray] = []
 
             for y in starting_ys:
                 for x in starting_xs:
@@ -50,11 +48,8 @@ class ImageSlicerServiceImpl(ImageSlicerService):
                     xmax = int(min(x + slice_w + overlap_w, width))
                     ymax = int(min(y + slice_h + overlap_h, height))
 
-                    slice_mat = input_image[ymin:ymax, xmin:xmax]
-
-                    success, buffer = cv2.imencode(".png", slice_mat)
-                    if success:
-                        result_slices.append(buffer.tobytes())
+                    slice = input_image[ymin:ymax, xmin:xmax]
+                    result_slices.append(slice)
 
             return result_slices
 
@@ -64,21 +59,18 @@ class ImageSlicerServiceImpl(ImageSlicerService):
 
     def stack_images_vertically(
         self,
-        images: List[bytes],
-    ) -> Optional[bytes]:
-        decoded_images = [
-            cv2.imdecode(np.frombuffer(img, np.uint8), cv2.IMREAD_GRAYSCALE)
-            for img in images
-        ]
-        largest_width = max([img.shape[1] for img in decoded_images])
-        decoded_images = [
-            self._ensure_slice_width(img, largest_width) for img in decoded_images
+        images: List[np.ndarray],
+    ) -> Optional[np.ndarray]:
+        if not images:
+            return None
+
+        largest_width = max([img.shape[1] for img in images])
+        normalized_images = [
+            self._ensure_slice_width(img, largest_width) for img in images
         ]
 
-        stacked = np.vstack(decoded_images)
-
-        _, out_bytes = cv2.imencode(".png", stacked)
-        return out_bytes.tobytes()
+        stacked = np.vstack(normalized_images)
+        return stacked
 
     def _ensure_slice_width(
         self,

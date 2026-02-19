@@ -43,11 +43,11 @@ def _get_unet_session() -> Tuple[ort.InferenceSession, str]:
 
 
 class ImageSegmentationServiceImpl(ImageSegmentationService):
-    def emphasise_characters_on_text_regions(self, image_bytes: bytes) -> bytes:
-        np_arr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        if img is None:
-            raise ValueError("Failed to decode image")
+    def emphasise_characters_on_text_regions(self, image: np.ndarray) -> np.ndarray:
+        if image is None:
+            raise ValueError("Input image is None")
+        img = self._ensure_grayscale(image)
+
         detector = get_text_detection_engine()
         polys = self._parse_text_polygons(detector, img)
         if not polys:
@@ -63,7 +63,6 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
 
         # _, out_bytes = cv2.imencode(".png", combined)
         # return out_bytes.tobytes()
-
         session, input_name = _get_unet_session()
         H, W = img.shape[:2]
 
@@ -86,23 +85,19 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
             final = self._blend_within_mask_region(sobel_img, final, mask_full)
             # Then: apply CLAHE contrast enhancement only within masked regions on the composed image
             # self._postprocess(final, mask_full, clip_limit=40, tile_grid=(8, 8))
-
-        _, out_bytes = cv2.imencode(".png", final)
-        return out_bytes.tobytes()
+        return final
 
     def compose_emphasised_text_region_mosaic(
-        self, image_bytes: bytes, emphasise_characters: bool
-    ) -> bytes:
-        np_arr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_GRAYSCALE)
-        if img is None:
-            raise ValueError("Failed to decode image")
+        self, image: np.ndarray, emphasise_characters: bool
+    ) -> np.ndarray:
+        if image is None:
+            raise ValueError("Input image is None")
+        img = self._ensure_grayscale(image)
 
         detector = get_text_detection_engine()
         polys = self._parse_text_polygons(detector, img)
         if not polys:
             raise ValueError("No text polygons found")
-
         gray = img
         # Compute average intensity of the input image for mosaic background
         avg_intensity = int(np.mean(gray))
@@ -155,12 +150,15 @@ class ImageSegmentationServiceImpl(ImageSegmentationService):
 
         # Initialize mosaic with the average color of the input image
         mosaic = np.full((max_h, max_w), avg_intensity, dtype=np.uint8)
-
         for slice_img, (w, h), (x, y) in zip(enhanced_slices, rects, positions):
             mosaic[y : y + h, x : x + w] = slice_img
 
-        _, out_bytes = cv2.imencode(".png", mosaic)
-        return out_bytes.tobytes()
+        return mosaic
+
+    def _ensure_grayscale(self, image: np.ndarray) -> np.ndarray:
+        if image.ndim == 3:
+            return cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        return image
 
     def _apply_sobel(self, src, erode: bool = False):
         grad_x = cv2.Sobel(src, cv2.CV_16S, 1, 0, ksize=3)

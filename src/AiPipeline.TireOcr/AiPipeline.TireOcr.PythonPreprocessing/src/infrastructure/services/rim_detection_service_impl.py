@@ -26,12 +26,14 @@ class RimDetectionServiceImpl(RimDetectionService):
     def __init__(self) -> None:
         self.model = _get_model()
 
-    def detect_rim(self, image_bytes: bytes) -> tuple[int, int, float]:
-        # Decode image
-        np_arr = np.frombuffer(image_bytes, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
-        if img is None:
+    def detect_rim(self, image: np.ndarray) -> tuple[int, int, float]:
+        if image is None:
             raise ValueError("Invalid image data")
+
+        if image.ndim == 2:
+            img = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
+        else:
+            img = image
 
         # Run segmentation (model is a segmentation ONNX; no need to pass task here)
         results = self.model.predict(
