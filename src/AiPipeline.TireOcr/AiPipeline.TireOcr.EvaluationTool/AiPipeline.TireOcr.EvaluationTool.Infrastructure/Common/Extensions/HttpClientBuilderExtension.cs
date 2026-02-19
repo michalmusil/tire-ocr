@@ -19,4 +19,18 @@ public static class HttpClientBuilderExtension
         });
         return builder;
     }
+
+    public static IHttpClientBuilder ApplyCustomResilienceHandler(this IHttpClientBuilder builder, int timeoutSeconds)
+    {
+        builder
+            .RemoveResilienceHandlers()
+            .AddStandardResilienceHandler(opt =>
+            {
+                var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+                opt.AttemptTimeout.Timeout = timeout;
+                opt.TotalRequestTimeout.Timeout = timeout;
+                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
+            });
+        return builder;
+    }
 }

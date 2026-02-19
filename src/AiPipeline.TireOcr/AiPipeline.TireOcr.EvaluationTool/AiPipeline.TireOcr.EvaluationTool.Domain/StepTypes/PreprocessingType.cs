@@ -7,4 +7,5 @@ public enum PreprocessingType
     ExtractRoiAndEnhanceCharacters = 2,
     ExtractAndComposeSlices = 3,
     ExtractTextsIntoMosaic = 4,
+    ExtractAndComposeSlicesEnhanceText = 5,
 }

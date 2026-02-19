@@ -80,83 +80,59 @@ public static class DependencyInjection
 
     private static void AddExternalServices(IServiceCollection services)
     {
+        var preprocessingTimeoutSeconds = 60;
+        var ocrTimeoutSeconds = 90;
+
+        // Preprocessing
+
         services.AddHttpClient<PreprocessingRoiExtractionProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://PreprocessingService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(120);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://PreprocessingService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+
         services.AddHttpClient<PreprocessingResizeProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://PreprocessingService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(60);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://PreprocessingService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+
         services.AddHttpClient<PreprocessingSlicesCompositionProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://PreprocessingService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(60);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://PreprocessingService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+
         services.AddHttpClient<PreprocessingTextExtractionMosaicProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://PreprocessingPythonService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(60);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://PreprocessingPythonService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+
+        services.AddHttpClient<PreprocessingSlicesEnhanceTextProcessor>(client =>
+        {
+            client.BaseAddress = new("https+http://PreprocessingPythonService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+
+        // OCR
+
         services.AddHttpClient<OcrRemoteServicesProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://OcrService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(90);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://OcrService");
+        }).ApplyCustomResilienceHandler(ocrTimeoutSeconds);
+
         services.AddHttpClient<OcrRemotePythonProcessor>(client =>
-            {
-                client.BaseAddress = new("https+http://OcrPythonService");
-            })
-            .RemoveResilienceHandlers()
-            .AddStandardResilienceHandler(opt =>
-            {
-                var timeout = TimeSpan.FromSeconds(90);
-                opt.AttemptTimeout.Timeout = timeout;
-                opt.TotalRequestTimeout.Timeout = timeout;
-                opt.CircuitBreaker.SamplingDuration = 2 * timeout;
-            });
+        {
+            client.BaseAddress = new("https+http://OcrPythonService");
+        }).ApplyCustomResilienceHandler(ocrTimeoutSeconds);
+
+        // Postprocessing
+
         services.AddHttpClient<PostprocessingRemoteServiceProcessor>(client =>
         {
             client.BaseAddress = new("https+http://PostprocessingService");
         });
+
         services.AddScoped<DbMatchingNoneProcessor>();
+        
+        // DbMatching
+
         services.AddHttpClient<DbMatchingRemoteProcessor>(client =>
         {
             client.BaseAddress = new("https+http://TasyDbMatcherService");
