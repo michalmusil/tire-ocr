@@ -73,8 +73,9 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var image = new Image(request.ImageData, request.ImageName, originalSize);
 
-        // Apply global adjustments to reduce image size and improve contrast
-        var processedImage = _imageManipulationService.ResizeToMaxSideSize(image, 2048);
+        // Prevent enormous images
+        var processedImage = _imageManipulationService
+            .ResizeToMaxSideSize(image, _imageProcessingOptions.MaxInputImageSize);
 
         // Attempt to detect tire circle (only successful for photos containing the whole tire)
         var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
@@ -88,6 +89,8 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
                     _logger.LogWarning(
                         $"Rim detection failed for '{request.ImageName}'.\nReason:'{failure.Message}'\nReturning fallback image version."
                     );
+                    processedImage = _imageManipulationService
+                        .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxOutputImageSize);
                     return DataResult<Image>.Success(processedImage);
                 default:
                     _logger.LogError(
@@ -120,11 +123,18 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
             : await _roiExtractionFacade.ExtractTireCodeRoi(processedImage);
 
         return roiExtractionResult.Map(
-            onSuccess: res => DataResult<Image>.Success(res.BestImage),
+            onSuccess: res =>
+            {
+                var finalImage = _imageManipulationService
+                    .ResizeToMaxSideSize(res.BestImage, _imageProcessingOptions.MaxOutputImageSize);
+                return DataResult<Image>.Success(finalImage);
+            },
             onFailure: failures =>
             {
                 _logger.LogError(
                     $"Roi extraction failed for '{request.ImageName}'.\nReason:'{failures.FirstOrDefault()?.Message ?? ""}'\nReturning fallback image version.");
+                fallbackImage = _imageManipulationService
+                    .ResizeToMaxSideSize(fallbackImage, _imageProcessingOptions.MaxOutputImageSize);
                 return DataResult<Image>.Success(fallbackImage);
             }
         );

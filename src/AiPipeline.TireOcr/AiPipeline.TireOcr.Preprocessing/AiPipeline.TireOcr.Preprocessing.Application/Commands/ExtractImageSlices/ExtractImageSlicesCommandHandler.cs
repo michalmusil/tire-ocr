@@ -73,9 +73,9 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         var originalSize = _imageManipulationService.GetRawImageSize(request.ImageData);
         var processedImage = new Image(request.ImageData, request.ImageName, originalSize);
 
-        // Reduce image size
+        // Prevent enormous images
         processedImage = _imageManipulationService
-            .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxOutputImageSize);
+            .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxInputImageSize);
 
         // Attempt to detect tire circle (only successful for photos containing the whole tire)
         var detectedTireResult = await _tireDetectionService.DetectTireRimCircle(processedImage);
@@ -89,6 +89,8 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                     _logger.LogWarning(
                         $"Rim detection failed for '{request.ImageName}'.\nReason:'{failure.Message}'\nReturning fallback image version."
                     );
+                    processedImage = _imageManipulationService
+                        .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxOutputImageSize);
                     return DataResult<Image>.Success(processedImage);
                 default:
                     _logger.LogError(
@@ -142,6 +144,9 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         if (request.ExtractEdges)
             finalImage = _imageManipulationService.ApplySobelEdgeDetection(finalImage, preBlur: false);
 
+        // Reduce image size
+        finalImage = _imageManipulationService
+            .ResizeToMaxSideSize(finalImage, _imageProcessingOptions.MaxOutputImageSize);
 
         return DataResult<Image>.Success(finalImage);
     }
