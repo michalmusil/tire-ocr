@@ -58,29 +58,29 @@ public class TireCodeValueObject : ValueObject
         builder.Append(SpeedRating);
         return builder.ToString();
     }
-    
+
     public int GetNonNullParameterCount()
     {
         var nonNullParameters = 0;
         if (VehicleClass is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (Width is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (AspectRatio is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (Construction is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (Diameter is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (LoadRange is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (LoadIndex is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (LoadIndex2 is not null)
-            nonNullParameters ++;
+            nonNullParameters++;
         if (SpeedRating is not null)
-            nonNullParameters ++;
-        
+            nonNullParameters++;
+
         return nonNullParameters;
     }
 
@@ -118,7 +118,7 @@ public class TireCodeValueObject : ValueObject
             var dimensionsPartRegexMatch = Regex.Match(
                 input: part,
                 pattern:
-                @"^(?<Width>\d{3}|\d{1,2}\.\d{1,2})-(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1,2})(?<DeprecatedSpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})?(?<Construction>[RDB]{1})(?<Diameter>\d{1,3}|\d{1,2}\.\d{1,2})");
+                @"^(?<Width>\d{3}|\d{1,2}\.\d{1,2})-(?<AspectRatio>\d{2,3}|\d{1,2}\.\d{1,2})(?<DeprecatedSpeedRating>[A,B,C,D,E,F,G,J,K,L,M,N,P,Q,R,S,T,U,H,V,Z,W,Y]{1})?(?<Construction>[RDB]{1})(?<Diameter>\d{1,3}|\d{1,2}\.\d{1,2})(?<LoadRange>[A-Z]{1})?");
             var isDimensionsPart = dimensionsPartRegexMatch.Success;
             if (isDimensionsPart)
             {
@@ -164,13 +164,21 @@ public class TireCodeValueObject : ValueObject
         var hasDiameter = decimal.TryParse(dimensionsPartMatch.Groups["Diameter"].Value, out var diameter);
         if (hasDiameter)
             tireCode.Diameter = diameter;
+
+        var hasLoadRange = dimensionsPartMatch.Groups["LoadRange"].Success;
+        if (hasLoadRange)
+            tireCode.LoadRange = dimensionsPartMatch.Groups["LoadRange"].Value.FirstOrDefault();
     }
 
     private static void ParseLoadAndSpeedPart(TireCodeValueObject tireCode, Match lsPartMatch)
     {
         var hasLoadRange = lsPartMatch.Groups["LoadRange"].Success;
         if (hasLoadRange)
-            tireCode.LoadRange = lsPartMatch.Groups["LoadRange"].Value.FirstOrDefault();
+        {
+            var loadRangeAlreadyPresent = tireCode.LoadRange is not null;
+            if (!loadRangeAlreadyPresent)
+                tireCode.LoadRange = lsPartMatch.Groups["LoadRange"].Value.FirstOrDefault();
+        }
 
         var hasLoadIndex = lsPartMatch.Groups["LoadIndex"].Success;
         if (hasLoadIndex)
