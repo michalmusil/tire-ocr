@@ -12,6 +12,7 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
 public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
 {
+    private const long Seed = 42;
     private readonly IConfiguration _configuration;
     private readonly IPromptRepository _promptRepository;
     private readonly string _modelName;
@@ -35,7 +36,7 @@ public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     $"Failed to retrieve {_modelName} endpoint configuration"));
 
-            var prompt = await _promptRepository.GetMainPromptAsync();
+            var prompt = await _promptRepository.GetMainPromptAsync(useRandomPrefix: true);
             List<ChatMessage> messages =
             [
                 new SystemChatMessage(
@@ -50,7 +51,10 @@ public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
             ];
             var options = new ChatCompletionOptions
             {
-                Temperature = 0.6f
+                Temperature = 0.0f,
+#pragma warning disable OPENAI001
+                Seed = Seed
+#pragma warning restore OPENAI001
             };
             var completion = await client.CompleteChatAsync(messages, options);
             var foundTireCode = completion.Value.Content
@@ -82,7 +86,8 @@ public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
         }
         catch (Exception e)
         {
-            var failure = new Failure(500,$"Failed to perform Ocr via RunPod vLLM Tire Code Detector with model '{_modelName}'");
+            var failure = new Failure(500,
+                $"Failed to perform Ocr via RunPod vLLM Tire Code Detector with model '{_modelName}'");
             return DataResult<OcrResultDto>.Failure(failure);
         }
     }

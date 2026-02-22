@@ -12,6 +12,7 @@ namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
 public class OpenRouterApiTireCodeDetectorService : ITireCodeDetectorService
 {
+    private const long Seed = 42;
     private readonly IConfiguration _configuration;
     private readonly IPromptRepository _promptRepository;
     private readonly string _modelName;
@@ -33,7 +34,7 @@ public class OpenRouterApiTireCodeDetectorService : ITireCodeDetectorService
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
                     $"Failed to retrieve OpenRouter '{_modelName}' endpoint configuration"));
 
-            var prompt = await _promptRepository.GetMainPromptAsync();
+            var prompt = await _promptRepository.GetMainPromptAsync(useRandomPrefix: true);
             List<ChatMessage> messages =
             [
                 new SystemChatMessage(
@@ -48,7 +49,10 @@ public class OpenRouterApiTireCodeDetectorService : ITireCodeDetectorService
             ];
             var options = new ChatCompletionOptions
             {
-                Temperature = 0.6f
+                Temperature = 0.0f,
+#pragma warning disable OPENAI001
+                Seed = Seed
+#pragma warning restore OPENAI001
             };
             var completion = await client.CompleteChatAsync(messages, options);
             var foundTireCode = completion.Value.Content
