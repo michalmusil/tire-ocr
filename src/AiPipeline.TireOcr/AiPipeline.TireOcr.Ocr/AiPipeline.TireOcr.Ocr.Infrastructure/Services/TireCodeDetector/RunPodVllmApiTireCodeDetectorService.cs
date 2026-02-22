@@ -97,7 +97,7 @@ public class RunPodVllmApiTireCodeDetectorService : ITireCodeDetectorService
                 credential: new ApiKeyCredential(apiKey!),
                 options: new OpenAIClientOptions
                 {
-                    Endpoint = new Uri(_endpointName),
+                    Endpoint = new Uri(_endpointName)
                 }
             );
         }

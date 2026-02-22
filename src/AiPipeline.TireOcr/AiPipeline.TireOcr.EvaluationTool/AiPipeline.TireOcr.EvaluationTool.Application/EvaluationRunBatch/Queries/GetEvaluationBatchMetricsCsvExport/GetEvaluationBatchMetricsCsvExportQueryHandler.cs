@@ -48,6 +48,16 @@ public class GetEvaluationBatchMetricsCsvExportQueryHandler
             return DataResult<byte[]>.Failure(evaluationResult.Failures);
         var evaluation = evaluationResult.Data!;
 
+        if (otherBatch is not null && request.AverageMetricsWithOtherBatch)
+        {
+            var averagedMetricsEvaluationResult =
+                await AverageEvaluationMetricsWithOtherBatch(evaluation, incalculableInputs, otherBatch);
+            if (averagedMetricsEvaluationResult.IsFailure)
+                return DataResult<byte[]>.Failure(averagedMetricsEvaluationResult.Failures);
+
+            evaluation = averagedMetricsEvaluationResult.Data!;
+        }
+
         var csvContent = await _batchCsvExportService.ExportBatchMetrics(evaluation);
         return csvContent.Map(
             onFailure: DataResult<byte[]>.Failure,
@@ -68,7 +78,42 @@ public class GetEvaluationBatchMetricsCsvExportQueryHandler
             description: batch.Description,
             evaluationRuns: runs.ToList()
         );
-        
+
         return batch;
+    }
+
+    private async Task<DataResult<BatchEvaluationDto>> AverageEvaluationMetricsWithOtherBatch(
+        BatchEvaluationDto originalEvaluation,
+        IncalculableInputsDto? originalIncalculableInputs,
+        EvaluationRunBatchEntity otherBatch)
+    {
+        var otherBatchEvaluationResult = await _batchEvaluationService.EvaluateBatch(otherBatch);
+        if (otherBatchEvaluationResult.IsFailure)
+            return otherBatchEvaluationResult;
+        var otherEvaluation = otherBatchEvaluationResult.Data!;
+
+        var averageInferenceCost =
+            (originalEvaluation.Metrics.AverageInferenceCost + otherEvaluation.Metrics.AverageInferenceCost) / 2;
+        var estimatedAnnualCost = 0m;
+        if (originalIncalculableInputs?.AnnualFixedCostUsd is { } fixedCostUsd)
+            estimatedAnnualCost += fixedCostUsd;
+        if (originalIncalculableInputs?.ExpectedAnnualInferences is { } expectedInferenceCount)
+            estimatedAnnualCost += expectedInferenceCount * averageInferenceCost;
+
+        var originalMetrics = originalEvaluation.Metrics;
+        var otherMetrics = otherEvaluation.Metrics;
+        var averagedEvaluation = originalEvaluation with
+        {
+            Metrics = new BatchEvaluationMetricsDto(
+                ParameterSuccessRate: (originalMetrics.ParameterSuccessRate + otherMetrics.ParameterSuccessRate) / 2,
+                FalsePositiveRate: (originalMetrics.FalsePositiveRate + otherMetrics.FalsePositiveRate) / 2,
+                AverageCer: (originalMetrics.AverageCer + otherMetrics.AverageCer) / 2,
+                AverageInferenceCost: averageInferenceCost,
+                AverageLatencyMs: (originalMetrics.AverageLatencyMs + otherMetrics.AverageLatencyMs) / 2,
+                EstimatedAnnualCostUsd: estimatedAnnualCost,
+                InferenceStability: originalMetrics.InferenceStability
+            )
+        };
+        return DataResult<BatchEvaluationDto>.Success(averagedEvaluation);
     }
 }

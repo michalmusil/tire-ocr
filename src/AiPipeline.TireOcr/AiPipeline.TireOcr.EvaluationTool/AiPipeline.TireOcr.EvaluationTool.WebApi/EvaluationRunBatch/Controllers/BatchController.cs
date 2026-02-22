@@ -109,7 +109,8 @@ public class BatchController : ControllerBase
             BatchId: id,
             OtherBatchId: request.InferenceStabilityRelativeBatchId,
             ExpectedAnnualInferences: request.ExpectedAnnualInferences,
-            AnnualFixedCost: request.AnnualFixedCostUsd
+            AnnualFixedCost: request.AnnualFixedCostUsd,
+            AverageMetricsWithOtherBatch: request.AverageMetricsWithOtherBatch ?? true
         );
         var result = await _mediator.Send(query);
 

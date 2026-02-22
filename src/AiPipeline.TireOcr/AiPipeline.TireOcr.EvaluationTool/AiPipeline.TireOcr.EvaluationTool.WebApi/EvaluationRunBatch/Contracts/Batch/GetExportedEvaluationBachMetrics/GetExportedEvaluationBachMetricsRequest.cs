@@ -3,5 +3,6 @@ namespace AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.
 public record GetExportedEvaluationBachMetricsRequest(
     Guid? InferenceStabilityRelativeBatchId,
     decimal? AnnualFixedCostUsd,
-    int? ExpectedAnnualInferences
+    int? ExpectedAnnualInferences,
+    bool? AverageMetricsWithOtherBatch
 );

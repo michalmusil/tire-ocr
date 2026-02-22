@@ -6,4 +6,5 @@ public record GetEvaluationBatchMetricsExportQuery(
     Guid BatchId,
     Guid? OtherBatchId,
     int? ExpectedAnnualInferences,
-    decimal? AnnualFixedCost) : IQuery<byte[]>;
+    decimal? AnnualFixedCost,
+    bool AverageMetricsWithOtherBatch) : IQuery<byte[]>;
