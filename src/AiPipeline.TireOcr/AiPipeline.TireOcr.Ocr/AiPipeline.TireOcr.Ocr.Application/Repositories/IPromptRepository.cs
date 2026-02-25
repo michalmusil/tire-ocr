@@ -9,5 +9,6 @@ public interface IPromptRepository
     public Task<string> GetPointsStrictPromptAsync();
     public Task<string> GetPointsStrictWithLisiContextPromptAsync();
     public Task<string> GetSpecializedDeepseekOcrPromptAsync();
+    public Task<string> GetSpecializedHunyuanOcrPromptAsync();
     public Task<string> GetOcrEnginePromptAsync();
 }

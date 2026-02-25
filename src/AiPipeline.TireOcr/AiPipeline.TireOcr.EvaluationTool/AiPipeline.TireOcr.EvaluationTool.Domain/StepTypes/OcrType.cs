@@ -11,5 +11,6 @@ public enum OcrType
     QwenVl = 6,
     InternVl = 7,
     EasyOcr = 8,
-    DeepseekOcr = 9
+    DeepseekOcr = 9,
+    HunyuanOcr = 10,
 }

@@ -53,6 +53,8 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
             ),
             TireCodeDetectorType.DeepseekOcr => new DeepseekOcrTireCodeDetectorService(
                 _httpClient, _imageConvertorService, _configuration, _promptRepository),
+            TireCodeDetectorType.HunyuanOcr => new HunyuanOcrTireCodeDetectorService(
+                _httpClient, _imageConvertorService, _configuration, _promptRepository),
             _ => null
         };
 

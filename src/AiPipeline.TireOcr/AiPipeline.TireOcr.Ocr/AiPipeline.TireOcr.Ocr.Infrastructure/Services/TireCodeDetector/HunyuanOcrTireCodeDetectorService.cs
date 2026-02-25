@@ -12,14 +12,14 @@ using TireOcr.Shared.Result;
 
 namespace TireOcr.Ocr.Infrastructure.Services.TireCodeDetector;
 
-public class DeepseekOcrTireCodeDetectorService : ITireCodeDetectorService
+public class HunyuanOcrTireCodeDetectorService : ITireCodeDetectorService
 {
     private readonly HttpClient _httpClient;
     private readonly IImageConvertorService _imageConvertorService;
     private readonly IConfiguration _configuration;
     private readonly IPromptRepository _promptRepository;
 
-    public DeepseekOcrTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService,
+    public HunyuanOcrTireCodeDetectorService(HttpClient httpClient, IImageConvertorService imageConvertorService,
         IConfiguration configuration, IPromptRepository promptRepository)
     {
         _httpClient = httpClient;
@@ -35,12 +35,12 @@ public class DeepseekOcrTireCodeDetectorService : ITireCodeDetectorService
             var endpointUri = GetPromptEndpointUri();
             if (endpointUri is null)
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
-                    "Failed to retrieve Deepseek OCR endpoint configuration"));
+                    "Failed to retrieve Hunyuan OCR endpoint configuration"));
 
             var apiKey = GetApiKey();
             if (apiKey is null)
                 return DataResult<OcrResultDto>.Failure(new Failure(500,
-                    "Failed to retrieve Deepseek OCR api key"));
+                    "Failed to retrieve Hunyuan OCR api key"));
 
             using var prompt = await GetPromptJsonBody(image);
             using var request = new HttpRequestMessage(HttpMethod.Post, endpointUri);
@@ -78,7 +78,7 @@ public class DeepseekOcrTireCodeDetectorService : ITireCodeDetectorService
         }
         catch (Exception e)
         {
-            var failure = new Failure(500, "Failed to perform Ocr via Deepseek OCR Tire Code Detector");
+            var failure = new Failure(500, "Failed to perform Ocr via Hunyuan OCR Tire Code Detector");
             return DataResult<OcrResultDto>.Failure(failure);
         }
     }
@@ -87,7 +87,7 @@ public class DeepseekOcrTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            return _configuration.GetValue<string>("OcrEndpoints:DeepseekOcr");
+            return _configuration.GetValue<string>("OcrEndpoints:HunyuanOcr");
         }
         catch
         {
@@ -109,7 +109,7 @@ public class DeepseekOcrTireCodeDetectorService : ITireCodeDetectorService
 
     private async Task<StringContent> GetPromptJsonBody(Image image)
     {
-        var prompt = await _promptRepository.GetSpecializedDeepseekOcrPromptAsync();
+        var prompt = await _promptRepository.GetSpecializedHunyuanOcrPromptAsync();
         var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {

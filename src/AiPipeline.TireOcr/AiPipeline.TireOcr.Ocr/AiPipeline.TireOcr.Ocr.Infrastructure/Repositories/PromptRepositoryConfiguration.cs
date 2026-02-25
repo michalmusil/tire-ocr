@@ -34,6 +34,9 @@ public class PromptRepositoryConfiguration : IPromptRepository
     public Task<string> GetSpecializedDeepseekOcrPromptAsync() =>
         Task.FromResult(GetPromptFromConfiguration("DeepseekOcr"));
 
+    public Task<string> GetSpecializedHunyuanOcrPromptAsync() =>
+        Task.FromResult(GetPromptFromConfiguration("HunyuanOcr"));
+
     public Task<string> GetOcrEnginePromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngine"));
 
 

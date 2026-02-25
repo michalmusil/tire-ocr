@@ -109,7 +109,7 @@ public class BatchEvaluationService : IBatchEvaluationService
             ? null
             : await CalculateInferenceStabilityAsync(batch, inputs.InferenceStabilityRelative);
 
-        var averageInferenceCost = allInferenceCosts.Average();
+        var averageInferenceCost = SafeAverage(allInferenceCosts);
         var estimatedAnnualCost = inputs?.AnnualFixedCostUsd is null && inputs?.ExpectedAnnualInferences is null
             ? null
             : CalculateEstimatedAnnualCost(inputs, averageInferenceCost);
@@ -139,11 +139,11 @@ public class BatchEvaluationService : IBatchEvaluationService
                 AverageSpeedRatingDistance: GetAverageDistance(speedRatingDistances)
             ),
             Metrics: new BatchEvaluationMetricsDto(
-                ParameterSuccessRate: allParameterSuccessRates.Average(),
+                ParameterSuccessRate: SafeAverage(allParameterSuccessRates),
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
-                AverageCer: allCers.Average(),
+                AverageCer: SafeAverage(allCers),
                 AverageInferenceCost: averageInferenceCost,
-                AverageLatencyMs: allDurationsWithoutTraffic.Average(),
+                AverageLatencyMs: SafeAverage(allDurationsWithoutTraffic),
                 InferenceStability: inferenceStability,
                 EstimatedAnnualCostUsd: estimatedAnnualCost
             )
@@ -191,7 +191,7 @@ public class BatchEvaluationService : IBatchEvaluationService
                 scores.Add(stability);
             });
 
-        return scores.Average();
+        return SafeAverage(scores);
     }
 
     private decimal? CalculateEstimatedAnnualCost(IncalculableInputsDto inputs, decimal averageInferenceCost)
@@ -245,6 +245,12 @@ public class BatchEvaluationService : IBatchEvaluationService
             ParameterSuccessRate: parameterSuccessRate,
             TotalDurationWithoutTraffic: durationWithoutTrafic
         );
+    }
+
+    private decimal SafeAverage(IEnumerable<decimal> elements)
+    {
+        var list = elements.ToList();
+        return list.Count == 0 ? 0 : list.Average();
     }
 
     private record SuccessDependentStats(

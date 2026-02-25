@@ -10,4 +10,5 @@ public enum TireCodeDetectorType
     QwenVl = 5,
     InternVl = 6,
     DeepseekOcr = 7,
+    HunyuanOcr = 8,
 }
