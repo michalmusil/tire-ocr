@@ -24,12 +24,12 @@ def get_paddle_ocr_engine() -> PaddleOCR:
         model_dir = "./custom_models/rec/3_15_epochs_with_synth_with_tire_dict"
 
         PADDLE_OCR_ENGINE = PaddleOCR(
-#             use_doc_orientation_classify=False,
-#             use_textline_orientation=False,
-#             use_doc_unwarping=False,
+            use_doc_orientation_classify=False,
+            use_textline_orientation=False,
+            use_doc_unwarping=False,
             lang="en",
             text_recognition_model_name=model_name,
-#             text_recognition_model_dir=model_dir,
+            text_recognition_model_dir=model_dir,
         )
         print("PaddleOCR: INITIALIZED")
     return PADDLE_OCR_ENGINE
