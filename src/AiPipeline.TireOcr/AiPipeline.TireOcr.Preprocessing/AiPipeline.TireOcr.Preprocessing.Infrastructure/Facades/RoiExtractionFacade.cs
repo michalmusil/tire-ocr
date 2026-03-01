@@ -15,65 +15,38 @@ public class RoiExtractionFacade : IRoiExtractionFacade
     private readonly IImageSlicerService _imageSlicerService;
     private readonly IImageTextApproximatorService _imageTextApproximatorService;
     private readonly ITextDetectionService _textDetectionService;
-    private readonly IImageManipulationService _imageManipulationService;
     private readonly ICharacterEnhancementService _characterEnhancementService;
     private readonly ImageProcessingOptions _imageProcessingOptions;
 
     public RoiExtractionFacade(IImageSlicerService imageSlicerService,
         IImageTextApproximatorService imageTextApproximatorService,
-        ITextDetectionService textDetectionService, IImageManipulationService imageManipulationService,
-        ICharacterEnhancementService characterEnhancementService,
+        ITextDetectionService textDetectionService, ICharacterEnhancementService characterEnhancementService,
         IOptions<ImageProcessingOptions> imageProcessingOptions)
     {
         _imageSlicerService = imageSlicerService;
         _imageTextApproximatorService = imageTextApproximatorService;
         _textDetectionService = textDetectionService;
-        _imageManipulationService = imageManipulationService;
         _characterEnhancementService = characterEnhancementService;
         _imageProcessingOptions = imageProcessingOptions.Value;
     }
 
-    public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoi(Image image)
-    {
-        var taskResult = await PerformanceUtils
-            .PerformTimeMeasuredTask(() => GetRoiOfImage(image));
-
-        var timeTaken = taskResult.Item1;
-        var resultImage = taskResult.Item2;
-
-        if (resultImage.IsFailure)
-            return DataResult<TextDetectionResultDto>.Failure(resultImage.Failures);
-
-        var result = new TextDetectionResultDto(
-            BestImage: resultImage.Data!.Image,
-            DetectedStringsWithLevenshteinDistance: resultImage.Data!.DetectedStrings,
-            TimeTaken: timeTaken
-        );
-        return DataResult<TextDetectionResultDto>.Success(result);
-    }
-
-    public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoiAndRemoveBg(Image image)
+    public async Task<DataResult<TextDetectionResultDto>> ExtractSliceContainingTireCode(Image image)
     {
         var taskResult = await PerformanceUtils
             .PerformTimeMeasuredTask(async () =>
             {
-                var roi = await GetRoiOfImage(image);
-                if (roi.IsFailure)
-                    return DataResult<ImageWithDetectedTexts>.Failure(roi.Failures);
+                var slicesWithTextResult = await GetSlicesWithDetectedTexts(image);
+                if (slicesWithTextResult.IsFailure)
+                    return DataResult<ImageWithDetectedTexts>.Failure(slicesWithTextResult.Failures);
 
-                var roiImage = roi.Data!;
-                var boundingBoxes = roiImage.DetectedStrings.Keys
-                    .Where(s => s.Characters.Count > 0)
-                    .Select(s => _imageManipulationService.GetBoundingBoxForTireCodeString(roiImage.Image, s));
-                var roiImageWithoutBg =
-                    _imageManipulationService.ApplyMaskToEverythingExceptBoundingBoxes(roiImage.Image, boundingBoxes);
+                var slicesWithDetectedTexts = slicesWithTextResult.Data!.ToList();
+                if (slicesWithDetectedTexts.Count < 1)
+                    return DataResult<ImageWithDetectedTexts>.NotFound("No text detected in the image");
 
-                var finalImage = _imageManipulationService.ApplyClahe(roiImageWithoutBg);
-                finalImage =
-                    _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
-                finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
+                var bestResult = slicesWithDetectedTexts
+                    .MinBy(r => r.DetectedStrings.Values.ToArray().Min());
 
-                return DataResult<ImageWithDetectedTexts>.Success(roiImage with { Image = finalImage });
+                return DataResult<ImageWithDetectedTexts>.Success(bestResult!);
             });
 
         var timeTaken = taskResult.Item1;
@@ -90,20 +63,27 @@ public class RoiExtractionFacade : IRoiExtractionFacade
         return DataResult<TextDetectionResultDto>.Success(result);
     }
 
-    public async Task<DataResult<TextDetectionResultDto>> ExtractTireCodeRoiAndEnhanceCharacters(Image image)
+    public async Task<DataResult<TextDetectionResultDto>> ExtractSliceContainingTireCodeAndEnhanceCharacters(Image image)
     {
         var taskResult = await PerformanceUtils
             .PerformTimeMeasuredTask(async () =>
             {
-                var roiResult = await GetRoiOfImage(image);
-                if (roiResult.IsFailure)
-                    return roiResult;
-                var roi = roiResult.Data!;
-                var enhancementResult = await _characterEnhancementService.EnhanceCharactersAsync(roi.Image);
+                var slicesWithTextResult = await GetSlicesWithDetectedTexts(image);
+                if (slicesWithTextResult.IsFailure)
+                    return DataResult<ImageWithDetectedTexts>.Failure(slicesWithTextResult.Failures);
+
+                var slicesWithDetectedTexts = slicesWithTextResult.Data!.ToList();
+                if (slicesWithDetectedTexts.Count < 1)
+                    return DataResult<ImageWithDetectedTexts>.NotFound("No text detected in the image");
+
+                var bestResult = slicesWithDetectedTexts
+                    .MinBy(r => r.DetectedStrings.Values.ToArray().Min())!;
+
+                var enhancementResult = await _characterEnhancementService.EnhanceCharactersAsync(bestResult.Image);
                 if (enhancementResult.IsFailure)
                     return DataResult<ImageWithDetectedTexts>.Failure(enhancementResult.Failures);
 
-                return DataResult<ImageWithDetectedTexts>.Success(roi with { Image = enhancementResult.Data! });
+                return DataResult<ImageWithDetectedTexts>.Success(bestResult with { Image = enhancementResult.Data! });
             });
 
         var timeTaken = taskResult.Item1;
@@ -120,7 +100,7 @@ public class RoiExtractionFacade : IRoiExtractionFacade
         return DataResult<TextDetectionResultDto>.Success(result);
     }
 
-    private async Task<DataResult<ImageWithDetectedTexts>> GetRoiOfImage(Image image)
+    private async Task<DataResult<IEnumerable<ImageWithDetectedTexts>>> GetSlicesWithDetectedTexts(Image image)
     {
         var sliceSize = new ImageSize(
             image.Size.Height,
@@ -134,7 +114,7 @@ public class RoiExtractionFacade : IRoiExtractionFacade
                 0
             );
         if (slicesResult.IsFailure)
-            return DataResult<ImageWithDetectedTexts>.Failure(slicesResult.Failures);
+            return DataResult<IEnumerable<ImageWithDetectedTexts>>.Failure(slicesResult.Failures);
 
         var slices = slicesResult.Data!;
         var results = await Task.WhenAll(slices.Select(ProcessSingleImageSliceAsync));
@@ -144,16 +124,7 @@ public class RoiExtractionFacade : IRoiExtractionFacade
             .Select(r => r.Data!)
             .ToList();
 
-        if (!successfulResults.Any())
-            return DataResult<ImageWithDetectedTexts>.NotFound("No text detected in the image");
-
-        var bestResult = successfulResults
-            .MinBy(r => r.DetectedStrings.Values.ToArray().Min());
-        if (bestResult is null)
-            return DataResult<ImageWithDetectedTexts>.Failure(new Failure(500,
-                "Failed to determine image with best text match"));
-
-        return DataResult<ImageWithDetectedTexts>.Success(bestResult);
+        return DataResult<IEnumerable<ImageWithDetectedTexts>>.Success(successfulResults);
     }
 
     private async Task<DataResult<ImageWithDetectedTexts>> ProcessSingleImageSliceAsync(Image slice)

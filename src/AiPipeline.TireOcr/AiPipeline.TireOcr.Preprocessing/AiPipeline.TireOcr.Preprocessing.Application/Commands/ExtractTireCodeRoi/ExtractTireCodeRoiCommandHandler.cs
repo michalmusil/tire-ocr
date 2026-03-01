@@ -119,8 +119,8 @@ public class ExtractTireCodeRoiCommandHandler : ICommandHandler<ExtractTireCodeR
 
         // Performing the roi extraction
         var roiExtractionResult = request.EnhanceCharacters
-            ? await _roiExtractionFacade.ExtractTireCodeRoiAndEnhanceCharacters(processedImage)
-            : await _roiExtractionFacade.ExtractTireCodeRoi(processedImage);
+            ? await _roiExtractionFacade.ExtractSliceContainingTireCodeAndEnhanceCharacters(processedImage)
+            : await _roiExtractionFacade.ExtractSliceContainingTireCode(processedImage);
 
         return roiExtractionResult.Map(
             onSuccess: res =>
