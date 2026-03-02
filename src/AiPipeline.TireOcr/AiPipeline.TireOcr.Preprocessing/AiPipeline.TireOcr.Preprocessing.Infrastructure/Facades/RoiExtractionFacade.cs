@@ -142,17 +142,19 @@ public class RoiExtractionFacade : IRoiExtractionFacade
                 );
 
                 var roiWidth = (int)Math.Ceiling(image.Size.Width * _imageProcessingOptions.AbsoluteRoiWidthRatio);
-                var roiHeight = (int)Math.Ceiling(
-                    (stringBbox.BottomRight.Y - stringBbox.TopLeft.Y) * _imageProcessingOptions.AbsoluteRoiHeightRatio
-                );
+                // var roiHeight = (int)Math.Ceiling(
+                //     (stringBbox.BottomRight.Y - stringBbox.TopLeft.Y) * _imageProcessingOptions.AbsoluteRoiHeightRatio
+                // );
 
                 var roiTopLeftCoordinate = new ImageCoordinate(
                     x: Math.Max(0, absoluteStringCenter.X - roiWidth / 2),
-                    y: Math.Max(0, absoluteStringCenter.Y - roiHeight / 2)
+                    // y: Math.Max(0, absoluteStringCenter.Y - roiHeight / 2)
+                    y: 0
                 );
                 var roiBottomRightCoordinate = new ImageCoordinate(
                     x: Math.Min(roiTopLeftCoordinate.X + roiWidth, image.Size.Width),
-                    y: Math.Min(roiTopLeftCoordinate.Y + roiHeight, image.Size.Height)
+                    // y: Math.Min(roiTopLeftCoordinate.Y + roiHeight, image.Size.Height)
+                    y: image.Size.Height
                 );
 
                 var roi = _imageManipulationService.GetBboxInImage(
