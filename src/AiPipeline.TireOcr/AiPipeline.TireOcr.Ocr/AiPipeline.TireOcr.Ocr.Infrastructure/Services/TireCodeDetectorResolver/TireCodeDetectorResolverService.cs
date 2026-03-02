@@ -40,11 +40,16 @@ public class TireCodeDetectorResolverService : ITireCodeDetectorResolverService
                 _openaiLogger),
             TireCodeDetectorType.GoogleCloudVision => new GoogleCloudVisionTireCodeDetectorService(_configuration),
             TireCodeDetectorType.AzureAiVision => new AzureAiVisionTireCodeDetectorService(_configuration),
-            TireCodeDetectorType.QwenVl => new RunPodVllmApiTireCodeDetectorService(
+            // TireCodeDetectorType.QwenVl => new RunPodVllmApiTireCodeDetectorService(
+            //     _configuration,
+            //     _promptRepository,
+            //     _configuration.GetValue<string>("RunPodModelNames:QwenVl")!,
+            //     _configuration.GetValue<string>("OcrEndpoints:QwenVl")!
+            // ),
+            TireCodeDetectorType.QwenVl => new OpenRouterApiTireCodeDetectorService(
                 _configuration,
                 _promptRepository,
-                _configuration.GetValue<string>("RunPodModelNames:QwenVl")!,
-                _configuration.GetValue<string>("OcrEndpoints:QwenVl")!
+                _configuration.GetValue<string>("OpenRouterModelNames:QwenVl")!
             ),
             TireCodeDetectorType.InternVl => new OpenRouterApiTireCodeDetectorService(
                 _configuration,
