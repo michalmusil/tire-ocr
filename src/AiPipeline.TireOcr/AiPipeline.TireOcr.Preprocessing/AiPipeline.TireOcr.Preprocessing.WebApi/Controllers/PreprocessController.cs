@@ -1,6 +1,7 @@
 using Asp.Versioning;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using TireOcr.Preprocessing.Application.Commands.ExtractAbsoluteRoiPosition;
 using TireOcr.Preprocessing.Application.Commands.ExtractImageSlices;
 using TireOcr.Preprocessing.Application.Commands.ExtractTireCodeRoi;
 using TireOcr.Preprocessing.Application.Commands.ResizeImage;
@@ -68,6 +69,61 @@ public class PreprocessController : ControllerBase
             ImageName: roiRequest.Image.FileName,
             OriginalContentType: roiRequest.Image.ContentType,
             EnhanceCharacters: roiRequest.EnhanceCharacters
+        );
+        var result = await _mediator.Send(command);
+
+        return result.Map(
+            onSuccess: dto => File(dto.ImageData, dto.ContentType),
+            onFailure: failures =>
+            {
+                var primaryFailure = failures.FirstOrDefault();
+                var otherFailures = failures.Skip(1).ToArray();
+
+                return primaryFailure?.ToActionResult(otherFailures) ??
+                       Problem("Failed to preprocess image", null, 500);
+            }
+        );
+    }
+
+    [HttpPost("ExtractAbsoluteRoi")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<ExtractRoiResponse>> ExtractAbsoluteRoi(IFormFile image)
+    {
+        var imageData = await image.ToByteArray();
+        var command = new ExtractAbsoluteRoiPositionCommand(
+            ImageData: imageData,
+            ImageName: image.FileName,
+            OriginalContentType: image.ContentType
+        );
+        var result = await _mediator.Send(command);
+
+        return result.ToActionResult<PreprocessedImageDto, ExtractRoiResponse>(
+            onSuccess: dto =>
+            {
+                var base64Data = Convert.ToBase64String(dto.ImageData);
+                var response = new ExtractRoiResponse(
+                    FileName: dto.Name,
+                    ContentType: dto.ContentType,
+                    Base64ImageData: base64Data,
+                    DurationMs: dto.DurationMs
+                );
+                return response;
+            });
+    }
+
+    [HttpPost("ExtractAbsoluteRoi/File")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ExtractAbsoluteRoiReturnFile(IFormFile image)
+    {
+        var imageData = await image.ToByteArray();
+        var command = new ExtractAbsoluteRoiPositionCommand(
+            ImageData: imageData,
+            ImageName: image.FileName,
+            OriginalContentType: image.ContentType
         );
         var result = await _mediator.Send(command);
 
