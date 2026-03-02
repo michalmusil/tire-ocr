@@ -10,4 +10,6 @@ public class ImageProcessingOptions
     public double NormSliceWidthPortion { get; set; }
     public double NormSliceOverlapRatio { get; set; }
     public double AdditiveSliceOverlapRatio { get; set; }
+    public double AbsoluteRoiWidthRatio { get; set; }
+    public double AbsoluteRoiHeightRatio { get; set; }
 }

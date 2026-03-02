@@ -141,8 +141,10 @@ public class RoiExtractionFacade : IRoiExtractionFacade
                     y: offset.Y + (stringBbox.TopLeft.Y + stringBbox.BottomRight.Y) / 2
                 );
 
-                var roiWidth = (int)Math.Ceiling(image.Size.Width * 0.14); // TODO: replace with custom appsettings value
-                var roiHeight = (int)Math.Ceiling((stringBbox.BottomRight.Y - stringBbox.TopLeft.Y) * 1.6);
+                var roiWidth = (int)Math.Ceiling(image.Size.Width * _imageProcessingOptions.AbsoluteRoiWidthRatio);
+                var roiHeight = (int)Math.Ceiling(
+                    (stringBbox.BottomRight.Y - stringBbox.TopLeft.Y) * _imageProcessingOptions.AbsoluteRoiHeightRatio
+                );
 
                 var roiTopLeftCoordinate = new ImageCoordinate(
                     x: Math.Max(0, absoluteStringCenter.X - roiWidth / 2),
