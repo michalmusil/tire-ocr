@@ -27,4 +27,5 @@ public interface IImageManipulationService
     public BoundingBox GetBoundingBoxForTireCodeString(Image image, StringInImage stringInImage);
     public Image ApplyMaskToEverythingExceptBoundingBoxes(Image image, IEnumerable<BoundingBox> boundingBoxes);
     public Image? StackImagesVertically(List<Image> images);
+    public Image GetBboxInImage(Image image, BoundingBox bbox);
 }

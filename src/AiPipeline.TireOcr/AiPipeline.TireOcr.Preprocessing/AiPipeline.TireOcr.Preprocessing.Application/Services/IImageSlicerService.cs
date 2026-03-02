@@ -1,3 +1,4 @@
+using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Shared.Result;
 
@@ -15,7 +16,7 @@ public interface IImageSlicerService
     /// is between 0 and 1 and specifies a percentage of the sliceSize dimension in which individual slices should
     /// overlap (in a given axis). 
     /// </summary>
-    public Task<DataResult<IEnumerable<Image>>> SliceImageNormalOverlap(
+    public Task<DataResult<IEnumerable<ImageWithOffset>>> SliceImageNormalOverlap(
         Image image,
         ImageSize sliceSize,
         double xOverlapRatio,
@@ -33,7 +34,7 @@ public interface IImageSlicerService
     /// on left and right and 10% of its height on top and bottom. The overlap is not added in case it would overflow
     /// the original image dimension. 
     /// </summary>
-    public Task<DataResult<IEnumerable<Image>>> SliceImageAdditiveOverlap(
+    public Task<DataResult<IEnumerable<ImageWithOffset>>> SliceImageAdditiveOverlap(
         Image image,
         ImageSize sliceSize,
         double xOverlapRatio,

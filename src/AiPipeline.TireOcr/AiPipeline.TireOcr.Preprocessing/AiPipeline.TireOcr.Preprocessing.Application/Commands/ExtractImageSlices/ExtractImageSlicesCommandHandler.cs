@@ -124,7 +124,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
         );
         if (slicesResult.IsFailure)
             return DataResult<Image>.Failure(slicesResult.Failures);
-        var slices = slicesResult.Data!.ToList();
+        var slices = slicesResult.Data!.Select(x => x.Image).ToList();
         if (!slices.Any())
             return DataResult<Image>.Failure(new Failure(500, "Failed to generate image slices."));
 

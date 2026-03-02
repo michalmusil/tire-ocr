@@ -309,6 +309,18 @@ public class OpenCvImageManipulationService : IImageManipulationService
         return resultImage.ToDomain(images.First().Name);
     }
 
+    public Image GetBboxInImage(Image image, BoundingBox bbox)
+    {
+        var width = bbox.BottomRight.X - bbox.TopLeft.X;
+        var height = bbox.BottomRight.Y - bbox.TopLeft.Y;
+        var rect = new Rect(bbox.TopLeft.X, bbox.TopLeft.Y, width, height);
+
+        using var cv2Image = image.ToCv2();
+        using var bboxArea = new Mat(cv2Image, rect);
+
+        return bboxArea.ToDomain(image.Name);
+    }
+
     private bool CoordinateIsValid(ImageCoordinate coordinate, int imageWidth, int imageHeight) => coordinate.X >= 0 &&
         coordinate.Y >= 0 && coordinate.X <= imageWidth && coordinate.Y <= imageHeight;
 }

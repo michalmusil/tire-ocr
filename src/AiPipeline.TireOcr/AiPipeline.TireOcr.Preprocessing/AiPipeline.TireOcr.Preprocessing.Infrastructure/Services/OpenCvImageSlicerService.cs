@@ -1,5 +1,7 @@
 using OpenCvSharp;
+using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Services;
+using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
 using TireOcr.Shared.Result;
@@ -8,7 +10,7 @@ namespace TireOcr.Preprocessing.Infrastructure.Services;
 
 public class OpenCvImageSlicerService : IImageSlicerService
 {
-    public async Task<DataResult<IEnumerable<Image>>> SliceImageNormalOverlap(
+    public async Task<DataResult<IEnumerable<ImageWithOffset>>> SliceImageNormalOverlap(
         Image image,
         ImageSize sliceSize,
         double xOverlapRatio,
@@ -33,7 +35,7 @@ public class OpenCvImageSlicerService : IImageSlicerService
             var startingXs = GenerateRange(0, width, logicalSliceWidth);
             var startingYs = GenerateRange(0, height, logicalSliceHeight);
 
-            var slices = new List<Mat>();
+            var slices = new List<(ImageCoordinate, Mat)>();
             foreach (var y in startingYs)
             {
                 foreach (var x in startingXs)
@@ -44,29 +46,32 @@ public class OpenCvImageSlicerService : IImageSlicerService
                     var ymax = (int)Math.Min(y + realSliceHeight, height);
 
                     var rect = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
-                    slices.Add(new Mat(inputImage, rect));
+                    slices.Add((new ImageCoordinate(xmin, ymin), new Mat(inputImage, rect)));
                 }
             }
 
-            var resultImages = new List<Image>();
+            var resultImages = new List<ImageWithOffset>();
             for (var i = 0; i < slices.Count; i++)
             {
                 var slice = slices[i];
                 var imageName = $"{i + 1}_{image.Name}";
-                resultImages.Add(slice.ToDomain(imageName));
+                resultImages.Add(
+                    new ImageWithOffset(slice.Item1, slice.Item2.ToDomain(imageName))
+                );
 
-                slice.Dispose();
+                slice.Item2.Dispose();
             }
 
-            return DataResult<IEnumerable<Image>>.Success(resultImages);
+            return DataResult<IEnumerable<ImageWithOffset>>.Success(resultImages);
         }
-        catch (Exception ex)
+        catch
         {
-            return DataResult<IEnumerable<Image>>.Failure(new Failure(500, "Failed to slice image."));
+            return DataResult<IEnumerable<ImageWithOffset>>.Failure(new Failure(500, "Failed to slice image."));
         }
     }
 
-    public async Task<DataResult<IEnumerable<Image>>> SliceImageAdditiveOverlap(Image image, ImageSize sliceSize,
+    public async Task<DataResult<IEnumerable<ImageWithOffset>>> SliceImageAdditiveOverlap(Image image,
+        ImageSize sliceSize,
         double xOverlapRatio, double yOverlapRatio)
     {
         try
@@ -84,7 +89,7 @@ public class OpenCvImageSlicerService : IImageSlicerService
             var startingXs = GenerateRange(0, width, realSliceWidth);
             var startingYs = GenerateRange(0, height, realSliceHeight);
 
-            var slices = new List<Mat>();
+            var slices = new List<(ImageCoordinate, Mat)>();
             foreach (var y in startingYs)
             {
                 foreach (var x in startingXs)
@@ -95,25 +100,27 @@ public class OpenCvImageSlicerService : IImageSlicerService
                     var ymax = (int)Math.Min(y + realSliceHeight + overlapHeight, height);
 
                     var rect = new Rect(xmin, ymin, xmax - xmin, ymax - ymin);
-                    slices.Add(new Mat(inputImage, rect));
+                    slices.Add((new ImageCoordinate(xmin, ymin), new Mat(inputImage, rect)));
                 }
             }
 
-            var resultImages = new List<Image>();
+            var resultImages = new List<ImageWithOffset>();
             for (var i = 0; i < slices.Count; i++)
             {
                 var slice = slices[i];
                 var imageName = $"{i + 1}_{image.Name}";
-                resultImages.Add(slice.ToDomain(imageName));
+                resultImages.Add(
+                    new ImageWithOffset(slice.Item1, slice.Item2.ToDomain(imageName))
+                );
 
-                slice.Dispose();
+                slice.Item2.Dispose();
             }
 
-            return DataResult<IEnumerable<Image>>.Success(resultImages);
+            return DataResult<IEnumerable<ImageWithOffset>>.Success(resultImages);
         }
         catch (Exception ex)
         {
-            return DataResult<IEnumerable<Image>>.Failure(new Failure(500, "Failed to slice image."));
+            return DataResult<IEnumerable<ImageWithOffset>>.Failure(new Failure(500, "Failed to slice image."));
         }
     }
 

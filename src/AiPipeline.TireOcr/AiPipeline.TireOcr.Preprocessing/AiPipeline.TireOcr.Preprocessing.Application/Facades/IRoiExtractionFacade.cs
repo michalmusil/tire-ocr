@@ -8,4 +8,5 @@ public interface IRoiExtractionFacade
 {
     public Task<DataResult<TextDetectionResultDto>> ExtractSliceContainingTireCode(Image image);
     public Task<DataResult<TextDetectionResultDto>> ExtractSliceContainingTireCodeAndEnhanceCharacters(Image image);
+    public Task<DataResult<TextDetectionResultDto>> ExtractAbsoluteTireCodeRoi(Image image);
 }
