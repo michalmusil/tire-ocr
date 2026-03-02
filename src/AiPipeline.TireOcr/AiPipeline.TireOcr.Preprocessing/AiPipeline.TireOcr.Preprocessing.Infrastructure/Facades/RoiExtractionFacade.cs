@@ -151,8 +151,8 @@ public class RoiExtractionFacade : IRoiExtractionFacade
                     y: Math.Max(0, absoluteStringCenter.Y - roiHeight / 2)
                 );
                 var roiBottomRightCoordinate = new ImageCoordinate(
-                    x: roiTopLeftCoordinate.X + roiWidth,
-                    y: roiTopLeftCoordinate.Y + roiHeight
+                    x: Math.Min(roiTopLeftCoordinate.X + roiWidth, image.Size.Width),
+                    y: Math.Min(roiTopLeftCoordinate.Y + roiHeight, image.Size.Height)
                 );
 
                 var roi = _imageManipulationService.GetBboxInImage(

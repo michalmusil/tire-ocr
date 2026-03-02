@@ -43,12 +43,12 @@ public static class DependencyInjection
         return services;
     }
 
-    public static void AddUnitOfWork(this IServiceCollection serviceCollection)
+    private static void AddUnitOfWork(IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 
-    public static void AddRepositories(this IServiceCollection serviceCollection)
+    private static void AddRepositories(IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IEvaluationRunEntityRepository, EvaluationRunEntityRepository>();
         serviceCollection.AddScoped<IEvaluationRunBatchEntityRepository, EvaluationRunBatchEntityRepository>();
@@ -86,6 +86,11 @@ public static class DependencyInjection
         // Preprocessing
 
         services.AddHttpClient<PreprocessingRoiExtractionProcessor>(client =>
+        {
+            client.BaseAddress = new("https+http://PreprocessingService");
+        }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
+        
+        services.AddHttpClient<PreprocessingAbsoluteRoiProcessor>(client =>
         {
             client.BaseAddress = new("https+http://PreprocessingService");
         }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
@@ -130,7 +135,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<DbMatchingNoneProcessor>();
-        
+
         // DbMatching
 
         services.AddHttpClient<DbMatchingRemoteProcessor>(client =>
