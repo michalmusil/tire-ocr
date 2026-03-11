@@ -20,6 +20,12 @@ public class PromptRepositoryConfiguration : IPromptRepository
         return prompt;
     }
 
+    public Task<string> GetSimplePromptAsync() => Task.FromResult(GetPromptFromConfiguration("Simple"));
+    public Task<string> GetTaskPromptAsync() => Task.FromResult(GetPromptFromConfiguration("Task"));
+
+    public Task<string> GetFewShotPromptAsync() => Task.FromResult(GetPromptFromConfiguration("FewShot"));
+    public Task<string> GetCotPromptAsync()=> Task.FromResult(GetPromptFromConfiguration("Cot"));
+
     public Task<string> GetBasePromptAsync() => Task.FromResult(GetPromptFromConfiguration("Base"));
 
     public Task<string> GetBaseStrictPromptAsync() => Task.FromResult(GetPromptFromConfiguration("BaseStrict"));
@@ -37,7 +43,7 @@ public class PromptRepositoryConfiguration : IPromptRepository
     public Task<string> GetSpecializedHunyuanOcrPromptAsync() =>
         Task.FromResult(GetPromptFromConfiguration("HunyuanOcr"));
 
-    public Task<string> GetOcrEnginePromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngine"));
+    public Task<string> GetOcrEnginePromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngine2"));
 
 
     private string GetPromptFromConfiguration(string promptKey)
