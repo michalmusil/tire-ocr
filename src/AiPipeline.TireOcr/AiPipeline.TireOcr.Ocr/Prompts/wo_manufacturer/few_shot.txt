@@ -13,6 +13,9 @@ A:195/60R15 96H
 Q:<Input image containing well legible tire code of a light truck>
 A:225/60R16C 112/110S
 
+Q:<Input image containing well legible dimensional part of the tire code, but load index and speed speed rating are obscured by mud>
+A:205/55R16
+
 Q:<Blurry input image containing no text at all>
 A:N
 
