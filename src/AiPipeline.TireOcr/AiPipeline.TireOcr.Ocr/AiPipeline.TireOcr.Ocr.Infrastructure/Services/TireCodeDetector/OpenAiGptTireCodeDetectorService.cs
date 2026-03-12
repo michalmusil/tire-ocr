@@ -36,10 +36,8 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
             var prompt = await _promptRepository.GetMainPromptAsync(useRandomPrefix: true);
             List<ChatMessage> messages =
             [
-                new SystemChatMessage(
-                    ChatMessageContentPart.CreateTextPart(prompt)
-                ),
                 new UserChatMessage(
+                    ChatMessageContentPart.CreateTextPart(prompt),
                     ChatMessageContentPart.CreateImagePart(new BinaryData(image.Data),
                         image.ContentType,
                         ChatImageDetailLevel.High

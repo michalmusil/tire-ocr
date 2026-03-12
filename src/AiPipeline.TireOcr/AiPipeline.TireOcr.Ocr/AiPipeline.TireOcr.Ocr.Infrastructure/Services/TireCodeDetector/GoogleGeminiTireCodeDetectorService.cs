@@ -101,14 +101,6 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
         var base64Image = _imageConvertorService.ConvertToBase64(image);
         var payload = new
         {
-            systemInstruction = new
-            {
-                role = "system",
-                parts = new object[]
-                {
-                    new { text = prompt },
-                }
-            },
             contents = new[]
             {
                 new
@@ -116,6 +108,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
                     role = "user",
                     parts = new object[]
                     {
+                        new { text = prompt },
                         new
                         {
                             inline_data = new
