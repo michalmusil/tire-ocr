@@ -56,8 +56,8 @@ const ExportBatchDialog = ({ batchId, trigger }: ExportBatchDialogProps) => {
         batchId,
         inferenceStabilityRelativeBatchId:
           inputs.inferenceStabilityRelativeBatchId,
-        annualFixedCostUsd: inputs.annualFixedCostUsd,
-        expectedAnnualInferences: inputs.expectedAnnualInferences,
+        fixedExpenditure: inputs.annualFixedCostUsd,
+        calculateVariableExpenditure: inputs.calculateVariableExpenditure,
       },
       {
         onSuccess: (data) => {

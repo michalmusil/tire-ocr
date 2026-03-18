@@ -108,9 +108,10 @@ public class BatchController : ControllerBase
         var query = new GetEvaluationBatchMetricsExportQuery(
             BatchId: id,
             OtherBatchId: request.InferenceStabilityRelativeBatchId,
-            ExpectedAnnualInferences: request.ExpectedAnnualInferences,
-            AnnualFixedCost: request.AnnualFixedCostUsd,
-            AverageMetricsWithOtherBatch: request.AverageMetricsWithOtherBatch ?? true
+            AverageMetricsWithOtherBatch: request.AverageMetricsWithOtherBatch ??
+                                          request.InferenceStabilityRelativeBatchId is not null,
+            FixedExpenditure: request.FixedExpenditure,
+            AddVariableExpenditure: request.CalculateVariableExpenditure ?? false
         );
         var result = await _mediator.Send(query);
 

@@ -50,8 +50,8 @@ export const BatchMetricsCard = ({ metrics }: BatchMetricsCardProps) => {
           />
           <MetricItem
             Icon={CreditCard}
-            name="Average Inference Cost"
-            value={`$${metrics.averageInferenceCost.toFixed(5)}`}
+            name="Average Variable Expenditure per Inference"
+            value={`$${metrics.averageVariableInferenceExpenditure.toFixed(5)}`}
           />
           <MetricItem
             Icon={Zap}

@@ -39,7 +39,7 @@ public class BatchEvaluationService : IBatchEvaluationService
         List<int> speedRatingDistances = [];
         List<decimal> allCers = [];
         List<decimal> allParameterSuccessRates = [];
-        List<decimal> allInferenceCosts = [];
+        List<decimal> allMeasuredInferenceCosts = [];
         List<decimal> allDurationsWithoutTraffic = [];
 
         foreach (var run in batch.EvaluationRuns)
@@ -99,20 +99,17 @@ public class BatchEvaluationService : IBatchEvaluationService
             AddDistanceIfNotNull(stats.SpeedRatingDistance, speedRatingDistances);
 
             allCers.Add(stats.Cer);
-            allInferenceCosts.Add(stats.InferenceCost);
+            allMeasuredInferenceCosts.Add(stats.InferenceCost);
             allParameterSuccessRates.Add(stats.ParameterSuccessRate);
             if (stats.TotalDurationWithoutTraffic is not null)
                 allDurationsWithoutTraffic.Add(stats.TotalDurationWithoutTraffic.Value);
         }
 
-        decimal? inferenceStability = inputs?.InferenceStabilityRelative is null
-            ? null
-            : await CalculateInferenceStabilityAsync(batch, inputs.InferenceStabilityRelative);
-
-        var averageInferenceCost = SafeAverage(allInferenceCosts);
-        var estimatedAnnualCost = inputs?.AnnualFixedCostUsd is null && inputs?.ExpectedAnnualInferences is null
-            ? null
-            : CalculateEstimatedAnnualCost(inputs, averageInferenceCost);
+        var estimatedExpenditurePer1000Requests = CalculateAverageExpenditurePer1000Requests(
+            fixedCostsPer1000Requests: inputs?.FixedExpenditurePer1000Requests,
+            measuredVariableCosts: allMeasuredInferenceCosts,
+            includeVariableExpenditure: inputs?.AddVariableExpenditure ?? false
+        );
 
         var batchEvaluation = new BatchEvaluationDto(
             Counts: new BatchEvaluationCountsDto(
@@ -142,14 +139,52 @@ public class BatchEvaluationService : IBatchEvaluationService
                 ParameterSuccessRate: SafeAverage(allParameterSuccessRates),
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
                 AverageCer: SafeAverage(allCers),
-                AverageInferenceCost: averageInferenceCost,
+                AverageVariableInferenceExpenditure: SafeAverage(allMeasuredInferenceCosts),
                 AverageLatencyMs: SafeAverage(allDurationsWithoutTraffic),
-                InferenceStability: inferenceStability,
-                EstimatedAnnualCostUsd: estimatedAnnualCost
+                InferenceStability: null,
+                NormalizedInferenceExpenditure: estimatedExpenditurePer1000Requests
             )
         );
 
         return DataResult<BatchEvaluationDto>.Success(batchEvaluation);
+    }
+
+    public async Task<DataResult<BatchEvaluationDto>> EvaluateBatchWithRelatedBatch(EvaluationRunBatchEntity batch,
+        EvaluationRunBatchEntity relatedBatch, IncalculableInputsDto? inputs)
+    {
+        var mainBatchResult = await EvaluateBatch(batch, inputs);
+        if (mainBatchResult.IsFailure)
+            return mainBatchResult;
+
+        var relatedBatchResult = await EvaluateBatch(relatedBatch, inputs);
+        if (relatedBatchResult.IsFailure)
+            return relatedBatchResult;
+
+        var mainBatchData = mainBatchResult.Data!;
+        var relatedBatchData = relatedBatchResult.Data!;
+
+        var mainMetrics = mainBatchData.Metrics;
+        var relatedMetrics = relatedBatchData.Metrics;
+        var bothHaveNormalizedInferenceExpenditure = mainMetrics.NormalizedInferenceExpenditure is not null &&
+                                                     relatedMetrics.NormalizedInferenceExpenditure is not null;
+
+        var inferenceStability = await CalculateInferenceStabilityAsync(batch, relatedBatch);
+
+        return DataResult<BatchEvaluationDto>.Success(mainBatchData with
+        {
+            Metrics = new BatchEvaluationMetricsDto(
+                InferenceStability: inferenceStability,
+                ParameterSuccessRate: (mainMetrics.ParameterSuccessRate + relatedMetrics.ParameterSuccessRate) / 2,
+                FalsePositiveRate: (mainMetrics.FalsePositiveRate + relatedMetrics.FalsePositiveRate) / 2,
+                AverageCer: (mainMetrics.AverageCer + relatedMetrics.AverageCer) / 2,
+                AverageLatencyMs: (mainMetrics.AverageLatencyMs + relatedMetrics.AverageLatencyMs) / 2,
+                AverageVariableInferenceExpenditure: (mainMetrics.AverageVariableInferenceExpenditure +
+                                                      relatedMetrics.AverageVariableInferenceExpenditure) / 2,
+                NormalizedInferenceExpenditure: bothHaveNormalizedInferenceExpenditure
+                    ? (mainMetrics.NormalizedInferenceExpenditure! + relatedMetrics.NormalizedInferenceExpenditure) / 2
+                    : null
+            )
+        });
     }
 
     private void AddDistanceIfNotNull(int? distance, List<int> distances)
@@ -194,15 +229,14 @@ public class BatchEvaluationService : IBatchEvaluationService
         return SafeAverage(scores);
     }
 
-    private decimal? CalculateEstimatedAnnualCost(IncalculableInputsDto inputs, decimal averageInferenceCost)
+    private decimal? CalculateAverageExpenditurePer1000Requests(decimal? fixedCostsPer1000Requests,
+        List<decimal> measuredVariableCosts, bool includeVariableExpenditure)
     {
-        var estimation = 0m;
-        if (inputs.AnnualFixedCostUsd is { } fixedCostUsd)
-            estimation += fixedCostUsd;
-        if (inputs.ExpectedAnnualInferences is { } expectedInferenceCount)
-            estimation += expectedInferenceCount * averageInferenceCost;
+        if (!includeVariableExpenditure)
+            return fixedCostsPer1000Requests;
 
-        return estimation;
+        var averageVariableCostPer1000 = SafeAverage(measuredVariableCosts) * 1000;
+        return averageVariableCostPer1000 + fixedCostsPer1000Requests;
     }
 
     private SuccessDependentStats? CalculateStatsOfEvaluationRun(EvaluationRunEntity run)

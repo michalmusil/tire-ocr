@@ -1,9 +1,6 @@
-using AiPipeline.TireOcr.EvaluationTool.Domain.EvaluationRunBatchAggregate;
-
 namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Dtos.BatchEvaluation;
 
 public record IncalculableInputsDto(
-    decimal? AnnualFixedCostUsd,
-    int? ExpectedAnnualInferences,
-    EvaluationRunBatchEntity? InferenceStabilityRelative
+    decimal? FixedExpenditurePer1000Requests,
+    bool AddVariableExpenditure
 );

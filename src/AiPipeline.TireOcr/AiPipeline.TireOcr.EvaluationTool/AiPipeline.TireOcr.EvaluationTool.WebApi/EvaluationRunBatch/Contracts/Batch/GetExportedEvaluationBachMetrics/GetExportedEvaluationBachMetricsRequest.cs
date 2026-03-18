@@ -2,7 +2,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.WebApi.EvaluationRunBatch.Contracts.
 
 public record GetExportedEvaluationBachMetricsRequest(
     Guid? InferenceStabilityRelativeBatchId,
-    decimal? AnnualFixedCostUsd,
-    int? ExpectedAnnualInferences,
+    decimal? FixedExpenditure,
+    bool? CalculateVariableExpenditure,
     bool? AverageMetricsWithOtherBatch
 );

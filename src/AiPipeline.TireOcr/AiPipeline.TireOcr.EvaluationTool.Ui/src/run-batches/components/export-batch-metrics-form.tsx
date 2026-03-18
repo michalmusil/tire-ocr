@@ -4,11 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import FormInput from "@/core/components/forms/form-input";
 import { Button } from "@/core/components/ui/button";
 import { Spinner } from "@/core/components/ui/spinner";
+import FormCheckbox from "@/core/components/forms/form-checkbox";
 
 const formSchema = z.object({
   inferenceStabilityRelativeBatchId: z.string().nullish(),
   annualFixedCostUsd: z.number().nullish(),
-  expectedAnnualInferences: z.number().nullish(),
+  calculateVariableExpenditure: z.boolean(),
 });
 export type ExportBatchMetricsFormSchema = z.infer<typeof formSchema>;
 
@@ -28,33 +29,33 @@ const ExportBatchMetricsForm = ({
     defaultValues: {
       inferenceStabilityRelativeBatchId: null,
       annualFixedCostUsd: null,
-      expectedAnnualInferences: null,
+      calculateVariableExpenditure: true,
     },
   });
 
   return (
     <FormProvider {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-2 mb-5 items-center">
-          <FormInput<ExportBatchMetricsFormSchema>
-            label="ID of relative batch to calculate inference stability (IS) against"
-            name="inferenceStabilityRelativeBatchId"
-            placeholder="Batch GUID"
-          />
+        <div className="flex flex-col gap-3 items-center">
+          <div className="flex flex-col gap-5 mb-5 items-start">
+            <FormInput<ExportBatchMetricsFormSchema>
+              label="ID of related batch to calculate inference stability (IS) against and average metrics with"
+              name="inferenceStabilityRelativeBatchId"
+              placeholder="Batch GUID"
+            />
 
-          <FormInput<ExportBatchMetricsFormSchema>
-            label="Annual fixed cost of operation (USD)"
-            name="annualFixedCostUsd"
-            type="number"
-            placeholder="Annual Fixed Cost"
-          />
+            <FormInput<ExportBatchMetricsFormSchema>
+              label="Fixed cost of operation (USD)"
+              name="annualFixedCostUsd"
+              type="number"
+              placeholder="Annual Fixed Cost"
+            />
 
-          <FormInput<ExportBatchMetricsFormSchema>
-            label="Expected annual inference count"
-            name="expectedAnnualInferences"
-            type="number"
-            placeholder="Inference Count"
-          />
+            <FormCheckbox<ExportBatchMetricsFormSchema>
+              label="Include variable expenditure in calculation"
+              name="calculateVariableExpenditure"
+            />
+          </div>
 
           {error && (
             <div className="mt-2 text-sm text-destructive">{error}</div>

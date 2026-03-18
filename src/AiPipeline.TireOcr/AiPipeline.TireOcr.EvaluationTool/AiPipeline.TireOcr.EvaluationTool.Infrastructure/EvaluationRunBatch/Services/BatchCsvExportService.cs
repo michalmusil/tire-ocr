@@ -41,8 +41,9 @@ public class BatchCsvExportService : IBatchCsvExportService
         };
         if (metrics.InferenceStability is { } inferenceStability)
             records.Add(new EvaluationMetricCsvLineDto("InferenceStability [ratio]", "IS", inferenceStability));
-        if (metrics.EstimatedAnnualCostUsd is { } estimatedAnnualCostUsd)
-            records.Add(new EvaluationMetricCsvLineDto("Estimated Annual Cost [USD]", "EAC", estimatedAnnualCostUsd));
+        if (metrics.NormalizedInferenceExpenditure is { } normalizedInferenceExpenditure)
+            records.Add(new EvaluationMetricCsvLineDto("Normalized Inference Expenditure [USD]", "NIE",
+                normalizedInferenceExpenditure));
 
         await csvWriter.WriteRecordsAsync(records);
         await streamWriter.FlushAsync();

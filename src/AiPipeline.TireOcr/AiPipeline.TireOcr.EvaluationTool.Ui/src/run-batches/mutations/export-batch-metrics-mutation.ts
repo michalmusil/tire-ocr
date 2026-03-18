@@ -4,22 +4,22 @@ import axios from "axios";
 type ExportBatchMetricsProps = {
   batchId: string;
   inferenceStabilityRelativeBatchId?: string | null;
-  annualFixedCostUsd?: number | null;
-  expectedAnnualInferences?: number | null;
+  fixedExpenditure?: number | null;
+  calculateVariableExpenditure: boolean;
 };
 
 const exportBatchMetrics = async ({
   batchId,
   inferenceStabilityRelativeBatchId,
-  annualFixedCostUsd,
-  expectedAnnualInferences,
+  fixedExpenditure,
+  calculateVariableExpenditure,
 }: ExportBatchMetricsProps) => {
   const response = await axios.post(
     `/api/v1/Batch/${batchId}/ExportMetrics`,
     {
       inferenceStabilityRelativeBatchId,
-      annualFixedCostUsd,
-      expectedAnnualInferences,
+      fixedExpenditure,
+      calculateVariableExpenditure,
     },
     {
       responseType: "blob",
