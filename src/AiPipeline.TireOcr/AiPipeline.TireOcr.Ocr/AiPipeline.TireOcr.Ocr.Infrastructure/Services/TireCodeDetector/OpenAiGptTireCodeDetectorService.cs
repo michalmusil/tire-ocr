@@ -99,7 +99,7 @@ public class OpenAiGptTireCodeDetectorService : ITireCodeDetectorService
         try
         {
             var apiKey = _configuration.GetValue<string>("ApiKeys:OpenAi");
-            return new ChatClient("gpt-4.1", apiKey);
+            return new ChatClient("ft:gpt-4.1-2025-04-14:mim:ocr-engine-user-prompt:DL6RKOuP:ckpt-step-188", apiKey);
         }
         catch
         {
