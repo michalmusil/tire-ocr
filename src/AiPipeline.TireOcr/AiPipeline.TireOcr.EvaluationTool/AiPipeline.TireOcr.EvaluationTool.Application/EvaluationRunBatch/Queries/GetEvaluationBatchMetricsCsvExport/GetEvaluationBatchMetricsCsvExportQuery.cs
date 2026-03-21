@@ -4,7 +4,7 @@ namespace AiPipeline.TireOcr.EvaluationTool.Application.EvaluationRunBatch.Queri
 
 public record GetEvaluationBatchMetricsExportQuery(
     Guid BatchId,
-    Guid? OtherBatchId,
+    IEnumerable<Guid>? OtherBatchIds,
     decimal? FixedExpenditure,
     bool AddVariableExpenditure,
     bool AverageMetricsWithOtherBatch) : IQuery<byte[]>;

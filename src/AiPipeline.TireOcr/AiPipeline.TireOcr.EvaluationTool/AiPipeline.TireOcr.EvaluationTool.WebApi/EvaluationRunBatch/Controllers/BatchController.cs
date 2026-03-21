@@ -107,9 +107,10 @@ public class BatchController : ControllerBase
     {
         var query = new GetEvaluationBatchMetricsExportQuery(
             BatchId: id,
-            OtherBatchId: request.InferenceStabilityRelativeBatchId,
+            OtherBatchIds: request.InferenceStabilityRelativeBatchIds,
             AverageMetricsWithOtherBatch: request.AverageMetricsWithOtherBatch ??
-                                          request.InferenceStabilityRelativeBatchId is not null,
+                                          request.InferenceStabilityRelativeBatchIds is not null &&
+                                          request.InferenceStabilityRelativeBatchIds.Any(),
             FixedExpenditure: request.FixedExpenditure,
             AddVariableExpenditure: request.CalculateVariableExpenditure ?? false
         );

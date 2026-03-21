@@ -54,8 +54,8 @@ const ExportBatchDialog = ({ batchId, trigger }: ExportBatchDialogProps) => {
     exportMetricsMutation.mutate(
       {
         batchId,
-        inferenceStabilityRelativeBatchId:
-          inputs.inferenceStabilityRelativeBatchId,
+        inferenceStabilityRelativeBatchIds:
+          inputs.inferenceStabilityRelativeBatchIds,
         fixedExpenditure: inputs.annualFixedCostUsd,
         calculateVariableExpenditure: inputs.calculateVariableExpenditure,
       },

@@ -149,40 +149,43 @@ public class BatchEvaluationService : IBatchEvaluationService
         return DataResult<BatchEvaluationDto>.Success(batchEvaluation);
     }
 
-    public async Task<DataResult<BatchEvaluationDto>> EvaluateBatchWithRelatedBatch(EvaluationRunBatchEntity batch,
-        EvaluationRunBatchEntity relatedBatch, IncalculableInputsDto? inputs)
+    public async Task<DataResult<BatchEvaluationDto>> EvaluateBatchWithRelatedBatches(EvaluationRunBatchEntity batch,
+        List<EvaluationRunBatchEntity> relatedBatches, IncalculableInputsDto? inputs)
     {
         var mainBatchResult = await EvaluateBatch(batch, inputs);
         if (mainBatchResult.IsFailure)
             return mainBatchResult;
 
-        var relatedBatchResult = await EvaluateBatch(relatedBatch, inputs);
-        if (relatedBatchResult.IsFailure)
-            return relatedBatchResult;
+        var relatedBatchesResults = await Task.WhenAll(relatedBatches
+            .Select(rb => EvaluateBatch(rb, inputs))
+        );
+        if (relatedBatchesResults.Any(r => r.IsFailure))
+            return relatedBatchesResults.First();
 
         var mainBatchData = mainBatchResult.Data!;
-        var relatedBatchData = relatedBatchResult.Data!;
+        var relatedBatchData = relatedBatchesResults
+            .Select(r => r.Data!.Metrics);
 
-        var mainMetrics = mainBatchData.Metrics;
-        var relatedMetrics = relatedBatchData.Metrics;
-        var bothHaveNormalizedInferenceExpenditure = mainMetrics.NormalizedInferenceExpenditure is not null &&
-                                                     relatedMetrics.NormalizedInferenceExpenditure is not null;
+        List<EvaluationRunBatchEntity> allEvaluationRuns = [batch];
+        allEvaluationRuns.AddRange(relatedBatches);
+        var inferenceStability = await CalculateInferenceStabilityAsync(allEvaluationRuns);
 
-        var inferenceStability = await CalculateInferenceStabilityAsync(batch, relatedBatch);
+        List<BatchEvaluationMetricsDto> allEvaluationMetrics = [mainBatchData.Metrics];
+        allEvaluationMetrics.AddRange(relatedBatchData);
 
         return DataResult<BatchEvaluationDto>.Success(mainBatchData with
         {
             Metrics = new BatchEvaluationMetricsDto(
                 InferenceStability: inferenceStability,
-                ParameterSuccessRate: (mainMetrics.ParameterSuccessRate + relatedMetrics.ParameterSuccessRate) / 2,
-                FalsePositiveRate: (mainMetrics.FalsePositiveRate + relatedMetrics.FalsePositiveRate) / 2,
-                AverageCer: (mainMetrics.AverageCer + relatedMetrics.AverageCer) / 2,
-                AverageLatencyMs: (mainMetrics.AverageLatencyMs + relatedMetrics.AverageLatencyMs) / 2,
-                AverageVariableInferenceExpenditure: (mainMetrics.AverageVariableInferenceExpenditure +
-                                                      relatedMetrics.AverageVariableInferenceExpenditure) / 2,
-                NormalizedInferenceExpenditure: bothHaveNormalizedInferenceExpenditure
-                    ? (mainMetrics.NormalizedInferenceExpenditure! + relatedMetrics.NormalizedInferenceExpenditure) / 2
-                    : null
+                ParameterSuccessRate: allEvaluationMetrics.Average(m => m.ParameterSuccessRate),
+                FalsePositiveRate: allEvaluationMetrics.Average(m => m.FalsePositiveRate),
+                AverageCer: allEvaluationMetrics.Average(m => m.AverageCer),
+                AverageLatencyMs: allEvaluationMetrics.Average(m => m.AverageLatencyMs),
+                AverageVariableInferenceExpenditure: allEvaluationMetrics.Average(m =>
+                    m.AverageVariableInferenceExpenditure),
+                NormalizedInferenceExpenditure: allEvaluationMetrics
+                    .Where(m => m.NormalizedInferenceExpenditure is not null)
+                    .Average(m => m.NormalizedInferenceExpenditure)
             )
         });
     }
@@ -201,30 +204,38 @@ public class BatchEvaluationService : IBatchEvaluationService
         return distances.Average();
     }
 
-    private async Task<decimal> CalculateInferenceStabilityAsync(EvaluationRunBatchEntity batch1,
-        EvaluationRunBatchEntity batch2)
+    private async Task<decimal> CalculateInferenceStabilityAsync(List<EvaluationRunBatchEntity> batches)
     {
-        var scores = new ConcurrentBag<decimal>();
-        var batch2Dict = batch2.EvaluationRuns.ToDictionary(e => e.InputImage.FileName, e => e);
-        await Parallel.ForEachAsync(batch1.EvaluationRuns,
-            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
-            async (r1, token) =>
+        var referenceBatch = batches.First();
+        var otherBatches = batches.Skip(1);
+        var resultsDict = referenceBatch.EvaluationRuns
+            .ToDictionary(e => e.InputImage.FileName, e => new
             {
-                batch2Dict.TryGetValue(r1.InputImage.FileName, out var r2);
-                if (r2 is null)
-                {
-                    scores.Add(0);
-                    return;
-                }
-
-                var categoriesMatch = r1.GetEvaluationResultCategory().Equals(r2.GetEvaluationResultCategory());
-                var resultsMatch = r1.PostprocessingResult?.TireCode.RawCode.Equals(
-                    r2.PostprocessingResult?.TireCode.RawCode, StringComparison.OrdinalIgnoreCase) ?? false;
-                var bothResultsMissing = r1.PostprocessingResult is null && r2.PostprocessingResult is null;
-
-                var stability = categoriesMatch && (resultsMatch || bothResultsMissing) ? 1 : 0;
-                scores.Add(stability);
+                Categories = new List<EvaluationResultCategory> { e.GetEvaluationResultCategory() },
+                RawCodes = new List<string?> { e.PostprocessingResult?.TireCode.RawCode.ToLower() }
             });
+        foreach (var batch in otherBatches)
+        {
+            foreach (var er in batch.EvaluationRuns)
+            {
+                var exists = resultsDict.TryGetValue(er.InputImage.FileName, out var result);
+                if (!exists)
+                    continue;
+                result!.Categories.Add(er.GetEvaluationResultCategory());
+                result.RawCodes.Add(er.PostprocessingResult?.TireCode.RawCode.ToLower());
+            }
+        }
+
+        var scores = new List<decimal>();
+        foreach (var result in resultsDict.Values)
+        {
+            var imagePresentInAllBatches = result.Categories.Count == batches.Count;
+            var allCategoriesMatch = result.Categories.Distinct().Count() == 1;
+            var allCodesMatch = result.RawCodes.Distinct().Count() == 1;
+
+            var isStable = imagePresentInAllBatches && allCategoriesMatch && allCodesMatch;
+            scores.Add(isStable ? 1 : 0);
+        }
 
         return SafeAverage(scores);
     }

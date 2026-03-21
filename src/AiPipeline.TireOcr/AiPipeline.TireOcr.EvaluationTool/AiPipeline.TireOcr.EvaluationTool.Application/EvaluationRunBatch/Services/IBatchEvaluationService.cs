@@ -10,13 +10,13 @@ public interface IBatchEvaluationService
         IncalculableInputsDto? inputs = null);
 
     /// <summary>
-    /// Evaluates the batch AND uses the other relative batch to average its metrics and calculate inference
-    /// stability with the related batch. 
+    /// Evaluates the batch AND uses the other relative batches to average its metrics and calculate inference
+    /// stability with the related batches. 
     /// </summary>
     /// <param name="batch">The main evaluated batch</param>
-    /// <param name="relatedBatch">The related batch for inference stability calculation and metrics averaging</param>
+    /// <param name="relatedBatches">The related batches for inference stability calculation and metrics averaging</param>
     /// <param name="inputs">Additional inputs for batch evaluation</param>
     /// <returns></returns>
-    public Task<DataResult<BatchEvaluationDto>> EvaluateBatchWithRelatedBatch(EvaluationRunBatchEntity batch,
-        EvaluationRunBatchEntity relatedBatch, IncalculableInputsDto? inputs);
+    public Task<DataResult<BatchEvaluationDto>> EvaluateBatchWithRelatedBatches(EvaluationRunBatchEntity batch,
+        List<EvaluationRunBatchEntity> relatedBatches, IncalculableInputsDto? inputs);
 }

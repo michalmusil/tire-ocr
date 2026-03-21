@@ -9,8 +9,5 @@ public class GetEvaluationBatchRawCsvExportQueryValidator : AbstractValidator<Ge
     {
         RuleFor(x => x.BatchId.ToString())
             .IsGuid();
-        RuleFor(x => x.OtherBatchId)
-            .Must(g => g is null || Guid.TryParse(g.ToString(), out _))
-            .WithMessage((_, s) => $"{s.ToString()} is not a valid GUID.");
     }
 }

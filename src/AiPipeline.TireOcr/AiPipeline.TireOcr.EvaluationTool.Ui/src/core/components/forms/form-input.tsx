@@ -6,14 +6,19 @@ import {
   useFormContext,
 } from "react-hook-form";
 
-type FormInputProps<T extends FieldValues> = {
+type FormInputProps<T extends FieldValues> = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  "onChange"
+> & {
   label: string;
   name: Path<T>;
-} & React.InputHTMLAttributes<HTMLInputElement>;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
 
 const FormInput = <T extends FieldValues>({
   label,
   name,
+  onChange,
   ...rest
 }: FormInputProps<T>) => {
   const { control } = useFormContext<T>();
@@ -28,6 +33,10 @@ const FormInput = <T extends FieldValues>({
             <span className="text-muted-foreground">{label}</span>
             <Input
               onChange={(e) => {
+                if (onChange) {
+                  onChange(e);
+                  return;
+                }
                 if (name === "") return;
                 if (rest.type === "number") {
                   field.onChange(e.target.valueAsNumber);

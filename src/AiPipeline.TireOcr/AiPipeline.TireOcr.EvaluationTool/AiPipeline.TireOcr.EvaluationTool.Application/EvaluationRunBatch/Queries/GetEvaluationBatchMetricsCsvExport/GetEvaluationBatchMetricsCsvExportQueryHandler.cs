@@ -29,17 +29,25 @@ public class GetEvaluationBatchMetricsCsvExportQueryHandler
         if (batch is null)
             return DataResult<byte[]>.NotFound($"Batch with id '{request.BatchId}' not found");
 
-        var otherBatch = request is { AverageMetricsWithOtherBatch: true, OtherBatchId: { } otherId }
-            ? await FetchBatchWithRuns(otherId)
-            : null;
-        
+        List<EvaluationRunBatchEntity>? otherBatches = null;
+        if (request is { AverageMetricsWithOtherBatch: true, OtherBatchIds: { } otherIds })
+        {
+            otherBatches = [];
+            foreach (var id in otherIds)
+            {
+                var otherBatch = await FetchBatchWithRuns(id);
+                if (otherBatch is not null)
+                    otherBatches.Add(otherBatch);
+            }
+        }
+
         var incalculableInputs = new IncalculableInputsDto(
             FixedExpenditurePer1000Requests: request.FixedExpenditure,
             AddVariableExpenditure: request.AddVariableExpenditure);
 
-        var evaluationResult = otherBatch is null
+        var evaluationResult = otherBatches is null || otherBatches.Count == 0
             ? await _batchEvaluationService.EvaluateBatch(batch, incalculableInputs)
-            : await _batchEvaluationService.EvaluateBatchWithRelatedBatch(batch, otherBatch, incalculableInputs);
+            : await _batchEvaluationService.EvaluateBatchWithRelatedBatches(batch, otherBatches!, incalculableInputs);
         if (evaluationResult.IsFailure)
             return DataResult<byte[]>.Failure(evaluationResult.Failures);
 

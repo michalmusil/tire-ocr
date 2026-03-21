@@ -7,7 +7,7 @@ import { Spinner } from "@/core/components/ui/spinner";
 import FormCheckbox from "@/core/components/forms/form-checkbox";
 
 const formSchema = z.object({
-  inferenceStabilityRelativeBatchId: z.string().nullish(),
+  inferenceStabilityRelativeBatchIds: z.array(z.string()).nullish(),
   annualFixedCostUsd: z.number().nullish(),
   calculateVariableExpenditure: z.boolean(),
 });
@@ -27,7 +27,7 @@ const ExportBatchMetricsForm = ({
   const form = useForm<ExportBatchMetricsFormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      inferenceStabilityRelativeBatchId: null,
+      inferenceStabilityRelativeBatchIds: [],
       annualFixedCostUsd: null,
       calculateVariableExpenditure: true,
     },
@@ -39,9 +39,16 @@ const ExportBatchMetricsForm = ({
         <div className="flex flex-col gap-3 items-center">
           <div className="flex flex-col gap-5 mb-5 items-start">
             <FormInput<ExportBatchMetricsFormSchema>
-              label="ID of related batch to calculate inference stability (IS) against and average metrics with"
-              name="inferenceStabilityRelativeBatchId"
-              placeholder="Batch GUID"
+              label="IDs of related batches (comma-separated) to calculate inference stability (IS) against and average metrics with"
+              name="inferenceStabilityRelativeBatchIds"
+              placeholder="Batch GUIDs (comma separated)"
+              onChange={(e) => {
+                const value = e.target.value;
+                form.setValue(
+                  "inferenceStabilityRelativeBatchIds",
+                  value ? value.split(",").map((id) => id.trim()) : [],
+                );
+              }}
             />
 
             <FormInput<ExportBatchMetricsFormSchema>
