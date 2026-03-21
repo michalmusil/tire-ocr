@@ -140,7 +140,7 @@ public class BatchEvaluationService : IBatchEvaluationService
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
                 AverageCer: SafeAverage(allCers),
                 AverageVariableInferenceExpenditure: SafeAverage(allMeasuredInferenceCosts),
-                AverageLatencyMs: SafeAverage(allDurationsWithoutTraffic),
+                TailLatencyMs: Percentile(allDurationsWithoutTraffic, 0.9m),
                 InferenceStability: null,
                 NormalizedInferenceExpenditure: estimatedExpenditurePer1000Requests
             )
@@ -180,7 +180,7 @@ public class BatchEvaluationService : IBatchEvaluationService
                 ParameterSuccessRate: allEvaluationMetrics.Average(m => m.ParameterSuccessRate),
                 FalsePositiveRate: allEvaluationMetrics.Average(m => m.FalsePositiveRate),
                 AverageCer: allEvaluationMetrics.Average(m => m.AverageCer),
-                AverageLatencyMs: allEvaluationMetrics.Average(m => m.AverageLatencyMs),
+                TailLatencyMs: allEvaluationMetrics.Average(m => m.TailLatencyMs),
                 AverageVariableInferenceExpenditure: allEvaluationMetrics.Average(m =>
                     m.AverageVariableInferenceExpenditure),
                 NormalizedInferenceExpenditure: allEvaluationMetrics
@@ -296,6 +296,28 @@ public class BatchEvaluationService : IBatchEvaluationService
     {
         var list = elements.ToList();
         return list.Count == 0 ? 0 : list.Average();
+    }
+
+    // See: https://en.wikipedia.org/wiki/Percentile
+    private decimal Percentile(List<decimal> elements, decimal percentile)
+    {
+        if (elements.Count == 0)
+            throw new ArgumentException("Percentile input collection cannot be empty.");
+        if (percentile is <= 0 or >= 1)
+            throw new ArgumentException("Percentile must be < 0 and < 1.");
+
+        var sortedElements = elements.OrderBy(x => x).ToArray();
+        var length = sortedElements.Length;
+
+        var indexUnbound = (length - 1) * percentile;
+        var lowerIndex = (int)Math.Floor(indexUnbound);
+        var upperIndex = (int)Math.Ceiling(indexUnbound);
+
+        if (lowerIndex == upperIndex)
+            return sortedElements[lowerIndex];
+
+        var fraction = indexUnbound - lowerIndex;
+        return sortedElements[lowerIndex] + (sortedElements[upperIndex] - sortedElements[lowerIndex]) * fraction;
     }
 
     private record SuccessDependentStats(

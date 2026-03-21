@@ -35,7 +35,7 @@ public class BatchCsvExportService : IBatchCsvExportService
         var records = new List<EvaluationMetricCsvLineDto>
         {
             new("Parameter Success Rate [ratio]", "PSR", metrics.ParameterSuccessRate),
-            new("Average Latency [ms]", "AL", metrics.AverageLatencyMs),
+            new("Tail Latency [ms]", "TL", metrics.TailLatencyMs),
             new("False Positive Rate [ratio]", "FPR", metrics.FalsePositiveRate),
             new("Character Error Rate [ratio]", "CER", metrics.AverageCer)
         };

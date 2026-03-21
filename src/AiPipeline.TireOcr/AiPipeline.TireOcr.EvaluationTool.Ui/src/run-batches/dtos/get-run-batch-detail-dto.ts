@@ -32,7 +32,7 @@ const BatchEvaluationMetricsSchema = z.object({
   falsePositiveRate: z.number(),
   averageCer: z.number(),
   averageVariableInferenceExpenditure: z.number(),
-  averageLatencyMs: z.number(),
+  tailLatencyMs: z.number(),
 });
 
 const BatchEvaluationSchema = z.object({
