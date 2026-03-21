@@ -2,6 +2,7 @@ using SkiaSharp;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
+using TireOcr.Preprocessing.Infrastructure.Exceptions;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
 using YoloDotNet.Enums;
 using YoloDotNet.ExecutionProvider.Cpu;
@@ -17,32 +18,18 @@ public class YoloTextDetectionService : ITextDetectionService
 {
     private const double ConfidenceThreshold = 0.05;
     private readonly IMlModelResolverService _modelResolverService;
+    private Yolo _yoloInstance;
 
     public YoloTextDetectionService(IMlModelResolverService modelResolverService)
     {
         _modelResolverService = modelResolverService;
+        EnsureYoloInitializedAsync().Wait();
     }
 
     public async Task<DataResult<List<CharacterInImage>>> DetectTextInImage(Image image)
     {
-        var modelResult = await _modelResolverService.Resolve<ITextDetectionService>();
-        if (modelResult.IsFailure)
-            return DataResult<List<CharacterInImage>>.Failure(
-                new Failure(500, modelResult.PrimaryFailure?.Message ?? "Failed to resolve ML model")
-            );
-
-        var model = modelResult.Data!;
-        using var yolo = new Yolo(new YoloOptions
-        {
-            ExecutionProvider = new CpuExecutionProvider(
-                model: model.GetMainFilePath()
-            ),
-            ImageResize = ImageResize.Proportional,
-            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
-        });
-
         using var imageToDetect = SKImage.FromBitmap(SKBitmap.Decode(image.Data));
-        var results = yolo.RunObjectDetection(imageToDetect, confidence: ConfidenceThreshold);
+        var results = _yoloInstance.RunObjectDetection(imageToDetect, confidence: ConfidenceThreshold);
 
         var detectedCharacters = results
             .Where(od => od.Confidence >= ConfidenceThreshold)
@@ -64,6 +51,26 @@ public class YoloTextDetectionService : ITextDetectionService
         //DrawAndSaveAnnotatedImage(image, imageToDetect, results);
 
         return DataResult<List<CharacterInImage>>.Success(detectedCharacters);
+    }
+
+    private async Task EnsureYoloInitializedAsync()
+    {
+        var modelResult = await _modelResolverService.Resolve<ITextDetectionService>();
+        if (modelResult.IsFailure)
+            throw new ModelInitializationFailedException(
+                serviceName: nameof(YoloTextDetectionService),
+                failureReason: modelResult.PrimaryFailure?.Message ?? "unknown"
+            );
+
+        var model = modelResult.Data!;
+        _yoloInstance = new Yolo(new YoloOptions
+        {
+            ExecutionProvider = new CpuExecutionProvider(
+                model: model.GetMainFilePath()
+            ),
+            ImageResize = ImageResize.Proportional,
+            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
+        });
     }
 
     private void DrawAndSaveAnnotatedImage(Image originalImage, SKImage image, List<ObjectDetection> results)

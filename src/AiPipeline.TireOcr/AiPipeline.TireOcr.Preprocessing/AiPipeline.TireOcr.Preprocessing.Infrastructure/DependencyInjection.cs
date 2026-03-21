@@ -22,9 +22,10 @@ public static class DependencyInjection
         services.AddTransient<IMlModelDownloaderService, MlModelDownloaderService>();
         services.AddSingleton<IMlModelResolverService, MlModelResolverService>();
 
+        services.AddSingleton<ITireDetectionService, YoloTireDetectionService>();
+        services.AddSingleton<ITextDetectionService, YoloTextDetectionService>();
+        
         services.AddScoped<IImageManipulationService, OpenCvImageManipulationService>();
-        services.AddScoped<ITireDetectionService, YoloTireDetectionService>();
-        services.AddScoped<ITextDetectionService, YoloTextDetectionService>();
         services.AddScoped<IImageSlicerService, OpenCvImageSlicerService>();
         services.AddScoped<IImageTextApproximatorService, ImageTextApproximatorService>();
         services.AddScoped<IContentTypeResolverService, ContentTypeResolverService>();

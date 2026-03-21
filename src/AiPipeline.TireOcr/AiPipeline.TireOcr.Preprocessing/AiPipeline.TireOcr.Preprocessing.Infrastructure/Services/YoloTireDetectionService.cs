@@ -5,6 +5,7 @@ using TireOcr.Preprocessing.Application.Dtos;
 using TireOcr.Preprocessing.Application.Services;
 using TireOcr.Preprocessing.Domain.Common;
 using TireOcr.Preprocessing.Domain.ImageEntity;
+using TireOcr.Preprocessing.Infrastructure.Exceptions;
 using TireOcr.Preprocessing.Infrastructure.Extensions;
 using TireOcr.Preprocessing.Infrastructure.Services.ModelResolver;
 using TireOcr.Shared.Result;
@@ -21,10 +22,12 @@ public class YoloTireDetectionService : ITireDetectionService
     private const double ConfidenceThreshold = 0.6;
 
     private readonly IMlModelResolverService _modelResolverService;
+    private Yolo _yoloInstance;
 
     public YoloTireDetectionService(IMlModelResolverService modelResolverService)
     {
         _modelResolverService = modelResolverService;
+        EnsureYoloInitializedAsync().Wait();
     }
 
     public async Task<DataResult<TireDetectionResultDto>> DetectTireRimCircle(Image image)
@@ -32,25 +35,9 @@ public class YoloTireDetectionService : ITireDetectionService
         var stopWatch = new Stopwatch();
         stopWatch.Start();
 
-        var modelResult = await _modelResolverService.Resolve<ITireDetectionService>();
-        if (modelResult.IsFailure)
-            return DataResult<TireDetectionResultDto>.Failure(
-                new Failure(500, modelResult.PrimaryFailure?.Message ?? "Failed to resolve ML model")
-            );
-
-        var model = modelResult.Data!;
-        using var yolo = new Yolo(new YoloOptions
-        {
-            ExecutionProvider = new CpuExecutionProvider(
-                model: model.GetMainFilePath()
-            ),
-            ImageResize = ImageResize.Proportional,
-            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
-        });
-
         // Running through segmentation to get masks for the rim (wheel excl. the tire sidewall) and the entire wheel (incl. tire sidewall)
         using var imageToDetect = SKImage.FromBitmap(SKBitmap.Decode(image.Data));
-        var results = yolo.RunSegmentation(imageToDetect);
+        var results = _yoloInstance.RunSegmentation(imageToDetect);
         var rimMaskResult = results.FirstOrDefault(res =>
             string.Equals(res.Label.Name, RimClassName, StringComparison.CurrentCultureIgnoreCase));
         if (rimMaskResult is null || rimMaskResult.Confidence < ConfidenceThreshold)
@@ -79,7 +66,7 @@ public class YoloTireDetectionService : ITireDetectionService
             Center = new ImageCoordinate((int)center.X, (int)center.Y),
             Radius = radius
         };
-        if (!IsCircleWithinImageBounds(rimCircle, image.Size)) 
+        if (!IsCircleWithinImageBounds(rimCircle, image.Size))
             // If circle is not within original image bounds, the photo doesn't contain the entire wheel 
             return DataResult<TireDetectionResultDto>.Invalid("Detected rim circle is not within image bounds.");
 
@@ -108,8 +95,8 @@ public class YoloTireDetectionService : ITireDetectionService
                 var pixelIndex = y * bbox.Width + x;
 
                 // Find the specific bit in the byte array
-                var byteIndex = pixelIndex >> 3;       // Same as / 8
-                var bitIndex = pixelIndex & 0b0111;    // Same as % 8
+                var byteIndex = pixelIndex >> 3; // Same as / 8
+                var bitIndex = pixelIndex & 0b0111; // Same as % 8
 
                 // Check if the bit is set to 1 (meaning it passed the confidence threshold)
                 var isSegmented = (maskData[byteIndex] & (1 << bitIndex)) != 0;
@@ -137,5 +124,25 @@ public class YoloTireDetectionService : ITireDetectionService
         var isWithinHorizontalBounds = circleMinX > 0 && circleMaxX <= imageDimensions.Width;
         var isWithinVerticalBounds = circleMinY > 0 && circleMaxY <= imageDimensions.Height;
         return isWithinHorizontalBounds && isWithinVerticalBounds;
+    }
+
+    private async Task EnsureYoloInitializedAsync()
+    {
+        var modelResult = await _modelResolverService.Resolve<ITireDetectionService>();
+        if (modelResult.IsFailure)
+            throw new ModelInitializationFailedException(
+                serviceName: nameof(YoloTireDetectionService),
+                failureReason: modelResult.PrimaryFailure?.Message ?? "unknown"
+            );
+
+        var model = modelResult.Data!;
+        _yoloInstance = new Yolo(new YoloOptions
+        {
+            ExecutionProvider = new CpuExecutionProvider(
+                model: model.GetMainFilePath()
+            ),
+            ImageResize = ImageResize.Proportional,
+            SamplingOptions = new(SKFilterMode.Nearest, SKMipmapMode.None)
+        });
     }
 }
