@@ -57,11 +57,9 @@ class PerformPreprocessing3CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
-                final_resized = self.image_manipulation_service.resize_to_max_dimension(
-                    resized_image, MAX_OUTPUT_IMAGE_SIDE
-                )
+                fallback_image = self.perform_global_image_enhancement(resized_image, False, True)
                 resized_bytes = self.image_manipulation_service.image_to_bytes(
-                    final_resized
+                    fallback_image
                 )
                 return PreprocessingResultDto(
                     status="acceptable_failure",
@@ -98,17 +96,8 @@ class PerformPreprocessing3CommandHandler:
             processed_image = self.image_slicer_service.stack_images_vertically(slices)
 
             # 5) Global properties enhancement
-            processed_image = self.image_manipulation_service.perform_clahe(
-                processed_image
-            )
-            processed_image = self.image_manipulation_service.perform_bilateral_filter(
-                processed_image
-            )
-
-            processed_image = self.image_manipulation_service.perform_bitwise_not(
-                processed_image
-            )
-
+            processed_image = self.perform_global_image_enhancement(processed_image, True, False)
+            
             # 6) Emphasise characters via segmentation pipeline
             try:
                 emphasised = await run_in_threadpool(
@@ -118,14 +107,11 @@ class PerformPreprocessing3CommandHandler:
                 )
             except Exception as ex:
                 duration_ms = int((time.perf_counter() - start) * 1000)
-                resized_processed = (
-                    self.image_manipulation_service.resize_to_max_dimension(
-                        processed_image, MAX_OUTPUT_IMAGE_SIDE
-                    )
-                )
+                fallback_image = self.perform_global_image_enhancement(resized_image, False, True)
                 processed_bytes = self.image_manipulation_service.image_to_bytes(
-                    resized_processed
+                    fallback_image
                 )
+                
                 return PreprocessingResultDto(
                     status="acceptable_failure",
                     message=f"Character emphasisation failed: {str(ex)}",
@@ -133,10 +119,8 @@ class PerformPreprocessing3CommandHandler:
                     duration_ms=duration_ms,
                 )
 
-            emphasised_resized = (
-                self.image_manipulation_service.resize_to_max_dimension(
-                    emphasised, MAX_OUTPUT_IMAGE_SIDE
-                )
+            emphasised_resized = self.image_manipulation_service.resize_to_max_dimension(
+                emphasised, MAX_OUTPUT_IMAGE_SIDE
             )
             emphasised_bytes = self.image_manipulation_service.image_to_bytes(
                 emphasised_resized
@@ -157,3 +141,26 @@ class PerformPreprocessing3CommandHandler:
                 image=command.image,
                 duration_ms=duration_ms,
             )
+    
+    def perform_global_image_enhancement(self, image: np.ndarray, is_grayscale: bool, resize_to_output: bool) -> np.ndarray:
+        adjusted_image = image
+        if not is_grayscale:
+            adjusted_image = self.image_manipulation_service.ensure_grayscale(
+                adjusted_image
+            )
+        adjusted_image = self.image_manipulation_service.perform_clahe(
+            adjusted_image
+        )
+        adjusted_image = self.image_manipulation_service.perform_bilateral_filter(
+            adjusted_image
+        )
+        adjusted_image = self.image_manipulation_service.perform_bitwise_not(
+            adjusted_image
+        )
+        
+        if resize_to_output:
+            self.image_manipulation_service.resize_to_max_dimension(
+                adjusted_image, MAX_OUTPUT_IMAGE_SIDE
+            )
+        
+        return adjusted_image

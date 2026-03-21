@@ -89,8 +89,7 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                     _logger.LogWarning(
                         $"Rim detection failed for '{request.ImageName}'.\nReason:'{failure.Message}'\nReturning fallback image version."
                     );
-                    processedImage = _imageManipulationService
-                        .ResizeToMaxSideSize(processedImage, _imageProcessingOptions.MaxOutputImageSize);
+                    processedImage = ApplyGlobalImageAdjustments(processedImage, request.ExtractEdges);
                     return DataResult<Image>.Success(processedImage);
                 default:
                     _logger.LogError(
@@ -100,9 +99,8 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
             }
         }
 
-        var detectedTire = detectedTireResult.Data!;
-
         // Unwrapping only the tire sidewall portion of the image into a long strip 
+        var detectedTire = detectedTireResult.Data!;
         processedImage = await _tireSidewallExtractionService
             .ExtractSidewallStripAroundRimCircle(processedImage, detectedTire.RimCircle);
         processedImage = _imageManipulationService.CopyAndAppendImagePortionFromLeft(
@@ -135,19 +133,26 @@ public class ExtractImageSlicesCommandHandler : ICommandHandler<ExtractImageSlic
                 new Failure(500, "Failed to compose generated slices vertically.")
             );
 
+        var finalImage = ApplyGlobalImageAdjustments(stackedImage, request.ExtractEdges);
+        return DataResult<Image>.Success(finalImage);
+    }
+
+    private Image ApplyGlobalImageAdjustments(Image processedImage, bool extractEdges)
+    {
         // Applying more processing to improve contrast
-        var finalImage = _imageManipulationService.ApplyClahe(stackedImage);
-        finalImage = _imageManipulationService.ApplyBilateralFilter(finalImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
-        finalImage = _imageManipulationService.ApplyBitwiseNot(finalImage);
+        var adjustedImage = _imageManipulationService.ApplyClahe(processedImage);
+        adjustedImage =
+            _imageManipulationService.ApplyBilateralFilter(adjustedImage, d: 5, sigmaColor: 40, sigmaSpace: 40);
+        adjustedImage = _imageManipulationService.ApplyBitwiseNot(adjustedImage);
 
         // If requested, extract only the image edges
-        if (request.ExtractEdges)
-            finalImage = _imageManipulationService.ApplySobelEdgeDetection(finalImage, preBlur: false);
+        if (extractEdges)
+            adjustedImage = _imageManipulationService.ApplySobelEdgeDetection(adjustedImage, preBlur: false);
 
         // Reduce image size
-        finalImage = _imageManipulationService
-            .ResizeToMaxSideSize(finalImage, _imageProcessingOptions.MaxOutputImageSize);
+        adjustedImage = _imageManipulationService
+            .ResizeToMaxSideSize(adjustedImage, _imageProcessingOptions.MaxOutputImageSize);
 
-        return DataResult<Image>.Success(finalImage);
+        return adjustedImage;
     }
 }
