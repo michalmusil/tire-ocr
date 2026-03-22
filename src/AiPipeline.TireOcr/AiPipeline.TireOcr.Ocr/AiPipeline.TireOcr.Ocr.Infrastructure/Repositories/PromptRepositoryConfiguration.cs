@@ -14,7 +14,7 @@ public class PromptRepositoryConfiguration : IPromptRepository
 
     public async Task<string> GetMainPromptAsync(bool useRandomPrefix = false)
     {
-        var prompt = await GetFewShotPromptAsync();
+        var prompt = await GetOcrEnginePromptAsync();
         if (useRandomPrefix)
             prompt = PrependRandomString(prompt);
         return prompt;
