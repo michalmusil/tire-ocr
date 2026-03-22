@@ -55,8 +55,8 @@ export const BatchMetricsCard = ({ metrics }: BatchMetricsCardProps) => {
           />
           <MetricItem
             Icon={Zap}
-            name="Tail latency (P90)"
-            value={`${metrics.tailLatencyMs.toFixed(3)} ms`}
+            name="Median latency (P50)"
+            value={`${metrics.medianLatencyMs.toFixed(3)} ms`}
           />
         </div>
       </CardContent>

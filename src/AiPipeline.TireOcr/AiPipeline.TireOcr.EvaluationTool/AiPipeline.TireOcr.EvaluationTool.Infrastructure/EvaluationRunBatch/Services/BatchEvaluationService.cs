@@ -140,7 +140,7 @@ public class BatchEvaluationService : IBatchEvaluationService
                 FalsePositiveRate: (decimal)falsePositiveCount / (decimal)batch.EvaluationRuns.Count,
                 AverageCer: SafeAverage(allCers),
                 AverageVariableInferenceExpenditure: SafeAverage(allMeasuredInferenceCosts),
-                TailLatencyMs: Percentile(allDurationsWithoutTraffic, 0.9m),
+                MedianLatencyMs: Percentile(allDurationsWithoutTraffic, 0.5m),
                 InferenceStability: null,
                 NormalizedInferenceExpenditure: estimatedExpenditurePer1000Requests
             )
@@ -180,7 +180,7 @@ public class BatchEvaluationService : IBatchEvaluationService
                 ParameterSuccessRate: allEvaluationMetrics.Average(m => m.ParameterSuccessRate),
                 FalsePositiveRate: allEvaluationMetrics.Average(m => m.FalsePositiveRate),
                 AverageCer: allEvaluationMetrics.Average(m => m.AverageCer),
-                TailLatencyMs: allEvaluationMetrics.Average(m => m.TailLatencyMs),
+                MedianLatencyMs: allEvaluationMetrics.Average(m => m.MedianLatencyMs),
                 AverageVariableInferenceExpenditure: allEvaluationMetrics.Average(m =>
                     m.AverageVariableInferenceExpenditure),
                 NormalizedInferenceExpenditure: allEvaluationMetrics

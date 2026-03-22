@@ -5,7 +5,7 @@ public record BatchEvaluationMetricsDto(
     decimal FalsePositiveRate,
     decimal AverageCer,
     decimal AverageVariableInferenceExpenditure,
-    decimal TailLatencyMs,
+    decimal MedianLatencyMs,
     decimal? NormalizedInferenceExpenditure,
     decimal? InferenceStability
 );
