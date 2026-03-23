@@ -42,6 +42,7 @@ services:
       ApiKeys__AzureAiVision: ${ApiKeys_AzureAiVision}
       ApiKeys__Mistral: ${ApiKeys_Mistral}
       ApiKeys__OpenAi: ${ApiKeys_OpenAi}
+      ApiKeys__OpenAiFineTuned: ${ApiKeys_OpenAiFineTuned}
       ApiKeys__RunPod: ${ApiKeys_RunPod}
       ApiKeys__OpenRouter: ${ApiKeys_OpenRouter}
       ApiKeys__GcpJsonCredentials: ${ApiKeys_GcpJsonCredentials}
