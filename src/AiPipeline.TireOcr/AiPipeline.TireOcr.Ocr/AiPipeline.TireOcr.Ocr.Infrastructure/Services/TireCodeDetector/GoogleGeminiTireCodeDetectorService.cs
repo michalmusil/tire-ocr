@@ -84,8 +84,8 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            var endpoint = _configuration.GetValue<string>("OcrEndpoints:GeminiFineTuned");
-            var key = _configuration.GetValue<string>("ApiKeys:GeminiFineTuned");
+            var endpoint = _configuration.GetValue<string>("OcrEndpoints:Gemini");
+            var key = _configuration.GetValue<string>("ApiKeys:Gemini");
 
             return $"{endpoint}?key={key}";
         }
@@ -124,7 +124,11 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             {
                 temperature = 0.0,
                 seed = Seed,
-                mediaResolution = "MEDIA_RESOLUTION_HIGH"
+                thinkingConfig = new
+                {
+                    thinkingBudget = 0
+                },
+                media_resolution = "MEDIA_RESOLUTION_HIGH"
             }
         };
         var jsonPayload = JsonConvert.SerializeObject(payload);
