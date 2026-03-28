@@ -14,7 +14,7 @@ public class PromptRepositoryConfiguration : IPromptRepository
 
     public async Task<string> GetMainPromptAsync(bool useRandomPrefix = false)
     {
-        var prompt = await GetOcrEnginePromptAsync();
+        var prompt = await GetOcrEngineWithManufacturerPromptAsync();
         if (useRandomPrefix)
             prompt = PrependRandomString(prompt);
         return prompt;
@@ -44,6 +44,8 @@ public class PromptRepositoryConfiguration : IPromptRepository
         Task.FromResult(GetPromptFromConfiguration("HunyuanOcr"));
 
     public Task<string> GetOcrEnginePromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngine"));
+    
+    private Task<string> GetOcrEngineWithManufacturerPromptAsync() => Task.FromResult(GetPromptFromConfiguration("OcrEngineWithManufacturer"));
 
 
     private string GetPromptFromConfiguration(string promptKey)

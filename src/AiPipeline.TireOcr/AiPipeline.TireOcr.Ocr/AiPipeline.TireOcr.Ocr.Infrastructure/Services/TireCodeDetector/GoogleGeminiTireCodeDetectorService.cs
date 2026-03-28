@@ -57,8 +57,9 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
             var manufacturerFound = indexOfManufacturerSplit > 0;
             if (manufacturerFound)
             {
-                foundManufacturer = foundTireCode.Substring(0, indexOfManufacturerSplit);
-                foundTireCode = foundTireCode.Substring(indexOfManufacturerSplit + 1);
+                if (indexOfManufacturerSplit < foundTireCode.Length - 1)
+                    foundManufacturer = foundTireCode.Substring(indexOfManufacturerSplit + 1);
+                foundTireCode = foundTireCode.Substring(0, indexOfManufacturerSplit);
             }
 
 
@@ -84,8 +85,8 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            var endpoint = _configuration.GetValue<string>("OcrEndpoints:GeminiFineTuned");
-            var key = _configuration.GetValue<string>("ApiKeys:GeminiFineTuned");
+            var endpoint = _configuration.GetValue<string>("OcrEndpoints:Gemini");
+            var key = _configuration.GetValue<string>("ApiKeys:Gemini");
 
             return $"{endpoint}?key={key}";
         }
