@@ -85,7 +85,7 @@ public class GoogleGeminiTireCodeDetectorService : ITireCodeDetectorService
     {
         try
         {
-            var endpoint = _configuration.GetValue<string>("OcrEndpoints:GeminiFineTuned");
+            var endpoint = _configuration.GetValue<string>("OcrEndpoints:Gemini");
             var key = _configuration.GetValue<string>("ApiKeys:GeminiFineTuned");
 
             return $"{endpoint}?key={key}";
