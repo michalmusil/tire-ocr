@@ -11,7 +11,7 @@ var ocrService = builder.AddProject<AiPipeline_TireOcr_Ocr_WebApi>("OcrService")
 var postprocessingService = builder.AddProject<AiPipeline_TireOcr_Postprocessing_WebApi>("PostprocessingService")
     .WithHttpHealthCheck("/health");
 
-var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_TasyDbMatcher_WebApi>("TasyDbMatcherService")
+var tireDbMatcherService = builder.AddProject<AiPipeline_TireOcr_DbMatcher_WebApi>("DbMatcherService")
     .WithHttpHealthCheck("/health");
 
 var pythonPreprocessingService = builder.AddUvicornApp("PreprocessingPythonService",

@@ -140,7 +140,7 @@ public static class DependencyInjection
 
         services.AddHttpClient<DbMatchingRemoteProcessor>(client =>
         {
-            client.BaseAddress = new("https+http://TasyDbMatcherService");
+            client.BaseAddress = new("https+http://DbMatcherService");
         });
     }
 

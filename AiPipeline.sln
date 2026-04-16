@@ -39,13 +39,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postproc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Shared", "src\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj", "{BB81313F-1161-43A3-A8D4-E39627BC9E90}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.TasyDbMatcher", "AiPipeline.TireOcr.TasyDbMatcher", "{27B2E266-20B8-4319-9822-68025944A5F3}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.DbMatcher", "AiPipeline.TireOcr.DbMatcher", "{27B2E266-20B8-4319-9822-68025944A5F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Application", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Application\AiPipeline.TireOcr.TasyDbMatcher.Application.csproj", "{248FBF77-8036-4CB9-9F5B-7E42361534A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.DbMatcher.Application", "src\AiPipeline.TireOcr.DbMatcher\AiPipeline.TireOcr.DbMatcher.Application\AiPipeline.TireOcr.DbMatcher.Application.csproj", "{248FBF77-8036-4CB9-9F5B-7E42361534A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Infrastructure", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.csproj", "{1B3D6F88-3A29-43FF-9017-FFBD92CD977C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.DbMatcher.Infrastructure", "src\AiPipeline.TireOcr.DbMatcher\AiPipeline.TireOcr.DbMatcher.Infrastructure\AiPipeline.TireOcr.DbMatcher.Infrastructure.csproj", "{1B3D6F88-3A29-43FF-9017-FFBD92CD977C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.WebApi", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.DbMatcher.WebApi", "src\AiPipeline.TireOcr.DbMatcher\AiPipeline.TireOcr.DbMatcher.WebApi\AiPipeline.TireOcr.DbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.EvaluationTool", "AiPipeline.TireOcr.EvaluationTool", "{7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}"
 EndProject

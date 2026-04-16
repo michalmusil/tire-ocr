@@ -36,7 +36,7 @@ The Tire OCR pipeline is composed of the following distinct, Dockerized services
 | **OCR** (`.Ocr`)                                    | Aggregates and calls multiple public/cloud OCR/Vision/LLM APIs. | Supports **Gemini**, **Azure AI Vision**, **Mistral**, **OpenAI**, and **GC Vision** via configurable API keys.                                                                 |
 | **PaddleOCR** (`.OcrPaddle`)                        | Dedicated OCR service using the **PaddleOCR** Python library.   | Packaged as a separate container for systematic comparison against cloud providers.                                                                                             |
 | **Postprocessing** (`.Postprocessing`)              | Refines and validates raw OCR output.                           | Normalization, schema validation and value parsing.                                                                                                                             |
-| **DB Matcher** (`.TasyDbMatcher`)                   | Matches the predicted tire code against external data.          | Web API for querying external tire/manufacturer databases (requires remote DB endpoints).                                                                                       |
+| **DB Matcher** (`.DbMatcher`)                       | Matches the predicted tire code against external data.          | Web API for querying external tire/manufacturer databases (requires remote DB endpoints).                                                                                       |
 | **Runner Prototype** (`.RunnerPrototype`)           | A simple prototype to test the end-to-end pipeline.             | Chained services (Preprocess → OCR → Postprocess → DB Match) via synchronous HTTP calls for initial trials.                                                                     |
 | **Evaluation Tool (API)** (`.EvaluationTool`)       | Thesis component for comparative analysis.                      | ASP.NET Core API for configuring, executing, and orchestrating controlled evaluation runs/batches. Uses HttpClients with resilience. Persists results to PostgreSQL via EFCore. |
 | **Evaluation Tool (UI/SPA)** (`.EvaluationTool.Ui`) | Frontend for managing and visualizing results.                  | React + Vite + TypeScript Single-Page Application (SPA).                                                                                                                        |
@@ -76,7 +76,7 @@ This setup is ideal for testing the core processing path and includes all core s
 deploy/prototype/docker-compose.yaml
 ```
 
-Includes: Preprocessing, Ocr, OcrPaddle, Postprocessing, TasyDbMatcher, and RunnerPrototype.
+Includes: Preprocessing, Ocr, OcrPaddle, Postprocessing, DbMatcher, and RunnerPrototype.
 
 ### 2. Full Evaluation Stack (API + UI)
 
