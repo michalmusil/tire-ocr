@@ -41,7 +41,15 @@ var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi
 
 var frontend = builder.AddViteApp("Frontend", "../AiPipeline.TireOcr.EvaluationTool.Ui")
     .WithNpm()
-    .WithExternalHttpEndpoints();
+    .WithExternalHttpEndpoints()
+    .WithEnvironment("EVALUATION_VITE_PROXY_URL", () =>
+    {
+        var endpoint = evaluationTool.GetEndpoint("https").Exists
+            ? evaluationTool.GetEndpoint("https").Url
+            : evaluationTool.GetEndpoint("http").Url;
+        return endpoint;
+    });
+;
 
 
 builder.Build().Run();
