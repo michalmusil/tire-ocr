@@ -3,13 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 #
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.Preprocessing", "AiPipeline.TireOcr.Preprocessing", "{EBDF096A-73D6-4FD1-B646-BF021E2CF320}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj", "{525474C0-9249-4040-9784-F9673CBAD457}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.WebApi", "src\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.WebApi\AiPipeline.TireOcr.Preprocessing.WebApi.csproj", "{525474C0-9249-4040-9784-F9673CBAD457}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Domain", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Domain\AiPipeline.TireOcr.Preprocessing.Domain.csproj", "{EE598F0D-2716-4621-86A1-847F855E3A0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Domain", "src\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Domain\AiPipeline.TireOcr.Preprocessing.Domain.csproj", "{EE598F0D-2716-4621-86A1-847F855E3A0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Application\AiPipeline.TireOcr.Preprocessing.Application.csproj", "{E193D60E-A067-4A26-A90F-75E79ACB478D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Application", "src\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Application\AiPipeline.TireOcr.Preprocessing.Application.csproj", "{E193D60E-A067-4A26-A90F-75E79ACB478D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Infrastructure\AiPipeline.TireOcr.Preprocessing.Infrastructure.csproj", "{3B45F63F-C54D-45E8-8353-B21D7AD0D178}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Infrastructure", "src\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Infrastructure\AiPipeline.TireOcr.Preprocessing.Infrastructure.csproj", "{3B45F63F-C54D-45E8-8353-B21D7AD0D178}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.AppHost", "src\AiPipeline.AppHost\AiPipeline.AppHost.csproj", "{6EF721EF-B6EB-44E2-B813-FCE1F342C9FF}"
 EndProject
@@ -19,87 +19,43 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Shared", "src\Ai
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.Ocr", "AiPipeline.TireOcr.Ocr", "{EEBDFA78-8026-44BA-9866-F2583A3FAA23}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Domain", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Domain\AiPipeline.TireOcr.Ocr.Domain.csproj", "{0A3113DD-5698-4EA1-8663-DEE38C53BA01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Domain", "src\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Domain\AiPipeline.TireOcr.Ocr.Domain.csproj", "{0A3113DD-5698-4EA1-8663-DEE38C53BA01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Application\AiPipeline.TireOcr.Ocr.Application.csproj", "{F81B0E8C-3F51-49A1-ADB3-D845C20B22CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Application", "src\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Application\AiPipeline.TireOcr.Ocr.Application.csproj", "{F81B0E8C-3F51-49A1-ADB3-D845C20B22CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Infrastructure\AiPipeline.TireOcr.Ocr.Infrastructure.csproj", "{957CDABD-2358-4A7F-8567-B23D257634E8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Infrastructure", "src\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Infrastructure\AiPipeline.TireOcr.Ocr.Infrastructure.csproj", "{957CDABD-2358-4A7F-8567-B23D257634E8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj", "{1536CDD1-1C2C-432A-940A-4A0D98CB935B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.RunnerPrototype", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.RunnerPrototype\AiPipeline.TireOcr.RunnerPrototype.csproj", "{52E9E848-69C2-49D3-9438-F648B1C2DDD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.WebApi", "src\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.WebApi\AiPipeline.TireOcr.Ocr.WebApi.csproj", "{1536CDD1-1C2C-432A-940A-4A0D98CB935B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.Postprocessing", "AiPipeline.TireOcr.Postprocessing", "{FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Domain", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj", "{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Domain", "src\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Domain\AiPipeline.TireOcr.Postprocessing.Domain.csproj", "{7DCBF259-8D33-45B6-B69B-CDC38D88DA3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Application\AiPipeline.TireOcr.Postprocessing.Application.csproj", "{2D071083-9AAC-4ECD-92CA-455FB469A0CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Application", "src\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Application\AiPipeline.TireOcr.Postprocessing.Application.csproj", "{2D071083-9AAC-4ECD-92CA-455FB469A0CE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Infrastructure\AiPipeline.TireOcr.Postprocessing.Infrastructure.csproj", "{9CF04516-5AB2-4546-AF3E-FB12C8A27358}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Infrastructure", "src\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Infrastructure\AiPipeline.TireOcr.Postprocessing.Infrastructure.csproj", "{9CF04516-5AB2-4546-AF3E-FB12C8A27358}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj", "{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.WebApi", "src\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj", "{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr", "AiPipeline.TireOcr", "{2EE8B3D7-9687-4E01-B751-5A04D5C2E154}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration", "AiPipeline.Orchestration", "{5790605B-61C1-4168-AC0E-A8B65D99CA38}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration.Runner", "AiPipeline.Orchestration.Runner", "{A1CC0876-5233-413C-805C-F2FECE70558A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Domain", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Domain\AiPipeline.Orchestration.Runner.Domain.csproj", "{252517A2-D6AA-4026-9595-01B77FA2202F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Application", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Application\AiPipeline.Orchestration.Runner.Application.csproj", "{675F093C-15B9-4472-817E-D484A267D74B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.Infrastructure", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.Infrastructure\AiPipeline.Orchestration.Runner.Infrastructure.csproj", "{5C77C22F-1660-4DF6-92F0-EE2706EFE4B1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Runner.WebApi", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Runner\AiPipeline.Orchestration.Runner.WebApi\AiPipeline.Orchestration.Runner.WebApi.csproj", "{B3BFFC8A-6C19-4FE2-91D2-6BEED52C1DAF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Ocr.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Ocr\AiPipeline.TireOcr.Ocr.Messaging\AiPipeline.TireOcr.Ocr.Messaging.csproj", "{9FB3EBD3-13D2-42FB-BE47-786E7ACCC8EE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.Messaging\AiPipeline.TireOcr.Postprocessing.Messaging.csproj", "{208CD580-2879-4987-8455-BF02F7A9487E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration.Shared", "AiPipeline.Orchestration.Shared", "{5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared.All", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.All\AiPipeline.Orchestration.Shared.All.csproj", "{DE381DB7-0572-4295-ABB7-1433BC4BEEF2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared.Nodes", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Nodes\AiPipeline.Orchestration.Shared.Nodes.csproj", "{AD6DECA6-8C30-41A9-A100-2F3CCCDAC3B5}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.Shared.Tests", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.Shared\AiPipeline.Orchestration.Shared.Tests\AiPipeline.Orchestration.Shared.Tests.csproj", "{685421B2-261C-49AC-BAD4-9C92238B806F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Preprocessing.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Preprocessing\AiPipeline.TireOcr.Preprocessing.Messaging\AiPipeline.TireOcr.Preprocessing.Messaging.csproj", "{A67E6C0D-1C4F-450B-B73C-7782F1940151}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Shared", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj", "{BB81313F-1161-43A3-A8D4-E39627BC9E90}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.Orchestration.FileService", "AiPipeline.Orchestration.FileService", "{50BCFAFB-837E-4E80-A53D-DE692AC8D165}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.FileService.Domain", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.Domain\AiPipeline.Orchestration.FileService.Domain.csproj", "{B33FDDE5-6D79-4F16-93D7-3F185D999904}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.FileService.Application", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.Application\AiPipeline.Orchestration.FileService.Application.csproj", "{618E7D9D-53B8-4908-83D3-988D29DDA841}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.FileService.Infrastructure", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.Infrastructure\AiPipeline.Orchestration.FileService.Infrastructure.csproj", "{7E8A05A2-E92F-4841-B9D7-62D8BCF847DA}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.FileService.GrpcServer", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.GrpcServer\AiPipeline.Orchestration.FileService.GrpcServer.csproj", "{EC48245E-E7C9-4D00-9FEB-C4461F8D2E79}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.Orchestration.FileService.GrpcSdk", "src\AiPipeline.Orchestration\AiPipeline.Orchestration.FileService\AiPipeline.Orchestration.FileService.GrpcSdk\AiPipeline.Orchestration.FileService.GrpcSdk.csproj", "{33FD0C20-1E99-4DA2-A762-80B18E38E025}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Shared", "src\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj", "{BB81313F-1161-43A3-A8D4-E39627BC9E90}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.TasyDbMatcher", "AiPipeline.TireOcr.TasyDbMatcher", "{27B2E266-20B8-4319-9822-68025944A5F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Application\AiPipeline.TireOcr.TasyDbMatcher.Application.csproj", "{248FBF77-8036-4CB9-9F5B-7E42361534A6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Application", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Application\AiPipeline.TireOcr.TasyDbMatcher.Application.csproj", "{248FBF77-8036-4CB9-9F5B-7E42361534A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.csproj", "{1B3D6F88-3A29-43FF-9017-FFBD92CD977C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Infrastructure", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure\AiPipeline.TireOcr.TasyDbMatcher.Infrastructure.csproj", "{1B3D6F88-3A29-43FF-9017-FFBD92CD977C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.Messaging", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.Messaging\AiPipeline.TireOcr.TasyDbMatcher.Messaging.csproj", "{042F52E3-1C8B-476D-A4FE-4DE165771F97}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.TasyDbMatcher.WebApi", "src\AiPipeline.TireOcr.TasyDbMatcher\AiPipeline.TireOcr.TasyDbMatcher.WebApi\AiPipeline.TireOcr.TasyDbMatcher.WebApi.csproj", "{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.EvaluationTool", "AiPipeline.TireOcr.EvaluationTool", "{7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Domain", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Domain\AiPipeline.TireOcr.EvaluationTool.Domain.csproj", "{F45668CE-5596-49BC-96D7-EFFCE89974B5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Domain", "src\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Domain\AiPipeline.TireOcr.EvaluationTool.Domain.csproj", "{F45668CE-5596-49BC-96D7-EFFCE89974B5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Application", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Application\AiPipeline.TireOcr.EvaluationTool.Application.csproj", "{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Application", "src\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Application\AiPipeline.TireOcr.EvaluationTool.Application.csproj", "{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Infrastructure", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Infrastructure\AiPipeline.TireOcr.EvaluationTool.Infrastructure.csproj", "{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.Infrastructure", "src\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.Infrastructure\AiPipeline.TireOcr.EvaluationTool.Infrastructure.csproj", "{52198B3B-C5AC-4690-B8D4-0D2ADCED382A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.WebApi", "src\AiPipeline.TireOcr\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.WebApi\AiPipeline.TireOcr.EvaluationTool.WebApi.csproj", "{F39E8EAE-211C-417A-8F1D-A07AA298A8F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.EvaluationTool.WebApi", "src\AiPipeline.TireOcr.EvaluationTool\AiPipeline.TireOcr.EvaluationTool.WebApi\AiPipeline.TireOcr.EvaluationTool.WebApi.csproj", "{F39E8EAE-211C-417A-8F1D-A07AA298A8F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,10 +75,6 @@ Global
 		{2D071083-9AAC-4ECD-92CA-455FB469A0CE} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
 		{9CF04516-5AB2-4546-AF3E-FB12C8A27358} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
 		{E1B37451-AE2A-41AC-8810-3E25C6D2F66C} = {FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD}
-		{52E9E848-69C2-49D3-9438-F648B1C2DDD7} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
-		{EEBDFA78-8026-44BA-9866-F2583A3FAA23} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
-		{FB0120EF-A0B1-40E5-9BD5-CDD408EF37DD} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
-		{EBDF096A-73D6-4FD1-B646-BF021E2CF320} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 		{A1CC0876-5233-413C-805C-F2FECE70558A} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
 		{252517A2-D6AA-4026-9595-01B77FA2202F} = {A1CC0876-5233-413C-805C-F2FECE70558A}
 		{675F093C-15B9-4472-817E-D484A267D74B} = {A1CC0876-5233-413C-805C-F2FECE70558A}
@@ -135,19 +87,16 @@ Global
 		{AD6DECA6-8C30-41A9-A100-2F3CCCDAC3B5} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
 		{685421B2-261C-49AC-BAD4-9C92238B806F} = {5E6F936E-6AEA-401F-81C5-AC5FB583CBB2}
 		{A67E6C0D-1C4F-450B-B73C-7782F1940151} = {EBDF096A-73D6-4FD1-B646-BF021E2CF320}
-		{BB81313F-1161-43A3-A8D4-E39627BC9E90} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 		{50BCFAFB-837E-4E80-A53D-DE692AC8D165} = {5790605B-61C1-4168-AC0E-A8B65D99CA38}
 		{B33FDDE5-6D79-4F16-93D7-3F185D999904} = {50BCFAFB-837E-4E80-A53D-DE692AC8D165}
 		{618E7D9D-53B8-4908-83D3-988D29DDA841} = {50BCFAFB-837E-4E80-A53D-DE692AC8D165}
 		{7E8A05A2-E92F-4841-B9D7-62D8BCF847DA} = {50BCFAFB-837E-4E80-A53D-DE692AC8D165}
 		{EC48245E-E7C9-4D00-9FEB-C4461F8D2E79} = {50BCFAFB-837E-4E80-A53D-DE692AC8D165}
 		{33FD0C20-1E99-4DA2-A762-80B18E38E025} = {50BCFAFB-837E-4E80-A53D-DE692AC8D165}
-		{27B2E266-20B8-4319-9822-68025944A5F3} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 		{248FBF77-8036-4CB9-9F5B-7E42361534A6} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{1B3D6F88-3A29-43FF-9017-FFBD92CD977C} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{042F52E3-1C8B-476D-A4FE-4DE165771F97} = {27B2E266-20B8-4319-9822-68025944A5F3}
 		{20CE89BE-14C5-420E-AE65-BFEEC27DD8D2} = {27B2E266-20B8-4319-9822-68025944A5F3}
-		{7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6} = {2EE8B3D7-9687-4E01-B751-5A04D5C2E154}
 		{F45668CE-5596-49BC-96D7-EFFCE89974B5} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
 		{C2B082D7-4CA5-4A46-A2EA-82D2C5D69115} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
 		{52198B3B-C5AC-4690-B8D4-0D2ADCED382A} = {7B8D42FF-01BE-4FFF-BE22-99A603BB1CD6}
