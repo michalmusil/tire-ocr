@@ -89,7 +89,7 @@ public static class DependencyInjection
         {
             client.BaseAddress = new("https+http://PreprocessingService");
         }).ApplyCustomResilienceHandler(preprocessingTimeoutSeconds);
-        
+
         services.AddHttpClient<PreprocessingAbsoluteRoiProcessor>(client =>
         {
             client.BaseAddress = new("https+http://PreprocessingService");
@@ -151,7 +151,13 @@ public static class DependencyInjection
 
     private static void AddDbContext(IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("AiPipelineEvaluationToolDb");
-        services.AddDbContextFactory<EvaluationToolDbContext>(options => { options.UseNpgsql(connectionString); });
+        var connectionString = configuration.GetConnectionString("evaluationdb");
+        services.AddDbContextFactory<EvaluationToolDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString ??
+                              throw new InvalidOperationException("Connection string 'evaluationdb' not found."));
+        });
+        
+        services.AddHostedService<DatabaseInitService>();
     }
 }

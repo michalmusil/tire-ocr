@@ -24,7 +24,15 @@ var pythonOcrService = builder.AddUvicornApp("OcrPythonService",
     .WithPip()
     .WithExternalHttpEndpoints();
 
+var postgres = builder.AddPostgres("postgres")
+    .WithDataVolume()
+    .WithPgAdmin();
+
+var evaluationDb = postgres.AddDatabase("evaluationdb");
+
 var evaluationTool = builder.AddProject<AiPipeline_TireOcr_EvaluationTool_WebApi>("EvaluationTool")
+    .WithReference(evaluationDb)
+    .WaitFor(evaluationDb)
     .WithHttpHealthCheck("/health")
     .WithReference(preprocessingService)
     .WaitFor(preprocessingService)

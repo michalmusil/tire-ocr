@@ -11,15 +11,16 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Aspire.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.1.1" />
       <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
       <PackageReference Include="CsvHelper" Version="33.1.0" />
       <PackageReference Include="Fastenshtein" Version="1.0.11" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.22" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.22">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.22">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
@@ -28,7 +29,6 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.9" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0" />
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     </ItemGroup>
 
