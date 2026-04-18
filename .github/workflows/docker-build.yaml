@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - eval
+      - submission
   workflow_dispatch:
 
 jobs:
@@ -28,6 +29,6 @@ jobs:
       - name: Login to Docker Hub
         run: docker login -u michalmusil -p ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
       - name: Build all docker images
-        run: chmod +x deploy/evaluation-tool/build-images.sh && deploy/evaluation-tool/build-images.sh
+        run: chmod +x deploy/evaluation-framework/build-images.sh && deploy/evaluation-framework/build-images.sh
       - name: Push all built images to Docker Hub
-        run: chmod +x deploy/evaluation-tool/push-images.sh && deploy/evaluation-tool/push-images.sh
+        run: chmod +x deploy/evaluation-framework/push-images.sh && deploy/evaluation-framework/push-images.sh

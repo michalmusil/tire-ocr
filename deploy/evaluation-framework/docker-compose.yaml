@@ -1,11 +1,9 @@
 services:
   PreprocessingService:
     container_name: "PreprocessingService"
-    image: "michalmusil/tire-ocr_eval_preprocessing-service:latest"
+    image: "michalmusil/tirecode-evaluation-preprocessing:latest"
     volumes:
       - preprocessing-volume:/app/models
-    networks:
-      - aipipeline-tireocr-network
     environment:
       OTEL_SERVICE_NAME: "PreprocessingService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -20,13 +18,11 @@ services:
     restart: unless-stopped
   PreprocessingPythonService:
     container_name: "PreprocessingPythonService"
-    image: "michalmusil/tire-ocr_eval_preprocessing-python-service:latest"
-    networks:
-      - aipipeline-tireocr-network
+    image: "michalmusil/tirecode-evaluation-preprocessing-python:latest"
     restart: unless-stopped
   OcrService:
     container_name: "OcrService"
-    image: "michalmusil/tire-ocr_eval_ocr-service:latest"
+    image: "michalmusil/tirecode-evaluation-recognition:latest"
     environment:
       OTEL_SERVICE_NAME: "OcrService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -47,18 +43,14 @@ services:
       ApiKeys__OpenRouter: ${ApiKeys_OpenRouter}
       ApiKeys__GcpJsonCredentials: ${ApiKeys_GcpJsonCredentials}
       HTTP_PORTS: "8080"
-    networks:
-      - aipipeline-tireocr-network
     restart: unless-stopped
   OcrPythonService:
     container_name: "OcrPythonService"
-    image: "michalmusil/tire-ocr_eval_ocr-python-service:latest"
-    networks:
-      - aipipeline-tireocr-network
+    image: "michalmusil/tirecode-evaluation-recognition-python:latest"
     restart: unless-stopped
   PostprocessingService:
     container_name: "PostprocessingService"
-    image: "michalmusil/tire-ocr_eval_postprocessing-service:latest"
+    image: "michalmusil/tirecode-evaluation-postprocessing:latest"
     environment:
       OTEL_SERVICE_NAME: "PostprocessingService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -70,12 +62,10 @@ services:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
-    networks:
-      - aipipeline-tireocr-network
     restart: unless-stopped
   DbMatcherService:
     container_name: "DbMatcherService"
-    image: "michalmusil/tire-ocr_tire-db-matcher-service:latest"
+    image: "michalmusil/tirecode-evaluation-dbmatcher:latest"
     environment:
       OTEL_SERVICE_NAME: "DbMatcherService"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -89,12 +79,12 @@ services:
       HTTP_PORTS: "8080"
       RemoteTireDbAddress: ${TireDbEndpoint}
       RemoteManufacturerDbAddress: ${ManufacturerDbEndpoint}
-    networks:
-      - aipipeline-tireocr-network
     restart: unless-stopped
   EvaluationTool:
     container_name: "EvaluationTool"
-    image: "michalmusil/tire-ocr_evaluation-tool:latest"
+    image: "michalmusil/tirecode-evaluation-service:latest"
+    depends_on:
+      - EvaluationDb
     environment:
       OTEL_SERVICE_NAME: "EvaluationTool"
       OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_Exporter_Endpoint}
@@ -112,30 +102,35 @@ services:
       services__DbMatcherService__http__0: "http://DbMatcherService:8080"
       services__OcrPythonService__http__0: "http://OcrPythonService:10100"
       services__PreprocessingPythonService__http__0: "http://PreprocessingPythonService:10200"
-      ConnectionStrings__AiPipelineEvaluationToolDb: ${ConnectionStrings_AiPipelineEvaluationToolDb}
+      ConnectionStrings__evaluationdb: "Host=EvaluationDb;Database=evaluationdb;Username=${DB_USER};Password=${DB_PASSWORD}"
       Jwt__Secret: ${EvaluationTool_JwtSecret}
     ports:
       - target: 8080
         published: 10006
       - target: 8443
         published: 10007
-    networks:
-      - aipipeline-tireocr-network
     restart: unless-stopped
   EvaluationToolFrontend:
     container_name: "EvaluationToolFrontend"
-    image: "michalmusil/tire-ocr_evaluation-tool-fe:latest"
+    image: "michalmusil/tirecode-evaluation-service-fe:latest"
     environment:
       EVALUATION_VITE_PROXY_URL: "http://EvaluationTool:8080"
     ports:
       - target: 80
         published: 10008
-    networks:
-      - aipipeline-tireocr-network
     restart: unless-stopped
+  EvaluationDb:
+    container_name: "EvaluationDb"
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: evaluationdb
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 volumes:
   preprocessing-volume:
     driver: local
-networks:
-  aipipeline-tireocr-network:
-    external: true
+  postgres-data:
+    driver: local
