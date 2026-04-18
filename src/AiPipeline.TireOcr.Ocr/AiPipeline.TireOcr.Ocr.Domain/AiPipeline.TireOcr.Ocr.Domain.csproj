@@ -7,8 +7,4 @@
         <RootNamespace>TireOcr.Ocr.Domain</RootNamespace>
     </PropertyGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj" />
-    </ItemGroup>
-
 </Project>

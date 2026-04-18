@@ -1,4 +1,4 @@
-using AiPipeline.TireOcr.Shared.Models;
+using TireOcr.Ocr.Domain;
 
 namespace TireOcr.Ocr.Infrastructure.Dtos.ConfigurationBillingCosts;
 

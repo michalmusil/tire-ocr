@@ -1,8 +1,8 @@
-using AiPipeline.TireOcr.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using TireOcr.Ocr.Application.Dtos;
 using TireOcr.Ocr.Application.Services;
+using TireOcr.Ocr.Domain;
 using TireOcr.Ocr.Infrastructure.Dtos.ConfigurationBillingCosts;
 using TireOcr.Shared.Result;
 

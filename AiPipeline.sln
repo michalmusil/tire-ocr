@@ -37,8 +37,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postproc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Postprocessing.WebApi", "src\AiPipeline.TireOcr.Postprocessing\AiPipeline.TireOcr.Postprocessing.WebApi\AiPipeline.TireOcr.Postprocessing.WebApi.csproj", "{E1B37451-AE2A-41AC-8810-3E25C6D2F66C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.Shared", "src\AiPipeline.TireOcr.Shared\AiPipeline.TireOcr.Shared.csproj", "{BB81313F-1161-43A3-A8D4-E39627BC9E90}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AiPipeline.TireOcr.DbMatcher", "AiPipeline.TireOcr.DbMatcher", "{27B2E266-20B8-4319-9822-68025944A5F3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiPipeline.TireOcr.DbMatcher.Application", "src\AiPipeline.TireOcr.DbMatcher\AiPipeline.TireOcr.DbMatcher.Application\AiPipeline.TireOcr.DbMatcher.Application.csproj", "{248FBF77-8036-4CB9-9F5B-7E42361534A6}"
