@@ -28,14 +28,14 @@ export const formSchema = z.object({
     .refine(
       (files) =>
         files.length === 1 && files[0].type.toLowerCase() === "text/csv",
-      "Exactly one CSV file should be supplied."
+      "Exactly one CSV file should be supplied.",
     ),
   processingBatchSize: z
     .number()
     .int()
     .refine(
       (n) => n > 0 && n <= 10,
-      "Processing batch size must be between 1 and 10 for performance reasons."
+      "Processing batch size must be between 1 and 10 for performance reasons.",
     ),
   preprocessingType: PreprocessingTypeSchema,
   ocrType: OcrTypeSchema,
@@ -80,7 +80,7 @@ export const CreateBatchForm = ({
                 type="number"
               />
               <FormFileInput<CreateBatchFormSchema>
-                label="Expected tire code"
+                label="CSV batch inputs"
                 name="imageUrlsWithExpectedTireCodeLabelsCsv"
                 accept="text/csv"
               />

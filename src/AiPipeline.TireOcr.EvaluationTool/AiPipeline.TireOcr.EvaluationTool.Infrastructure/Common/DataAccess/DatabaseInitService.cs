@@ -1,4 +1,6 @@
+using AiPipeline.TireOcr.EvaluationTool.Application.User.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -7,12 +9,16 @@ namespace AiPipeline.TireOcr.EvaluationTool.Infrastructure.Common.DataAccess;
 public class DatabaseInitService : BackgroundService
 {
     private readonly IDbContextFactory<EvaluationToolDbContext> _dbContextFactory;
+    private readonly IConfiguration _configuration;
+    private readonly IHashService _hashService;
     private readonly ILogger<DatabaseInitService> _logger;
 
     public DatabaseInitService(IDbContextFactory<EvaluationToolDbContext> dbContextFactory,
-        ILogger<DatabaseInitService> logger)
+        IConfiguration configuration, IHashService hashService, ILogger<DatabaseInitService> logger)
     {
         _dbContextFactory = dbContextFactory;
+        _configuration = configuration;
+        _hashService = hashService;
         _logger = logger;
     }
 
@@ -39,9 +45,19 @@ public class DatabaseInitService : BackgroundService
         var isFirstMigration = pendingMigrations.Contains("20251005185443_InitialMigration");
         if (isFirstMigration)
         {
-            _logger.LogInformation("Seeding initial user data");
-            context.Users.Add(new Domain.UserAggregate.User("admin", "$2a$13$f6FCH8Kvbg5uPLzUpyBl6e4P8HTo040Tl27Ik5xesmOPpcjR4.PMK"));
-            await context.SaveChangesAsync(stoppingToken);
+            var initialUsername = _configuration.GetValue<string>("InitialUserCredentials:Username");
+            var initialPassword = _configuration.GetValue<string>("InitialUserCredentials:Password");
+            var credentialsSpecified = initialUsername?.Length > 0 && initialPassword?.Length >= 5;
+            if (credentialsSpecified)
+            {
+                var passwordHashResult = _hashService.GetHashOf(initialPassword!);
+                if (passwordHashResult.IsSuccess)
+                {
+                    _logger.LogInformation("Seeding initial user data");
+                    context.Users.Add(new Domain.UserAggregate.User(initialUsername!, passwordHashResult.Data!));
+                    await context.SaveChangesAsync(stoppingToken);
+                }
+            }
         }
     }
 }

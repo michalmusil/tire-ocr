@@ -33,15 +33,15 @@ services:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_EMIT_EVENT_LOG_ATTRIBUTES: "true"
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
-      ApiKeys__Gemini: ${ApiKeys_Gemini}
-      ApiKeys__GeminiFineTuned: ${ApiKeys_GeminiFineTuned}
-      ApiKeys__AzureAiVision: ${ApiKeys_AzureAiVision}
-      ApiKeys__Mistral: ${ApiKeys_Mistral}
-      ApiKeys__OpenAi: ${ApiKeys_OpenAi}
-      ApiKeys__OpenAiFineTuned: ${ApiKeys_OpenAiFineTuned}
-      ApiKeys__RunPod: ${ApiKeys_RunPod}
-      ApiKeys__OpenRouter: ${ApiKeys_OpenRouter}
-      ApiKeys__GcpJsonCredentials: ${ApiKeys_GcpJsonCredentials}
+      ApiKeys__Gemini: ${ApiKeys__Gemini}
+      ApiKeys__GeminiFineTuned: ${ApiKeys__GeminiFineTuned}
+      ApiKeys__AzureAiVision: ${ApiKeys__AzureAiVision}
+      ApiKeys__Mistral: ${ApiKeys__Mistral}
+      ApiKeys__OpenAi: ${ApiKeys__OpenAi}
+      ApiKeys__OpenAiFineTuned: ${ApiKeys__OpenAiFineTuned}
+      ApiKeys__RunPod: ${ApiKeys__RunPod}
+      ApiKeys__OpenRouter: ${ApiKeys__OpenRouter}
+      ApiKeys__GcpJsonCredentials: ${ApiKeys__GcpJsonCredentials}
       HTTP_PORTS: "8080"
     restart: unless-stopped
   OcrPythonService:
@@ -77,8 +77,8 @@ services:
       OTEL_DOTNET_EXPERIMENTAL_OTLP_RETRY: "in_memory"
       ASPNETCORE_FORWARDEDHEADERS_ENABLED: "true"
       HTTP_PORTS: "8080"
-      RemoteTireDbAddress: ${TireDbEndpoint}
-      RemoteManufacturerDbAddress: ${ManufacturerDbEndpoint}
+      RemoteTireDbAddress: ${RemoteTireDbAddress}
+      RemoteManufacturerDbAddress: ${RemoteManufacturerDbAddress}
     restart: unless-stopped
   EvaluationTool:
     container_name: "EvaluationTool"
@@ -103,7 +103,9 @@ services:
       services__OcrPythonService__http__0: "http://OcrPythonService:10100"
       services__PreprocessingPythonService__http__0: "http://PreprocessingPythonService:10200"
       ConnectionStrings__evaluationdb: "Host=EvaluationDb;Database=evaluationdb;Username=${DB_USER};Password=${DB_PASSWORD}"
-      Jwt__Secret: ${EvaluationTool_JwtSecret}
+      Jwt__Secret: ${Jwt__Secret}
+      InitialUserCredentials__Username: ${InitialUserCredentials__Username}
+      InitialUserCredentials__Password: ${InitialUserCredentials__Password}
     ports:
       - target: 8080
         published: 10006
