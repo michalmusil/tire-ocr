@@ -123,14 +123,14 @@ services:
     restart: unless-stopped
   EvaluationDb:
     container_name: "EvaluationDb"
-    image: postgres
+    image: postgres:18
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: evaluationdb
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
 volumes:
   preprocessing-volume:
     driver: local
