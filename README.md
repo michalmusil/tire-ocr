@@ -1,6 +1,6 @@
 # Tire Code Text Recognition Evaluation Framework
 
-This archive contains the implementation of the **evaluation framework**, a core component of the thesis: "Evaluation and Application of Contemporary Text Recognition Solutions for Tire Parameter Extraction."
+This archive contains the implementation of the **evaluation framework**, a core component of the thesis: "Evaluation and Application of Contemporary Text Recognition Solutions for Tire Parameter Extraction".
 
 ## Codebase Structure
 

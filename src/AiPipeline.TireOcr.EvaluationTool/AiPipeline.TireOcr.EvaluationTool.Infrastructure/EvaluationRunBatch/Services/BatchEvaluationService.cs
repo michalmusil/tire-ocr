@@ -302,7 +302,7 @@ public class BatchEvaluationService : IBatchEvaluationService
     private decimal Percentile(List<decimal> elements, decimal percentile)
     {
         if (elements.Count == 0)
-            throw new ArgumentException("Percentile input collection cannot be empty.");
+            return 0m;
         if (percentile is <= 0 or >= 1)
             throw new ArgumentException("Percentile must be < 0 and < 1.");
 
