@@ -89,7 +89,7 @@ Similarly, more TR solutions were experimentally investigated than were included
 
 ## Deployment & Execution
 
-### 1. Docker Compose (recommended for Evaluation)
+### 1. Docker Compose (recommended for evaluation)
 
 All services are containerized. Each service directory contains a `Dockerfile`. A `docker-compose.yaml` file using pre-built images from Docker Hub is located in `/deploy/evaluation-framework/`.
 
@@ -135,7 +135,7 @@ docker compose up
 
 By default, the evaluation service and frontend are mapped to local ports 10007 and 10008, respectively.
 
-### 2. .NET Aspire (Local Development)
+### 2. .NET Aspire (local development)
 
 [.NET Aspire](https://aspire.dev/) was used for local development, running on ARM-based macOS. Note that some of the preprocessing services' dependendies include native packages, which are installed differently depending on the platform. While efforts were made to ensure cross-platform compatibility of the entire evaluation framework, some dependencies may cause issues requiring dependency updates on untested environments, such as Windows.
 
@@ -143,8 +143,10 @@ By default, the evaluation service and frontend are mapped to local ports 10007 
 
 - Docker
 - [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-- Python >= `3.13.0` and < `4.0` (tested with `3.13.13`).
-  - Check by running `python --version` and `python3 --version` in CLI.
+- [Python](https://www.python.org/downloads/) for running the Python services (tested with `3.13.13`).
+  - Check by running both `python --version` and `python3 --version` in CLI.
+- [Node.js & npm](https://nodejs.org/en/download) for running the frontend (tested with Node.js:`v20.17.0` and npm:`10.8.3`)
+  - Check by running both `node --version` and `npm --version` in CLI.
 - Recommended IDE: JetBrains Rider with the [Aspire plugin](https://plugins.jetbrains.com/plugin/23289-aspire)
 - Configuration (same values as specified in the Docker Compose `.env` prerequisites): Set secrets in `AiPipeline.TireOcr.Ocr.WebApi/appsettings.json` (for TR API keys) and `AiPipeline.TireOcr.EvaluationTool.WebApi/appsettings.json` (for all others).
 
@@ -160,9 +162,11 @@ The Aspire dashboard will launch on a free localhost port. Access the `Frontend`
 
 ---
 
-## Running Evaluation Batches
+## Executing Evaluation
 
-Evaluation is driven by "evaluation batches" functionality provided by the evaluation service (`EvaluationTool`), which execute a TR pipeline with specific preprocessing and recognition configurations on multiple images.
+#### Batches
+
+Evaluation is driven mainly by "Evaluation Batches" functionality provided by the evaluation service (`EvaluationTool`), which execute a TR pipeline with specific preprocessing and recognition configurations on multiple images.
 
 This is accessible via the `/api/v1/Batch/Form` endpoint in evaluation service's API or the `New Batch` page in the frontend. A CSV file containing image URLs paired with ground truth labels is required.
 
@@ -189,3 +193,31 @@ https://example-image-storage.com/images/2.jpg,235-55ZR17_103W
 - **DbMatching**: Set to `None` for evaluation purposes.
 
 Batches run in the background. Results are available upon completion. While the UI does not currently show a progress indicator, progress can be monitored via the evaluation service logs.
+
+_Screenshot showing Evaluation Service Web UI form for running an evaluation batch._
+![Run pipeline form](images/run_batch.png)
+
+_Screenshot showing Evaluation Service Web UI detail of an evaluation batch result._
+![Run pipeline result detail](images/batch_detail.png)
+
+#### Single runs
+
+For running a pipeline evaluation on a single image, the evaluation service (`EvaluationTool`) also supports simpler "Run" functionality
+
+This is accessible via the `/api/v1/Run/WithImageUrl` endpoint in evaluation service's API or the `New Run` page in the frontend. An URL of a tire photo publicly available via internet is required. The API additionally provides the `/api/v1/Run/WithImage` endpoint which allows for running a pipeline on an image file included directly in the request parameters instead of URL.
+
+**Run Parameters:**
+
+- **Title**: Display name for the run result.
+- **Image URL**: URL of the input image of the pipeline.
+- **Expected tire code**: The string of a tire code present in the input image used as ground truth for evaluation. The string must be formatted following rules specified in **Ground Truth Formatting** section in the aforementioned **Batches** description. If not provided, metrics relying on GT are not calculated.
+- **Preprocessing**: The preprocessing variant to use.
+- **Ocr**: The TR solution to use.
+- **Postprocessing**: Currently only `SimpleExtractValues` is available.
+- **DbMatching**: Set to `None` for evaluation purposes.
+
+_Screenshot showing Evaluation Service Web UI form for running a single evaluation pipeline._
+![Run pipeline form](images/run.png)
+
+_Screenshot showing Evaluation Service Web UI detail of a single evaluation run result._
+![Run pipeline result detail](images/run_detail.png)
