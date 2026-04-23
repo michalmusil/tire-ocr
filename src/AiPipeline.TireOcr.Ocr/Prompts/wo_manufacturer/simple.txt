@@ -1,1 +1,0 @@
-Read the tire code from the input image. Return only the tire code itself (e.g. '185/50R13 96H') and nothing else. 

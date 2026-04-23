@@ -1,4 +1,0 @@
-Your task is to recognize the tire code present in the provided image.
-
-- Input: An image possibly containing a tire code text. Example formats: '185/50R13 89H', '205/55R16', '225/60R16C 112/110S'.
-- Output: If you can detect and recognize the tire code, only output the tire code as a string with no additional messages. If you can't recognize the tire code, output only the single letter 'N'.
