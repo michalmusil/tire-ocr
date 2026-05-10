@@ -59,22 +59,10 @@ Similarly, more TR solutions were experimentally investigated than were included
 
 ## Services overview
 
-<!-- - **AiPipeline.TireOcr.Preprocessing**: a .NET service providing the functionality for preprocessing variants 1 and 3 (and other experimental preprocessing variants not included in the evaluation).
-- **AiPipeline.TireOcr.PythonPreprocessing**: a Python service providing the functionality for preprocessing variant 2 (and other experimental preprocessing variants not included in the evaluation).
-- **AiPipeline.TireOcr.Ocr**: a .NET service facilitating the functionality of remote-accessed TR solutions (like Gemini, GPT, Qwen, HunyuanOCR, Google Ai Vision and Azure Ai Vision).
-- **AiPipeline.TireOcr.PythonOcr**: a Python service facilitating the functionality locally hosted TR solutions (PP-OCRv5 and EasyOCR).
-- **AiPipeline.TireOcr.Postprocessing**: a .NET service implementing the domain-specific postprocessing procedure.
-- **AiPipeline.TireOcr.DbMatcher**: a .NET service implementing the tire code matching procedure included in the final production service prototype. This service isn't relevant for the evaluation process and was included as a part of this framework only in preparation for the production prototype implementation.
-- **AiPipeline.TireOcr.EvaluationTool**: a .NET service implementing the functionality of the **Evaluation Service** described in the thesis evaluation framework design. This service acts as the core orchestrator of the evaluation framework, invoking pipelines and processing/storing the results.
-- **AiPipeline.TireOcr.EvaluationTool.Ui**: a Vite React application serving as a front-end for the evaluation service. This SPA is written in typescript and provides a simplified interface for invoking pipelines/pipeline batches and analyzing/exporting the results.
-- **AiPipeline.Shared**: a .NET class library project containing the shared core components used across all implemented .NET services.
-- **AiPipeline.ServiceDefaults**: a .NET class library project providing fundamental configuration defaults used acrosss all implemented .NET services.
-- **AiPipeline.AppHost**: a [.NET Aspire](https://aspire.dev/) project enabling seamless orchestration and running of the evaluation framework for development environments. -->
-
 | Thesis Reference               | Service Name (Codebase)                  | Description                                                                                                                                                                                                                                                                            |
 | :----------------------------- | :--------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Preprocessing Service (.NET)   | `AiPipeline.TireOcr.Preprocessing`       | A .NET service providing the functionality of preprocessing variants 1 and 3 (and other experimental variants not included in the evaluation).                                                                                                                                         |
-| Preprocessing Service (Python) | `AiPipeline.TireOcr.PythonPreprocessing` | A Python service providing the functionality for preprocessing variant 2 (and other experimental variants not included in the evaluation).                                                                                                                                             |
+| Preprocessing Service (.NET)   | `AiPipeline.TireOcr.Preprocessing`       | A .NET service providing the functionality of preprocessing Variants 1 and 3 (and other experimental variants not included in the evaluation).                                                                                                                                         |
+| Preprocessing Service (Python) | `AiPipeline.TireOcr.PythonPreprocessing` | A Python service providing the functionality for preprocessing Variant 2 (and other experimental variants not included in the evaluation).                                                                                                                                             |
 | Recognition Service (.NET)     | `AiPipeline.TireOcr.Ocr`                 | A .NET service facilitating the functionality of remote-accessed TR solutions (Gemini 2.5 Flash, GPT-4.1, Qwen3-VL 8B Instruct, HunyuanOcr, Google Cloud Vision, and Azure Ai Vision).                                                                                                 |
 | Recognition Service (Python)   | `AiPipeline.TireOcr.PythonOcr`           | A Python service facilitating the functionality of locally hosted TR solutions (PP-OCRv5 and EasyOcr).                                                                                                                                                                                 |
 | Postprocessing Service         | `AiPipeline.TireOcr.Postprocessing`      | A .NET service implementing the domain-specific postprocessing procedure.                                                                                                                                                                                                              |
@@ -104,7 +92,7 @@ Images are built for the `linux/amd64` platform (x86_64). For ARM-based architec
 
 ```
 # Mandatory Security Configuration [Evaluation Service]
-Jwt__Secret= <jwt secred used for signing jwt tokens by the evaluation service>
+Jwt__Secret= <jwt secret used for signing jwt tokens by the evaluation service>
 DB_USER= <usename for the postgre database used by evaluation service> # arbitrary
 DB_PASSWORD= <password for the postgre database used by evaluation service> # arbitrary
 
@@ -148,7 +136,32 @@ By default, the evaluation service and frontend are mapped to local ports 10007 
 - [Node.js & npm](https://nodejs.org/en/download) for running the frontend (tested with Node.js:`v20.17.0` and npm:`10.8.3`)
   - Check by running both `node --version` and `npm --version` in CLI.
 - Recommended IDE: JetBrains Rider with the [Aspire plugin](https://plugins.jetbrains.com/plugin/23289-aspire)
-- Configuration (same values as specified in the Docker Compose `.env` prerequisites): Set secrets in `AiPipeline.TireOcr.Ocr.WebApi/appsettings.json` (for TR API keys) and `AiPipeline.TireOcr.EvaluationTool.WebApi/appsettings.json` (for all others).
+- Configuration (equivalent values as specified in the Docker Compose `.env` prerequisites). Set secrets in:
+  - `AiPipeline.TireOcr.Ocr.WebApi/appsettings.json` (for TR API keys - only needed to run pipelines with the respective TR solutions)
+
+  ```
+  "ApiKeys": {
+    "Gemini": "<your gemini api key>",
+    "OpenAi": "<your open ai api key>",
+    "RunPod": "<your runpod api key used for vlm self-hosting hunyuan and fine-tuned qwen>",
+    "OpenRouter": "<your open router api key used for baseline qwen model>",
+    "AzureAiVision": "<your azure ai vision api key>",
+    "GcpJsonCredentials": "<your gcp string json credentials used for google ai vision>"
+  }
+  ```
+
+  - `AiPipeline.TireOcr.EvaluationTool.WebApi/appsettings.json` (for all others).
+
+  ```
+  "Jwt": {
+    "Secret": "<jwt secret used for signing jwt tokens by the evaluation service>",
+    ...
+  },
+  "InitialUserCredentials": {
+    "Username": "<username for the initial evaluation service user>",
+    "Password": "<password for the initial evaluation service user>" //Min length: 5
+  }
+  ```
 
 #### Execution
 
